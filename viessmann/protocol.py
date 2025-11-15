@@ -295,7 +295,7 @@ class SDPProtocolViessmann(SDPProtocol):
                         response_packet.extend(chunk)
                         return self._parse_response(response_packet)
                 else:
-                    self.logger.error(f'received 0 bytes chunk - ignoring response_packet, chunk was {chunk}')
+                    self.logger.debug(f'received 0 bytes chunk - ignoring response_packet, chunk was {chunk}')
             elif self._viess_proto == 'KW':
                 self.logger.debug(f'received {len(chunk)} bytes chunk of response as hexstring {self._bytes2hexstring(chunk)} and as bytes {chunk}')
                 if len(chunk) != 0:
