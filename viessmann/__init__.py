@@ -64,6 +64,9 @@ class viessmann(SmartDevicePlugin):
 
         self._parameters[PLUGIN_ATTR_PROTOCOL] = SDPProtocolViessmann
 
+        # use callbacks to enable schedulers
+        self._use_callbacks = True
+
 #
 # methods for standalone mode
 #

@@ -121,7 +121,7 @@ class SDPProtocolViessmann(SDPProtocol):
         # select controlset for viess_proto
         self._controlset = self._controlsets[self._viess_proto]
 
-        # make sure we have a basic set of parameters for the TCP connection
+        # make sure we have a basic set of parameters for the serial connection
         self._params = {PLUGIN_ATTR_SERIAL_PORT: '',
                         PLUGIN_ATTR_SERIAL_BAUD: self._controlset[PLUGIN_ATTR_SERIAL_BAUD],
                         PLUGIN_ATTR_SERIAL_BSIZE: self._controlset[PLUGIN_ATTR_SERIAL_BSIZE],
@@ -136,12 +136,16 @@ class SDPProtocolViessmann(SDPProtocol):
                         PLUGIN_ATTR_CB_ON_DISCONNECT: None,
                         PLUGIN_ATTR_CONNECTION: CONN_SER_DIR}
         self._params.update(kwargs)
-
         # check if some of the arguments are usable
         self._set_connection_params()
 
+        if self._params[PLUGIN_ATTR_CB_ON_CONNECT] or self._params[PLUGIN_ATTR_CB_ON_DISCONNECT]:
+            use_callbacks = True
+        else:
+            use_callbacks = False
+
         # initialize connection
-        self._get_connection(name=name)
+        self._get_connection(use_callbacks=use_callbacks, name=name)
 
         # set "method pointers"
         self._send_bytes = self._connection._send_bytes
@@ -251,7 +255,7 @@ class SDPProtocolViessmann(SDPProtocol):
 
         return True
 
-    def _send(self, data_dict):
+    def _send(self, data_dict, **kwargs):
         """
         send data. data_dict needs to contain the following information:
 
@@ -265,6 +269,9 @@ class SDPProtocolViessmann(SDPProtocol):
         :type read_response: bool
         :return: Response packet (bytearray) if no error occured, None otherwise
         """
+        if kwargs:
+            self.logger.debug(f'got additional kw args {kwargs}')
+
         (packet, responselen) = self._build_payload(data_dict)
 
         # send payload
