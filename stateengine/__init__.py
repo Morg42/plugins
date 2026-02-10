@@ -29,7 +29,7 @@ from . import StateEngineFunctions
 from . import StateEngineValue
 from . import StateEngineWebif
 from . import StateEngineStructs
-from . import StateEngineActionScheduler
+from . import StateEngineScheduler
 
 import logging
 import os
@@ -69,8 +69,10 @@ class StateEngine(SmartPlugin):
         self.init_webinterface(WebInterface)
         self.__sh.stateengine_plugin_functions = StateEngineFunctions.SeFunctions(self.__sh, self.logger)
         try:
-            self._action_scheduler = StateEngineActionScheduler.ActionScheduler(self.__sh, self, self.logger)
+            self._action_scheduler = StateEngineScheduler.ActionScheduler(self.__sh, self, self.logger)
+            self._item_scheduler = StateEngineScheduler.ItemScheduler(self.__sh, self, self.logger)
             self.scheduler_add('actionscheduler', self._action_scheduler.run, cron='init')
+            self.scheduler_add('itemscheduler', self._item_scheduler.run, cron='init')
             log_level = self.get_parameter_value("log_level")
             startup_log_level = self.get_parameter_value("startup_log_level")
             log_directory = self.get_parameter_value("log_directory")
@@ -97,6 +99,12 @@ class StateEngine(SmartPlugin):
             default_instant_leaveaction = self.get_parameter_value("instant_leaveaction")
             self.__default_instant_leaveaction = StateEngineValue.SeValue(self, "Default Instant Leave Action", False, "bool")
             self.__default_instant_leaveaction.set(default_instant_leaveaction)
+            default_cycle = self.get_parameter_value("cycle_default")
+            self.__default_cycle = StateEngineValue.SeValue(self, "Default Cycle", False, "num")
+            self.__default_cycle.set(default_cycle)
+            default_cron = self.get_parameter_value("cron_default")
+            self.__default_cron = StateEngineValue.SeValue(self, "Default Cron", False, "str")
+            self.__default_cron.set(default_cron)
 
             StateEngineDefaults.suntracking_offset = self.get_parameter_value("lamella_offset")
             StateEngineDefaults.lamella_open_value = self.get_parameter_value("lamella_open_value")
@@ -144,6 +152,7 @@ class StateEngine(SmartPlugin):
                     abitem = StateEngineItem.SeItem(self.__sh, item, self)
                     abitem.ab_alive = True
                     abitem.update_leave_action(self.__default_instant_leaveaction)
+                    abitem.update_cycle_cron(self.__default_cycle, self.__default_cron)
                     abitem.write_to_log()
                     abitem.show_issues_summary()
                     abitem.startup()
@@ -155,6 +164,7 @@ class StateEngine(SmartPlugin):
             self.logger.info("Using StateEngine for {} items".format(len(self._items)))
         else:
             self.scheduler_remove('actionscheduler')
+            self.scheduler_remove('itemscheduler')
             self.logger.info("StateEngine deactivated because no items have been found.")
 
         self.__cli = StateEngineCliCommands.SeCliCommands(self.__sh, self._items, self.logger)
@@ -167,9 +177,6 @@ class StateEngine(SmartPlugin):
         self.scheduler_remove_all()
         for item in self._items:
             self._items[item].ab_alive = False
-            self.scheduler_remove('{}'.format(item))
-            self.scheduler_remove('{}-Startup Delay'.format(item))
-            self._items[item].remove_all_schedulers()
 
         self.alive = False
         self.__sh.stateengine_plugin_functions.ab_alive = False
