@@ -210,17 +210,12 @@ class SeItem:
         self.__sh = smarthome
         self.__shtime = Shtime.get_instance()
         self.__se_plugin = se_plugin
-        self.__log_cycle_cron = ""
         self.__active_schedulers = []
         self.__release_info = {}
         self.__cache = {}
         self.__last_run = {}
         self.__pass_repeat = {}
         self._delayedactions_text = []
-        self.__cycle = StateEngineValue.SeValue(self, "Cycle", False, "num")
-        self.__cron = StateEngineValue.SeValue(self, "Cron", False, "str")
-        self.__default_cycle = StateEngineValue.SeValue(self, "Default Cycle", False, "num")
-        self.__default_cron = StateEngineValue.SeValue(self, "Default Cron", False, "str")
         self.__default_instant_leaveaction = StateEngineValue.SeValue(self, "Default Instant Leave Action", False, "bool")
         self.__instant_leaveaction = StateEngineValue.SeValue(self, "Instant Leave Action", False, "num")
         try:
@@ -365,8 +360,6 @@ class SeItem:
             "item.suspend_time": self.__suspend_time.get(),
             "item.suspend_remaining": 0,
             "item.instant_leaveaction": 0,
-            "item.cycle": 0,
-            "item.cron": "",
             "release.can_release": "",
             "release.can_be_released_by": "",
             "release.has_released": "",
@@ -408,19 +401,18 @@ class SeItem:
         _startup_delay_param = self.__startup_delay.get()
         startup_delay = 1 if self.__startup_delay.is_empty() or _startup_delay_param == 0 else _startup_delay_param
         if startup_delay > 0:
-            self.__se_plugin._item_scheduler.add_startup(
-                self.__item,
-                self.__id + "-Startup Delay",
-                startup_delay=startup_delay,
-                callback=lambda added, next_run: self.__startup_delay_callback(self.__item, "Init", None, None)
-            )
             first_run = self.__shtime.now() + datetime.timedelta(seconds=startup_delay)
             self.__first_run = first_run.strftime('%H:%M:%S, %d.%m.')
             self.__logger.info("Will start stateengine evaluation at {}", self.__first_run)
+            scheduler_name = self.__id + "-Startup Delay"
+            value = {"item": self.__item, "caller": "Init"}
+            self.__se_plugin.scheduler_add(scheduler_name, self.__startup_delay_callback, value=value, next=first_run)
         elif startup_delay == -1:
             self.__startup_delay_over = True
             self.__first_run = None
             self.__add_triggers()
+        else:
+            self.__startup_delay_callback(self.__item, "Init", None, None)
 
         _log_level = self.__log_level.get()
         self.__logger.info("Reset log level to {}", _log_level)
@@ -463,60 +455,6 @@ class SeItem:
             self.__log_issues('structs')
         if issues == 0:
             self.__logger.info("No configuration issues found. Congratulations ;)")
-
-    def update_cycle_cron(self, default_cycle, default_cron):
-        default_cycle_value = default_cycle.get()
-        default_cron_value = default_cron.get()
-        self.__default_cycle = default_cycle_value
-        self.__default_cron = default_cron_value
-
-        _returnvalue_cycle, _returntype_cycle, _using_default_cycle, _issue, _ = self.__cycle.set_from_attr(
-            self.__item, "se_cycle", default_value=default_cycle_value)
-        _returnvalue_cron, _returntype_cron, _using_default_cron, _issue, _ = self.__cron.set_from_attr(
-            self.__item, "se_crontab", default_value=default_cron_value)
-
-        if len(_returnvalue_cycle) > 1:
-            self.__log_cycle_cron += "se_cycle for item {} can not be defined as a list" \
-                                     " ({}). Using default value {}. ".format(self.id, _returnvalue_cycle,
-                                     default_cycle_value)
-            self.__cycle.set(default_cycle_value)
-            self.__variables.update({"item.cycle": default_cycle_value})
-        elif len(_returnvalue_cycle) == 1 and _returnvalue_cycle[0] is None:
-            self.__cycle.set(default_cycle_value)
-            self.__variables.update({"item.cycle": default_cycle_value})
-            self.__log_cycle_cron += "Using default cycle '{0}' " \
-                                     "as no se_cycle is set. ".format(default_cycle_value)
-        elif _using_default_cycle:
-            self.__variables.update({"item.cycle": default_cycle_value})
-            self.__log_cycle_cron += "Using default cycle '{0}' " \
-                                     "as no se_cycle is set. ".format(default_cycle_value)
-        else:
-            _returnvalue_cycle = _returnvalue_cycle[0] if isinstance(_returnvalue_cycle, list) else _returnvalue_cycle
-            self.__variables.update({"item.cycle": _returnvalue_cycle})
-            self.__log_cycle_cron += "Using cycle '{0}' from attribute se_cycle. " \
-                                     "Default value is '{1}'. ".format(_returnvalue_cycle, default_cycle_value)
-
-        if len(_returnvalue_cron) > 1:
-            final_cron = []
-            for entry in _returnvalue_cron:
-                if entry is not None:
-                    final_cron.append(entry)
-            _returnvalue_cron = final_cron
-        if len(_returnvalue_cron) == 1 and _returnvalue_cron[0] is None:
-            self.__cron.set(default_cron_value)
-            self.__variables.update({"item.cron": default_cron_value})
-            self.__log_cycle_cron += "Using default cron '{0}' " \
-                                     "as no se_cron is set.".format(default_cron_value)
-        elif _using_default_cron:
-            self.__variables.update({"item.cron": default_cron_value})
-            self.__log_cycle_cron += "Using default cron '{0}' " \
-                                     "as no se_cron is set.".format(default_cron_value)
-        else:
-            l = isinstance(_returnvalue_cron, list) and len(_returnvalue_cron) == 1
-            _returnvalue_cron = _returnvalue_cron[0] if l else _returnvalue_cron
-            self.__variables.update({"item.cron": _returnvalue_cron})
-            self.__log_cycle_cron += "Using cron '{0}' from attribute se_cron. " \
-                                     "Default value is '{1}'".format(_returnvalue_cron, default_cron_value)
 
     def update_leave_action(self, default_instant_leaveaction):
         default_instant_leaveaction_value = default_instant_leaveaction.get()
@@ -1897,30 +1835,10 @@ class SeItem:
                         crons += ", "
                     crons += entry
 
-        if cycles != "" or crons != "":
-            if cycles == "":
-                cycles = "Inactive"
-            if crons == "":
-                crons = "Inactive"
-            self.__cycle.set(0)
-            self.__cron.set('')
-            self.__logger.info("Stateengine-specific cycle/cron ignored, using item scheduler")
-        else:
-            self.__logger.info("{0}", self.__log_cycle_cron)
-            cy = self.__cycle.get()
-            if cy > 0:
-                cycles = f"every {cy} seconds (stateengine-specific)"
-            else:
-                cycles = "Inactive"
-            cr = self.__cron.get()
-            if cr != "":
-                for entry in cr:
-                    if crons != "":
-                        crons += ", "
-                    crons += entry
-                crons = f"{crons} (stateengine-specific)"
-            else:
-                crons = "Inactive"
+        if cycles == "":
+            cycles = "Inactive"
+        if crons == "":
+            crons = "Inactive"
         return crons, cycles
 
     def __init_releasedby(self):
@@ -2290,32 +2208,20 @@ class SeItem:
     # noinspection PyUnusedLocal
     def __startup_delay_callback(self, item, caller=None, source=None, dest=None):
         scheduler_name = self.__id + "-Startup Delay"
-        if not self.__ab_alive:
+        if not self.__ab_alive and self.__se_plugin.scheduler_get(scheduler_name):
             next_run = self.__shtime.now() + datetime.timedelta(seconds=3)
             self.__logger.debug(
-                "Startup Delay over but StateEngine Plugin not running yet. Will try again at {}", next_run
-            )
-            # Scheduler-Eintrag erneuern
-            self.scheduler_add(
-                self.__item,
-                scheduler_name,
-                next=next_run,
-                callback=lambda added, new_next: self.__logger.debug(
-                    "Retrying startup delay for {} scheduled at {}", self.__id, new_next
-                ),
-                scheduler_type="item"
-            )
-            return
-
-        # Plugin ist alive -> Delay abgeschlossen
-        self.__startup_delay_over = True
-        self.__first_run = None
-        self.__logger.debug("Startup Delay over for {}", self.__id)
-        self.__se_plugin._item_scheduler.remove(self.__item, scheduler_name)
-
-        # State aktualisieren und Triggers hinzufügen
-        self.update_state(item, "Startup Delay", source, dest)
-        self.__add_triggers()
+                "Startup Delay over but StateEngine Plugin not running yet. Will try again at {}", next_run)
+            self.__se_plugin.scheduler_change(scheduler_name, next=next_run)
+            self.__se_plugin.scheduler_trigger(scheduler_name)
+        else:
+            self.__startup_delay_over = True
+            if self.__se_plugin.scheduler_get(scheduler_name):
+                self.__se_plugin.scheduler_remove(scheduler_name)
+                self.__logger.debug('Startup Delay over. Removed scheduler {}', scheduler_name)
+            self.__first_run = None
+            self.update_state(item, "Startup Delay", source, dest)
+            self.__add_triggers()
 
     # Return an item related to the StateEngine Object Item
     # item_id: Id of item to return
