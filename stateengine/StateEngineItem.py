@@ -553,7 +553,7 @@ class SeItem:
         else:
             self.__templates[template] = value
 
-    def scheduler_add(self, name, action=None, value=None, next=None, overwrite=True, scheduler_type=None):
+    def scheduler_add(self, name, action=None, value=None, next=None, overwrite=True, callback=None, scheduler_type=None):
         """
         Add a scheduler entry for this item.
         :param name: Name of the scheduled job
@@ -563,23 +563,21 @@ class SeItem:
         :param overwrite: whether to overwrite existing
         :param scheduler_type: "action" or "item"
         """
-        def _log_result(added, new_next):
+        def _log_result(added, new_next, issues=""):
             if scheduler_type == "action":
-                if added:
-                    self._delayedactions_text.append(f"Scheduling action {action} with name '{name}' at {next}.")
+                if new_next is None:
+                    self._delayedactions_text.append(f"Scheduling action {action} with name '{name}' issue! No next execution time given")
+                elif added:
+                    self._delayedactions_text.append(f"Scheduling action {action} with name '{name}' at {new_next.strftime('%H:%M:%S, %d.%m.%Y')}.")
                 else:
                     self._delayedactions_text.append(
-                        f"Scheduled action '{name}' already exists, overwrite is {overwrite}. Will run at {new_next}"
+                        f"Scheduled action '{name}' already exists, overwrite is {overwrite}. Will run at {new_next.strftime('%H:%M:%S, %d.%m.%Y')}"
                     )
-            elif scheduler_type == "item":
-                self.__logger.debug("ItemScheduler entry '{}' added at {}", name, next)
             else:
                 self.__logger.warning("Scheduler_add needs to be called with a scheduler type")
 
         if scheduler_type == "action":
-            self.__se_plugin._action_scheduler.add(self, name, action, value, next, overwrite=overwrite, callback=_log_result)
-        elif scheduler_type == "item":
-            self.__se_plugin._item_scheduler.add(self.__item, name, next, callback=_log_result)
+            self.__se_plugin._action_scheduler.add(self, name, action, value, next, overwrite=overwrite, callback=callback, add_callback=_log_result)
         else:
             self.__logger.warning("Unknown scheduler_type '{}'. Skipping scheduler add for '{}'", scheduler_type, name)
 
@@ -603,8 +601,6 @@ class SeItem:
 
         if scheduler_type == "action":
             self.__se_plugin._action_scheduler.remove(self, name, callback=_log_result)
-        elif scheduler_type == "item":
-            self.__se_plugin.itemscheduler.remove(self.__item, name, callback=_log_result)
         else:
             self.__logger.warning("Unknown scheduler_type '{}'. Skipping removal for '{}'", scheduler_type, name)
 
@@ -620,8 +616,6 @@ class SeItem:
 
         if scheduler_type == "action":
             self.__se_plugin._action_scheduler.remove_all(self, callback=_log_result)
-        elif scheduler_type == "item":
-            self.__se_plugin._item_scheduler.remove_all(self.__item, callback=_log_result)
         else:
             self.__logger.warning("Unknown scheduler_type '{}'. Skipping removal of all schedulers for item {}", scheduler_type, self.id)
 
@@ -637,15 +631,12 @@ class SeItem:
 
         if scheduler_type == "action":
             sched = self.__se_plugin._action_scheduler.get(self, name)
-        elif scheduler_type == "item":
-            sched = self.__se_plugin._item_scheduler.get(self, name)
         else:
             self.__logger.warning("Unknown scheduler_type '{}'. Can not return next_run for item {}", scheduler_type, self.id)
 
         if sched:
             return sched.get("next")
         return None
-
 
     # region Updatestate ***********************************************************************************************
     # run queue
