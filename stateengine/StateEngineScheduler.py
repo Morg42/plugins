@@ -34,12 +34,11 @@ class BaseScheduler:
         self._se_plugin = se_plugin
         self.logger = logger
         self._lock = RLock()
-        self._dirty = False
         self._next_wakeup = None
         self._name = name
 
     # ---------- API ----------
-    def add(self, key, job, next_run, overwrite=True, callback=None):
+    def add(self, key, job, next_run, overwrite=True, callback=None, add_callback=None):
         with self._lock:
             if key in self._scheduled and not overwrite:
                 added = False
@@ -52,12 +51,12 @@ class BaseScheduler:
                 }
                 added = True
                 new_next = next_run
-
         self._queue.put(('commit', key))
-        self._mark_dirty(next_run)
-
-        if callback:
-            callback(added, new_next)
+        self._trigger(next_run)
+        if job.get('item') and job.get('source'):
+            added = job.get('source')
+        if add_callback:
+            add_callback(added, new_next, job.get('issues'))
 
     def remove(self, key, callback=None):
         with self._lock:
@@ -67,37 +66,30 @@ class BaseScheduler:
             )
 
         self._queue.put(('remove', key))
-        self._mark_dirty()
-
+        self._trigger()
         if callback:
-            callback(removed)
+            callback(True)
 
     def remove_all(self, predicate=None, callback=None):
         self._queue.put(('remove_all', predicate, callback))
-        self._mark_dirty()
+        self._trigger()
 
     def get(self, key):
         with self._lock:
             return self._scheduled.get(key) or self._pending.get(key)
 
-    def _mark_dirty(self, next_run=None):
-        with self._lock:
-            self._dirty = True
-            self._trigger(next_run)
-
     def _trigger(self, next_run=None):
-        # Nur Scheduler wecken, niemals Jobs sofort ausführen!
-        if next_run is None:
-            self._se_plugin.scheduler_trigger(self._name, by=self._se_plugin.get_fullname())
-        else:
-            if self._next_wakeup is None or next_run < self._next_wakeup:
-                self._next_wakeup = next_run
-                self._se_plugin.scheduler_trigger(self._name, by=self._se_plugin.get_fullname(), dt=next_run)
+        with self._lock:
+            if next_run is None:
+                self._se_plugin.scheduler_trigger(self._name, by=self._se_plugin.get_fullname())
+            else:
+                if self._next_wakeup is None or next_run < self._next_wakeup:
+                    self._next_wakeup = next_run
+                    self._se_plugin.scheduler_trigger(self._name, by=self._se_plugin.get_fullname(), dt=next_run)
 
 
     # ---------- MAIN LOOP ----------
     def run(self):
-        self._dirty = False
         now = self._sh.shtime.now()
 
         # --- Process queue ---
@@ -191,13 +183,13 @@ class ActionScheduler(BaseScheduler):
     def __init__(self, smarthome, se_plugin, logger):
         super().__init__(smarthome, se_plugin, logger, "actionscheduler")
 
-    def add(self, abitem, name, action, value, next_run, overwrite=True, callback=None):
+    def add(self, abitem, name, action, value, next_run, overwrite=True, callback=None, add_callback=None):
         key = (abitem, name)
         job = {
             "action": action,
             "value": value or {}
         }
-        super().add(key, job, next_run, overwrite, callback)
+        super().add(key, job, next_run, overwrite, callback=callback, add_callback=add_callback)
 
     def remove(self, abitem, name, callback=None):
         key = (abitem, name)
@@ -213,80 +205,76 @@ class ActionScheduler(BaseScheduler):
             key = (abitem, name)
         return super().get(key)
 
-    def _execute_job(self, key, job):
-        action = job["action"]
-        values = job.get("value", {})
+    def _execute_job(self, key, entry):
+        action = entry["job"].get("action")
+        values = entry["job"].get("value", {})
+        callback = entry.get("callback")
         action.delayed_execute(**values)
+        if callback:
+            try:
+                callback()
+            except Exception as e:
+                self.logger.error(f"{self._name} callback failed for {key}: {e}")
 
 
 class ItemScheduler(BaseScheduler):
 
-    def __init__(self, smarthome, se_plugin, logger):
-        super().__init__(smarthome, se_plugin, logger, "itemscheduler")
+    def __init__(self, smarthome, se_plugin, logger, use_execution_queue=False):
+        self.__crons = {}
+        super().__init__(smarthome, se_plugin, logger, "itemscheduler", use_execution_queue)
 
-   # ---------- SANITIZERS ----------
-    def _sanitize_cron(self, cron):
-        if cron is None:
-            return None, False
-
-        new_cron = {}
-        changed = False
-
-        for entry, value in cron.items():
-            if value is None:
-                value = 1
-                changed = True
-            new_cron[entry] = value
-
-        return new_cron, changed
-
-    def _sanitize_cycle(self, cycle):
-        if cycle is None:
-            return None, False, None
-
-        changed = False
-        key = list(cycle.keys())[0]
-        value = cycle[key]
-
-        if value is None:
-            value = "1"
-            changed = True
-
-        new_cycle = {key: value}
-
-        return new_cycle, changed, key
-
-    def add_startup(self, item, name, startup_delay=0, callback=None):
-        next_run = self._sh.shtime.now() + datetime.timedelta(seconds=startup_delay)
+    def add_startup(self, item, name, startup_delay=0, callback=None, add_callback=None, now=None):
+        now = now if now is not None else self._sh.shtime.now()
+        next_run = (now + datetime.timedelta(seconds=startup_delay)).replace(microsecond=0)
         key = (item, name)
-        job = {"item": item, "startup_delay": True}
-        # Immer über pending hinzufügen, damit run() entscheidet, wann es fällig ist
-        with self._lock:
-            self._pending[key] = {
-                "job": job,
-                "next": next_run,
-                "callback": callback
-            }
-        self._queue.put(('commit', key))
-        self._mark_dirty(next_run)
+        job = {
+            "item": item,
+            "source": "startup_delay"
+        }
 
-    def add(self, item, name, next_run, callback=None):
+        super().add(key, job, next_run, overwrite=True, callback=callback, add_callback=add_callback)
+
+    def add(self, item, name, value, next_run, callback=None, add_callback=None):
         key = (item, name)
-        job = {"item": item}
+        next_times = []
+        source = None
+        cron_log = []
+        if value and value.get("cycle") not in [0.0, None]:
+            if value.get("last_scheduled"):
+                next = value.get("last_scheduled") + datetime.timedelta(seconds=value["cycle"])
+            else:
+                next = self._sh.shtime.now() + datetime.timedelta(seconds=value["cycle"])
+            next_times.append(("cycle", next))
+        if value and value.get("cron"):
+            cron = value["cron"] if isinstance(value["cron"], list) else [value["cron"]]
+            for c in cron:
+                if c in self.__crons:
+                    crontab = self.__crons.get(c)
+                else:
+                    crontab = Crontab(c)
+                    if crontab._is_valid:
+                        self.__crons[c] = crontab
+                    else:
+                        cron_log.append(c)
+                        continue
+                next_time = crontab.get_next(self._sh.shtime.now())
+                if next_time is None:
+                    cron_log.append(c)
+                else:
+                    next_times.append(("cron", next_time))
+            if cron_log:
+                self.logger.warning(f"{self._name}: These crontabs have issues: {cron_log}. next_times = {next_times}")
+        if next_times:
+            source, next_run = min(next_times, key=lambda x: x[1])
+        else:
+            source, next_run = None, None
 
-        def job_callback(added, new_next):
-            if added and callback:
-                callback(added, new_next)
-
-        with self._lock:
-            self._pending[key] = {
-                'job': job,
-                'next': next_run,
-                'callback': job_callback
-            }
-
-        self._queue.put(('commit', key))
-        self._mark_dirty(next_run)
+        job = {
+            "item": item,
+            "source": source,
+            "issues": cron_log
+        }
+        super().add(key, job, next_run, overwrite=True, callback=callback, add_callback=add_callback)
 
     def remove(self, item, name, callback=None):
         key = (item, name)
@@ -302,41 +290,18 @@ class ItemScheduler(BaseScheduler):
             key = (item, name)
         return super().get(key)
 
-    def _execute_job(self, key, job):
+    def _execute_job(self, key, entry):
+        job = entry["job"]
+        callback = entry.get("callback")
         item = job["item"]
-        callback = None
-
-        # Check if callback exists (from pending)
-        with self._lock:
-            entry = self._scheduled.get(key)
-            if entry and "callback" in entry:
-                callback = entry.pop("callback")
+        source = job.get("source")
 
         # Run the item
-        item(True, "ItemScheduler")
+        self.logger.develop(f"{self._name} triggering item {item.property.path} based on {source}")
+        item(True, self._se_plugin.get_fullname(), "itemscheduler")
 
-        # Trigger callback **nach tatsächlicher Ausführung**
-        if callback:
+        if callback and source != "cron":
             try:
-                callback(True, entry['next'])
+                callback()
             except Exception as e:
                 self.logger.error(f"{self._name} callback failed for {key}: {e}")
-
-        # Reschedule if cycle or cron exists
-        next_run = None
-        if job.get("cycle"):
-            next_run = self._sh.shtime.now() + job["cycle"]
-        elif job.get("cron"):
-            cron = job["cron"]
-            now_dt = self._sh.shtime.now()
-            next_dt = now_dt.replace(
-                hour=cron.get("hour", now_dt.hour),
-                minute=cron.get("minute", now_dt.minute),
-                second=cron.get("second", now_dt.second),
-                microsecond=0
-            )
-            if next_dt <= now_dt:
-                next_dt += datetime.timedelta(days=1)
-            next_run = next_dt
-        if next_run:
-            super().add(key, job, next_run, overwrite=True)

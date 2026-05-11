@@ -606,6 +606,9 @@ class SeActionBase(StateEngineTools.SeItemChild):
         return True
 
     def _waitforexecute(self, state, actionname: str, namevar: str = "", repeat_text: str = "", delay: int = 0, current_condition: list[str] = None, previous_condition: list[str] = None, previousstate_condition: list[str] = None, next_condition: list[str] = None):
+        def _log_actionscheduler(message=""):
+            self._log_develop("Action {} successfully executed. {}", namevar, message)
+
         if current_condition is None:
             current_condition = []
         if previous_condition is None:
@@ -647,8 +650,6 @@ class SeActionBase(StateEngineTools.SeItemChild):
                 self._name, delay, self._scheduler_name, repeat_text, instanteval, overwrite, next_run
             )
 
-
-
             if instanteval is True:
                 self._log_increase_indent()
                 self._log_debug("Evaluating value for delayed action '{}'.", namevar)
@@ -671,6 +672,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
                 value=vals,
                 next=next_run,
                 overwrite=overwrite,
+                callback=_log_actionscheduler,
                 scheduler_type="action"
             )
 
