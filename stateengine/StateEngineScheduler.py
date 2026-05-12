@@ -141,11 +141,8 @@ class BaseScheduler:
                 entry = self._scheduled.pop(key, None)
             if entry:
                 try:
-                    self._execute_job(key, entry['job'])
-                    cb = entry.get('callback')
-                    if cb:
-                        cb(True, entry['next'])
-                    self.logger.info(f"{self._name} job {entry['job']} done. key: {key}")
+                    self._execute_job(key, entry)
+                    self.logger.debug(f"{self._name} job {entry} done.")
                 except Exception as e:
                     self.logger.error(f"{self._name} job failed {key}: {e}")
 
