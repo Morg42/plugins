@@ -150,23 +150,26 @@ class BaseScheduler:
         next_times = []
         with self._lock:
             for entry in self._scheduled.values():
-                next_times.append(entry['next'])
+                if entry['next'] is not None:
+                    next_times.append(entry['next'])
             for entry in self._pending.values():
-                next_times.append(entry['next'])
+                if entry['next'] is not None:
+                    next_times.append(entry['next'])
 
         if next_times:
             next_wakeup = min(next_times)
-            self._next_wakeup = next_wakeup
+            if self._next_wakeup != next_wakeup:
+                self._next_wakeup = next_wakeup
 
-            self.logger.debug(
-                f"{self._name}: scheduling next wakeup at {next_wakeup}"
-            )
+                self.logger.debug(f"{self._name}: scheduling next wakeup at {next_wakeup}")
 
-            self._se_plugin.scheduler_trigger(
-                self._name,
-                by=self._se_plugin.get_fullname(),
-                dt=next_wakeup
-            )
+                self._se_plugin.scheduler_trigger(
+                    self._name,
+                    by=self._se_plugin.get_fullname(),
+                    dt=next_wakeup
+                )
+            else:
+                self.logger.debug(f"{self._name}: next wakeup unchanged, skipping trigger")
         else:
             self._next_wakeup = None
 
