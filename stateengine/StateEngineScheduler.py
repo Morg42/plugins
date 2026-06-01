@@ -91,6 +91,7 @@ class BaseScheduler:
     # ---------- MAIN LOOP ----------
     def run(self):
         now = self._sh.shtime.now()
+        entry = None
 
         # --- Process queue ---
         while not self._queue.empty():
@@ -142,7 +143,7 @@ class BaseScheduler:
             if entry:
                 try:
                     self._execute_job(key, entry)
-                    self.logger.debug(f"{self._name} job {entry} done.")
+                    self.logger.debug(f"{self._name} job done: {entry}.")
                 except Exception as e:
                     self.logger.error(f"{self._name} job failed {key}: {e}")
 
@@ -159,17 +160,15 @@ class BaseScheduler:
         if next_times:
             next_wakeup = min(next_times)
             if self._next_wakeup != next_wakeup:
+                self.logger.debug(f"{self._name}: scheduling next wakeup at {next_wakeup} (different to {self._next_wakeup}) for entry {entry}. next_times: {next_times}")
                 self._next_wakeup = next_wakeup
-
-                self.logger.debug(f"{self._name}: scheduling next wakeup at {next_wakeup}")
-
                 self._se_plugin.scheduler_trigger(
                     self._name,
                     by=self._se_plugin.get_fullname(),
                     dt=next_wakeup
                 )
             else:
-                self.logger.debug(f"{self._name}: next wakeup unchanged, skipping trigger")
+                self.logger.debug(f"{self._name}: next wakeup unchanged, skipping trigger at {self._next_wakeup}. Upcoming triggers: {next_times}")
         else:
             self._next_wakeup = None
 
