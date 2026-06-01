@@ -80,18 +80,27 @@ class BaseScheduler:
 
     def _trigger(self, next_run=None):
         with self._lock:
+            now = self._sh.shtime.now()
+            if hasattr(self, "_last_trigger") and (now - self._last_trigger) < datetime.timedelta(seconds=0.1):
+                return
+            self._last_trigger = now
             if next_run is None:
                 self._se_plugin.scheduler_trigger(self._name, by=self._se_plugin.get_fullname())
             else:
                 if self._next_wakeup is None or next_run < self._next_wakeup:
-                    self._next_wakeup = next_run
                     self._se_plugin.scheduler_trigger(self._name, by=self._se_plugin.get_fullname(), dt=next_run)
 
 
     # ---------- MAIN LOOP ----------
     def run(self):
+        if getattr(self, "_running", False):
+            self.logger.develop("run() skipped (already running)")
+            return
+
+        self._running = True
         now = self._sh.shtime.now()
         entry = None
+        self.logger.develop(f"RUN id={id(self)} next_wakeup={self._next_wakeup}, queue={self._queue.qsize()}")
 
         # --- Process queue ---
         while not self._queue.empty():
@@ -159,7 +168,7 @@ class BaseScheduler:
 
         if next_times:
             next_wakeup = min(next_times)
-            if self._next_wakeup != next_wakeup:
+            if (self._next_wakeup is None or abs((self._next_wakeup - next_wakeup).total_seconds()) >= 0.1):
                 self.logger.debug(f"{self._name}: scheduling next wakeup at {next_wakeup} (different to {self._next_wakeup}) for entry {entry}. next_times: {next_times}")
                 self._next_wakeup = next_wakeup
                 self._se_plugin.scheduler_trigger(
@@ -171,6 +180,7 @@ class BaseScheduler:
                 self.logger.debug(f"{self._name}: next wakeup unchanged, skipping trigger at {self._next_wakeup}. Upcoming triggers: {next_times}")
         else:
             self._next_wakeup = None
+        self._running = False
 
     # ---------- OVERRIDE ----------
     def _execute_job(self, key, job):
