@@ -72,7 +72,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
         self._caller = StateEngineDefaults.plugin_identification
         self.shtime = Shtime.get_instance()
         self._name = name
-        self.__delay = StateEngineValue.SeValue(self._abitem, "delay")
+        self._delay = StateEngineValue.SeValue(self._abitem, "delay")
         self.__repeat = None
         self.__instanteval = None
         self.__overwrite = None
@@ -121,7 +121,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
         return _issue_list
 
     def update_delay(self, value):
-        _issue = self._update_value(self.__delay, value, 'delay', 'seconds')
+        _issue = self._update_value(self._delay, value, 'delay', 'seconds')
         return _issue
 
     def update_instanteval(self, value):
@@ -206,7 +206,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
     # Write action to logger
     def write_to_logger(self):
         self._log_info("function: {}", self._function)
-        delay = self.__delay.write_to_logger() or 0
+        delay = self._delay.write_to_logger() or 0
         if self.__repeat is not None:
             repeat = self.__repeat.write_to_logger()
         else:
@@ -302,7 +302,9 @@ class SeActionBase(StateEngineTools.SeItemChild):
                     _issue = {
                         self._name: {'issue': _issue, 'issueorigin': [{'state': self._state.id, 'action': self._function}]}}
                     check_item, check_mindelta = self._cast_stuff(check_item, check_mindelta, check_value)
-                    self._scheduler_name = "{}-SeItemDelayTimer".format(check_item.property.path)
+                    delay = 0 if self._delay.is_empty() else self._delay.get()
+                    if delay > 0:
+                        self._scheduler_name = "{}-SeItemDelayTimer".format(check_item.property.path)
                     if self._abitem.id == check_item.property.path:
                         self._caller += '_self'
                     #self._log_develop("Got item from eval on {} {}", self._function, check_item)
@@ -489,6 +491,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
             _validitem = True
         except Exception:
             _validitem = False
+        self._log_develop("Action '{0}' validitem '{1}'", self._name, _validitem)
         if not self._can_execute(state):
             self._log_decrease_indent()
             return
@@ -551,17 +554,18 @@ class SeActionBase(StateEngineTools.SeItemChild):
                 repeat_text = ""
         self._log_increase_indent()
         if _validitem:
-            delay = 0 if self.__delay.is_empty() else self.__delay.get()
+            delay = 0 if self._delay.is_empty() else self._delay.get()
+            overwrite = None if self.__overwrite is None else self.__overwrite.get()
             plan_next = None
             if self._scheduler_name:
-                plan_next = self._se_plugin.scheduler_return_next(self._scheduler_name)
-            if plan_next is not None and plan_next > self.shtime.now() or delay == -1:
-                self._log_info("Action '{0}: Removing previous delay timer '{1}'.", self._name, self._scheduler_name)
-                self._se_plugin.scheduler_remove(self._scheduler_name)
-                try:
-                    self._abitem.remove_scheduler_entry(self._scheduler_name)
-                except Exception:
-                    pass
+                plan_next = self._abitem.scheduler_return_next(self._scheduler_name, "action")
+            cond_plan = plan_next is not None and plan_next > self.shtime.now()
+            cond_remove = delay == -1 and self._scheduler_name
+            if cond_plan and overwrite is False:
+                self._log_develop("Not removing previous delay timer '{0}' because overwrite is false. Action will run at {1}", self._scheduler_name, plan_next)
+            elif cond_plan or cond_remove:
+                self._log_info("Removing previous delay timer '{0}'.", self._scheduler_name)
+                self._abitem.scheduler_remove(self._scheduler_name, "action")
 
             actionname = "Action '{0}'".format(self._name) if delay == 0 else "Delayed Action ({0} seconds) '{1}'.".format(
                 delay, self._scheduler_name)
@@ -602,6 +606,9 @@ class SeActionBase(StateEngineTools.SeItemChild):
         return True
 
     def _waitforexecute(self, state, actionname: str, namevar: str = "", repeat_text: str = "", delay: int = 0, current_condition: list[str] = None, previous_condition: list[str] = None, previousstate_condition: list[str] = None, next_condition: list[str] = None):
+        def _log_actionscheduler(message=""):
+            self._log_develop("Action {} successfully executed. {}", namevar, message)
+
         if current_condition is None:
             current_condition = []
         if previous_condition is None:
@@ -625,7 +632,8 @@ class SeActionBase(StateEngineTools.SeItemChild):
             'next_condition': next_condition
         }
         if delay == 0:
-            self._abitem.scheduler_remove(self._scheduler_name)
+            if self._scheduler_name:
+                self._abitem.scheduler_remove(self._scheduler_name, "action")
             self._log_info("Action '{}': Running.", namevar)
             self.real_execute(
                 state, actionname, namevar, repeat_text,
@@ -636,12 +644,11 @@ class SeActionBase(StateEngineTools.SeItemChild):
         else:
             instanteval = None if self.__instanteval is None else self.__instanteval.get()
             overwrite = None if self.__overwrite is None else self.__overwrite.get()
-            self._log_info(
-                "Action '{0}': Add {1} second timer '{2}' for delayed execution.{3} Instant Eval: {4}. Overwrite: {5}",
-                self._name, delay, self._scheduler_name, repeat_text, instanteval, overwrite
-            )
-
             next_run = self.shtime.now() + datetime.timedelta(seconds=delay)
+            self._log_info(
+                "Action '{0}': Add {1} second timer '{2}' for delayed execution.{3} Instant Eval: {4}. Overwrite: {5}. Action will run at {6}",
+                self._name, delay, self._scheduler_name, repeat_text, instanteval, overwrite, next_run
+            )
 
             if instanteval is True:
                 self._log_increase_indent()
@@ -664,7 +671,9 @@ class SeActionBase(StateEngineTools.SeItemChild):
                 self,
                 value=vals,
                 next=next_run,
-                overwrite=overwrite
+                overwrite=overwrite,
+                callback=_log_actionscheduler,
+                scheduler_type="action"
             )
 
     def delayed_execute(self, actionname: str, namevar: str = "", repeat_text: str = "", value=None, current_condition=None, previous_condition=None, previousstate_condition=None, next_condition=None, state=None, caller=None):
@@ -728,7 +737,9 @@ class SeActionMixSetForce:
             self._log_develop("Casting value {} to status {}", check_value, check_status)
             check_value.set_cast(check_status.cast)
             check_mindelta.set_cast(check_status.cast)
-            self._scheduler_name = "{}-SeItemDelayTimer".format(check_status.property.path)
+            delay = 0 if self._delay.is_empty() else self._delay.get()
+            if delay > 0:
+                self._scheduler_name = "{}-SeItemDelayTimer".format(check_status.property.path)
             if self._abitem.id == check_status.property.path:
                 self._caller += '_self'
         elif check_status is None:
@@ -738,7 +749,9 @@ class SeActionMixSetForce:
                 self._log_develop("Casting value {} to item {}", check_value, check_item)
                 check_value.set_cast(check_item.cast)
                 check_mindelta.set_cast(check_item.cast)
-                self._scheduler_name = "{}-SeItemDelayTimer".format(check_item.property.path)
+                delay = 0 if self._delay.is_empty() else self._delay.get()
+                if delay > 0:
+                    self._scheduler_name = "{}-SeItemDelayTimer".format(check_item.property.path)
                 if self._abitem.id == check_item.property.path:
                     self._caller += '_self'
         if _issue[self._name].get('issue') not in [[], [None], None]:
@@ -991,7 +1004,9 @@ class SeActionSetByattr(SeActionBase):
         self._log_develop('Completing action {}, action type {}, state {}', self._name, self._action_type, self._state)
         self._abitem.set_variable('current.action_name', self._name)
         self._abitem.set_variable('current.state_name', self._state.name)
-        self._scheduler_name = "{}-SeByAttrDelayTimer".format(self.__byattr)
+        delay = 0 if self._delay.is_empty() else self._delay.get()
+        if delay > 0:
+            self._scheduler_name = "{}-SeByAttrDelayTimer".format(self.__byattr)
         _issue = {self._name: {'issue': None, 'attribute': [self.__byattr],
                                'issueorigin': [{'state': self._state.id, 'action': self._function}]}}
         self._abitem.set_variable('current.action_name', '')
@@ -1055,7 +1070,9 @@ class SeActionTrigger(SeActionBase):
         self._log_develop('Completing action {}, action type {}, state {}', self._name, self._action_type, self._state)
         self._abitem.set_variable('current.action_name', self._name)
         self._abitem.set_variable('current.state_name', self._state.name)
-        self._scheduler_name = "{}-SeLogicDelayTimer".format(self.__logic)
+        delay = 0 if self._delay.is_empty() else self._delay.get()
+        if delay > 0:
+            self._scheduler_name = "{}-SeLogicDelayTimer".format(self.__logic)
         _issue = {self._name: {'issue': None, 'logic': self.__logic,
                                'issueorigin': [{'state': self._state.id, 'action': self._function}]}}
         self._abitem.set_variable('current.action_name', '')
@@ -1133,7 +1150,9 @@ class SeActionRun(SeActionBase):
         self._log_develop('Completing action {}, action type {}, state {}', self._name, self._action_type, self._state)
         self._abitem.set_variable('current.action_name', self._name)
         self._abitem.set_variable('current.state_name', self._state.name)
-        self._scheduler_name = "{}-SeRunDelayTimer".format(StateEngineTools.get_eval_name(self.__eval))
+        delay = 0 if self._delay.is_empty() else self._delay.get()
+        if delay > 0:
+            self._scheduler_name = "{}-SeRunDelayTimer".format(StateEngineTools.get_eval_name(self.__eval))
         _issue = {self._name: {'issue': None, 'eval': StateEngineTools.get_eval_name(self.__eval),
                                'issueorigin': [{'state': self._state.id, 'action': self._function}]}}
         self._abitem.set_variable('current.action_name', '')
@@ -1247,7 +1266,9 @@ class SeActionSpecial(SeActionBase):
             item = self.__value[0].property.path
         else:
             item = self.__value.property.path
-        self._scheduler_name = "{}_{}-SeSpecialDelayTimer".format(self.__special, item)
+        delay = 0 if self._delay.is_empty() else self._delay.get()
+        if delay > 0:
+            self._scheduler_name = "{}_{}-SeSpecialDelayTimer".format(self.__special, item)
         _issue = {self._name: {'issue': None, 'special': item, 'issueorigin': [{'state': self._state.id, 'action': self._function}]}}
         self._abitem.set_variable('current.action_name', '')
         self._abitem.set_variable('current.state_name', '')

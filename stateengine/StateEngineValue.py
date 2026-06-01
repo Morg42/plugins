@@ -102,8 +102,20 @@ class SeValue(StateEngineTools.SeItemChild):
     # item: item containing the attribute
     # attribute_name: name of attribute to use
     # default_value: default value to be used if item contains no such attribute
-    def set_from_attr(self, item, attribute_name, default_value=None, reset=True, attr_type=None, ignore=None):
+    # reset: completely get rid of all value entries
+    # attr_type: type of declaration (item, value, eval, etc.)
+    # ignore: values to ignore, important for se_use
+    # function: the value from the given attribute gets converted by this function. function needs to have "value" as parameter!
+    def set_from_attr(self, item, attribute_name, default_value=None, reset=True, attr_type=None, ignore=None, function=None):
         value = copy.deepcopy(item.conf.get(attribute_name))
+        if function is not None:
+            try:
+                new_value = function(value)
+                self._log_develop("Using function {0} on value {1}: Result: {2}", function, value, new_value)
+                value = new_value
+            except Exception as e:
+                self._log_warning("While setting value from attribute, function {0} resulted in problems: {1}", function, e)
+
         if value is not None:
             _using_default = False
             if isinstance(value, list):
@@ -142,6 +154,7 @@ class SeValue(StateEngineTools.SeItemChild):
             value = StateEngineTools.convert_str_to_dict(value)
         except Exception:
             pass
+
         if value is not None:
             self._log_develop("Setting value {0}, attribute name {1}, reset {2}, type {3}",
                               value, attribute_name, reset, attr_type)
@@ -306,7 +319,10 @@ class SeValue(StateEngineTools.SeItemChild):
         else:
             source = "value"
             field_value = value
-
+            if not returnvalue:
+                self.__listorder = [field_value]
+                self.__type_listorder.append(source)
+                self.__orig_listorder.append(value)
         if isinstance(source, list):
             for i, s in enumerate(source):
                 if isinstance(field_value[i], list) and not self.__allow_value_list:

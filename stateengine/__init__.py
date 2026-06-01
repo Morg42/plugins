@@ -29,7 +29,7 @@ from . import StateEngineFunctions
 from . import StateEngineValue
 from . import StateEngineWebif
 from . import StateEngineStructs
-from . import StateEngineActionScheduler
+from . import StateEngineScheduler
 
 import logging
 import os
@@ -69,7 +69,7 @@ class StateEngine(SmartPlugin):
         self.init_webinterface(WebInterface)
         self.__sh.stateengine_plugin_functions = StateEngineFunctions.SeFunctions(self.__sh, self.logger)
         try:
-            self._action_scheduler = StateEngineActionScheduler.ActionScheduler(self.__sh, self, self.logger)
+            self._action_scheduler = StateEngineScheduler.ActionScheduler(self.__sh, self, self.logger)
             self.scheduler_add('actionscheduler', self._action_scheduler.run, cron='init')
             log_level = self.get_parameter_value("log_level")
             startup_log_level = self.get_parameter_value("startup_log_level")
@@ -167,9 +167,6 @@ class StateEngine(SmartPlugin):
         self.scheduler_remove_all()
         for item in self._items:
             self._items[item].ab_alive = False
-            self.scheduler_remove('{}'.format(item))
-            self.scheduler_remove('{}-Startup Delay'.format(item))
-            self._items[item].remove_all_schedulers()
 
         self.alive = False
         self.__sh.stateengine_plugin_functions.ab_alive = False

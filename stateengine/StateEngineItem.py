@@ -413,6 +413,7 @@ class SeItem:
             self.__add_triggers()
         else:
             self.__startup_delay_callback(self.__item, "Init", None, None)
+
         _log_level = self.__log_level.get()
         self.__logger.info("Reset log level to {}", _log_level)
         self.__logger.log_level_as_num = _log_level
@@ -466,10 +467,10 @@ class SeItem:
             self.__logger.warning("se_instant_leaveaction for item {} can not be defined as a list"
                                   " ({}). Using default value {}.", self.id, _returnvalue_leave,
                                   default_instant_leaveaction_value)
-            self.__instant_leaveaction = default_instant_leaveaction
+            self.__instant_leaveaction = default_instant_leaveaction_value
             self.__variables.update({"item.instant_leaveaction": default_instant_leaveaction_value})
         elif len(_returnvalue_leave) == 1 and _returnvalue_leave[0] is None:
-            self.__instant_leaveaction = default_instant_leaveaction
+            self.__instant_leaveaction = default_instant_leaveaction_value
             self.__variables.update({"item.instant_leaveaction": default_instant_leaveaction_value})
             self.__logger.info("Using default instant_leaveaction {0} "
                                "as no se_instant_leaveaction is set.".format(default_instant_leaveaction_value))
@@ -478,6 +479,7 @@ class SeItem:
             self.__logger.info("Using default instant_leaveaction {0} "
                                "as no se_instant_leaveaction is set.".format(default_instant_leaveaction_value))
         else:
+            _returnvalue_leave = _returnvalue_leave[0] if isinstance(_returnvalue_leave, list) else _returnvalue_leave
             self.__variables.update({"item.instant_leaveaction": _returnvalue_leave})
             self.__logger.info("Using instant_leaveaction {0} "
                                "from attribute se_instant_leaveaction. "
@@ -489,45 +491,90 @@ class SeItem:
         else:
             self.__templates[template] = value
 
-    def scheduler_add(self, name, action, value=None, next=None, overwrite=True):
-        def _log_result(added, new_next):
-            if added:
-                self._delayedactions_text.append(f"Scheduling action {action} with name '{name}' at {next}.")
+    def scheduler_add(self, name, action=None, value=None, next=None, overwrite=True, callback=None, scheduler_type=None):
+        """
+        Add a scheduler entry for this item.
+        :param name: Name of the scheduled job
+        :param action: action to execute (for ActionScheduler)
+        :param value: optional value dict (for ActionScheduler)
+        :param next: next run time (datetime)
+        :param overwrite: whether to overwrite existing
+        :param scheduler_type: "action" or "item"
+        """
+        def _log_result(added, new_next, issues=""):
+            if scheduler_type == "action":
+                if new_next is None:
+                    self._delayedactions_text.append(f"Scheduling action {action} with name '{name}' issue! No next execution time given")
+                elif added:
+                    self._delayedactions_text.append(f"Scheduling action {action} with name '{name}' at {new_next.strftime('%H:%M:%S, %d.%m.%Y')}.")
+                else:
+                    self._delayedactions_text.append(
+                        f"Scheduled action '{name}' already exists, overwrite is {overwrite}. Will run at {new_next.strftime('%H:%M:%S, %d.%m.%Y')}"
+                    )
             else:
-                self._delayedactions_text.append(f"Scheduled action '{name}' already exists, overwrite is set to {overwrite}. Will run at {new_next}")
+                self.__logger.warning("Scheduler_add needs to be called with a scheduler type")
 
-        self.__se_plugin._action_scheduler.add(self, name, action, value, next, overwrite=overwrite, callback=_log_result)
+        if scheduler_type == "action":
+            self.__se_plugin._action_scheduler.add(self, name, action, value, next, overwrite=overwrite, callback=callback, add_callback=_log_result)
+        else:
+            self.__logger.warning("Unknown scheduler_type '{}'. Skipping scheduler add for '{}'", scheduler_type, name)
 
-    def scheduler_remove(self, name):
+
+    def scheduler_remove(self, name: str, scheduler_type: str = None):
+        """
+        Remove a scheduler entry for this item.
+        :param name: Name of the scheduled job
+        :param scheduler_type: "action" or "item"
+        """
         def _log_result(removed):
             if removed:
-                self.__logger.debug("Removed scheduled action '{}'", name)
+                self.__logger.debug("Removed scheduled {} '{}'", scheduler_type, name)
             else:
-                self.__logger.develop("Scheduled action '{}' not found – nothing to remove", name)
+                self.__logger.develop("Scheduled {} '{}' not found – nothing to remove", scheduler_type, name)
+
         if not name:
             return
-        self.__logger.develop("Requesting removal of scheduler '{}'", name)
-        self.__se_plugin._action_scheduler.remove(self, name, callback=_log_result)
-        #self.__se_plugin.scheduler_trigger('actionscheduler')
 
-    def scheduler_remove_all(self):
+        self.__logger.develop("Requesting removal of {} scheduler '{}'", scheduler_type, name)
+
+        if scheduler_type == "action":
+            self.__se_plugin._action_scheduler.remove(self, name, callback=_log_result)
+        else:
+            self.__logger.warning("Unknown scheduler_type '{}'. Skipping removal for '{}'", scheduler_type, name)
+
+    def scheduler_remove_all(self, scheduler_type: str = None):
+        """
+        Remove all scheduler entries for this item.
+        :param scheduler_type: "action" or "item"
+        """
         def _log_result(count):
-            self.__logger.debug("Removed {} scheduled actions for item {}", count, self.id)
+            self.__logger.debug("Removed {} scheduled {}s for item {}", count, scheduler_type, self.id)
 
-        self.__logger.develop("Requesting removal of all schedulers for item {}", self.id)
-        self.__se_plugin._action_scheduler.remove_all(self, callback=_log_result)
-        #self.__se_plugin.scheduler_trigger('actionscheduler')
+        self.__logger.develop("Requesting removal of all {} schedulers for item {}", scheduler_type, self.id)
 
-    def add_scheduler_entry(self, name):
-        if name not in self.__active_schedulers:
-            self.__active_schedulers.append(name)
+        if scheduler_type == "action":
+            self.__se_plugin._action_scheduler.remove_all(self, callback=_log_result)
+        else:
+            self.__logger.warning("Unknown scheduler_type '{}'. Skipping removal of all schedulers for item {}", scheduler_type, self.id)
 
-    def remove_scheduler_entry(self, name):
-        self.__active_schedulers.remove(name)
+    def scheduler_return_next(self, name: str, scheduler_type: str = None):
+        """
+        Return the next run datetime of a scheduled item or action.
+        :param name: Name of the scheduled entry
+        :param scheduler_type: "item" or "action"
+        :return: datetime.datetime of next run or None
+        """
+        if not name:
+            return None
 
-    def remove_all_schedulers(self):
-        for entry in self.__active_schedulers:
-            self.__se_plugin.scheduler_remove('{}'.format(entry))
+        if scheduler_type == "action":
+            sched = self.__se_plugin._action_scheduler.get(self, name)
+        else:
+            self.__logger.warning("Unknown scheduler_type '{}'. Can not return next_run for item {}", scheduler_type, self.id)
+
+        if sched:
+            return sched.get("next")
+        return None
 
     # region Updatestate ***********************************************************************************************
     # run queue
@@ -773,7 +820,7 @@ class SeItem:
                             text = "No matching state found, staying at {0} ('{1}') based on conditionset {2} ('{3}')"
                             self.__logger.info(text, last_state.id, last_state.name, _last_conditionset_id,
                                                _last_conditionset_name)
-                        last_state.run_stay(self.__repeat_actions.get())                
+                        last_state.run_stay(self.__repeat_actions.get())
                     self.__logger.decrease_indent(50)
                     self.__logger.debug("State evaluation finished")
                     for entry in self._delayedactions_text:
@@ -1688,7 +1735,6 @@ class SeItem:
     # endregion
 
     # region Helper methods ********************************************************************************************
-    # add all required triggers
     def __add_triggers(self):
         # add item trigger
         self.__item.add_method_trigger(self.update_state)
