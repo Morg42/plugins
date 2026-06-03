@@ -16,7 +16,28 @@ class TestDatabaseBase(unittest.TestCase):
     def plugin(self):
         self.sh = MockSmartHome()
         self.sh.with_items_from(common.BASE + '/plugins/database/tests/test_items.yaml')
-        plugin = Database(self.sh, 'sqlite3', {'database' : ':memory:'})
+
+        # In test environments the full SmartPlugin parameter loading infrastructure
+        # is not available, so get_parameter_value() would return None for everything.
+        # Inject the plugin.yaml defaults directly as a class-level parameter dict so
+        # the Database constructor can initialise without errors.
+        Database._parameters = {
+            'driver':                   'sqlite3',
+            'connect':                  {'database': ':memory:'},
+            'prefix':                   '',
+            'cycle':                    60,
+            'removeold_cycle':          91,
+            'precision':                2,
+            'time_precision':           3,
+            'count_logentries':         False,
+            'max_delete_logentries':    20000,
+            'max_reassign_logentries':  20,
+            'default_maxage':           0,
+            'copy_database':            False,
+            'copy_database_name':       '',
+        }
+
+        plugin = Database(self.sh)
         for item in self.sh.return_items():
             plugin.parse_item(item)
         return plugin
