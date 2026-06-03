@@ -331,7 +331,7 @@ Eintrag in der ``log``-Tabelle trägt jetzt eine Spalte ``val_quality``:
 | ``0`` | Normaler, gültiger Messwert (Standard; alle alten Zeilen).|
 +-------+-----------------------------------------------------------+
 | ``1`` | Keine Daten verfügbar (Lücke).  Alle ``val_*`` Spalten    |
-|       | sind ``NULL``.  Wird bei Aggregationen ausgeschlossen.     |
+|       | sind ``NULL``.  Wird bei Aggregationen ausgeschlossen.    |
 +-------+-----------------------------------------------------------+
 
 item.db_mark_invalid()
@@ -387,4 +387,17 @@ Einträge mit ``val_quality = 1`` werden bei folgenden Funktionen automatisch
 Bei Rohwertabfragen (``raw``) erscheinen Lückeneinträge als ``NULL``, damit
 Visualisierungen die Unterbrechung als echte Lücke darstellen können.
 
+Implizite Revalidierung
+------------------------
+
+Trifft ein neuer Messwert über ``update_item()`` ein, während für das Item noch
+eine offene Datenlücke besteht, **schließt das Plugin die Lücke automatisch** —
+ohne dass ``db_mark_valid()`` vorher explizit aufgerufen werden muss.  Die
+Lückendauer wird dabei korrekt ab dem Öffnungszeitpunkt der Lücke berechnet,
+nicht ab der letzten regulären Wertänderung.
+
+Das bedeutet: Wenn ein Gerät nach einem Verbindungsabbruch wieder Werte liefert,
+genügt es, den neuen Messwert direkt zu setzen.  ``db_mark_valid()`` ist dann
+optional und muss nur explizit aufgerufen werden, wenn die Lücke geschlossen
+werden soll, *bevor* der erste neue Messwert bekannt ist.
 
