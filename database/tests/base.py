@@ -21,9 +21,19 @@ class TestDatabaseBase(unittest.TestCase):
         # is not available, so get_parameter_value() would return None for everything.
         # Inject the plugin.yaml defaults directly as a class-level parameter dict so
         # the Database constructor can initialise without errors.
+        #
+        # Use a named temp file rather than ':memory:' because SQLite3 opens a
+        # separate, independent in-memory database for every connection.  The plugin
+        # creates two connections (_db and _db_maint); with ':memory:' they cannot
+        # see each other's data, which breaks build_orphanlist() and any test that
+        # uses the maintenance connection.  A shared on-disk file avoids this.
+        self._db_file = tempfile.NamedTemporaryFile(suffix='.db', delete=False)
+        self._db_file.close()
+        self.addCleanup(os.unlink, self._db_file.name)
+
         Database._parameters = {
             'driver':                   'sqlite3',
-            'connect':                  {'database': ':memory:'},
+            'connect':                  {'database': self._db_file.name},
             'prefix':                   '',
             'cycle':                    60,
             'removeold_cycle':          91,

@@ -260,6 +260,16 @@ class TestDatabaseBasic(TestDatabaseBase):
         self.create_item(plugin, 'main.nodb')
         # cleanup() only sets flags for the scheduler; drive the orphan-removal
         # loop directly so the test doesn't depend on a running scheduler.
+        #
+        # Explicit commit required: insertItem() writes to _db but does not
+        # call commit().  The plugin maintains two separate SQLite connections
+        # (_db for normal I/O, _db_maint for maintenance tasks).  SQLite
+        # transaction isolation means _db_maint cannot see data that is still
+        # in an open transaction on _db, so build_orphanlist() would return an
+        # empty list and remove_orphan_items() would crash with IndexError.
+        # In production the scheduler calls _dump() → _db.commit() before
+        # remove_older_than_maxage() ever runs; here we replicate that.
+        plugin._db.commit()
         plugin.cleanup()
         plugin.build_orphanlist()
         while plugin.remove_orphan:
