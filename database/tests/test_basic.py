@@ -258,7 +258,12 @@ class TestDatabaseBasic(TestDatabaseBase):
         plugin = self.plugin()
         self.create_item(plugin, 'main.num')
         self.create_item(plugin, 'main.nodb')
+        # cleanup() only sets flags for the scheduler; drive the orphan-removal
+        # loop directly so the test doesn't depend on a running scheduler.
         plugin.cleanup()
+        plugin.build_orphanlist()
+        while plugin.remove_orphan:
+            plugin.remove_orphan_items()
         items = plugin.readItems()
         self.assertEqual(1, len(items))
         self.assertEqual("main.num", items[0][1])
