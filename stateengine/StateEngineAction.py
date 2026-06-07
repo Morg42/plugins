@@ -622,7 +622,6 @@ class SeActionBase(StateEngineTools.SeItemChild):
             self.real_execute(state, actionname, namevar, repeat_text, None, False, current_condition, previous_condition, previousstate_condition, next_condition)
         else:
             instanteval = None if self.__instanteval is None else self.__instanteval.get()
-            overwrite = None if self.__overwrite is None else self.__overwrite.get()
             self._log_info("Action '{0}': Add {1} second timer '{2}' "
                            "for delayed execution.{3} Instant Eval: {4}", self._name, delay,
                            self._scheduler_name, repeat_text, instanteval)
