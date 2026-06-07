@@ -46,11 +46,8 @@ except Exception:
     VIS_ENABLED = False
 
 
-logging.addLevelName(StateEngineDefaults.VERBOSE, 'DEVELOP')
-
-
 class StateEngine(SmartPlugin):
-    PLUGIN_VERSION = '2.2.2'
+    PLUGIN_VERSION = '2.3.0'
 
     # Constructor
     # noinspection PyUnusedLocal,PyMissingConstructor
