@@ -495,7 +495,8 @@ class SeItem:
             self.__active_schedulers.append(name)
 
     def remove_scheduler_entry(self, name):
-        self.__active_schedulers.remove(name)
+        if name in self.__active_schedulers:
+            self.__active_schedulers.remove(name)
 
     def remove_all_schedulers(self):
         for entry in self.__active_schedulers:
@@ -517,8 +518,11 @@ class SeItem:
             self.__logger.debug("{} not running (anymore). Queue not activated.",
                                 StateEngineDefaults.plugin_identification)
             return
+        self.update_lock.acquire(True, 10)
+        self.__logger.develop("Geting log level")
         _current_log_level = self.__log_level.get()
         _default_log_level = self.__logger.default_log_level.get()
+        self.__logger.debug("Running queue")
 
         if _current_log_level <= -1:
             self.__using_default_log_level = True
@@ -566,7 +570,7 @@ class SeItem:
             additional_text = ""
         self.__logger.debug("Current suspend time {}, default {}{}",
                             _suspend_time, self.__default_suspend_time, additional_text)
-        self.update_lock.acquire(True, 10)
+
         self.__reorder_states(init=False)
         all_released_by = {}
         new_state = None
