@@ -491,7 +491,6 @@ class SeActionBase(StateEngineTools.SeItemChild):
             _validitem = True
         except Exception:
             _validitem = False
-        self._log_develop("Action '{0}' validitem '{1}'", self._name, _validitem)
         if not self._can_execute(state):
             self._log_decrease_indent()
             return
@@ -606,9 +605,6 @@ class SeActionBase(StateEngineTools.SeItemChild):
         return True
 
     def _waitforexecute(self, state, actionname: str, namevar: str = "", repeat_text: str = "", delay: int = 0, current_condition: list[str] = None, previous_condition: list[str] = None, previousstate_condition: list[str] = None, next_condition: list[str] = None):
-        def _log_actionscheduler(message=""):
-            self._log_develop("Action {} successfully executed. {}", namevar, message)
-
         if current_condition is None:
             current_condition = []
         if previous_condition is None:
@@ -620,84 +616,44 @@ class SeActionBase(StateEngineTools.SeItemChild):
 
         self._log_decrease_indent(50)
         self._log_increase_indent()
-        vals = {
-            'state': state,
-            'actionname': actionname,
-            'namevar': self._name,
-            'repeat_text': repeat_text,
-            'value': None,
-            'current_condition': current_condition,
-            'previous_condition': previous_condition,
-            'previousstate_condition': previousstate_condition,
-            'next_condition': next_condition
-        }
         if delay == 0:
-            if self._scheduler_name:
-                self._abitem.scheduler_remove(self._scheduler_name, "action")
+            self._abitem.scheduler_remove(self._scheduler_name)
             self._log_info("Action '{}': Running.", namevar)
-            self.real_execute(
-                state, actionname, namevar, repeat_text,
-                None, False,  # False = kein Instant Eval
-                current_condition, previous_condition,
-                previousstate_condition, next_condition
-            )
+            self.real_execute(state, actionname, namevar, repeat_text, None, False, current_condition, previous_condition, previousstate_condition, next_condition)
         else:
             instanteval = None if self.__instanteval is None else self.__instanteval.get()
             overwrite = None if self.__overwrite is None else self.__overwrite.get()
+            self._log_info("Action '{0}': Add {1} second timer '{2}' "
+                           "for delayed execution.{3} Instant Eval: {4}", self._name, delay,
+                           self._scheduler_name, repeat_text, instanteval)
             next_run = self.shtime.now() + datetime.timedelta(seconds=delay)
-            self._log_info(
-                "Action '{0}': Add {1} second timer '{2}' for delayed execution.{3} Instant Eval: {4}. Overwrite: {5}. Action will run at {6}",
-                self._name, delay, self._scheduler_name, repeat_text, instanteval, overwrite, next_run
-            )
-
             if instanteval is True:
                 self._log_increase_indent()
                 self._log_debug("Evaluating value for delayed action '{}'.", namevar)
-
-                vals['value'] = self.real_execute(
-                    state, actionname, self._name, repeat_text,
-                    None, True,
-                    current_condition, previous_condition,
-                    previousstate_condition, next_condition
-                )
-
-                self._log_debug("Value for delayed action is going to be '{}'.", vals['value'])
+                value = self.real_execute(state, actionname, namevar, repeat_text, None, True, current_condition, previous_condition, previousstate_condition, next_condition)
+                self._log_debug("Value for delayed action is going to be '{}'.", value)
                 self._log_decrease_indent()
-
+            else:
+                value = None
+            self._abitem.add_scheduler_entry(self._scheduler_name)
             self.update_webif_actionstatus(state, self._name, 'Scheduled')
+            self._se_plugin.scheduler_add(self._scheduler_name, self._delayed_execute,
+                                          value={'actionname': actionname, 'namevar': self._name,
+                                                 'repeat_text': repeat_text, 'value': value,
+                                                 'current_condition': current_condition,
+                                                 'previous_condition': previous_condition,
+                                                 'previousstate_condition': previousstate_condition,
+                                                 'next_condition': next_condition, 'state': state}, next=next_run)
 
-            self._abitem.scheduler_add(
-                self._scheduler_name,
-                self,
-                value=vals,
-                next=next_run,
-                overwrite=overwrite,
-                callback=_log_actionscheduler,
-                scheduler_type="action"
-            )
-
-    def delayed_execute(self, actionname: str, namevar: str = "", repeat_text: str = "", value=None, current_condition=None, previous_condition=None, previousstate_condition=None, next_condition=None, state=None, caller=None):
-        self._log_debug(
-            "Putting action '{}'{} into queue. Caller: {}", namevar,
-            f" from state '{state}'" if state else "", caller
-        )
-
-        self.__queue.put([
-            "delayedaction",
-            self,
-            actionname,
-            namevar,
-            repeat_text,
-            value,
-            current_condition,
-            previous_condition,
-            previousstate_condition,
-            next_condition,
-            state
-        ])
+    def _delayed_execute(self, actionname: str, namevar: str = "", repeat_text: str = "", value=None, current_condition=None, previous_condition=None, previousstate_condition=None, next_condition=None, state=None, caller=None):
+        if state:
+            self._log_debug("Putting delayed action '{}' from state '{}' into queue. Caller: {}", namevar, state, caller)
+            self.__queue.put(["delayedaction", self, actionname, namevar, repeat_text, value, current_condition, previous_condition, previousstate_condition, next_condition, state])
+        else:
+            self._log_debug("Putting delayed action '{}' into queue. Caller: {}", namevar, caller)
+            self.__queue.put(["delayedaction", self, actionname, namevar, repeat_text, value, current_condition, previous_condition, previousstate_condition, next_condition])
         if not self._abitem.update_lock.locked():
             self._log_debug("Running queue")
-            self._log_increase_indent()
             self._abitem.run_queue()
 
     # Really execute the action (needs to be implemented in derived classes)

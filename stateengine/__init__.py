@@ -29,8 +29,6 @@ from . import StateEngineFunctions
 from . import StateEngineValue
 from . import StateEngineWebif
 from . import StateEngineStructs
-from . import StateEngineScheduler
-
 import logging
 import os
 import copy
@@ -66,8 +64,6 @@ class StateEngine(SmartPlugin):
         self.init_webinterface(WebInterface)
         self.__sh.stateengine_plugin_functions = StateEngineFunctions.SeFunctions(self.__sh, self.logger)
         try:
-            self._action_scheduler = StateEngineScheduler.ActionScheduler(self.__sh, self, self.logger)
-            self.scheduler_add('actionscheduler', self._action_scheduler.run, cron='init')
             log_level = self.get_parameter_value("log_level")
             startup_log_level = self.get_parameter_value("startup_log_level")
             log_directory = self.get_parameter_value("log_directory")
@@ -113,7 +109,7 @@ class StateEngine(SmartPlugin):
             if log_maxage > 0:
                 self.logger.info("StateEngine extended log files will be deleted after {0} days.".format(log_maxage))
                 cron = ['init', '30 0 * *']
-                self.scheduler_add('remove old logfiles', SeLogger.remove_old_logfiles, cron=cron, offset=0)
+                self.scheduler_add('Remove old logfiles', SeLogger.remove_old_logfiles, cron=cron, offset=0)
 
         except Exception as ex:
             self._init_complete = False
@@ -151,7 +147,6 @@ class StateEngine(SmartPlugin):
         if len(self._items) > 0:
             self.logger.info("Using StateEngine for {} items".format(len(self._items)))
         else:
-            self.scheduler_remove('actionscheduler')
             self.logger.info("StateEngine deactivated because no items have been found.")
 
         self.__cli = StateEngineCliCommands.SeCliCommands(self.__sh, self._items, self.logger)
@@ -164,6 +159,9 @@ class StateEngine(SmartPlugin):
         self.scheduler_remove_all()
         for item in self._items:
             self._items[item].ab_alive = False
+            self.scheduler_remove('{}'.format(item))
+            self.scheduler_remove('{}-Startup Delay'.format(item))
+            self._items[item].remove_all_schedulers()
 
         self.alive = False
         self.__sh.stateengine_plugin_functions.ab_alive = False
