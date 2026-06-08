@@ -48,7 +48,7 @@ class iCal(SmartPlugin):
             self.handle_login = self.get_parameter_value('handle_login')
             try:
                 self.dl = Http(timeout=self.get_parameter_value('timeout'), hide_login=self.handle_login)
-            except:
+            except Exception:
                 self.dl = Http(hide_login=self.handle_login)
             self._items = []
             self._icals = {}

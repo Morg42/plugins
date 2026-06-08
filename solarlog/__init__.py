@@ -220,7 +220,7 @@ class SolarLog(SmartPlugin):
                     else:
                         try:
                             vars(self)[name] = [None] * int(value)
-                        except:
+                        except Exception:
                             vars(self)[name] = [x.strip(' "')
                                                 for x in value.split(',')]
                     continue
@@ -391,8 +391,8 @@ class SolarLog(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

@@ -93,7 +93,7 @@ class WebInterface(SmartPluginWebIf):
 
         try:
             tmpl = self.tplenv.get_template('index.html')
-        except:
+        except Exception:
             self.logger.error("Template file 'index.html' not found")
         else:
             # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)

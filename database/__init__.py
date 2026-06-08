@@ -411,7 +411,7 @@ class Database(SmartPlugin):
         try:
             database_name = next((s for s in self._connect if s.startswith("database:")), '')
             database_name = database_name[9:].strip()
-        except:
+        except Exception:
             database_name = ''
 
         # copy the database file
@@ -444,7 +444,7 @@ class Database(SmartPlugin):
 
         try:
             item_path = str(item.property.path)
-        except:
+        except Exception:
             item_path = item
         try:
             id = self.readItem(item_path, cur=cur)
@@ -474,7 +474,7 @@ class Database(SmartPlugin):
 
         try:
             item_path = str(item.property.path)
-        except:
+        except Exception:
             item_path = item
         try:
             row = self.readItem(item_path, cur=None)
@@ -515,7 +515,7 @@ class Database(SmartPlugin):
 
         try:
             item_path = str(item.property.path)
-        except:
+        except Exception:
             item_path = item
         try:
             row = self.readItem(item_path, cur=None)
@@ -1341,7 +1341,7 @@ class Database(SmartPlugin):
         ts = self._timestamp(self.shtime.now())
         try:
             return min(ts, int(dts))    # rts, if dts is an integer value, return now, if dts is a timestamp in th future
-        except:
+        except Exception:
             pass
 
         duration = 0
@@ -1378,7 +1378,7 @@ class Database(SmartPlugin):
         _frames = {'s': second, 'i': minute, 'h': hour, 'd': day, 'w': week, 'm': month, 'y': year}
         try:
             return int(frame)
-        except:
+        except Exception:
             pass
         ts = self._timestamp(self.shtime.now())
         # if frame == 'now':
@@ -1392,7 +1392,7 @@ class Database(SmartPlugin):
             return frame
         try:
             ts = int(float(frame) * fac)
-        except:
+        except Exception:
             self.logger.warning("Database: Unknown time frame '{0}'".format(frame))
         return ts
 
@@ -1606,7 +1606,7 @@ class Database(SmartPlugin):
 
         try:
             item_id = self.id(item, create=False)
-        except:
+        except Exception:
             if item_id is None:
                 self.logger.info(f"remove_older_: no id for item {itempath}")
             else:

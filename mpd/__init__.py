@@ -131,7 +131,7 @@ class MPD(SmartPlugin):
             self.scheduler_remove('update_status')
         try:
             self._client.close()
-        except:
+        except Exception:
             pass
 
     def handle_connect(self, client):
@@ -282,7 +282,7 @@ class MPD(SmartPlugin):
                 if item.type() == 'num':
                     try:
                         val = float(val)
-                    except:
+                    except Exception:
                         self.logger.error(f"can't parse {val} to float")
                         continue
                 elif item.type() == 'bool':

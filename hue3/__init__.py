@@ -318,7 +318,7 @@ class HueApiV2(SmartPlugin):
         self.update_items_with_mapping(event_item, mapping_root, 'xy', [event_item.color.xy.x, event_item.color.xy.y], initialize)
         try:
             mirek = event_item.color_temperature.mirek
-        except:
+        except Exception:
             mirek = 0
         self.update_items_with_mapping(event_item, mapping_root, 'ct', mirek, initialize)
         self.update_items_with_mapping(event_item, mapping_root, 'alert', event_item.alert.action_values[0].value, initialize)

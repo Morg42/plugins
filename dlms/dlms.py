@@ -54,7 +54,7 @@ try:
     with open(exportfile, 'r') as infile:
         y = YAML(typ='safe')
         manufacturer_ids = y.load(infile)
-except:
+except Exception:
     pass
 """
 This module implements the query of a smartmeter using the DLMS protocol.

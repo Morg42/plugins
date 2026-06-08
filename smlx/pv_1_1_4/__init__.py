@@ -238,7 +238,7 @@ class Smlx(SmartPlugin):
                 elif self._sock is not None:
                     self._sock.shutdown(socket.SHUT_RDWR)
                     self._sock = None
-            except:
+            except Exception:
                 pass
             self.logger.info('SML: Disconnected!')
             self.connected = False

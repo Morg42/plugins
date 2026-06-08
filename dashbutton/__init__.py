@@ -136,7 +136,7 @@ class Dashbutton(SmartPlugin):
                                     if reset_time <= delta:
                                         reset = True
                                         self._logger.debug("reset timer activated for item {item}".format(item=item))
-                                except:
+                                except Exception:
                                     self._logger.warning("Atrribute 'dashbutton_reset' has to be "
                                                          "an int value. Ignoring value.")
                             # check whether the prev item value was configured in dashbutton_value or not

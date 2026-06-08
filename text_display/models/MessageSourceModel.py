@@ -8,7 +8,7 @@ class MessageSourceModel():
     def __get_is_relevant(self):
         try:
             return self.__is_relevant_fnc()
-        except:
+        except Exception:
             raise Exception(
                 f"Cannot read relevance from {self.__content_source_path}")
     is_relevant = property(__get_is_relevant)
@@ -16,7 +16,7 @@ class MessageSourceModel():
     def __get_content_value(self):
         try:
             return self.__get_content()
-        except:
+        except Exception:
             raise Exception(
                 f"Cannot read value from {self.__content_source_path}")
     content = property(__get_content_value)

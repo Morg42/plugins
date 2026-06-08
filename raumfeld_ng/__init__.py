@@ -363,7 +363,7 @@ class Raumfeld_ng(SmartPlugin):
         response = json.loads(content.decode('utf-8'))
         try:
             info = response['data']['zoneConfig']['zones']
-        except:
+        except Exception:
             self.logger.error(response["errorMsg"])
             return None
         ZoneCheckList = []
@@ -406,7 +406,7 @@ class Raumfeld_ng(SmartPlugin):
         response = json.loads(content.decode('utf-8'))
         try:
             zs = response["data"][0]
-        except:
+        except Exception:
             self.logger.error("No Data for Zone " + zone["Name"] + " found")
             return
 
@@ -431,7 +431,7 @@ class Raumfeld_ng(SmartPlugin):
                 zone["PlayMedia"]["CurrentTrack"] = zs["CurrentTrack"]
 
                 zone["PlayMedia"]["PlayState"] = zs["TransportState"]
-            except:
+            except Exception:
                 print(json.dumps(zs, sort_keys=True, indent=3, ensure_ascii=False))
                 print("Media Meta Data incomplete")
 
@@ -458,8 +458,8 @@ class Raumfeld_ng(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

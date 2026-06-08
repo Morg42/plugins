@@ -37,12 +37,12 @@ from   pymodbus import version as pymodbusversion
 
 try:   # Modbus rtu/serial, for pymodbus3+ or pymodbus2.x
     from pymodbus.client import ModbusSerialClient
-except:
+except Exception:
     from pymodbus.client.sync import ModbusSerialClient
 
 try:   # Modbus tcp, for pymodbus3+ or pymodbus2.x
     from pymodbus.client.tcp import ModbusTcpClient
-except:
+except Exception:
     from pymodbus.client.sync import ModbusTcpClient
 
 
@@ -129,8 +129,8 @@ class trovis557x(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

@@ -104,11 +104,11 @@ class Roomba(SmartPlugin):
         self.alive = False
         try:
             self._sh.scheduler.remove('Roomba')
-        except:
+        except Exception:
             self.logger.error("Roomba: Removing Roomba from scheduler failed: {}".format(sys.exc_info()))
         try:
             self._socket.close()
-        except:
+        except Exception:
             self.logger.error("Roomba: Closing connection failed: {}".format(sys.exc_info()))
 
     def init_command(self):
@@ -121,21 +121,21 @@ class Roomba(SmartPlugin):
         if self.is_connected == 'False':
             try:
                 self.connect()
-            except:
+            except Exception:
                 self.logger.error("Roomba: (Re)connect failed in send")
         if self.is_connected == 'True':
             if type(raw) is list:
                 self.logger.debug("Roomba: Send List:{0}".format(raw))
                 try:
                     self._socket.send(bytearray(raw))
-                except:
+                except Exception:
                     self.logger.error("Roomba: Send failed for {}!".format(raw))
                     self.is_connected = 'False'
             else:
                 self.logger.debug("Roomba: Send Single:{0}".format([raw]))
                 try:
                     self._socket.send(bytearray([raw]))
-                except:
+                except Exception:
                     self.logger.error("Roomba: Send failed for {}!".format([raw]))
                     self.is_connected = 'False'
 
@@ -152,7 +152,7 @@ class Roomba(SmartPlugin):
                 self._socket.connect((self._socket_addr, self._socket_port))
             logger.debug("Roomba: Connected to {}".format(self._socket_addr))
             self.is_connected = 'True'
-        except:
+        except Exception:
             logger.error("Roomba: Function connect failed {}".format(sys.exc_info()))
             self.is_connected = 'False'
     
@@ -224,7 +224,7 @@ class Roomba(SmartPlugin):
                     wait = float(i)
                     time.sleep(wait)
                     #print ('SLEEP {0}'.format(wait))
-                except:
+                except Exception:
                     self.send(cmd_dict[i])
                     #print (cmd_dict[i])
         else:
@@ -396,8 +396,8 @@ class Roomba(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

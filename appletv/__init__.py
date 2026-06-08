@@ -146,7 +146,7 @@ class AppleTV(SmartPlugin):
             if hasattr(self._atv_rc, command):
                 try:
                     await getattr(self._atv_rc, command)()
-                except:
+                except Exception:
                     self.logger.error("Error launching coroutine {}".format(command))
             else:
                 self.logger.error("Coroutine {} not found".format(command))
@@ -217,7 +217,7 @@ class AppleTV(SmartPlugin):
                 self._paired = True
             else:
                 self.logger.warning('Error setting credentials, please re-pair !')
-        except:
+        except Exception:
             self.logger.warning('No credentials found, you must pair this device !')
             return False
         return True
@@ -303,7 +303,7 @@ class AppleTV(SmartPlugin):
             self._update_items("artwork_height", _artwork.height)
             self._update_items("artwork_mimetype", _artwork.mimetype)
             self._update_items("artwork_base64", base64.b64encode(_artwork.bytes).decode())
-        except:
+        except Exception:
             pass
 
     def _update_items(self, attribute, value):
@@ -357,7 +357,7 @@ class AppleTV(SmartPlugin):
                         _time_passed = int(round((datetime.datetime.now() - self._position_timestamp).total_seconds()))
                         self._update_position(self._position + _time_passed, False)
                     _cycle = 0
-        except:
+        except Exception:
             #self.logger.error('*** DEBUG ***')
             return
 
@@ -376,7 +376,7 @@ class AppleTV(SmartPlugin):
             _app = self._device.metadata.app
             self._update_items('playing_app_name', _app.name if _app.name else '---')
             self._update_items('playing_app_identifier', _app.identifier if _app.identifier else '---')
-        except:
+        except Exception:
             pass
 
         self._update_items('playing_state', playstatus.device_state.value)

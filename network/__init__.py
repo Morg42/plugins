@@ -424,7 +424,7 @@ class Network(SmartPlugin):
         for listener in self._dispatcher_list:
             try:  # keep some ugly errors on keyboard interrupt hidden
                 listener.close()
-            except:
+            except Exception:
                 pass
         self._dispatcher_list = []
         self.alive = False

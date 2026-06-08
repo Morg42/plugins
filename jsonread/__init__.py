@@ -238,7 +238,7 @@ class JSONREAD(SmartPlugin):
         else:
             try:
                 cmp_val = float(raw_val)
-            except:
+            except Exception:
                 cmp_val = raw_val
 
         # Traversiere verschachtelte Keys
@@ -250,7 +250,7 @@ class JSONREAD(SmartPlugin):
                 cmp_num = float(cmp_val)
                 val = val_num
                 cmp_val = cmp_num
-            except:
+            except Exception:
                 pass
 
             if op == '==':

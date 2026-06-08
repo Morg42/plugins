@@ -96,7 +96,7 @@ class Homematic(SmartPlugin):
             self.hm = HMConnection(interface_id="myserver", autostart=False,
                                     eventcallback=self.eventcallback, systemcallback=self.systemcallback,
                                     remotes=remotes, localport=self.proxyPort, local="0.0.0.0")
-        except:
+        except Exception:
             self.logger.error("Unable to create HomeMatic object")
             self._init_complete = False
             return
@@ -115,7 +115,7 @@ class Homematic(SmartPlugin):
                 self.hmip = HMConnection(interface_id="myserver_ip", autostart=False,
                                           eventcallback=self.eventcallback, systemcallback=self.systemcallback,
                                           remotes=remotes, localport=self.proxyPort_hmip, local="0.0.0.0")
-            except:
+            except Exception:
                 self.logger.error("Unable to create HomeMaticIP object")
 #                self._init_complete = False
 #                return
@@ -128,7 +128,7 @@ class Homematic(SmartPlugin):
         try:
             self.hm.start()
             self.connected = True
-        except:
+        except Exception:
             self.logger.error("Unable to start HomeMatic object - SmartHomeNG will be unable to terminate the thread vor this plugin (instance)")
             self.connected = False
         #            self._init_complete = False
@@ -139,7 +139,7 @@ class Homematic(SmartPlugin):
         # start communication with HomeMatic ccu
         try:
             self.hmip.start()
-        except:
+        except Exception:
             self.logger.error("{}: Unable to start HomeMaticIP object".format(self.get_fullname()))
         # set the name of the thread that got created by pyhomematic to something meaningfull
         self.hmip._server.name = 'plugins.' + self.get_fullname() + '.ip.server'

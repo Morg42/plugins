@@ -62,7 +62,7 @@ class Resol(SmartPlugin):
             if self.socket: 
                 self.socket.shutdown(0)
                 self.socket.close()
-        except:
+        except Exception:
             pass
         
         self.socket = None

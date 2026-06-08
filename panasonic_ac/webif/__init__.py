@@ -87,7 +87,7 @@ class WebInterface(SmartPluginWebIf):
         result = self.plugin._devices[device_index]['parameters'].get(parametername, '-')
         try:
             result = str(result.value) + ' (' + result.name + ')'   # get name of enum type
-        except:
+        except Exception:
             pass
         if result != '-':
             result = str(result) + suffix

@@ -263,7 +263,7 @@ class Pluggit(SmartPlugin):
         if self._is_connected:
             try:
                 self._Pluggit.close()
-            except:
+            except Exception:
                 pass
         self._is_connected = False
         end_time = time.time()

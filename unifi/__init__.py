@@ -209,7 +209,7 @@ class UniFiControllerClientModel():
                     try:
                         node_body[single_dev_key]['port_enabled'][UniFiConst.ATTR_SW_PORT_PROF_ON] = self._api.get_port_profile_for(
                             n['mac'], port_no)
-                    except:
+                    except Exception:
                         pass
                 else:
                     attached_clnts = {}
@@ -226,7 +226,7 @@ class UniFiControllerClientModel():
                     try:
                         attached_clnts['port_enabled'][UniFiConst.ATTR_SW_PORT_PROF_ON] = self._api.get_port_profile_for(
                             n['mac'], port_no)
-                    except:
+                    except Exception:
                         pass
                     node_body["non_unifi_switch_at_port_{}".format(port_no)] = attached_clnts
         else:
@@ -358,7 +358,7 @@ class UniFiControllerClient(SmartPlugin):
         try:
             self._model._api.logout()
             self.logger.debug("Logout done")
-        except:
+        except Exception:
             self.logger.warning("Exception during logout")
         self.alive = False
 

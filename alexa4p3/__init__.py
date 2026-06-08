@@ -63,7 +63,7 @@ class protocoll(object):
         try:
             if len (myLog) >= 500:
                 myLog = myLog[0:499]
-        except:
+        except Exception:
             return
         now = str(datetime.datetime.now())[0:22]
         myLog.insert(0,str(now)[0:19]+' Type: ' + str(type) + ' - '+str(_text))
@@ -364,7 +364,7 @@ class Alexa4P3(SmartPlugin):
                     retJson=json.loads(myJson)
                     pass
             file.close()
-        except:
+        except Exception:
             self.logger.error("Error while loading Directive : {}".format(cmdName))
         return myDescription,myUrl,retJson
     
@@ -380,7 +380,7 @@ class Alexa4P3(SmartPlugin):
                 if line[1] == "cmd":
                     newCmd = {'Name':line[0]}
                     retValue.append(newCmd)
-            except:
+            except Exception:
                 pass
         
         return json.dumps(retValue)
@@ -532,8 +532,8 @@ class Alexa4P3(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
@@ -675,7 +675,7 @@ class WebInterface(SmartPluginWebIf):
             state_log_file = ''
             for line in my_state_loglines:
                 state_log_file += str(line)+'\n'
-        except:
+        except Exception:
             state_log_file = 'No Data available right now\n'
         
         payload_action = "used Actions Payload V2 = " + str(self.plugin.action_count_v2) + " / " +"<strong>used Actions Payload V3 = " + str(self.plugin.action_count_v3)+'</strong>'

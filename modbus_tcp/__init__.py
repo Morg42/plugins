@@ -414,7 +414,7 @@ class modbus_tcp(SmartPlugin):
 
         try:
             bits = int(''.join(filter(str.isdigit, dataTypeStr)))  # bit-Zahl aus aus dataType z.B. uint16 = 16
-        except:
+        except Exception:
             bits = 16
 
         if regPara['factor'] != 1:
@@ -519,7 +519,7 @@ class modbus_tcp(SmartPlugin):
 
         try:
             bits = int(''.join(filter(str.isdigit, dataTypeStr))) # get only bits from e.g.  'uint32' --> 32
-        except:
+        except Exception:
             bits = 16
 
         if dataType.lower() == 'string':

@@ -318,7 +318,7 @@ class LOGO(SmartPlugin):
         try:
             self.disconnect()
             self.logger.info('{0}: disconnected {1}:{2}'.format(self.get_instance_name(), self.host, self.port))
-        except:
+        except Exception:
             pass
 
     def disconnect(self):

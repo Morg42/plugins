@@ -85,7 +85,7 @@ class ROOMBAPY(SmartPlugin):
         if not self.myroomba.roomba_connected:
             try:
                 self.myroomba.connect()
-            except:
+            except Exception:
                 self.get_status()
                 self._status_items['connect']('false', __name__)
             finally:
@@ -128,93 +128,93 @@ class ROOMBAPY(SmartPlugin):
                 if status_item == "name":
                     try:
                         self._status_items[status_item](status['state']['reported']['name'], __name__)
-                    except:
+                    except Exception:
                         pass
                 # Batterie-Info
                 elif status_item == "bat_cCount":
                     try:
                         self._status_items[status_item](status['state']['reported']['batInfo']['cCount'], __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "status_batterie":
                     try:
                         self._status_items[status_item](status['state']['reported']['batPct'], __name__)
-                    except:
+                    except Exception:
                         pass
                 # Summenwerte über die gesamte Lebenszeit aus bbrun
                 elif status_item == "run_nCliffs":
                     try:
                         self._status_items[status_item](status['state']['reported']['bbrun']['nCliffsF'], __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "run_nPanics":
                     try:
                         self._status_items[status_item](status['state']['reported']['bbrun']['nPanics'], __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "run_time":
                     try:
                         self._status_items[status_item](str(status['state']['reported']['bbrun']['hr']) + ':' + str(
                             status['state']['reported']['bbrun']['min']), __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "run_nScrubs":
                     try:
                         self._status_items[status_item](status['state']['reported']['bbrun']['nScrubs'], __name__)
-                    except:
+                    except Exception:
                         pass
                 # Missionsanzahl aus bbmssn
                 elif status_item == "mission_total":
                     try:
                         self._status_items[status_item](status['state']['reported']['bbmssn']['nMssn'], __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "mission_OK":
                     try:
                         self._status_items[status_item](status['state']['reported']['bbmssn']['nMssnOK'], __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "mission_err":
                     try:
                         self._status_items[status_item](status['state']['reported']['bbmssn']['nMssnF'], __name__)
-                    except:
+                    except Exception:
                         pass
                 # aktueller Missions-Status
                 elif status_item == "MissionStatus_cycle":
                     try:
                         self._status_items[status_item](status['state']['reported']['cleanMissionStatus']['cycle'],
                                                         __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "MissionStatus_phase":
                     try:
                         self._status_items[status_item](status['state']['reported']['cleanMissionStatus']['phase'],
                                                         __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "MissionStatus_error":
                     try:
                         self._status_items[status_item](status['state']['reported']['cleanMissionStatus']['error'],
                                                         __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "MissionStatus_startTime":
                     try:
                         self._status_items[status_item](
                             status['state']['reported']['cleanMissionStatus']['mssnStrtTm'] * 1000, __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "MissionStatus_expireTime":
                     try:
                         self._status_items[status_item](
                             status['state']['reported']['cleanMissionStatus']['expireTm'] * 1000, __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "MissionStatus_initiator":
                     try:
                         self._status_items[status_item](status['state']['reported']['cleanMissionStatus']['initiator'],
                                                         __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "MissionStatus_runTime":
                     self._status_items[status_item](
@@ -236,41 +236,41 @@ class ROOMBAPY(SmartPlugin):
                                                                          'cleanMissionStatus'][
                                                                          'mssnStrtTm'])),
                                 __name__)
-                    except:
+                    except Exception:
                         pass
                 # Last Command
                 elif status_item == "lastCommand_command":
                     try:
                         self._status_items[status_item](status['state']['reported']['lastCommand']['command'], __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "lastCommand_time":
                     try:
                         self._status_items[status_item](status['state']['reported']['lastCommand']['time'] * 1000,
                                                         __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "lastCommand_initiator":
                     try:
                         self._status_items[status_item](status['state']['reported']['lastCommand']['initiator'],
                                                         __name__)
-                    except:
+                    except Exception:
                         pass
                 # Sonstiger allgemeiner Status
                 elif status_item == "dock_known":
                     try:
                         self._status_items[status_item](status['state']['reported']['dock']['known'], __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "bin_present":
                     try:
                         self._status_items[status_item](status['state']['reported']['bin']['present'], __name__)
-                    except:
+                    except Exception:
                         pass
                 elif status_item == "bin_full":
                     try:
                         self._status_items[status_item](status['state']['reported']['bin']['full'], __name__)
-                    except:
+                    except Exception:
                         pass
                 # states reported from roombapy
                 # -----------------------------
@@ -292,15 +292,15 @@ class ROOMBAPY(SmartPlugin):
                 if status_item == "status":  # overall status: 0=not connected, 1=unknown, 2=charging, 3=charging (full), 4=running, 5=pause/stop, 6=going to dock, 7=error
                     try:
                         _mission_phase = status['state']['reported']['cleanMissionStatus']['phase']
-                    except:
+                    except Exception:
                         _mission_phase = 'unknown'
                     try:
                         _battery_state = status['state']['reported']['batPct']
-                    except:
+                    except Exception:
                         _battery_state = 0
                     try:
                         _bin_full = status['state']['reported']['bin']['full']
-                    except:
+                    except Exception:
                         _bin_full = False
                     if not self.myroomba.roomba_connected:
                         self._status_items[status_item](0, __name__)

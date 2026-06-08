@@ -179,7 +179,7 @@ class PanComfortCloud(SmartPlugin):
                 json_token,
                 self._raw
             )
-        except:
+        except Exception:
             self.logger.error("The installed verson of 'pcomfortcloud' package is not compatible with this plugin")
             self._init_complete = False
             return
@@ -420,7 +420,7 @@ class PanComfortCloud(SmartPlugin):
                     try:
                         value = int(self._devices[str(index)]['parameters'][key].value)
                         self.update_items_with_mapping(mapping_root, key, value_enum=self._devices[str(index)]['parameters'][key])
-                    except:
+                    except Exception:
                         value = self._devices[str(index)]['parameters'][key]
                         self.update_items_with_mapping(mapping_root, key, value)
             else:

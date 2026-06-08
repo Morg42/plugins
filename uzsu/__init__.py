@@ -325,7 +325,7 @@ class UZSU(SmartPlugin):
         if self._items.get(item) is None:
             try:
                 self.logger.warning(f'Item {item.property.path} is no valid UZSU item!')
-            except:
+            except Exception:
                 self.logger.warning(f'Item {item} does not exist!')
             return None
         self.activate(activevalue, item)
@@ -341,7 +341,7 @@ class UZSU(SmartPlugin):
         if self._items.get(item) is None:
             try:
                 self.logger.warning(f'Item {item.property.path} is no valid UZSU item!')
-            except:
+            except Exception:
                 self.logger.warning(f'Item {item} does not exist!')
             return None
         if isinstance(activevalue, str):
@@ -366,7 +366,7 @@ class UZSU(SmartPlugin):
         if self._items.get(item) is None:
             try:
                 self.logger.warning(f'Item {item.property.path} is no valid UZSU item!')
-            except:
+            except Exception:
                 self.logger.warning(f'Item {item} does not exist!')
             return None
         backintime = self._backintime if backintime is None else backintime
@@ -397,7 +397,7 @@ class UZSU(SmartPlugin):
         elif self._items.get(item) is None:
             try:
                 self.logger.warning(f'Item {item.property.path} is no valid UZSU item!')
-            except:
+            except Exception:
                 self.logger.warning(f'Item {item} does not exist!')
             return None
         else:
@@ -420,7 +420,7 @@ class UZSU(SmartPlugin):
         if self._items.get(item) is None:
             try:
                 self.logger.warning(f'Item {item.property.path} is no valid UZSU item!')
-            except:
+            except Exception:
                 self.logger.warning(f'Item {item} does not exist!')
             return None
         if isinstance(clear, str):
@@ -442,7 +442,7 @@ class UZSU(SmartPlugin):
         if self._items.get(item) is None:
             try:
                 self.logger.warning(f'Item {item.property.path} is no valid UZSU item!')
-            except:
+            except Exception:
                 self.logger.warning(f'Item {item} does not exist!')
             return None
         if isinstance(clear, str):
@@ -460,7 +460,7 @@ class UZSU(SmartPlugin):
         if self._items.get(item) is None:
             try:
                 self.logger.warning(f'Item {item.property.path} is no valid UZSU item!')
-            except:
+            except Exception:
                 self.logger.warning(f'Item {item} does not exist!')
             return None
         next_item = None
@@ -650,7 +650,7 @@ class UZSU(SmartPlugin):
     def _write_dict_to_item(self, item, comment=""):
         try:
             current_value = item.property.value
-        except:
+        except Exception:
             current_value = None
         if self._items[item] != current_value:
             self.logger.debug(f"Writing dict to item {item} due to {comment}")

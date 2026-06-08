@@ -117,11 +117,11 @@ class ComfoAir(SmartPlugin):
         self.connected = False
         try:
             self._sock.shutdown(socket.SHUT_RDWR)
-        except:
+        except Exception:
             pass
         try:
             self._sock.close()
-        except:
+        except Exception:
             pass
 
     def disconnect_serial(self):
@@ -129,7 +129,7 @@ class ComfoAir(SmartPlugin):
         try:
             self._serialconnection.close()
             self._serialconnection = None
-        except:
+        except Exception:
             pass
 
     def send_bytes(self, packet):

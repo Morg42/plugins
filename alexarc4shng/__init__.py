@@ -178,7 +178,7 @@ class AlexaRc4shNG(SmartPlugin):
         if (not self.login_state and self.credentials != ''):
             try:
                 os.remove(self.update_file)
-            except:
+            except Exception:
                 pass
             self.check_refresh_login()
             self.login_state=self.check_login_state()
@@ -352,12 +352,12 @@ class AlexaRc4shNG(SmartPlugin):
                             myActEcho.playerinfo = myPlayerInfo['playerInfo']
                             actVolume = self.search(myPlayerInfo, "volume")
                             actVolume = self.search(actVolume, "volume")
-                        except:
+                        except Exception:
                             actVolume = 50
                     else:
                         try:
                             actVolume = int(item())
-                        except:
+                        except Exception:
                             actVolume = 50
                         
                 if ("volumeadj" in myCommand.Action.lower()):
@@ -408,7 +408,7 @@ class AlexaRc4shNG(SmartPlugin):
                 for line in fp:
                     last_update_time = float(line)
             fp.close()
-        except:
+        except Exception:
             last_update_time = 0
         
         mytime = time.time()
@@ -437,7 +437,7 @@ class AlexaRc4shNG(SmartPlugin):
             for Replacement in search:
                 myNewValue = myNewValue.replace(search[counter],replace[counter])
                 counter +=1
-        except:
+        except Exception:
             pass
             
         return myNewValue
@@ -611,7 +611,7 @@ class AlexaRc4shNG(SmartPlugin):
         actEcho = None
         try:
             actEcho = self.Echos.get(dvName)
-        except:
+        except Exception:
             self.logger.warning('found no Echo with Name : {}'.format(dvName))
             self._insert_protocoll_entry('found no Echo with Name : {}'.format(dvName))
             return
@@ -873,7 +873,7 @@ class AlexaRc4shNG(SmartPlugin):
                     retJson=json.loads(myJson)
                     pass
             file.close()
-        except:
+        except Exception:
             self.logger.error("Error while loading Commandlet : {}".format(cmdName))
         return myDescription,myUrl,retJson
     
@@ -889,7 +889,7 @@ class AlexaRc4shNG(SmartPlugin):
                 if line[1] == "cmd":
                     newCmd = {'Name':line[0]}
                     retValue.append(newCmd)
-            except:
+            except Exception:
                 pass
         
         return json.dumps(retValue)
@@ -1234,7 +1234,7 @@ class AlexaRc4shNG(SmartPlugin):
             file.close()
             
             myResults.append('login state : %s' % self.login_state)
-        except:
+        except Exception:
             myResults.append('cookieFile- Step 6 - error while writing new cookie-File')
                         
         for entry in myResults:
@@ -1282,8 +1282,8 @@ class AlexaRc4shNG(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))
@@ -1434,7 +1434,7 @@ class WebInterface(SmartPluginWebIf):
                     txt_Result["Status"] = "OK"
                     txt_Result["Step"] = myOrder
                     txt_Result["data"] = { "OTPCode" : mfaCode }
-                except err:
+                except Exception:
                     txt_Result["Status"] = "ERROR"
                     txt_Result["Step"] = myOrder
                     txt_Result["data"] = { "Message" : "OTP could not calculated something seems to be wrong with the MFA<br>Try again" }

@@ -54,7 +54,7 @@ else:
 
 try:
     import openpyxl
-except:
+except Exception:
     sys.exit(f"Package 'openpyxl' was not found. You might install with {install_openpyxl}")
 
 

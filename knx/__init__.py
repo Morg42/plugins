@@ -185,7 +185,7 @@ class KNX(SmartPlugin):
                 try:
                     self.projectpath.parent.mkdir(parents=True, exist_ok=True)
                     self.logger.warning(self.translate("directory {} was created").format(self.projectpath.parent))
-                except:
+                except Exception:
                     self.logger.warning(self.translate("could not create directory {}").format(self.projectpath.parent))
 
     def _send(self, data):
@@ -207,13 +207,13 @@ class KNX(SmartPlugin):
         pkt = bytearray([0, KNXD.GROUP_PACKET])
         try:
             pkt.extend(self.encode(ga, 'ga'))
-        except:
+        except Exception:
             self.logger.warning('groupwrite: ' + self.translate("problem encoding ga: {}").format(ga))
             return
         pkt.extend([0])
         try:
             pkt.extend(self.encode(payload, dpt))
-        except:
+        except Exception:
             self.logger.warning(self.translate('problem encoding payload {} for dpt {}').format(payload,dpt))
             return
         if flag == 'write':
@@ -239,7 +239,7 @@ class KNX(SmartPlugin):
         pkt = bytearray([0, KNXD.CACHE_READ])
         try:
             pkt.extend(self.encode(ga, 'ga'))
-        except:
+        except Exception:
             self.logger.warning("_cacheread: " + self.translate('problem encoding ga: {}').format(ga))
             return
         pkt.extend([0, 0])
@@ -254,7 +254,7 @@ class KNX(SmartPlugin):
         pkt = bytearray([0, KNXD.GROUP_PACKET])
         try:
             pkt.extend(self.encode(ga, 'ga'))
-        except:
+        except Exception:
             self.logger.warning("groupread: " + self.translate('problem encoding ga: {}').format(ga))
             return
         pkt.extend([0, FLAG_KNXREAD])
@@ -381,7 +381,7 @@ class KNX(SmartPlugin):
             try:
                 # expecting an unsigned short integer:
                 client.terminator = struct.unpack(">H", data)[0]
-            except:
+            except Exception:
                 self.logger.error(f"KNX[{self.get_instance_name()}]: problem unpacking length: {data}")
             return
         else:

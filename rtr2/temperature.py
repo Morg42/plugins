@@ -45,13 +45,13 @@ class Temperature():
     def to_int (self, value, default):
         try:
             return int(value)
-        except:
+        except Exception:
             return int(default)
 
     def to_float (self, value, default):
         try:
             return float(value)
-        except:
+        except Exception:
             return float(default)
 
 

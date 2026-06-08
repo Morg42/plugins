@@ -80,7 +80,7 @@ class Simulation(SmartPlugin):
         self.logger.info('Exit Simulation')
         try:
             self.file.close()
-        except:
+        except Exception:
             self.logger.error('No file to close')
         self.alive = False
 
@@ -178,7 +178,7 @@ class Simulation(SmartPlugin):
         self.logger.debug('stop record')
         try:
             self.file.close()
-        except:
+        except Exception:
             self.logger.error('Not running')
 
     # ----------------------------- _start_playbacl ---------------------------------
@@ -202,7 +202,7 @@ class Simulation(SmartPlugin):
         self._message_item('Playback stopped', 'Simulation')
         try:
             self.file.close()
-        except:
+        except Exception:
             self.logger.error('No fileto close')
 
     # --------------------------------- _set_item -----------------------------------
@@ -221,7 +221,7 @@ class Simulation(SmartPlugin):
             item = self.items.return_item(target)
             try:
                 item(value, caller='Simulation')
-            except:
+            except Exception:
                 self.logger.error('Skipped unknown item: {}'.format(target))
         entry = self.file.readline()
         if entry in ['NextDay', 'NextDay\n']:
@@ -386,8 +386,8 @@ class Simulation(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))

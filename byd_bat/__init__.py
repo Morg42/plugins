@@ -832,7 +832,7 @@ class byd_bat(SmartPlugin):
         client = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
         try:
           client.connect((self.ip,8080))
-        except:
+        except Exception:
           self.log_info("client.connect failed (" + self.ip + ")")
           self.byd_root.info.connection(False)
           client.close()
@@ -3060,7 +3060,7 @@ class byd_bat(SmartPlugin):
         
         try:
           data = client.recv(BUFFER_SIZE)
-        except:
+        except Exception:
           self.log_info("read_reg 0x" + f"{reg:04x}" + " failed !")
           return byd_error,0
 
@@ -3078,7 +3078,7 @@ class byd_bat(SmartPlugin):
         client.settimeout(tout)
         try:
           data = client.recv(BUFFER_SIZE)
-        except:
+        except Exception:
           return byd_error,0
         d = []
         for n in range(len(data) - 2):  # ohne CRC
@@ -3111,7 +3111,7 @@ class byd_bat(SmartPlugin):
     def buf2int16SI(self,byteArray,pos):   # signed
         try:
           result = byteArray[pos] * 256 + byteArray[pos + 1]
-        except:
+        except Exception:
           return 0
         if (result > 32768):
             result -= 65536
@@ -3120,14 +3120,14 @@ class byd_bat(SmartPlugin):
     def buf2int16US(self,byteArray,pos):   # unsigned
         try:
           result = byteArray[pos] * 256 + byteArray[pos + 1]
-        except:
+        except Exception:
           return 0
         return result
 
     def buf2int16SIx(self,byteArray,pos):   # signed
         try:
           result = byteArray[pos + 1] * 256 + byteArray[pos]
-        except:
+        except Exception:
           return 0
         if (result > 32768):
             result -= 65536
@@ -3136,7 +3136,7 @@ class byd_bat(SmartPlugin):
     def buf2int16USx(self,byteArray,pos):   # unsigned
         try:
           result = byteArray[pos + 1] * 256 + byteArray[pos]
-        except:
+        except Exception:
           return 0
         return result
 
@@ -3144,7 +3144,7 @@ class byd_bat(SmartPlugin):
 #        self.log_debug("buf2int32US 0=" + f"{byteArray[pos]:02x}" + " 1=" + f"{byteArray[pos+1]:02x}" + " 2=" + f"{byteArray[pos+2]:02x}" + " 3=" + f"{byteArray[pos+3]:02x}")
         try:
           result = byteArray[pos + 2] * 0x01000000 + byteArray[pos + 3] * 0x00010000 + byteArray[pos] * 0x00000100 + byteArray[pos + 1]
-        except:
+        except Exception:
           return 0
         if (result > 0x7FFFFFFF):
             result -= 0x100000000
@@ -3155,7 +3155,7 @@ class byd_bat(SmartPlugin):
 #        self.log_debug("buf2int32US 0=" + f"{byteArray[pos]:02x}" + " 1=" + f"{byteArray[pos+1]:02x}" + " 2=" + f"{byteArray[pos+2]:02x}" + " 3=" + f"{byteArray[pos+3]:02x}")
         try:
           result = byteArray[pos + 2] * 0x01000000 + byteArray[pos + 3] * 0x00010000 + byteArray[pos] * 0x00000100 + byteArray[pos + 1]
-        except:
+        except Exception:
           return 0
 #        self.log_debug("buf2int32US r=" + str(result))
         return result
@@ -3236,8 +3236,8 @@ class byd_bat(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

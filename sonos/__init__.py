@@ -3833,7 +3833,7 @@ class Sonos(SmartPlugin):
             if sonos_speaker[uid].soco is not None:
                 try:
                     speaker_ip = sonos_speaker[uid].ip_address
-                except:
+                except Exception:
                     speaker_ip = "unknown ip"
                 self.logger.warning(f"Removing/disposing undiscovered speaker: {speaker_ip}, {uid}")
                 sonos_speaker[uid].dispose()

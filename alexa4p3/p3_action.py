@@ -618,7 +618,7 @@ def SetColor(self, directive):
     try:
         r,g,b = p3tools.hsv_to_rgb(new_hue,new_saturation,new_brightness)
     except Exception as err:
-        self.logger.error("Alexa P3: SetColor Calculate to RGB failed ({}, {})".format(item.property.path, err))
+        self.logger.error("Alexa P3: SetColor Calculate to RGB failed ({}, {})".format(directive, err))
     
     retValue=[]
     retValue.append(r)

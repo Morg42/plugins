@@ -75,7 +75,7 @@ class SMTP(SmartPlugin):
             try:
                 smtp.quit()
                 del (smtp)
-            except:
+            except Exception:
                 pass
             self.logger.debug("email was sent")
 
@@ -155,7 +155,7 @@ class SMTP(SmartPlugin):
             try:
                 smtp.quit()
                 del(smtp)
-            except:
+            except Exception:
                 pass
 
     def _connect(self):

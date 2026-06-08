@@ -191,13 +191,13 @@ class eBus(SmartPlugin):
         self.connected = False
         try:
             self._sock.shutdown(socket.SHUT_RDWR)
-        except:
+        except Exception:
             pass
         try:
             self._sock.close()
             self._sock = False
             self.logger.info('Connection closed to {0}:{1}'.format(self.host, self.port))
-        except:
+        except Exception:
             pass
 
 

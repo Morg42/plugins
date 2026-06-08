@@ -294,7 +294,7 @@ class Indego4shNG(SmartPlugin):
                     myUrl = self.indego_url + item.conf['indego_config_url'].format(self.alm_sn)
                     myBody = json.loads(item.conf['indego_config'].replace('#',str(item.property.value)))
                     self._send_config(myUrl, myBody)
-                except:
+                except Exception:
                     self.logger.warning("Error building config for item '{}' from caller '{}', source '{}' and dest '{}'".format(item,caller,source,dest))
 
             if self.has_iattr(item.conf, 'indego_function_4_visu'):
@@ -324,7 +324,7 @@ class Indego4shNG(SmartPlugin):
                 command = self.get_iattr_value(item.conf,'indego_command')
                 if item():
                     self.send_command(command,item.property.name)
-            except:
+            except Exception:
                     self.logger.warning("Error sending command for item '{}' from caller '{}', source '{}' and dest '{}'".format(item,caller,source,dest))
 
         if self.has_iattr(item.conf, 'indego_function_4_all'):
@@ -334,7 +334,7 @@ class Indego4shNG(SmartPlugin):
                 myFunction_Name = self.get_iattr_value(item.conf, 'indego_function_4_all')
                 myFunction = getattr(self,myFunction_Name)
                 myFunction(item)
-            except:
+            except Exception:
                 self.logger.warning("failed : Item '{}' has attribute '{}' found with {}".format( item, 'indego_function_4_all', self.get_iattr_value(item.conf, 'indego_function_4_all')))
                             
                
@@ -556,7 +556,7 @@ class Indego4shNG(SmartPlugin):
         url = "{}alms/{}/predictive/location".format( self.indego_url, self.alm_sn)
         try:
             myResult, response = self._put_url( url, self.context_id, body)
-        except err:
+        except Exception as err:
             self.logger.warning("Error during putting Location {}".format(err))
             return False
         return True
@@ -564,7 +564,7 @@ class Indego4shNG(SmartPlugin):
     def _send_config(self,url,body=None):
         try:
             myResult, response = self._put_url( url, self.context_id, body)
-        except err:
+        except Exception as err:
             self.logger.warning("Error during putting Config {}".format(err))
             return False
         return True
@@ -669,14 +669,14 @@ class Indego4shNG(SmartPlugin):
                 self._set_childitem('calendar_predictive_save', False)
                 try:
                     self.scheduler_remove('auto_pred_cal_update')
-                except:
+                except Exception:
                     pass
                 myMsg = "Ausschlusskalender wurde gespeichert"
 
         else: # Bereits drei Versuche getätigt
             try:
                 self.scheduler_remove('auto_pred_cal_update')
-            except:
+            except Exception:
                 pass
             myMsg = """Ausschlusskalender konnte nach drei Versuchen nicht 
                        nicht gespeichert werden. "
@@ -715,7 +715,7 @@ class Indego4shNG(SmartPlugin):
                 self._set_childitem('calendar_save', False)
                 try:
                     self.scheduler_remove('auto_cal_update')
-                except:
+                except Exception:
                     pass
                 myMsg = "Mähkalender wurde gespeichert"
                 # Deactivate the UZSU, when saving the calendar, calendar-mode is activated
@@ -726,7 +726,7 @@ class Indego4shNG(SmartPlugin):
         else: # Bereits drei Versuche getätigt
             try:
                 self.scheduler_remove('auto_mow_cal_update')
-            except:
+            except Exception:
                 pass
             myMsg = """Mähkalender konnte nach drei Versuchen nicht 
                        nicht gespeichert werden. "
@@ -808,7 +808,7 @@ class Indego4shNG(SmartPlugin):
         try:
             if len (myLog) >= 500:
                 myLog = myLog[0:499]
-        except:
+        except Exception:
             return
         now = self.shtime.now()
         myLog.insert(0,str(now)[0:19]+' Type: ' + str(type) + ' Result : '+str(result) + ' Url : ' + url)
@@ -828,7 +828,7 @@ class Indego4shNG(SmartPlugin):
             content = response.json()
             try:
                 expiration_timestamp = int(str(response.cookies._cookies['api.indego.iot.bosch-si.com']['/']).split(',')[11].split('=')[1])
-            except:
+            except Exception:
                 pass
         else:
             self.logger.warning("Problem fetching {}: HTTP : {}".format(url,  response.status_code))
@@ -862,7 +862,7 @@ class Indego4shNG(SmartPlugin):
         if response.status_code == 200 or response.status_code == 201:
             try:
                 content = response
-            except:
+            except Exception:
                 content = False
                 pass
         else:
@@ -907,7 +907,7 @@ class Indego4shNG(SmartPlugin):
                 elif str(response.headers).find("svg") > -1:
                     content = response.content
                     
-            except:
+            except Exception:
                 content = False
                 pass
         else:
@@ -1012,7 +1012,7 @@ class Indego4shNG(SmartPlugin):
         
         try:
             myResult, response = self._put_url( url, self.context_id, myCal)
-        except err:
+        except Exception as err:
             self.logger.warning("Error during saving Calendar-Infos Error {}".format(err))
             return None
             
@@ -1324,7 +1324,7 @@ class Indego4shNG(SmartPlugin):
                     myNewUrl = myText1.split('"')[0].replace('&amp;','&')
                 else:
                     pass
-            except:
+            except Exception:
                 pass
     
             mySession.headers['sec-fetch-site'] = 'cross-site'
@@ -1338,7 +1338,7 @@ class Indego4shNG(SmartPlugin):
                     pass
                 else:
                     myNewUrl = response.history[0].headers['location']
-            except:
+            except Exception:
                 pass
     
             # Signin to Session
@@ -1654,7 +1654,7 @@ class Indego4shNG(SmartPlugin):
             else:
                 return False,'','',0,''
             
-        except err:
+        except Exception as err:
             self._log_communication('LOGIN ', 'something went wrong during getting Sinlge-Key-ID Login on Step : {} - {}'.format(step,err), 999)
             self.logger.warning('something went wrong during getting Sinlge-Key-ID Login on Step : {} - {}'.format(step,err))
             return False,'','',0,''
@@ -1675,7 +1675,7 @@ class Indego4shNG(SmartPlugin):
 
         try:
             response = self._get_url(url, self.context_id, 10)
-        except err:
+        except Exception:
             self.logger.warning("Error during getting predictive Calendar-Infos")
             return None
             
@@ -1694,7 +1694,7 @@ class Indego4shNG(SmartPlugin):
 
         try:
             response = self._get_url(url, self.context_id, 10)
-        except err:
+        except Exception:
             self.logger.warning("Error during getting Calendar-Infos")
             return None
             
@@ -1931,7 +1931,7 @@ class Indego4shNG(SmartPlugin):
                             myStartTime1 = '00:00'
                         try:
                             myEndTime1 = str('%0.2d' %slots['EnHr'])+':'+str('%0.2d' %slots['EnMin'])
-                        except:
+                        except Exception:
                             myEndTime1 = '00:00'
                         myKey = str(myCalendarNo)+'-'+myStartTime1+'-'+myEndTime1
                         myDict = {
@@ -2023,19 +2023,19 @@ class Indego4shNG(SmartPlugin):
             predictiveSetup = self._get_childitem('smartmowsetup')
             try:
                 self._set_childitem('visu.avoid_temperature',predictiveSetup['avoid_temperature'] )
-            except:
+            except Exception:
                 self._set_childitem('visu.avoid_temperature',False)
             try:
                 self._set_childitem('visu.avoid_rain',predictiveSetup['avoid_rain'] )
-            except:
+            except Exception:
                 self._set_childitem('visu.avoid_rain',False)
             try:
                 self._set_childitem('visu.use_grass_growth',predictiveSetup['use_grass_growth'])
-            except:
+            except Exception:
                 self._set_childitem('visu.use_grass_growth',False)
             try:
                 self._set_childitem('visu.full_cuts',predictiveSetup['full_cuts'] )
-            except:
+            except Exception:
                 self._set_childitem('visu.full_cuts',2 )
             
         if (mode == "write"):
@@ -2158,7 +2158,7 @@ class Indego4shNG(SmartPlugin):
                 self._set_childitem('visu.battery_load', myLoad_percent)
                 myLoad_icon = myVoltage/5.0*255.0
                 self._set_childitem('visu.battery_load_icon', myLoad_icon)
-            except err:
+            except Exception:
                 self.logger.warning("Problem to calculate Battery load")
         elif (activeModel == 2):    # the small ones
             try:
@@ -2166,7 +2166,7 @@ class Indego4shNG(SmartPlugin):
                 self._set_childitem('visu.battery_load', myLoad_percent)
                 myLoad_icon = myLoad_percent/100.0*255.0
                 self._set_childitem('visu.battery_load_icon', myLoad_icon)
-            except err:
+            except Exception:
                 self.logger.warning("Problem to calculate Battery load")
         else:
             pass
@@ -2184,14 +2184,14 @@ class Indego4shNG(SmartPlugin):
             if network_data:
                 try:
                     self._parse_dict_2_item(network_data,'network.')
-                except err:
+                except Exception as err:
                     self.logger.warning("Problem parsing Network-Info : {}".format(err))
             
             myMcc = self._get_childitem('network.mcc')
             myMnc = self._get_childitem('network.mnc')
             try:
                 actProvider = self.providers[str(myMcc)+str('%0.2d' %myMnc)]
-            except:
+            except Exception:
                 actProvider = 'unknown('+str(myMcc)+str('%0.2d' %myMnc)+')'
                 self.providers[str(myMcc)+str('%0.2d' %myMnc)] = str(myMcc)+str('%0.2d' %myMnc)+'unknown'
                 self._store_dict_2_item(self.providers,'providers')
@@ -2202,7 +2202,7 @@ class Indego4shNG(SmartPlugin):
             for entry in ProviderLst:
                 try:
                     myLst += self.providers[str(entry)]+', '
-                except:
+                except Exception:
                     myLst += entry + ' - unknown'+', '
             self._set_childitem('visu.network.available_provider', myLst[0:-2])
              
@@ -2278,7 +2278,7 @@ class Indego4shNG(SmartPlugin):
             return
         try:
             weather = self._get_url(self.indego_url +'alms/'+ self.alm_sn +'/predictive/weather',self.context_id,10)
-        except err:
+        except Exception:
             return 
         if not weather:
             return
@@ -2301,7 +2301,7 @@ class Indego4shNG(SmartPlugin):
                 if wertpunkt == 'wwsymbol_mg2008':
                     try:
                         self._set_childitem('weather.int_'+position+'.'+'picture',self.path_2_weather_pics+myPictures[wert])
-                    except:
+                    except Exception:
                         # got known Weather-Symbol
                         self.logger.warning("Got unknown Value for Weather-Pic, Value: {}".format(str(wert)))
                         self._set_childitem('weather.int_'+position+'.'+'picture',self.path_2_weather_pics+'na.png')
@@ -2433,7 +2433,7 @@ class Indego4shNG(SmartPlugin):
             try:
                 myModell = myModells[bareToolnumber].split(',')[0]
                 myModellType = int(myModells[bareToolnumber].split(',')[1])
-            except:
+            except Exception:
                 myModell = "unknown Modell ("+bareToolnumber+")"
                 myModellType = 0
                 self.mowertype[bareToolnumber]="unknown"
@@ -2509,7 +2509,7 @@ class Indego4shNG(SmartPlugin):
                     self._store_dict_2_item(self.states,'states_str')
                    
                         
-            except err:
+            except Exception as err:
                 self.logger.warning("Error while adding new State-Code : {}".format(err))
                 pass
             self._set_childitem('stateCode',state_code)
@@ -2523,7 +2523,7 @@ class Indego4shNG(SmartPlugin):
                 try:
                     if len (myLog) >= 500:
                         myLog = myLog[0:499]
-                except:
+                except Exception:
                     pass
                 now = self.shtime.now()
                 logLine =str(now)[0:19]+'  State : '+str(state_code) + ' State-Message : ' + self.states[state_code][0]
@@ -2742,8 +2742,8 @@ class Indego4shNG(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
@@ -2934,7 +2934,7 @@ class WebInterface(SmartPluginWebIf):
             state_log_file = ''
             for line in my_state_loglines:
                 state_log_file += str(line)+'\n'
-        except:
+        except Exception:
             state_log_file = 'No Data available right now\n'
         
         try:
@@ -2942,7 +2942,7 @@ class WebInterface(SmartPluginWebIf):
             com_log_file = ''
             for line in my_com_loglines:
                 com_log_file += str(line)+'\n'
-        except:
+        except Exception:
             state_log_file = 'No Data available right now\n'
             
         # get the login-times
@@ -2964,7 +2964,7 @@ class WebInterface(SmartPluginWebIf):
             newEntry['ID']='99999'
             newEntry['Caption']="kein State-Trigger"
             selectStates.append(newEntry)
-        except:
+        except Exception:
             pass
         
         try:
@@ -2978,7 +2978,7 @@ class WebInterface(SmartPluginWebIf):
             Alarm_Trigger_2=self.plugin._get_childitem('trigger.alarm_trigger_2.alarm')
             Alarm_Trigger_3=self.plugin._get_childitem('trigger.alarm_trigger_3.alarm')
             Alarm_Trigger_4=self.plugin._get_childitem('trigger.alarm_trigger_4.alarm')
-        except:
+        except Exception:
             pass
         myLongitude = ""
         myLatitude = ""
@@ -2992,7 +2992,7 @@ class WebInterface(SmartPluginWebIf):
                 myLongitude = self.plugin.sh.sun._obs.long / degree
                 myLatitude =  self.plugin.sh.sun._obs.lat  / degree
                 myText = 'Location from shNG-Settings'
-        except:
+        except Exception:
             pass
         
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)

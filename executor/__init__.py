@@ -111,7 +111,7 @@ class Executor(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module('http')
-        except:
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

@@ -544,7 +544,7 @@ class mlgwlistener(threading.Thread):
                 self._mlgwdata = self._mlgwbase._mysocket.recv(self._mlgwbase.buffersize)
             except socket.timeout:
                 timeoutcount += 1
-            except e:
+            except Exception as e:
                 self.logger.info("mlgwlistener error '{0}'".format(e))
             else:
                 timeoutcount = 0
@@ -737,7 +737,7 @@ class Mlgw(SmartPlugin):
                 self.logger.info("Rooms defined: " + str(roomdict))
                 reverse_roomdict = {v.upper(): k for k, v in roomdict.items()}
                 self.logger.info("reverse_roomdict=" + str(reverse_roomdict))
-            except:
+            except Exception:
                 roomdict = {}
                 self.logger.warning("Room definition '{}' is not valid -> No rooms defined".format(self.rooms))
 
@@ -749,7 +749,7 @@ class Mlgw(SmartPlugin):
                 self.logger.info("MLNs defined: " + str(mlndict))
                 reverse_mlndict = {v.upper(): k for k, v in mlndict.items()}
                 self.logger.info("reverse_mlndict=" + str(reverse_mlndict))
-            except:
+            except Exception:
                 mlndict = {}
                 self.logger.warning("MLN definition '{}' is not valid -> No MLNs defined".format(self.mlns))
         self.alive = False
@@ -814,7 +814,7 @@ class Mlgw(SmartPlugin):
             if mln is None:
                 try:
                     mln = int(item.conf['mlgw_mln'])
-                except:
+                except Exception:
                     self.logger.error("Parse item: {0}".format(item) + " - mlgw_mln is not numeric")
                     return None
 
@@ -825,7 +825,7 @@ class Mlgw(SmartPlugin):
                     if wrk is None:
                         try:
                             wrk = int( item.conf['mlgw_cmd'], 16 )
-                        except:
+                        except Exception:
                             pass
                 item.conf['_mlgw_cmd'] = wrk
                 self.logger.info("parse item: {0}".format(item) + ", type=" + item._type + ", item.conf=" + str(item.conf) )
@@ -843,7 +843,7 @@ class Mlgw(SmartPlugin):
             if room is None:
                 try:
                     room = int(item.conf['mlgw_room'])
-                except:
+                except Exception:
                     self.logger.error("parse item: {0}".format(item) + " - mlgw_room is not numeric")
                     return None
 
@@ -853,7 +853,7 @@ class Mlgw(SmartPlugin):
                     if cmd is None:
                         try:
                             cmd = int( item.conf['mlgw_cmd'], 16 )
-                        except:
+                        except Exception:
                             pass
                 elif item._type == 'str':
                     cmd = reverse_beo4commanddict.get('<ALL>')
@@ -869,7 +869,7 @@ class Mlgw(SmartPlugin):
                     if cmd is None:
                         try:
                             cmd = int( item.conf['mlgw_cmd'], 16 )
-                        except:
+                        except Exception:
                             pass
                 elif item._type == 'str':
                     cmd = reverse_beo4commanddict.get('<ALL>')
@@ -883,7 +883,7 @@ class Mlgw(SmartPlugin):
             if mln is None:
                 try:
                     mln = int(item.conf['mlgw_mln'])
-                except:
+                except Exception:
                     self.logger.error("parse item: {0}".format(item) + " - mlgw_mln is not numeric")
                     return None
 
@@ -893,7 +893,7 @@ class Mlgw(SmartPlugin):
                     if source is None:
                         try:
                             source = int( item.conf['mlgw_cmd'], 16 )
-                        except:
+                        except Exception:
                             pass
                 elif item._type == 'str':
                     source = reverse_selectedsourcedict.get('<ALL>')
@@ -909,7 +909,7 @@ class Mlgw(SmartPlugin):
                     if source is None:
                         try:
                             source = int( item.conf['mlgw_cmd'], 16 )
-                        except:
+                        except Exception:
                             pass
                 elif item._type == 'str':
                     source = reverse_speakermodedict.get('<ALL>')
@@ -948,7 +948,7 @@ class Mlgw(SmartPlugin):
             if mln is None:
                 try:
                     mln = int(item.conf['mlgw_mln'])
-                except:
+                except Exception:
                     self.logger.error("update_channel: {0}".format(item) + " - mlgw_mln is not numeric")
                     return None
             self.logger.warning("update channel: {0}".format(item.property.path)+", value="+ str(item()) +", (MLN="+str(mln)+")")   # info
@@ -982,7 +982,7 @@ class Mlgw(SmartPlugin):
             if mln is None:
                 try:
                     mln = int(item.conf['mlgw_mln'])
-                except:
+                except Exception:
                     self.logger.error("update_item: {0}".format(item) + " - mlgw_mln is not numeric")
                     return None
             if item._type == 'str':
@@ -990,7 +990,7 @@ class Mlgw(SmartPlugin):
                 if cmd is None:
                     try:
                         cmd = int( item(), 16 )
-                    except:
+                    except Exception:
                         pass
             elif item._type == 'bool':
                 cmd = item.conf['_mlgw_cmd']

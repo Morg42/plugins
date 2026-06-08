@@ -137,7 +137,7 @@ class WebInterface(SmartPluginWebIf):
         try:
             _datetime = datetime.datetime.fromtimestamp(timestamp)
             result = _datetime.strftime("%d/%m/%Y")
-        except:
+        except Exception:
             result = 'ERROR'
         return result
 
@@ -145,6 +145,6 @@ class WebInterface(SmartPluginWebIf):
         try:
             _datetime = datetime.datetime.fromtimestamp(timestamp)
             result = _datetime.strftime("%H:%M:%S")
-        except:
+        except Exception:
             result = 'ERROR'
         return result

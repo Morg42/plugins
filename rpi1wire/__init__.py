@@ -269,7 +269,7 @@ class Rpi1Wire(SmartPlugin):
                 mytemp = '99999'
             f.close()
             return int(mytemp[1])
-        except:
+        except Exception:
             self.logger.warning(f"can not read sensor {owid}")
             return 99999
 

@@ -100,7 +100,7 @@ class Harmony(SmartPlugin):
                     if 'label' in device and 'id' in device:
                         self._devices[int(device['id'])] = device['label']
             self._set_current_activity()
-        except:
+        except Exception:
             self._client.disconnect(reconnect=False, send_close=False, wait=2)
             self._logger.warning("Harmony: Harmony hub seems to be offline.")
 

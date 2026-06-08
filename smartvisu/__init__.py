@@ -106,7 +106,7 @@ class SmartVisu(SmartPlugin):
         # get instance of websocket module (to enable sv-protocol support)
         try:
             self.mod_websocket = Modules.get_instance().get_module('websocket')
-        except:
+        except Exception:
             self.mod_websocket = None
             self.logger.info("Module 'websocket' could not be initialized.")
 
@@ -115,7 +115,7 @@ class SmartVisu(SmartPlugin):
             self.payload_smartvisu = self.mod_websocket.get_payload_protocol_by_id('sv')
             try:
                 self.payload_smartvisu.set_smartvisu_support(protocol_enabled=True, default_acl=self.default_acl, query_definitions=False, series_updatecycle=0, protocol_over_reverseproxy=self.protocol_over_reverseproxy)
-            except:
+            except Exception:
                 self.logger.exception("Payload protocol 'smartvisu' of module 'websocket' could not be found.")
 
         self.port = ''
@@ -403,7 +403,7 @@ class SmartVisu(SmartPlugin):
 
         try:
             value = config_parser.get('dummy_section', key)
-        except:
+        except Exception:
             self.logger.info("smartVISU is not configured (no entry 'pages' in 'config.ini' file found)")
             return ''
         value = Utils.strip_quotes(value)
@@ -462,7 +462,7 @@ class SmartVisu(SmartPlugin):
                 with open(filename, 'w', encoding='utf-8') as f:
                     json.dump(item_list, f, ensure_ascii=False, indent=4)
                 self.logger.info(f"master-itemfile written to smartVISU (to directory {pagedir_name})")
-            except:
+            except Exception:
                 self.logger.warning(f"Could not write master-itemfile to smartVISU (to directory {pagedir_name})")
         else:
             self.logger.warning("Master-itemfile not written, because the name of the pages directory could not be read from smartVISU")
@@ -479,7 +479,7 @@ class SmartVisu(SmartPlugin):
 
         try:
             result = self.payload_smartvisu.set_visu_url(url, clientip)
-        except:
+        except Exception:
             self.logger.notice("Payload protocol 'smartvisu' of module 'websocket' could not be found.")
 
         return result
@@ -497,7 +497,7 @@ class SmartVisu(SmartPlugin):
         try:
             client_info = self.payload_smartvisu.get_visu_client_info()
             self.logger.info(f"client_info = {client_info}")
-        except:
+        except Exception:
             self.logger.notice("Payload protocol 'smartvisu' of module 'websocket' could not be found.")
             client_info = {}
 

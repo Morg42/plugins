@@ -45,7 +45,7 @@ import threading
 try:
     import serial
     REQUIRED_PACKAGE_IMPORTED = True
-except:
+except Exception:
     REQUIRED_PACKAGE_IMPORTED = False
 
 
@@ -175,7 +175,7 @@ class THZ(SmartPlugin):
             self._update_values()
             self._thzServer.start()
             self.logger.info("plugin started")
-        except:
+        except Exception:
             self.logger.error(
                 "thz: plugin start failed - {}".format(sys.exc_info()))
 
@@ -208,15 +208,15 @@ class THZ(SmartPlugin):
         self.alive = False
         try:
             self.scheduler_remove('THZ')
-        except:
+        except Exception:
             self.logger.error("removing 'thz.update' from scheduler failed - {}".format(sys.exc_info()))
         try:
             self.scheduler_remove('ThzRegister')
-        except:
+        except Exception:
             self.logger.error("removing 'ThzRegister' from scheduler failed - {}".format(sys.exc_info()))
         try:
             self.scheduler_remove('ThzScan')
-        except:
+        except Exception:
             self.logger.error("removing 'ThzScan' from scheduler failed - {}".format(sys.exc_info()))
         self._thzProtocol.stop()
         self._thzServer.stop()
@@ -238,7 +238,7 @@ class THZ(SmartPlugin):
               try:
                   self.scheduler_add('ThzScan', self._logFullScan, next=shtime.now() + datetime.timedelta(milliseconds=10))
                   #self.logger.info('logFullScan requested')
-              except:
+              except Exception:
                   self.logger.error( "thz: scheduling logFullScan failed - {}".format(sys.exc_info()))
             elif item.conf['thz'] == 'logRegister':
               # request logging a register
@@ -248,11 +248,11 @@ class THZ(SmartPlugin):
               try:
                   self.scheduler_add('ThzRegister', self._logRegister, next=shtime.now() + datetime.timedelta(milliseconds=10))
                   #self.logger.info('logRegister requested')
-              except:
+              except Exception:
                   self.logger.error( "thz: scheduling logRegister failed - {}".format(sys.exc_info()))
             else:
               self.logger.warning('thz: Invalid parameter name - {}'.format(item.conf['thz']))
-        except:
+        except Exception:
             self.logger.warning(
                 "thz: Setting parameter failed - {}".format(sys.exc_info()))
 
@@ -263,7 +263,7 @@ class THZ(SmartPlugin):
 
             try:
               msgName = self._thzProtocol.getMsgFromParameter(item.conf['thz'])
-            except:
+            except Exception:
               self.logger.error('thz: ### parse_item - {}'.format(sys.exc_info()))
             try:
               if msgName:
@@ -301,7 +301,7 @@ class THZ(SmartPlugin):
                     return self.update_item
               else:
                 self.logger.warning('thz: No such parameter - {}'.format(item.conf['thz']))
-            except:
+            except Exception:
               self.logger.error('thz: ### parse_item - {}'.format(sys.exc_info()))
  
         return None
@@ -318,7 +318,7 @@ class THZ(SmartPlugin):
                     # a message parameter
                     # add the message name to the list
                     self._extMsgList[msgName] = 1
-            except:
+            except Exception:
                 self.logger.error('thz: ### parse_item - {}'.format(sys.exc_info()))
 
         return self._curData
@@ -332,8 +332,8 @@ class THZ(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
@@ -398,7 +398,7 @@ class ThzServer(threading.Thread):
                 #self.logger.info("Notify '{0}' sent to {1}".format(msg, client))
                 msg = 'notify ' + msg
                 self._server.sendto(msg.encode('ascii'), self._clients[client]['addr'])
-        except:
+        except Exception:
             self.logger.error("Exception: {0}".format(sys.exc_info()))
             pass
 
@@ -431,7 +431,7 @@ class ThzServer(threading.Thread):
                 self.logger.debug("Received *{0}* from {1}:{2}".format(buf, remoteAddr[0], remoteAddr[1]))
 
                 addr = "{0}:{1}".format(remoteAddr[0], remoteAddr[1])
-            except:
+            except Exception:
                 self.logger.error("Exception: {0}".format(sys.exc_info()))
                 continue
 
@@ -440,7 +440,7 @@ class ThzServer(threading.Thread):
                 try:
                     buf = buf.decode('ascii')
                     cmd, params = buf.split(' ')
-                except:
+                except Exception:
                    cmd = buf
 
                 if cmd == 'subscribe':
@@ -461,7 +461,7 @@ class ThzServer(threading.Thread):
                     #self.logger.info("alive from {0}".format(addr))
                     self._clients[addr]['lastContact'] = datetime.datetime.now()
 
-            except:
+            except Exception:
                 self.logger.error("Exception: {0}".format(sys.exc_info()))
 
         self.logger.debug("Thz Server ends run() method")

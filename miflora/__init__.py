@@ -62,7 +62,7 @@ class Miflora(SmartPlugin):
         self.logger.debug("Plugin '{}': 'stop' method called.".format(self.get_fullname()))
         try:
             self.scheduler_remove(__name__)
-        except:
+        except Exception:
             self.logger.error("Plugin '{}': Removing of scheduler failed: {}.".format(self.get_fullname(), sys.exc_info()))
 
         self.alive = False
@@ -109,8 +109,8 @@ class Miflora(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))

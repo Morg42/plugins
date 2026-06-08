@@ -30,7 +30,7 @@ import threading
 try:
     import serial
     REQUIRED_PACKAGE_IMPORTED = True
-except:
+except Exception:
     REQUIRED_PACKAGE_IMPORTED = False
 
 # _dim = 10^((n-1)/(253/3)-1) by JNK from KNX UF
@@ -89,7 +89,7 @@ class DMX(SmartPlugin):
         else:
             try:
                 self._port = serial.Serial(self._serialport, 38400, timeout=1)
-            except:
+            except Exception:
                 self.logger.error("Could not open {}.".format(self._serialport))
                 self._init_complete = False
                 return
@@ -124,7 +124,7 @@ class DMX(SmartPlugin):
         try:
             self._port.write(data.encode())
             ret = self._port.read(1)
-        except:
+        except Exception:
             self.logger.warning("Problem sending data to dmx adapter.")
             ret = False
         finally:
@@ -251,8 +251,8 @@ class DMX(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

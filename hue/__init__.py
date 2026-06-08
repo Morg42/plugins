@@ -562,7 +562,7 @@ class HUE(SmartPlugin):
         # dann der aufruf kompatibel, aber inhaltlich nicht identisch fetch_url aus lib.tools, daher erst eimal das fehlerobjekt nicht mehr da
         try:
             response = client.fetch_url(url, None, None, 2, 0, method, body, errorItem)
-        except:
+        except Exception:
             response = False
         if response:
             # und jetzt der anteil der decodierung, der nicht in der fetch_url drin ist

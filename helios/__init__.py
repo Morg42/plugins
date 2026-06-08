@@ -120,7 +120,7 @@ class HeliosBase(SmartPlugin):
                 timeout=1)
             self._is_connected = True
             return True
-        except:
+        except Exception:
             self.logger.error("Helios: Could not open {0}.".format(self._tty))
             return False
 

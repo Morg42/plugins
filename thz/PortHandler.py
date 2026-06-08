@@ -62,7 +62,7 @@ class PortHandler(threading.Thread):
         try:
           self._fd = serial.Serial(serial_port, baudrate, timeout=5)
           self.logger.info('thz: Connected to serial port - {}'.format(serial_port))
-        except:
+        except Exception:
           self._fd = None
           self.logger.error('thz: Failed to open serial port - {}'.format(sys.exc_info()))
         self._state = IDLE
@@ -193,13 +193,13 @@ class PortHandler(threading.Thread):
 
                   if event is self._txQueue._reader:
                     self._processTxData()
-              except:
+              except Exception:
                 self.logger.error("Data processing failed - {}".format(sys.exc_info()))
                 if self._fd is not None:
                   self._fd.close()
                   self._fd = None
 
-            except:
+            except Exception:
               self.logger.error("select failed - {}".format(sys.exc_info()))
               if self._fd is not None:
                 self._fd.close()
@@ -240,7 +240,7 @@ class PortHandler(threading.Thread):
             self._fd = serial.Serial(serial_port, baudrate, timeout=5)
             self.logger.info('Reconnected to serial port - {}'.format(serial_port))
             return True
-        except:
+        except Exception:
             self._fd = None
             return False
     def closePort(self):
@@ -250,6 +250,6 @@ class PortHandler(threading.Thread):
             self._fd = None
             self.logger.info('Closed serial port.')
             return True
-        except:
+        except Exception:
             self._fd = None
             return False

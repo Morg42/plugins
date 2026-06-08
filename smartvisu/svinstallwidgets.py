@@ -234,7 +234,7 @@ class SmartVisuInstallWidgets:
         self.logger.debug("install_widgets: Creating directory for widgets")
         try:
             os.mkdir(self.outdir)
-        except:
+        except Exception:
             pass
 
         if not os.path.isdir(self.outdir):

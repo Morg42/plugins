@@ -38,7 +38,7 @@ import os
 try:
     import rrdtool
     REQUIRED_PACKAGE_IMPORTED = True
-except:
+except Exception:
     REQUIRED_PACKAGE_IMPORTED = False
 
 
@@ -71,7 +71,7 @@ class RRD(SmartPlugin):
         if not os.path.exists(self._rrd_dir):
             try:
                 os.makedirs(self._rrd_dir)
-            except:
+            except Exception:
                 self.logger.error(f"Unable to create directory '{self._rrd_dir}'")
 
         self._rrds = {}

@@ -95,7 +95,7 @@ class WebInterface(SmartPluginWebIf):
             client['port'] = clientinfo.get('port', '')
             try:
                 client['name'] = socket.gethostbyaddr(client['ip'])[0]
-            except:
+            except Exception:
                 client['name'] = client['ip']
 
             client['proto'] = clientinfo.get('proto', '')
@@ -165,7 +165,7 @@ class WebInterface(SmartPluginWebIf):
                 value_dict['port'] = clientinfo.get('port', '')
                 try:
                     value_dict['name'] = socket.gethostbyaddr(value_dict['ip'])[0]
-                except:
+                except Exception:
                     value_dict['name'] = value_dict['ip']
                 value_dict['proto'] = clientinfo.get('proto', '')
                 value_dict['sw'] = clientinfo.get('sw', '')

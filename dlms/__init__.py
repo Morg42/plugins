@@ -48,7 +48,7 @@ from threading import Semaphore
 try:
     import serial
     REQUIRED_PACKAGE_IMPORTED = True
-except:
+except Exception:
     REQUIRED_PACKAGE_IMPORTED = False
 
 from . import dlms
@@ -185,8 +185,8 @@ class DLMS(SmartPlugin, conversion.Conversion):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module('http')   # try/except to handle running in a core version that does not support modules
-        except:
+            self.mod_http = Modules.get_instance().get_module('http')   # try/except to handle disabled http module
+        except Exception:
              self.mod_http = None
         if self.mod_http is None:
             self.logger.error(f"Plugin '{self.get_shortname()}': Not initializing the web interface")
@@ -283,12 +283,12 @@ class DLMS(SmartPlugin, conversion.Conversion):
                         if Index < 0:
                             self.logger.warning(f"Index '{attribute[1]}' is negative, please provide a positive index or zero")    
                             Index = 0
-                    except:
+                    except Exception:
                         self.logger.warning(f"Index '{attribute[1]}' is not a positive integer")
                         Index = 0
                     try:
                         Key = attribute[2] if len(attribute)>2 else 'Value'
-                    except:
+                    except Exception:
                         pass
                     if Key not in ['Value', 'Unit']: 
                         self.logger.warning(f"Key should be either 'Value' or 'Unit' but is '{Key}', change to 'Value'")
@@ -404,7 +404,7 @@ class DLMS(SmartPlugin, conversion.Conversion):
                         self.logger.debug(f"{line:40} ---> {values}")
                         try:
                             self._update_items(obis_code, values)
-                        except:
+                        except Exception:
                             self.logger.error(f"tried to update items for Obis Code {obis_code} to Values {values} failed with {sys.exc_info()[0]}")
             self.logger.debug("All lines inspected, no more data")
         except Exception:

@@ -65,7 +65,7 @@ class Systemair(SmartPlugin):
             if self.instrument is None:
                 self.instrument = minimalmodbus.Instrument(serialport, int(slave_address))
             return True
-        except:
+        except Exception:
             self.instrument = None
             self.logger.error("Failed to initialize modbus on {serialport}".format(serialport=serialport))
             return False

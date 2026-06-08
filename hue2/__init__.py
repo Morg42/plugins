@@ -852,7 +852,7 @@ class Hue2(SmartPlugin):
             # for qhue versions v2.0.0 and up
             session = requests.Session()
             res = qhue.qhue.Resource(api_url, session, timeout)
-        except:
+        except Exception:
             # for qhue versions prior to v2.0.0
             res = qhue.qhue.Resource(api_url, timeout)
             res = qhue.qhue.Resource(api_url, timeout)

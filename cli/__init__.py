@@ -231,7 +231,7 @@ class CLI(SmartPlugin):
         self.alive = False
         try:  # keep some ugly errors on keyboard interrupt to yourself
             self.server.close()
-        except:
+        except Exception:
             pass
 
     def add_command(self, command, function, usage):

@@ -633,7 +633,7 @@ class AlexaRequestHandler(BaseHTTPRequestHandler):
                         alreadyReportedControllers.append(myAction.response_type)
                     
                     #alreadyReportedControllers.append(myAction.namespace)
-                except:
+                except Exception:
                     self._proto.addEntry('ERROR  ', msg)
         # Add the EndpointHealth Property
         MyNewProperty ={
@@ -686,7 +686,7 @@ class AlexaRequestHandler(BaseHTTPRequestHandler):
         directive = header['name']
         try:
             device_id = mydirective["endpoint"]["endpointId"]
-        except :
+        except Exception:
             device_id = 'unknown'
         self.logger.debug("Alexa: control-directive '{}' received".format(directive))
         

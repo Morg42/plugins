@@ -285,7 +285,7 @@ class ArtNet(SmartPlugin):
         for token in data:
             try:  # Handels all strings
                 result = result + token.encode('utf-8', 'ignore')
-            except:  # Handels all bytes
+            except Exception:  # Handels all bytes
                 result = result + token
 
         # send over ethernet

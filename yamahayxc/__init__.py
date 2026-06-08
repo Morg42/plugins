@@ -291,7 +291,7 @@ class YamahaYXC(SmartPlugin):
         try:
             local_ip = self._yamaha_hosts[host]
             return
-        except:
+        except Exception:
             s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
             s.connect((host, 80))
             local_ip = s.getsockname()[0]
@@ -387,7 +387,7 @@ class YamahaYXC(SmartPlugin):
             cmd = "albumart_url"
         try:
             value = state[cmd]
-        except:
+        except Exception:
             return "Invalid data received (required item not found) - contact plugin author"
         return self._convert_value_yxc_to_plugin(value, cmd, host)
 
@@ -475,7 +475,7 @@ class YamahaYXC(SmartPlugin):
                     res = requests.get(url, headers=headers)
                     response = res.text
                     del res
-                except:
+                except Exception:
                     self.logger.info("Device not answering: {}.".format(host))
                     response = None
             elif type(payload) is list:
@@ -491,7 +491,7 @@ class YamahaYXC(SmartPlugin):
                         res = requests.post(url, data=payload[1], headers=headers)
                         response = res.text
                         del res
-                    except:
+                    except Exception:
                         self.logger.info("Device not answering: {}.".format(host))
                         response = None
             try:

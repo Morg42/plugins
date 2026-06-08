@@ -133,7 +133,7 @@ class WebInterface(SmartPluginWebIf):
                 value_dict['ct'] = light.color_temperature.mirek
                 if not light.color_temperature.mirek_valid:
                     value_dict['ct'] = '(' + str(light.color_temperature.mirek) + ')'
-            except:
+            except Exception:
                 value_dict['ct'] = ''
             value_dict['gamut_type'] = light.color.gamut_type.value
             value_dict['type'] = light.type.value
@@ -185,7 +185,7 @@ class WebInterface(SmartPluginWebIf):
                     value_dict['name'] = room.metadata.name
                     if value_dict['name'] == '':
                         value_dict['name'] = '(All lights)'
-                except:
+                except Exception:
                     value_dict['name'] = ''
                 value_dict['type'] = group.type.value
 
@@ -211,7 +211,7 @@ class WebInterface(SmartPluginWebIf):
                 value_dict['id_v1'] = sensor.id_v1
             try:
                 value_dict['name'] = sensor.name
-            except:
+            except Exception:
                 value_dict['name'] = ''
                 self.logger.debug("get_sensorsdata: Exception 'no name'")
                 self.logger.debug(f"- sensor={sensor}")
@@ -219,21 +219,21 @@ class WebInterface(SmartPluginWebIf):
 
             try:
                 value_dict['control_id'] = sensor.metadata.control_id
-            except:
+            except Exception:
                 value_dict['control_id'] = ''
             try:
                 value_dict['event'] = sensor.button.last_event.value
-            except:
+            except Exception:
                 value_dict['event'] = ''
             try:
                 value_dict['last_event'] = sensor.button.last_event.value
-            except:
+            except Exception:
                 value_dict['last_event'] = ''
 
             try:
                 value_dict['battery_level'] = sensor.power_state.battery_level
                 value_dict['battery_state'] = sensor.power_state.battery_state.value
-            except:
+            except Exception:
                 value_dict['battery_level'] = ''
                 value_dict['battery_state'] = ''
 
@@ -241,15 +241,15 @@ class WebInterface(SmartPluginWebIf):
             value_dict['data'] = ''
             try:
                 value_dict['data'] = f"{sensor.light.light_level:,}".replace(",",".") + ' Lux'
-            except:
+            except Exception:
                 pass
             try:
                 value_dict['data'] = sensor.motion.motion
-            except:
+            except Exception:
                 pass
             try:
                 value_dict['data'] = str(sensor.temperature.temperature) + ' °C'
-            except:
+            except Exception:
                 pass
 
             try:
@@ -311,7 +311,7 @@ class WebInterface(SmartPluginWebIf):
                     sensor = self.plugin.v2bridge.devices.get_zigbee_connectivity(device.id)
                     try:
                         value_dict['zigbee_connectivity'] = str(sensor.status.value)
-                    except:
+                    except Exception:
                         value_dict['zigbee_connectivity'] = ''
             value_dict['product_archetype'] = device.product_data.product_archetype.value
             value_dict['certified'] = device.product_data.certified
@@ -372,7 +372,7 @@ class WebInterface(SmartPluginWebIf):
 
         try:
             tmpl = self.tplenv.get_template('index.html')
-        except:
+        except Exception:
             self.logger.error("Template file 'index.html' not found")
         else:
             # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)

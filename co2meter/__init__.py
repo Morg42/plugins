@@ -129,7 +129,7 @@ class CO2Meter(SmartPlugin):
                 operation = decrypted[0]
                 val = decrypted[1] << 8 | decrypted[2]
                 self._values[operation] = val
-        except:
+        except Exception:
             self._running = False
 
 

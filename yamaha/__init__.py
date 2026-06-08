@@ -36,7 +36,7 @@ try:
     from lxml import etree
     import requests
     REQUIRED_PACKAGE_IMPORTED = True
-except:
+except Exception:
     REQUIRED_PACKAGE_IMPORTED = False
 
 
@@ -310,14 +310,14 @@ class Yamaha(SmartPlugin):
             try:
                 value = tree.find('Main_Zone/Basic_Status/Input/Input_Sel')
                 return value.text
-            except:
+            except Exception:
                 value = tree.find('Main_Zone/Input/Input_Sel')
                 return value.text
         elif cmd == 'volume':
             try:
                 value = tree.find('Main_Zone/Basic_Status/Volume/Lvl/Val')
                 return int(value.text)
-            except:
+            except Exception:
                 value = tree.find('Main_Zone/Volume/Lvl/Val')
                 return int(value.text)
         elif cmd == 'mute':
@@ -328,7 +328,7 @@ class Yamaha(SmartPlugin):
                 elif value.text == 'Off':
                     return False
                 return value.text
-            except:
+            except Exception:
                 value = tree.find('Main_Zone/Volume/Mute')
                 if value.text == 'On':
                     return True
@@ -342,7 +342,7 @@ class Yamaha(SmartPlugin):
                     return False
                 elif value.text == 'On':
                     return True
-            except:
+            except Exception:
                 value = tree.find('Main_Zone/Power_Control/Power')
                 if value.text == 'Standby':
                     return False
@@ -479,8 +479,8 @@ class Yamaha(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

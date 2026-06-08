@@ -114,7 +114,7 @@ class LuxBase(SmartPlugin):
         try:
             self._sock.close()
             self._sock = False
-        except:
+        except Exception:
             pass
 
     def _request(self, request, length):

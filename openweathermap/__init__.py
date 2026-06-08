@@ -359,7 +359,7 @@ class OpenWeatherMap(SmartPlugin):
             try:
                 new_day = int(s[4])
                 s = s.replace(s[0:5], 'daily/' + str(new_day))
-            except:
+            except Exception:
                 s = s.replace('day/', 'daily/0/')
                 was_ok = False
                 self.logger.warning(
@@ -370,7 +370,7 @@ class OpenWeatherMap(SmartPlugin):
             try:
                 new_day = int(s[5])
                 s = s.replace(s[0:6], 'hourly/' + str(new_day))
-            except:
+            except Exception:
                 s = s.replace('hour/', 'hourly/0/')
                 was_ok = False
                 self.logger.warning(
@@ -595,7 +595,7 @@ class OpenWeatherMap(SmartPlugin):
                         val = self.get_value(f'day/-{day_back}/hour/{hr}/{data_field}', correlation_hint)
                         if not isinstance(val, Exception):
                             pool.append(val)
-                    except:
+                    except Exception:
                         pass
             pool = pool[-hours:]
 

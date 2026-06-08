@@ -133,14 +133,14 @@ def decodeDate2(data, offset, pos, dummy):
 def decodeOpMode(data, offset, pos, dummy):
     try:
         str = OpMode[format(data[offset], '02d')]
-    except:
+    except Exception:
         str = 'Unknown mode: '
     return str
 
 def decodeOpModeHC(data, offset, pos, dummy):
     try:
         str = OpModeHC[format(data[offset], '02d')]
-    except:
+    except Exception:
         str = 'Unknown HC mode: '
     return str
 
@@ -1115,7 +1115,7 @@ class ThzProtocol():
           else:
             self._rxTimeoutCount += 1
             msg = None
-        except:
+        except Exception:
           self.logger.error('Get request failed - {:06x}\n{}'.format(cmd, sys.exc_info()))
         finally:
           self._lock.release()
@@ -1180,7 +1180,7 @@ class ThzProtocol():
               if not (data[0] == 0x01 and data[1] == 0x80):
                 self.logger.warning('Set request failed - {}: {}'.format(param, ' '.join(format(x, '02x') for x in data)))
                 self._rxNackCount += 1
-          except:
+          except Exception:
             self.logger.error('Message encoding failed - {}\n{}'.format(param, sys.exc_info()))
           finally:
             self._lock.release()
@@ -1212,7 +1212,7 @@ class ThzProtocol():
             if not (data[0] == 0x01 and data[1] == 0x80):
               self.logger.warning('Set request failed - {}: {}'.format(param, ' '.join(format(x, '02x') for x in data)))
               self._rxNackCount += 1
-        except:
+        except Exception:
           self.logger.error('Message encoding failed - {}\n{}'.format(param, sys.exc_info()))
         finally:
             self._lock.release()
@@ -1243,7 +1243,7 @@ class ThzProtocol():
                     # be multiplied by 1000)
                     msg1[name][param] = round(msg2[name][param] * 1000 + msg1[name][param],3)
                     response.update(msg1[name])
-                  except:
+                  except Exception:
                     self.logger.warning(sys.exc_info())
               else:
                 # there is only one response
@@ -1257,7 +1257,7 @@ class ThzProtocol():
                 self.logger.debug('Status: isPortOpen: {}, request: {}, portErrorCount: {}, name: {}'.format(self._portHandler.isPortOpen(),request,self._portErrorCount,name))
                 self._portHandler.closePort()
                 break
-        except:
+        except Exception:
           self.logger.warning(sys.exc_info())
 
         return response
@@ -1290,7 +1290,7 @@ class ThzProtocol():
             data = bytearray(data)
             if data[0] == 0x01 and data[1] == 0x00:
               self.logger.info('Rx: ' + ' '.join(format(x, '02x') for x in data))
-        except:
+        except Exception:
           self.logger.error('Get request failed - {:06x}\n{}'.format(cmd, sys.exc_info()))
         finally:
           self._lock.release()

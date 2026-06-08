@@ -102,7 +102,7 @@ class XMPP(SmartPlugin):
         finally:
             try:
                 pass
-            except:
+            except Exception:
                 pass
 
     def is_connected(self):

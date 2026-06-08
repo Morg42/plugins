@@ -277,11 +277,11 @@ class OwBase(object):
         self.connected = False
         try:
             self._sock.shutdown(socket.SHUT_RDWR)
-        except:
+        except Exception:
             pass
         try:
             self._sock.close()
-        except:
+        except Exception:
             pass
 
     def identify_sensor(self, path):

@@ -151,7 +151,7 @@ def discover_via_mdns():
 
 try:
     from .ssdp import discover as ssdp_discover
-except:
+except Exception:
     from ssdp import discover as ssdp_discover
 
 def discover_via_upnp():

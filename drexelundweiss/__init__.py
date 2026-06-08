@@ -96,7 +96,7 @@ class DuW(SmartPlugin):
             return
         try:
             self._port = serial.Serial(self._tty, 115200, timeout=5)
-        except:
+        except Exception:
             self.logger.error("Could not open {}.".format(self._tty))
             return
         else:
@@ -113,7 +113,7 @@ class DuW(SmartPlugin):
         liste = antwort.splitlines()
         try:
             antwort = liste[0].split()
-        except:
+        except Exception:
             antwort = str("-1")
         if type(antwort) is list and len(antwort) >= 2:
             if teil == 'id':
@@ -121,12 +121,12 @@ class DuW(SmartPlugin):
             elif teil == 'register':
                 try:
                     antwort = str(antwort[1])
-                except:
+                except Exception:
                     antwort = '-1'
             elif teil == 'data':
                 try:
                     antwort = str(antwort[2])
-                except:
+                except Exception:
                     antwort = '-1'
         else:
             antwort = str(antwort)
@@ -493,7 +493,7 @@ class DuW(SmartPlugin):
             self.logger.debug("Read {} on Register: {}".format(dw_data, register))
             try:
                 return (((dw_data / divisor) / (10 ** komma)), 1)
-            except:
+            except Exception:
                 self.logger.debug("{} on register {} Division with zero problem".format(dw_data, register))
                 return (((dw_data / 1) / (10 ** 1)), 1)
         else:

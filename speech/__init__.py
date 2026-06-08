@@ -138,7 +138,7 @@ class Speech_Parser(SmartPlugin):
         self.default_access = self.get_parameter_value('default_access')
         try:
             self.config = os.path.expanduser(self.get_parameter_value('config_file'))
-        except:
+        except Exception:
             pass
 
         # Initialization code goes here
@@ -292,8 +292,8 @@ class Speech_Parser(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle running in a core version that does not support modules
-        except:
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

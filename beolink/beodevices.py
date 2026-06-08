@@ -108,7 +108,7 @@ class BeoDevices():
             try:
                 r = requests.get(device + '/Ping', timeout=0.5)
                 result = True
-            except:
+            except Exception:
                 result = False
 
             if result:
@@ -287,7 +287,7 @@ class BeoDevices():
         try:
             r = requests.get(device + api_url, timeout=0.5)
             request_result = True
-        except:
+        except Exception:
             self.logger.debug("Could not get data from device {} for {}".format(device, api_url))
             request_result = False
             result = '-'
@@ -307,7 +307,7 @@ class BeoDevices():
                     #result = actual_r['standby']['powerState']
                 else:
                     result = actual_r
-            except:
+            except Exception:
                 pass
         return result
 
@@ -331,7 +331,7 @@ class BeoDevices():
                 r = requests.put(device + api_url, data=json_elements, timeout=0.5)
             self.logger.info("send_beo_api: request result = {}".format(r.status_code))
             request_result = True
-        except:
+        except Exception:
             self.logger.debug("Could not get data from device {} for {}".format(device, api_url))
             request_result = False
 
@@ -442,7 +442,7 @@ class BeoDevices():
         try:
             r = requests.get(device + api_url, timeout=0.5)
             request_result = r.json()
-        except:
+        except Exception:
             self.logger.debug("Could not get data from device {} for {}".format(device, api_url))
             request_result = {'error': { 'message': '', 'type': 'NO_RESPONSE'}}
         return request_result
@@ -461,7 +461,7 @@ class BeoDevices():
         try:
             r = requests.put(device + api_url, data, timeout=0.5)
             request_result = r.json()
-        except:
+        except Exception:
             self.logger.debug("Could not get data from device {} for {}".format(device, api_url))
             request_result = {'error': { 'message': '', 'type': 'NO_RESPONSE'}}
         return request_result

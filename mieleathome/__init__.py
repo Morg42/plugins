@@ -199,7 +199,7 @@ class mieleathome(SmartPlugin):
                 self.ValidFrom = time.ctime(time.time())                        #Time and date when (new) tokens were received
                 self.ValidThrough = time.ctime(time.time() + self.Expiration)   #Time and date when tokens will expire
                 return True
-        except:
+        except Exception:
             self.logger.warning("Error while authentication on {}".format(self.Url+'/thirdparty/token/'))
         
         return False
@@ -230,7 +230,7 @@ class mieleathome(SmartPlugin):
                 self.ValidThrough = time.ctime(time.time() + self.Expiration)   #Time and date when tokens will expire
                 self.scheduler_change('_refreshToken', cycle={myTokenRefresh:None}) # Zum Testen von 6 auf 10 Sekunden geändert
                 self.auth = True
-        except:
+        except Exception:
             self.logger.warning("Error while refresh Token on {}".format(self.Url+'/thirdparty/token/'))
             self.auth = False                    
     
@@ -566,12 +566,12 @@ class miele_event(threading.Thread):
         self.logger.debug("mieleathome - try to establish new Event-Connection")
         try:
             self.response.close()
-        except:
+        except Exception:
             self.logger.warning("mieleathome - Error while closing Event-Connection")
             pass
         try:
             self.connect()
-        except:
+        except Exception:
             self.logger.warning("mieleathome - Error while estabslishing new Event-Connection")
             pass
         
@@ -591,7 +591,7 @@ class miele_event(threading.Thread):
                     if (not self.alive):
                         try:
                             self.response.close()
-                        except:
+                        except Exception:
                             pass
                         break
                     if line:

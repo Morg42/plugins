@@ -113,7 +113,7 @@ class beo_notifications():
             else:
                 log_msg = log_msg + ', level=' + level.lower()
                 self.logger.info( log_msg )
-        except:
+        except Exception:
             self.logger.warning(log_msg)
 
     def notification_playing_net_radio(self, notification):

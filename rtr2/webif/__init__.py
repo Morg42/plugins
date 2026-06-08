@@ -82,7 +82,7 @@ class WebInterface(SmartPluginWebIf):
     def get_value(self, param):
         try:
             pass
-        except:
+        except Exception:
             pass
 
     @cherrypy.expose

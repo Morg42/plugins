@@ -102,10 +102,10 @@ class SmartTV(SmartPlugin):
 
         try:
             s.send(pkt)
-        except:
+        except OSError:
             try:
                 s.close()
-            except:
+            except OSError:
                 pass
             return
 
@@ -121,12 +121,12 @@ class SmartTV(SmartPlugin):
 
         try:
             s.send(pkt)
-        except:
+        except Exception:
             return
         finally:
             try:
                 s.close()
-            except:
+            except Exception:
                 pass
         self.logger.debug("Send {0} to Smart TV".format(key))
         time.sleep(0.1)

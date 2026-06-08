@@ -81,13 +81,13 @@ class WebInterface(SmartPluginWebIf):
         try:
             interface = self.plugin.hm.listBidcosInterfaces(self.hm_id)[0]
             # [{'DEFAULT': True, 'DESCRIPTION': '', 'ADDRESS': 'OEQ1658621', 'TYPE': 'CCU2', 'DUTY_CYCLE': 1, 'CONNECTED': True, 'FIRMWARE_VERSION': '2.8.5'}]
-        except:
+        except Exception:
             interface = None
 
         try:
             interfaceip = self.plugin.hm.listBidcosInterfaces(self.hmip_id)[0]
             # [{'DEFAULT': True, 'DESCRIPTION': '', 'ADDRESS': 'OEQ1658621', 'TYPE': 'CCU2', 'DUTY_CYCLE': 1, 'CONNECTED': True, 'FIRMWARE_VERSION': '2.8.5'}]
-        except:
+        except Exception:
             interfaceip = None
 
         # get HomeMatic devices
@@ -110,7 +110,7 @@ class WebInterface(SmartPluginWebIf):
             if d_type in ['Switch','SwitchPowermeter','ShutterContact']:
                 try:
                     d['value'] = dev.getValue('STATE')
-                except:
+                except Exception:
                     pass
 
             devices.append(d)
@@ -138,7 +138,7 @@ class WebInterface(SmartPluginWebIf):
             if d_type in ['Switch','SwitchPowermeter','ShutterContact']:
                 try:
                     d['value'] = dev.getValue('STATE')
-                except:
+                except Exception:
                     pass
 
             ipdevices.append(d)

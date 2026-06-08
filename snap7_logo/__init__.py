@@ -142,7 +142,7 @@ class snap7_logo(SmartPlugin):
                     self.logger.info('connected to {0}'.format(self.host))
                     self.connected = True
                 else:
-                    self.logger.error('could not connect to {0}: {1}'.format(self.host, e))
+                    self.logger.error('could not connect to {0}'.format(self.host))
                     self.connected = False
                     return
 

@@ -170,7 +170,7 @@ class Snmp(SmartPlugin):
                     # Prüfung, ob Leerzeichen vorhanden sind, um den Wert von Einheit zu trennen
                     try:
                         code_pos = response.index(" ")
-                    except:
+                    except (IndexError, AttributeError):
                         if isinstance(response, int) is True:
                             result = int(response)
                         else:
@@ -302,8 +302,8 @@ class Snmp(SmartPlugin):
         """
         try:
             self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle running in a core version that does not support modules
-        except:
+                'http')  # try/except to handle disabled http module
+        except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error("Not initializing the web interface")

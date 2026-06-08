@@ -54,7 +54,7 @@ class EtaValue():
         value = 0
         try:
             value = int(str_value) # FIXME
-        except:
+        except Exception:
             value = self.valueFromString(str_value)
             if value is None:
                 self.logger.error("unhandled strValue {0} for {1}".format(str_value, uri))
@@ -148,7 +148,7 @@ class ETA_PU(SmartPlugin):
             self.del_set(self._setname)
             self.add_set(self._setname)
             self.fill_set(self._setname)
-        except:
+        except Exception:
             self.logger.error('Failed to rebuild.. ETA offline?')
  
     '''
@@ -248,7 +248,7 @@ class ETA_PU(SmartPlugin):
         xml = self.get_sh().tools.fetch_url(url, timeout=2)
         try:
                 return ET.fromstring(xml)
-        except:
+        except Exception:
                 self.logger.error('can not parse response from ETA')
         return None
 
@@ -283,7 +283,7 @@ class ETA_PU(SmartPlugin):
                     if isinstance(item, str):
                         value = value.replace(',', '.')
                     item(value, caller=__ETA_PU__)
-        except:
+        except Exception:
             self.logger.error('Update var failed, trying to rebuild varset...')
             self.rebuild_set()
 

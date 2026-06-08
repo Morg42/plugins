@@ -300,7 +300,7 @@ class Shelly(MqttPlugin):
             config_data = self.get_item_config(item)
             try:
                 device_data = self.shelly_devices.get(config_data['shelly_id'], None)
-            except:
+            except Exception:
                 self.logger.warning(f"update_item: Exception occurred. Shelly ID not known yet. Cannot update item {item.id()}")
                 return
 
@@ -402,7 +402,7 @@ class Shelly(MqttPlugin):
                     fw_ver += '-' + wrk.split('-')[1]
             if fw_ver == '?':
                 raise ValueError
-        except:
+        except Exception:
             fw_ver = version_str
         return fw_ver
 
@@ -1237,7 +1237,7 @@ class Shelly(MqttPlugin):
 
         try:  # ignore, if device is not discovered yet
             self.shelly_devices[shelly_id]['last_contact'] = self.shtime.now().strftime('%Y-%m-%d %H:%M')
-        except:
+        except Exception:
             pass
 
         property = topic_parts[2]

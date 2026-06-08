@@ -603,7 +603,7 @@ class SmartVisuGenerator:
         # create output directory
         try:
             os.mkdir(self.pages_dir)
-        except:
+        except Exception:
             pass
         # remove old dynamic files
         if not os.path.isdir(self.pages_dir):
@@ -645,7 +645,7 @@ class SmartVisuGenerator:
             # create output directory
             try:
                 os.mkdir(self.gen_tpldir)
-            except:
+            except Exception:
                 pass
             # Open file for twig import statements (for root.html)
             for fn in os.listdir(self.shng_tpldir):
