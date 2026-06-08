@@ -33,14 +33,14 @@ from lib.item import Items
 from lib.model.smartplugin import SmartPluginWebIf
 
 from ..constants import (
-                     COL_LOG_CHANGED,
-                     COL_LOG_DURATION,
-                     COL_LOG_ITEM_ID,
-                     COL_LOG_TIME,
-                     COL_LOG_VAL_BOOL,
-                     COL_LOG_VAL_NUM,
-                     COL_LOG_VAL_STR,
-                     )
+    COL_LOG_CHANGED,
+    COL_LOG_DURATION,
+    COL_LOG_ITEM_ID,
+    COL_LOG_TIME,
+    COL_LOG_VAL_BOOL,
+    COL_LOG_VAL_NUM,
+    COL_LOG_VAL_STR,
+    )
 
 # ------------------------------------------
 #    Webinterface of the plugin

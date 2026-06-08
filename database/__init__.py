@@ -24,6 +24,7 @@
 #########################################################################
 
 import copy
+import logging
 import re
 import os
 import datetime
@@ -41,21 +42,21 @@ from lib.model.smartplugin import SmartPlugin
 from lib.module import Modules
 
 from .constants import (
-                    COL_ITEM,
-                    COL_ITEM_ID,
-                    COL_ITEM_NAME,
-                    COL_ITEM_TIME,
-                    COL_ITEM_VAL_BOOL,
-                    COL_ITEM_VAL_NUM,
-                    COL_ITEM_VAL_STR,
-                    COL_LOG,
-                    COL_LOG_CHANGED,
-                    COL_LOG_DURATION,
-                    COL_LOG_TIME,
-                    COL_LOG_VAL_BOOL,
-                    COL_LOG_VAL_NUM,
-                    COL_LOG_VAL_STR,
-                    )
+    COL_ITEM,
+    COL_ITEM_ID,
+    COL_ITEM_NAME,
+    COL_ITEM_TIME,
+    COL_ITEM_VAL_BOOL,
+    COL_ITEM_VAL_NUM,
+    COL_ITEM_VAL_STR,
+    COL_LOG,
+    COL_LOG_CHANGED,
+    COL_LOG_DURATION,
+    COL_LOG_TIME,
+    COL_LOG_VAL_BOOL,
+    COL_LOG_VAL_NUM,
+    COL_LOG_VAL_STR,
+    )
 from .webif import WebInterface
 
 
@@ -75,13 +76,22 @@ class Database(SmartPlugin):
             "CREATE TABLE {log} (time BIGINT, item_id INTEGER, duration BIGINT, val_str TEXT, val_num REAL, val_bool BOOLEAN, changed BIGINT);",
             "DROP TABLE {log};"],
         '2': [
-            "CREATE TABLE {item} (id INTEGER, name varchar(255), time BIGINT, val_str TEXT, val_num REAL, val_bool BOOLEAN, changed BIGINT);",
+            # id declared as INTEGER PRIMARY KEY so the DB handles auto-increment;
+            # avoids the previous MAX(id)+1 race condition on multi-connection setups.
+            "CREATE TABLE {item} (id INTEGER PRIMARY KEY, name varchar(255), time BIGINT, val_str TEXT, val_num REAL, val_bool BOOLEAN, changed BIGINT);",
             "DROP TABLE {item};"],
         '3': ["CREATE UNIQUE INDEX {log}_{item}_id_time ON {log} (item_id, time);", "DROP INDEX {log}_{item}_id_time;"],
         '4': ["CREATE INDEX {log}_{item}_id_changed ON {log} (item_id, changed);",
               "DROP INDEX {log}_{item}_id_changed;"],
         '5': ["CREATE UNIQUE INDEX {item}_id ON {item} (id);", "DROP INDEX {item}_id;"],
-        '6': ["CREATE INDEX {item}_name ON {item} (name);", "DROP INDEX {item}_name;"]
+        '6': ["CREATE INDEX {item}_name ON {item} (name);", "DROP INDEX {item}_name;"],
+        '7': [
+            # Add data-quality column to the log table.
+            # 0 (default) = normal valid measurement.
+            # 1 = QUALITY_NO_DATA: data source was unavailable; all val_* columns NULL.
+            # Existing rows implicitly have quality=0 via the DEFAULT clause.
+            "ALTER TABLE {log} ADD COLUMN val_quality TINYINT DEFAULT 0;",
+            "/* val_quality column cannot be removed via ALTER TABLE on SQLite <3.35 */"],
     }
 
 
@@ -114,14 +124,17 @@ class Database(SmartPlugin):
             self._prefix += '_'
         self._dump_cycle = self.get_parameter_value('cycle')
         self._removeold_cycle = self.get_parameter_value('removeold_cycle')
-        if self._removeold_cycle == self._dump_cycle:
+        # Guard against None (e.g. in test environments where get_parameter_value
+        # returns None), and ensure the two scheduler cycles are not identical so
+        # they don't compete for the same scheduler slot.
+        if self._removeold_cycle is not None and self._removeold_cycle == self._dump_cycle:
             self._removeold_cycle += 2
         self._precision = self.get_parameter_value('precision')
         self._time_precision = self.get_parameter_value('time_precision')
         self.count_logentries = self.get_parameter_value('count_logentries')
         self.max_delete_logentries = self.get_parameter_value('max_delete_logentries')
         self.max_reassign_logentries = self.get_parameter_value('max_reassign_logentries')
-        self._default_maxage = float(self.get_parameter_value('default_maxage'))
+        self._default_maxage = float(self.get_parameter_value('default_maxage') or 0)
 
         self._copy_database = self.get_parameter_value('copy_database')
         self._copy_database_name = self.get_parameter_value('copy_database_name')
@@ -130,7 +143,8 @@ class Database(SmartPlugin):
 
         self._replace = {table: table if self._prefix == "" else self._prefix + table for table in ["log", "item"]}
         self._replace['item_columns'] = ", ".join(COL_ITEM)
-        self._replace['log_columns'] = ", ".join(COL_LOG)
+        # val_quality column added in schema v7; include in log column list
+        self._replace['log_columns'] = ", ".join(COL_LOG + ('val_quality',))
         self._buffer = {}
         self._buffer_lock = threading.Lock()
         self._dump_lock = threading.Lock()
@@ -240,6 +254,11 @@ class Database(SmartPlugin):
             item.series = functools.partial(self._series, item=item.property.path)  # Zur Nutzung im Websocket Plugin
             item.db = functools.partial(self._single, item=item.property.path)      # Zur Nutzung ueber Funktionen in Logiken
             item.dbplugin = self                                           # genutzt zum Zugriff auf die Plugin Instanz z.B. durch Logiken
+
+            # Inject db_mark_invalid / db_mark_valid so data-source plugins can
+            # signal connectivity loss without changing the item's Python value.
+            item.db_mark_invalid = functools.partial(self._mark_item_invalid, item)
+            item.db_mark_valid   = functools.partial(self._mark_item_valid,   item)
             if self._db_initialized and self.get_iattr_value(item.conf, 'database').lower() == 'init':
                 if not self._db.lock(5):
                     self.logger.error("Can not acquire lock for database to read value for item {}".format(item.property.path))
@@ -325,8 +344,40 @@ class Database(SmartPlugin):
             start = self._timestamp(item.prev_change())
             end = self._timestamp(item.last_change())
             if end - start < 0:
-                self.logger.warning("Negative duration: start: {0}, end {1}, prevChange: {2}, lastChange: {3}, item: {4}".format(start , end, item.prev_change(), item.last_change(), item ))
+                self.logger.warning("Negative duration clamped to 0: start: {0}, end {1}, prevChange: {2}, lastChange: {3}, item: {4}".format(start , end, item.prev_change(), item.last_change(), item ))
+                end = start  # clamp — negative duration must not be stored
 
+            # ── Gap detection ────────────────────────────────────────────────
+            # If db_mark_invalid() was called previously and the open buffer
+            # entry is a no-data gap (value is None), this new valid measurement
+            # implicitly re-validates the item.  We must NOT use the standard
+            # step-1a duration formula here because that computes
+            #   end - item.prev_change()
+            # which reaches back to the last Python-value change *before* the
+            # gap started, making the gap duration appear longer than it really
+            # was.  Instead the gap is closed using its own start timestamp.
+            in_gap = (
+                getattr(self, '_gap_items', {}).get(item) is not None
+                and self._buffer[item]
+                and self._buffer[item][-1][1] is None       # still open
+                and self._buffer[item][-1][2] is None       # is a gap entry
+            )
+            if in_gap:
+                gap = self._buffer[item][-1]
+                # Close the gap with the correct duration relative to gap start
+                self._buffer[item][-1] = (gap[0], end - gap[0], None)
+                # Clear gap tracking — implicitly re-validated by the new value
+                del self._gap_items[item]
+                self.logger.info(
+                    f"update_item: implicit re-validation for '{item.property.path}' "
+                    f"— no-data gap closed (duration {self._seconds(end - gap[0])} s)"
+                )
+                # Skip step 1b: there is no meaningful prev_value to record
+                # during a gap period.  Go straight to step 2.
+                self._buffer[item].append((end, None, item()))
+                return
+
+            # ── Normal path ──────────────────────────────────────────────────
             # Determine, if DB buffer has a valid "last" value:
             if len(self._buffer[item]) == 0 or self._buffer[item][-1][1] is not None:
                 last = None
@@ -343,7 +394,7 @@ class Database(SmartPlugin):
                     self.logger.warning(f"Debug 1a): Rewriting valid last value, start: {last[0]}, duration: {end - start}, value: {last[2]} to item '{item}'.")
                 self._buffer[item][-1] = (last[0], end - start, last[2])
             else:
-		# Step 1b): Append new value with none duration
+                # Step 1b): Append new value with none duration
 
                 #If item is configured to be initialized via database init (see database: init in item.yaml), do not update previous value if the latter qual to the regular initial_value.
                 # This is because configuring database: init aims at avoiding the regular item initial value to appear inside the DB:
@@ -362,6 +413,71 @@ class Database(SmartPlugin):
             self._buffer[item].append((end, None, item()))
         else:
             self.logger.debug("Not writing item '{}' value because database_acl = {}".format(item,  acl))
+
+
+    def _mark_item_invalid(self, item, caller=None, source=None):
+        """Open a no-data gap in the database log for *item*.
+
+        Call this when a data source loses connectivity.  The item's Python
+        value is **not** changed; only the database log is affected.  The gap
+        entry is stored with ``val_quality=QUALITY_NO_DATA`` and all value
+        columns ``NULL``.  Its duration remains open until
+        :meth:`_mark_item_valid` is called or a new value arrives.
+
+        This method is injected onto every registered item as
+        ``item.db_mark_invalid(caller, source)`` by :meth:`parse_item`.
+
+        :param item:   SmartHomeNG item object.
+        :param caller: Optional caller identifier (for logging).
+        :param source: Optional source identifier (for logging).
+        """
+        from .constants import QUALITY_NO_DATA
+        start_ts = self._timestamp(self.shtime.now())
+        self.logger.info(
+            f"db_mark_invalid: opening no-data gap for '{item.property.path}'"
+            + (f" (caller={caller})" if caller else "")
+        )
+        # Close any currently-open valid entry
+        with self._buffer_lock:
+            buf = self._buffer.get(item, [])
+            if buf and buf[-1][1] is None:
+                last = buf[-1]
+                buf[-1] = (last[0], start_ts - last[0], last[2])
+        # Append the open-ended no-data entry
+        self._buffer_insert(item, [(start_ts, None, None)])
+        # Track that we're in a gap so _mark_item_valid knows to close it
+        if not hasattr(self, '_gap_items'):
+            self._gap_items = {}
+        self._gap_items[item] = start_ts
+
+
+    def _mark_item_valid(self, item, caller=None, source=None):
+        """Close an open no-data gap for *item*.
+
+        Call this when a data source regains connectivity.  The open gap
+        entry's duration is back-filled.  The next call to :meth:`update_item`
+        will push a new valid value entry as usual.
+
+        This method is injected onto every registered item as
+        ``item.db_mark_valid(caller, source)`` by :meth:`parse_item`.
+
+        :param item:   SmartHomeNG item object.
+        :param caller: Optional caller identifier (for logging).
+        :param source: Optional source identifier (for logging).
+        """
+        if not hasattr(self, '_gap_items') or item not in self._gap_items:
+            return  # no open gap — nothing to close
+        end_ts = self._timestamp(self.shtime.now())
+        self.logger.info(
+            f"db_mark_valid: closing no-data gap for '{item.property.path}'"
+            + (f" (caller={caller})" if caller else "")
+        )
+        with self._buffer_lock:
+            buf = self._buffer.get(item, [])
+            if buf and buf[-1][1] is None:
+                last = buf[-1]
+                buf[-1] = (last[0], end_ts - last[0], last[2])
+        del self._gap_items[item]
 
 
     def _start_schedulers(self):
@@ -444,7 +560,7 @@ class Database(SmartPlugin):
 
         try:
             item_path = str(item.property.path)
-        except Exception:
+        except AttributeError:
             item_path = item
         try:
             id = self.readItem(item_path, cur=cur)
@@ -474,7 +590,7 @@ class Database(SmartPlugin):
 
         try:
             item_path = str(item.property.path)
-        except Exception:
+        except AttributeError:
             item_path = item
         try:
             row = self.readItem(item_path, cur=None)
@@ -485,7 +601,6 @@ class Database(SmartPlugin):
         if (row is None) or (COL_ITEM_ID >= len(row)) :
             return None
 
-        int(row[COL_ITEM_ID])
         strval = row[COL_ITEM_VAL_STR]
         numval = row[COL_ITEM_VAL_NUM]
         boolval = row[COL_ITEM_VAL_BOOL]
@@ -515,7 +630,7 @@ class Database(SmartPlugin):
 
         try:
             item_path = str(item.property.path)
-        except Exception:
+        except AttributeError:
             item_path = item
         try:
             row = self.readItem(item_path, cur=None)
@@ -526,7 +641,6 @@ class Database(SmartPlugin):
         if (row is None) or (COL_ITEM_ID >= len(row)):
             return None
 
-        int(row[COL_ITEM_ID])
         last_change = row[COL_ITEM_TIME]
         if last_change is None:
             return None
@@ -612,21 +726,23 @@ class Database(SmartPlugin):
 
     def insertItem(self, name, cur=None):
         """
-        Create database item record for given database ID
+        Create database item record for given item name.
 
-        This is a public function of the plugin
+        Uses database-assigned auto-increment for the id rather than the
+        previous ``MAX(id) + 1`` pattern, which was prone to a race
+        condition on multi-connection setups.
 
-        :param name: name of item to create a record for
-        :param cur: A database cursor object if available (optional)
+        This is a public function of the plugin.
 
-        :return: ID within the database
-        :rtype: int
+        :param name: Full item path to create a record for.
+        :param cur:  Optional cursor for transaction batching.
+        :return:     The new integer item ID.
+        :rtype:      int
         """
-        id = self._fetchone("SELECT MAX(id) FROM {item};", cur=cur)
-        self._execute(self._prepare("INSERT INTO {item}(id, name) VALUES(:id, :name);"),
-                      {'id': 1 if id[0] is None else id[0] + 1, 'name': name}, cur=cur)
-        id = self._fetchone("SELECT id FROM {item} where name = :name;", {'name': name}, cur=cur)
-        return int(id[0])
+        self._execute(self._prepare("INSERT INTO {item}(name) VALUES(:name);"),
+                      {'name': name}, cur=cur)
+        row = self._fetchone("SELECT id FROM {item} WHERE name = :name;", {'name': name}, cur=cur)
+        return int(row[0])
 
 
     def updateItem(self, id, time, duration=0, val=None, it=None, changed=None, cur=None):
@@ -838,20 +954,21 @@ class Database(SmartPlugin):
             else:
                 return db_values[0][0]
 
-    def readTotalLogCount(self, id=None, time_start=None, time_end=None, cur=None):
+    def readTotalLogCount(self, cur=None):
         """
-        Read database log count for the hole database
+        Return the total number of log rows across all items.
 
-        :param id:
-        :param time_start:
-        :param time_end:
-        :param cur:
+        Previously accepted ``id``, ``time_start``, ``time_end`` parameters
+        that were silently ignored; the signature is corrected here.
 
-        :return: Number of log records
+        This is a public function of the plugin.
+
+        :param cur: Optional cursor.
+        :return:    Total log row count.
+        :rtype:     int
         """
-        params = {'id': id, 'time_start': time_start, 'time_end': time_end}
-        result = self._fetchall("SELECT count(*) FROM {log};", params, cur=cur)
-        if result == []:
+        result = self._fetchall("SELECT count(*) FROM {log};", cur=cur)
+        if not result:
             return 0
         return result[0][0]
 
@@ -1341,7 +1458,7 @@ class Database(SmartPlugin):
         ts = self._timestamp(self.shtime.now())
         try:
             return min(ts, int(dts))    # rts, if dts is an integer value, return now, if dts is a timestamp in th future
-        except Exception:
+        except (TypeError, ValueError):
             pass
 
         duration = 0
@@ -1378,7 +1495,7 @@ class Database(SmartPlugin):
         _frames = {'s': second, 'i': minute, 'h': hour, 'd': day, 'w': week, 'm': month, 'y': year}
         try:
             return int(frame)
-        except Exception:
+        except (TypeError, ValueError):
             pass
         ts = self._timestamp(self.shtime.now())
         # if frame == 'now':
@@ -1392,7 +1509,7 @@ class Database(SmartPlugin):
             return frame
         try:
             ts = int(float(frame) * fac)
-        except Exception:
+        except (TypeError, ValueError):
             self.logger.warning("Database: Unknown time frame '{0}'".format(frame))
         return ts
 
@@ -1511,7 +1628,8 @@ class Database(SmartPlugin):
                     self.logger.debug('Dumping {}/{} with {} values'.format(item.property.path, id, len(tuples)))
 
                     for t in tuples:
-                        if len(self.readLog(id, t[0], cur)):
+                        existing = self.readLog(id, t[0], cur)
+                        if existing:  # readLog may return None on connection failure
                             self.updateLog(id, t[0], t[1], t[2], item.type(), changed, cur)
                         else:
                             self.insertLog(id, t[0], t[1], t[2], item.type(), changed, cur)
@@ -1604,6 +1722,7 @@ class Database(SmartPlugin):
         item = self._maxage_worklist.pop(0)
         itempath = item.property.path
 
+        item_id = None  # initialise before try so the except clause can reference it safely
         try:
             item_id = self.id(item, create=False)
         except Exception:
@@ -1800,8 +1919,21 @@ class Database(SmartPlugin):
 
 
     def _query(self, func, query, params, cur=None):
-        if not self._initialize_db():
-            return None
+        """Execute *func* with the prepared *query* and *params*.
+
+        Handles connection verification and lock acquisition when no explicit
+        cursor is provided.  Debug logging is only evaluated when DEBUG is
+        actually enabled (avoids regex + format on every call).
+
+        :param func:   One of ``self._db.execute``, ``.fetchone``, ``.fetchall``.
+        :param query:  SQL with ``{log}``/``{item}`` placeholders and ``:name`` params.
+        :param params: Parameter dict.
+        :param cur:    Optional cursor; if given the caller owns lock + commit.
+        :returns:      Query result or ``None`` on failure.
+        """
+        if not self._db_initialized:  # fast-path: avoid full init check on every query
+            if not self._initialize_db():
+                return None
         if cur is None:
             if self._db.verify(5) == 0:
                 self.logger.error("Database: Connection not recovered")
@@ -1809,18 +1941,23 @@ class Database(SmartPlugin):
             if not self._db.lock(300):
                 self.logger.error("Database: Can't query due to fail to acquire lock")
                 return None
-        query = self._prepare(query)
-        query_readable = re.sub(r':([a-z_]+)', r'{\1}', query).format(**params)
+        prepared = self._prepare(query)   # prepare once
         tuples = None
         try:
-            tuples = func(self._prepare(query), params, cur=cur)
+            tuples = func(prepared, params, cur=cur)
         except Exception as e:
-            self.logger.error("Database: Error for query {}: {}".format(query_readable, e))
+            if self.logger.isEnabledFor(logging.DEBUG):
+                query_readable = re.sub(r':([a-z_]+)', r'{\1}', prepared).format(**params)
+                self.logger.error("Database: Error for query {}: {}".format(query_readable, e))
+            else:
+                self.logger.error("Database: Query error: {}".format(e))
             raise e
         finally:
             if cur is None:
                 self._db.release()
-        self.logger.debug("Database: Fetch {}: {}".format(query_readable, tuples))
+        if self.logger.isEnabledFor(logging.DEBUG):
+            query_readable = re.sub(r':([a-z_]+)', r'{\1}', prepared).format(**params)
+            self.logger.debug("Database: Fetch {}: {}".format(query_readable, tuples))
         return tuples
 
 
@@ -1829,43 +1966,34 @@ class Database(SmartPlugin):
     # ------------------------------------------
 
     def _item_value_tuple(self, item_type, item_val):
-        """
-        Convert item type and value to tuple for database
+        """Convert item type and value to the three database column dict.
 
-        :param item_type:
-        :param item_val:
-        :return:
-        """
-        if item_type == 'num':
-            val_str = None
-            val_num = float(item_val)
-            val_bool = int(bool(item_val))
-        elif item_type == 'bool':
-            val_str = None
-            val_num = float(item_val)
-            val_bool = int(bool(item_val))
-        else:
-            val_str = str(item_val)
-            val_num = None
-            val_bool = int(bool(item_val))
+        Delegates to :func:`~utils.encode_value`.  When ``item_val`` is
+        ``None`` (used for ``QUALITY_NO_DATA`` entries) all three columns
+        are returned as ``None``.
 
-        return {'val_str': val_str, 'val_num': val_num, 'val_bool': val_bool}
+        :param item_type: SmartHomeNG item type string.
+        :param item_val:  Item value, or ``None`` for a no-data entry.
+        :return:          Dict with keys ``val_str``, ``val_num``, ``val_bool``.
+        :rtype:           dict
+        """
+        from .utils import encode_value
+        return encode_value(item_type, item_val)
 
 
     def _item_value_tuple_rev(self, item_type, item_val_tuple):
-        """
-        Convert tuple to item value
+        """Reconstruct an item value from the three database column tuple.
 
-        :param item_type:
-        :param item_val_tuple:
-        :return:
+        Delegates to :func:`~utils.decode_value`.  Returns ``None`` when
+        the expected column is ``NULL`` (either no value stored yet or a
+        ``QUALITY_NO_DATA`` row).
+
+        :param item_type:      SmartHomeNG item type string.
+        :param item_val_tuple: Tuple of ``(val_str, val_num, val_bool)``.
+        :return:               Decoded Python value, or ``None``.
         """
-        if item_type == 'num':
-            return None if item_val_tuple[1] is None else float(item_val_tuple[1])
-        elif item_type == 'bool':
-            return None if item_val_tuple[2] is None else bool(int(item_val_tuple[2]))
-        else:
-            return None if item_val_tuple[0] is None else str(item_val_tuple[0])
+        from .utils import decode_value
+        return decode_value(item_type, item_val_tuple[0], item_val_tuple[1], item_val_tuple[2])
 
 
     def _datetime(self, ts):
@@ -1902,5 +2030,5 @@ class Database(SmartPlugin):
         else:
             return ms
 
-    def _len(self, value):
-        return len(value)
+    def _len(self, lst):
+        return len(lst)
