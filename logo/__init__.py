@@ -449,11 +449,12 @@ class LOGO(SmartPlugin):
 
 #***********************************************************************************************
 
+    @staticmethod
     def int_to_bitarr(integer):
         string = bin(integer)[2:]
         arr = list()
 
-        for bit in xrange(8 - len(string)):
+        for bit in range(8 - len(string)):
             arr.append(0)
 
         for bit in string:
@@ -493,7 +494,7 @@ class LOGO(SmartPlugin):
     def get_input(self, input, byte):
         m_byte = self.get_input_byte(input)
         if m_byte >= 0:
-            byte_arr = int_to_bitarr(m_byte)
+            byte_arr = self.int_to_bitarr(m_byte)
             return byte_arr[byte]
         return False
 
@@ -501,7 +502,7 @@ class LOGO(SmartPlugin):
     def get_output(self, output, byte):
         m_byte = self.get_output_byte(output)
         if m_byte >= 0:
-            byte_arr = int_to_bitarr(m_byte)
+            byte_arr = self.int_to_bitarr(m_byte)
             return byte_arr[byte]
         return False
 
@@ -521,7 +522,7 @@ class LOGO(SmartPlugin):
     def get_marker(self, marker, byte):
         m_byte = self.get_marker_byte(marker)
         if m_byte >= 0:
-            byte_arr = int_to_bitarr(m_byte)
+            byte_arr = self.int_to_bitarr(m_byte)
             return byte_arr[byte]
         return False
 
@@ -529,7 +530,7 @@ class LOGO(SmartPlugin):
     def get_vm(self, vm, byte):
         m_byte = self.get_vm_byte(vm)
         if m_byte >= 0:
-            byte_arr = int_to_bitarr(m_byte)
+            byte_arr = self.int_to_bitarr(m_byte)
             return byte_arr[byte]
         return False
 
@@ -575,7 +576,7 @@ class LOGO(SmartPlugin):
         return self.dave.daveWriteBytes(self.dc, self.daveDB, 1, vm, 2, buffer_p)
 
     #VM WORD
-    def write_vm_double(self, vm):
+    def write_vm_double(self, vm, value):
         writeBuffer = ctypes.create_string_buffer(4)
         pBuf = ctypes.pointer(writeBuffer)  # LesebufferIO
         writeBuffer[0] = ((value & 0xFF000000) >> 32)

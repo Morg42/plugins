@@ -839,9 +839,9 @@ class Indego4shNG(SmartPlugin):
     
     def _delete_url(self, url, contextid=None, timeout=40, auth=None,nowait = True):
         # Wait while login is pending
-        myCouner = 1
+        myCounter = 1
         while self.login_pending and not nowait and myCounter <=2:
-            myCouner += 1
+            myCounter += 1
             time.sleep(2)
             
         headers = {'accept' : '*/*',
@@ -874,9 +874,9 @@ class Indego4shNG(SmartPlugin):
         
     def _get_url(self, url, contextid=None, timeout=40, auth=None):
         # Wait while login is pending
-        myCouner = 1
+        myCounter = 1
         while self.login_pending and myCounter <=2:
-            myCouner += 1
+            myCounter += 1
             time.sleep(2)
             
         headers = {'accept-encoding' : 'gzip',
@@ -953,9 +953,9 @@ class Indego4shNG(SmartPlugin):
     
     def _put_url(self, url, contextid=None, body=None, timeout=2):
         # Wait while login is pending
-        myCouner = 1
+        myCounter = 1
         while self.login_pending and myCounter <=2:
-            myCouner += 1
+            myCounter += 1
             time.sleep(2)
             
         headers = {'accept-encoding' : 'gzip',
@@ -1988,7 +1988,7 @@ class Indego4shNG(SmartPlugin):
             location = self._get_url( url, self.context_id, 20)    
         except Exception as e:
             self.logger.warning("Problem fetching {}: {}".format(url, e))
-            return false
+            return False
         if location:
             self._set_childitem('location', location)
             if "latitude" in location:

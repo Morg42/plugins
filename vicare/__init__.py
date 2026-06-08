@@ -165,7 +165,7 @@ class Vicare(SmartPlugin):
     # Getter/Setter
     ############################################################
 
-    def enablePolling(enable = True):
+    def enablePolling(self, enable=True):
         self.pollData = enable
 
     def set_refreshToken(self, refreshToken):

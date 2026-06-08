@@ -1,3 +1,4 @@
+import time
 
 _defaults2= {
     'stopItems': None,          # used: to disable the controller

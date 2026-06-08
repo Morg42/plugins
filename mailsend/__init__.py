@@ -28,6 +28,7 @@ from email.header import Header
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
+from email import encoders
 
 from lib.module import Modules
 from lib.model.smartplugin import SmartPlugin, os

@@ -22,7 +22,7 @@
 #########################################################################
 
 import logging
-from mvg import MvgApi
+from mvg import MvgApi, MvgApiError
 from lib.model.smartplugin import SmartPlugin
 
 class MVG_Live(SmartPlugin):
@@ -47,7 +47,7 @@ class MVG_Live(SmartPlugin):
             if mvg_station:
                 return mvg_station
         except MvgApiError as e:
-            self.logger.error("MVGLive: Could not find %s: %s" % (ort, e))
+            self.logger.error("MVGLive: Could not find %s: %s" % (station, e))
 
     def get_station_departures(self, station):
         mvg_station = self.get_station(station)

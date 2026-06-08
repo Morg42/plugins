@@ -275,7 +275,7 @@ class SolarLog(SmartPlugin):
                 matches = re_entry.match(line)
 
                 if matches:
-                    logger.debug(matches.groups())
+                    self.logger.debug(matches.groups())
 
     def _read_months(self):
         pattern = r'mo\[mx\+\+\]=.(?P<day>\d{2})\.(?P<month>\d{2})\.(?P<year>\d{2})'
@@ -293,7 +293,7 @@ class SolarLog(SmartPlugin):
                 matches = re_entry.match(line)
 
                 if matches:
-                    logger.debug(matches.groups())
+                    self.logger.debug(matches.groups())
 
     def _read_days(self, history=False):
         pattern = r'da\[dx\+\+\]=.(?P<day>\d{2})\.(?P<month>\d{2})\.(?P<year>\d{2})'
@@ -314,7 +314,7 @@ class SolarLog(SmartPlugin):
                 matches = re_entry.match(line)
 
                 if matches:
-                    logger.debug(matches.groups())
+                    self.logger.debug(matches.groups())
 
     def _read_min_day(self, date=None, read_all=False):
         pattern = r'm\[mi\+\+\]=.(?P<day>\d{2})\.(?P<month>\d{2})\.(?P<year>\d{2})\s(?P<hour>\d{2})\:(?P<minute>\d{2})\:(?P<second>\d{2})'

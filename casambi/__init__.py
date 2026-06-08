@@ -30,6 +30,7 @@ from .webif import WebInterface
 import threading
 import requests
 import json
+import socket
 import time
 import errno
 from websocket import create_connection
@@ -435,8 +436,6 @@ class Casambi(SmartPlugin):
                     receivedData =  self.websocket.recv()
                     self.logger.debug(f"Received data: {receivedData}")
                     errorCount = 0
-                except timeout:
-                    self.logger.debug("Reception timeout")
                 except socket.timeout:
                     self.logger.debug("Socket reception timeout")
                 except Exception as e:

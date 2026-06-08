@@ -283,7 +283,7 @@ class modbus_tcp(SmartPlugin):
                     continue
 
                 if self.is_NaN( raw_value, regPara['dataType']):
-                    self.logger.debug(f"value read: {raw_value} type: {type(value)} is a bad Value")
+                    self.logger.debug(f"value read: {raw_value} type: {type(raw_value)} is a bad Value")
                     continue
                     
                 value = raw_value

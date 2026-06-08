@@ -373,7 +373,7 @@ class Robonect(MqttPlugin):
         self.logger.debug(json_obj)
         if not json_obj['successful']:
             self.logger.error("Plugin '{}': Error when trying to get motor data via API {} - {}: '{}'.".format(
-                self.get_fullname(), mode, str(json_obj['error_code']), json_obj['error_message']))
+                self.get_fullname(), self._mode, str(json_obj['error_code']), json_obj['error_message']))
 
         if 'drive' in json_obj:
             if 'motor_drive_left_power' in self._motor_items:
@@ -429,7 +429,7 @@ class Robonect(MqttPlugin):
 
         if not json_obj['successful']:
             self.logger.error("Plugin '{}': Error when trying to get battery data via API {} - {}: '{}'.".format(
-                self.get_fullname(), mode, str(json_obj['error_code']), json_obj['error_message']))
+                self.get_fullname(), self._mode, str(json_obj['error_code']), json_obj['error_message']))
 
         if 'battery_id' in self._battery_items and 'batteries' in json_obj:
             for item in self._battery_items['battery_id']:
@@ -540,7 +540,7 @@ class Robonect(MqttPlugin):
 
         if not json_obj['successful']:
             self.logger.error("Plugin '{}': Error when trying to set name via API {} - {}: '{}'.".format(
-                self.get_fullname(), mode, str(json_obj['error_code']), json_obj['error_message']))
+                self.get_fullname(), self._mode, str(json_obj['error_code']), json_obj['error_message']))
         else:
             return json_obj
 
@@ -713,7 +713,7 @@ class Robonect(MqttPlugin):
                     self.get_fullname()))
             return
         if enabled is not None:
-            param += '&enabled=%s' % int(enable)
+            param += '&enabled=%s' % int(enabled)
         if start is not None:
             if self.is_time_format(start):
                 param += '&start=%s' % start

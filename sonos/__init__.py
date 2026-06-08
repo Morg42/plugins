@@ -26,6 +26,7 @@
 
 import io
 import os
+import errno
 import logging
 import re
 import socketserver
@@ -43,7 +44,7 @@ from urllib.parse import unquote
 
 from . import utils
 
-from .soco import SoCo
+from .soco import SoCo, discover
 from .soco.exceptions import SoCoUPnPException
 from .soco.music_services import MusicService
 from .soco.data_structures import to_didl_string, DidlItem, DidlMusicTrack
@@ -179,10 +180,13 @@ class SimpleHttpServer:
         self.waitForThread()
 
 
+_logger = logging.getLogger(__name__)
+
+
 def renew_error_callback(exception):  # events_twisted: failure
     msg = f'Error received on autorenew: {exception}'
     # Redundant, as the exception will be logged by the events module
-    self.logger.error(msg)
+    _logger.error(msg)
 
     # ToDo possible improvement: Do not do periodic renew but do proper disposal on renew failure here instead. sub.renew(requested_timeout=10)
 
@@ -3739,7 +3743,7 @@ class Sonos(SmartPlugin):
                 zones.append(SoCo(ip))
         else:
             try:
-                zones = soco.discover(timeout=5)
+                zones = discover(timeout=5)
             except Exception as e:
                 self.logger.error(f"Exception during soco discover function: {e}")
                 return

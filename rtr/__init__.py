@@ -707,7 +707,7 @@ class RTR(SmartPlugin):
 
                 if y >= 0:
                     yItem = self._items.return_item(self._controller[c]['actuatorItem'])
-                    self.logger.debug("set item '{}' to '{}'".format(yitem.property.path, y))
+                    self.logger.debug("set item '{}' to '{}'".format(yItem.property.path, y))
                     self._controller[c]['valveProtectActive'] = True
                     yItem(y)
                 else:

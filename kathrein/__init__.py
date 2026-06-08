@@ -111,7 +111,7 @@ class Kathrein(SmartPlugin):
             return None
 
         if self.has_iattr(item.conf, 'kathrein'):
-            logger.debug("Kathrein Item {0} with value {1} for Kathrein ID {2} found!".format(
+            self.logger.debug("Kathrein Item {0} with value {1} for Kathrein ID {2} found!".format(
                 item, self.get_iattr_value(item.conf,'kathrein'), kathreinid))
             return self.update_item
         else:
@@ -156,7 +156,7 @@ class Kathrein(SmartPlugin):
         #urllib.request.urlopen("http://" + self._host + ":" + str(self._port) + "/HandleKey/" + key).read()
         url = "http://{}:{}/HandleKey/{}".format(self._host, self._port, key )
         urllib.request.urlopen(url).read()
-        logger.debug("Send {0} to Kathrein with IP {1} at Port {2}".format(key, self._host, self._port))
+        self.logger.debug("Send {0} to Kathrein with IP {1} at Port {2}".format(key, self._host, self._port))
         time.sleep(0.1)
 
     def init_webinterface(self):

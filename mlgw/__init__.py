@@ -26,6 +26,7 @@
 
 import logging
 import socket
+import sys
 import threading
 #import struct
 import time
@@ -1020,6 +1021,6 @@ if __name__ == '__main__':
         (0x04,"BLActive-GZ"), (0x05,"BLActive-BD"), (0x06,"BLActive-DU"),
         (0x07,"BLActive-AZ"), (0x08,"BLC"), (0x09,"BeoPlayV1-AZ")
     ]
-    myplugin = mlgw('mlgw', 'mlgw.local', 9000, 'mlgw', 'mlgw', str(dict(rooms)), str(dict(mlns)), 3 )
+    myplugin = Mlgw('mlgw', 'mlgw.local', 9000, 'mlgw', 'mlgw', str(dict(rooms)), str(dict(mlns)), 3 )
     myplugin.run()
     myplugin.stop()

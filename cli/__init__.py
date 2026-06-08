@@ -444,7 +444,7 @@ class CLICommands:
             self.logics.trigger_logic(parameter, by='CLI')
             handler.push("Logic '{0}' reloaded and triggered.\n".format(parameter))
         else:
-            handler.push("Logic '{0}' not found.\n".format(name))
+            handler.push("Logic '{0}' not found.\n".format(parameter))
 
     # noinspection PyUnusedLocal
     def _cli_ll(self, handler, parameter, source):

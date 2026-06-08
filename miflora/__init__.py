@@ -21,6 +21,7 @@
 #########################################################################
 
 import logging
+import sys
 from miflora.miflora_poller import MiFloraPoller, \
     MI_CONDUCTIVITY, MI_MOISTURE, MI_LIGHT, MI_TEMPERATURE, MI_BATTERY
 from btlewrap import available_backends, BluepyBackend, GatttoolBackend, PygattBackend

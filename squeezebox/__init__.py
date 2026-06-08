@@ -415,4 +415,4 @@ if __name__ == '__main__':
     logging.basicConfig(level=logging.DEBUG, format='%(relativeCreated)6d %(threadName)s %(message)s')
     # todo
     # change PluginClassName appropriately
-    PluginClassName(Squeezebox).run()
+    # PluginClassName(Squeezebox).run()

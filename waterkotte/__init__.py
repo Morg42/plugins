@@ -24,6 +24,7 @@ import logging
 from lib.model.smartplugin import SmartPlugin
 import time
 import re
+import base64
 import http.client
 
 logger = logging.getLogger('')

@@ -78,9 +78,9 @@ class DT_PioInitVol(DT.Datatype):
         elif int(data) < -80:
             _returnvalue = "000"
         elif float(data) >= 0:
-            _returnvalue = f"{int(((x - 0) / 12) * (185 - 161) + 161):03}"
+            _returnvalue = f"{int(((data - 0) / 12) * (185 - 161) + 161):03}"
         elif float(data) < 0:
-            _returnvalue = f"{int(161 - ((x - 0) / -80) * 160):03}"
+            _returnvalue = f"{int(161 - ((data - 0) / -80) * 160):03}"
         return _returnvalue
 
     def get_shng_data(self, data, type=None, **kwargs):
