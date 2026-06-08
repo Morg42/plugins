@@ -344,7 +344,8 @@ class Rtr2(SmartPlugin):
             try:
                 if self.default_Kd != self._rtr[r].controller._Kd:
                     info_dict[r]['Kd'] = self._rtr[r].controller._Kd
-            except: pass
+            except:
+                pass
         self.logger.info(f"write_cacheinfo: info_dict = {info_dict}")
 
         filename = os.path.join(self.cache_path,'rtr2.json')
@@ -374,7 +375,8 @@ class Rtr2(SmartPlugin):
                     self._rtr[r].controller._Kp = float(info_dict[r]['Kp'])
                     self._rtr[r].controller._Ki = float(info_dict[r]['Ki'])
                     self._rtr[r].controller._Kd = float(info_dict[r]['Kd'])
-                except: pass
+                except:
+                    pass
 
                 self._rtr[r]._mode._mode_before_frost = info_dict[r].get('mode_before_frost', 0)
                 self._rtr[r]._mode.hvac = info_dict[r]['hvac']

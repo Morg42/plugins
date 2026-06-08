@@ -102,7 +102,7 @@ class WebInterface(SmartPluginWebIf):
             # add item data
             for item in self.plugin.get_item_list():
                 item_dict = {'typ': item.property.type,
-                    		 'obis_code': self.plugin.get_iattr_value(item.conf, 'obis_code', ''),
+                             'obis_code': self.plugin.get_iattr_value(item.conf, 'obis_code', ''),
                              'obis_index': self.plugin.get_iattr_value(item.conf, 'obis_index', '0'),
                              'obis_property': self.plugin.get_iattr_value(item.conf, 'obis_property', 'value'),
                              'obis_vtype': self.plugin.get_iattr_value(item.conf, 'obis_vtype', '-'),

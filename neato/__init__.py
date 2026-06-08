@@ -135,10 +135,6 @@ class Neato(SmartPlugin):
                 #self.robot.robot_command("start", item._value, '2020-03-09T07:52:21Z')
             pass
 
-    def start_robot(self):
-        response = self.robot.robot_command("start")
-        return self.check_command_response(response)
-
     def start_robot(self, boundary_id=None, map_id=None):
         response = self.robot.robot_command("start", boundary_id, map_id)
         return self.check_command_response(response)

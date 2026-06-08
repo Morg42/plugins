@@ -377,7 +377,7 @@ class ParseText():
         # Build regular expression
         for x in range(0, len(varVars)):
             reg_ex += '('
-            if type(varVars[x]) == list:
+            if isinstance(varVars[x], list):
                 for var2 in varVars[x]:
                     for word in var2[1]:
                         reg_ex += str(word) + '|'
@@ -393,7 +393,7 @@ class ParseText():
 
         if mo:
             for x in range(0, len(varVars)):
-                if type(varVars[x]) == list:
+                if isinstance(varVars[x], list):
                     for y in range(0, len(varVars[x])):
                         if mo.group(x + 1).lower() in varVars[x][y][1]:
                             varList.append(str(varVars[x][y][0]))

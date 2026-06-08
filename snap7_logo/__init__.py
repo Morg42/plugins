@@ -249,11 +249,11 @@ class snap7_logo(SmartPlugin):
                     #self.logger.debug('read_cycle() h{0} : l{1} '.format(resVM[v['VMaddr']-self._vm], resVM[v['VMaddr']+1-self._vm]))
                     if v['typ'] == 'VMW':                           # VMW word   z.B. VMW0
                         h = resVM[v['VMaddr'] - self._vm]
-                        l = resVM[v['VMaddr'] + 1 - self._vm]
+                        lo = resVM[v['VMaddr'] + 1 - self._vm]
                     else:                                           # AI AQ AM word z.B, AM1
                         h = resVMIO[v['VMaddr'] - self._vmIO]
-                        l = resVMIO[v['VMaddr'] + 1 - self._vmIO]
-                    new_value = l + (h << 8)
+                        lo = resVMIO[v['VMaddr'] + 1 - self._vmIO]
+                    new_value = lo + (h << 8)
                 elif v['DataType'] == 'bit':
                     if v['typ'] == 'VM':                            # VM bit z.B.VM10.6
                         new_byte = resVM[v['VMaddr'] - self._vm]

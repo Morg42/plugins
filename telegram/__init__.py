@@ -685,7 +685,7 @@ class Telegram(SmartPlugin):
         chat_ids_to_send = []                           # new list
         if att_chat_id is None:                         # no attribute specified
             if self._chat_ids_item:
-                chat_ids_to_send = [l for l in self._chat_ids_item()]  # chat_ids from chat_ids item
+                chat_ids_to_send = [cid for cid in self._chat_ids_item()]  # chat_ids from chat_ids item
         else:
             if isinstance(att_chat_id, list):           # if attribute is a list
                 chat_ids_to_send = att_chat_id
@@ -832,7 +832,7 @@ class Telegram(SmartPlugin):
                             self._waitAnswer = None
                             await self._bot.sendMessage(chat_id=update.message.chat.id, text=self.translate("Control/Change item-values:"), reply_markup={"keyboard":self.create_control_reply_markup()})
                         elif dicCtl['type'] == 'num':
-                            if type(text) == int or float:
+                            if isinstance(text, (int, float)):
                                 if self.logger.isEnabledFor(logging.DEBUG):
                                     self.logger.debug("control-item: answer is num ")
                                 item = dicCtl['item']

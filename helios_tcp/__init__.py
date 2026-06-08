@@ -171,8 +171,8 @@ class HeliosTCP(SmartPlugin):
 
     @staticmethod
     def _string_to_registers(instr: str):
-        l = bytearray(instr, 'ascii')
-        return [k[0]*256 + k[1] for k in zip(l[::2], l[1::2])] + [0]
+        barr = bytearray(instr, 'ascii')
+        return [k[0]*256 + k[1] for k in zip(barr[::2], barr[1::2])] + [0]
 
 
     def _read_value(self, item):
@@ -249,7 +249,7 @@ class HeliosTCP(SmartPlugin):
             if not varprop["write"]:
                 return
 
-            if type(newval) != varprop["type"]:
+            if type(newval) is not varprop["type"]:
                 self.logger.error("Helios TCP: Type mismatch for variable '{0}'".format(var))
                 return
 
@@ -257,11 +257,11 @@ class HeliosTCP(SmartPlugin):
                 self.logger.error("Helios TCP: Variable '{0}' out of bounds. The allowed range is [{1}, {2}]".format(var, varprop["min"], varprop["max"]))
                 return
 
-            if varprop["type"] == bool:
+            if varprop["type"] is bool:
                 payload_string = "{0}={1}".format(varprop["var"], int(newval))
-            elif varprop["type"] == int:
+            elif varprop["type"] is int:
                 payload_string = "{0}={1}".format(varprop["var"], int(newval))
-            elif varprop["type"] == float:
+            elif varprop["type"] is float:
                 payload_string = "{0}={1:.1f}".format(varprop["var"], newval)
             else:
                 self.logger.error("Helios TCP: Type {0} of varible '{1}' not known".format(varprop["type"], var))

@@ -29,7 +29,7 @@ from lib.module import Modules
 from lib.model.smartplugin import SmartPlugin
 
 from .webif import WebInterface
-from .beodevices import BeoDevices, os
+from .beodevices import BeoDevices
 import plugins.beolink.beonotifications as beonotify
 
 # If a needed package is imported, which might be not installed in the Python environment,

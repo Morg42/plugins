@@ -530,6 +530,6 @@ class Pluggit(SmartPlugin):
                         if readItemValue is not None:
                             item(readItemValue, 'Pluggit')
                         else:
-                            self.logger.warning("Unbekannter Wert-Typ: {} bei Item {}.".format(pluggit_paramList[self.DICT_VALUE_TYPE]), item)
+                            self.logger.warning("Unbekannter Wert-Typ: {} bei Item {}.".format(pluggit_paramList[self.DICT_VALUE_TYPE], item))
 
             time.sleep(0.1)

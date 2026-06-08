@@ -110,7 +110,8 @@ class WebInterface(SmartPluginWebIf):
             if d_type in ['Switch','SwitchPowermeter','ShutterContact']:
                 try:
                     d['value'] = dev.getValue('STATE')
-                except: pass
+                except:
+                    pass
 
             devices.append(d)
 
@@ -137,7 +138,8 @@ class WebInterface(SmartPluginWebIf):
             if d_type in ['Switch','SwitchPowermeter','ShutterContact']:
                 try:
                     d['value'] = dev.getValue('STATE')
-                except: pass
+                except:
+                    pass
 
             ipdevices.append(d)
 

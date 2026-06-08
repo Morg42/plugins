@@ -661,7 +661,7 @@ class Database(SmartPlugin):
         :return: Data for the selected item
         """
         params = {'id': id}
-        if type(id) == str:
+        if isinstance(id, str):
             return self._fetchone("SELECT {item_columns} from {item} WHERE name = :id;", params, cur=cur)
         return self._fetchone("SELECT {item_columns} from {item} WHERE id = :id;", params, cur=cur)
 
@@ -1902,5 +1902,5 @@ class Database(SmartPlugin):
         else:
             return ms
 
-    def _len(self, l):
-        return len(l)
+    def _len(self, value):
+        return len(value)

@@ -60,19 +60,6 @@ class WebInterface(SmartPluginWebIf):
         self.items = Items.get_instance()
 
     @cherrypy.expose
-    def index(self, reload=None, mode=None):
-        """
-        Build index.html for cherrypy
-
-        Render the template and return the html file to be delivered to the browser
-
-        :return: contents of the template after beeing rendered
-        """
-        tmpl = self.tplenv.get_template('index.html')
-        # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])))
-
-    @cherrypy.expose
     def index(self, reload=None):
         """
         Build index.html for cherrypy

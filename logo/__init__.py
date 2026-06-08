@@ -26,7 +26,6 @@
 
 import ctypes
 import os
-import string
 import time
 import logging
 import threading
@@ -281,11 +280,11 @@ class LOGO(SmartPlugin):
                     #self.logger.debug('{0}: read_cycle() h{1} : l{2} '.format(self.get_instance_name(), pBuf_VM[v['VMaddr']-self._vm], pBuf_VM[v['VMaddr']+1-self._vm]))
                     if v['typ'] == 'VMW':                           # VMW word   z.B. VMW0
                         h = ord(pBuf_VM[v['VMaddr'] - self._vm])
-                        l = ord(pBuf_VM[v['VMaddr'] + 1 - self._vm])
+                        lo = ord(pBuf_VM[v['VMaddr'] + 1 - self._vm])
                     else:                                           # AI AQ AM word z.B, AM1
                         h = ord(pBuf_VMIO[v['VMaddr'] - self._vmIO])
-                        l = ord(pBuf_VMIO[v['VMaddr'] + 1 - self._vmIO])
-                    new_value = l + (h << 8)
+                        lo = ord(pBuf_VMIO[v['VMaddr'] + 1 - self._vmIO])
+                    new_value = lo + (h << 8)
                 elif v['DataType'] == 'bit':
                     if v['typ'] == 'VM':                            # VM bit z.B.VM10.6
                         new_byte = ord(pBuf_VM[v['VMaddr'] - self._vm])

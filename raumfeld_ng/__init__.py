@@ -212,7 +212,7 @@ class Raumfeld_ng(SmartPlugin):
                 # For call w/o tracknumber playlist name can be a single element list or simple string : ["plname"] or "plname"
                 if self.get_iattr_value(item.conf, 'rf_attr') == 'load_playlist':
                     action = "loadPlaylist"
-                    if type(value) == list:
+                    if isinstance(value, list):
                         pl = self.urlencode(value[0])
                         self.logger.info("Playlist item gefunden: {}".format(pl))
                         urlaction = [self._baseURL + "/controller/" + action + "?id=" + renderer + "&value=" + pl]

@@ -1,8 +1,8 @@
 
 import time
 from mode import Mode, logging
-from temperature import Temperature, logging
-from pi_controller import Pi_controller, logging
+from temperature import Temperature
+from pi_controller import Pi_controller
 
 class Rtr():
 

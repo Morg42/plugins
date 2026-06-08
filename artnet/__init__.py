@@ -200,11 +200,11 @@ class ArtNet(SmartPlugin):
         self.alive = False
 
     def __call__(self, var1=None, var2=None):
-        if type(var1) == int and type(var2) == int:
+        if isinstance(var1, int) and isinstance(var2, int):
             self.send_single_value(var1, var2)
-        if type(var1) == int and type(var2) == list:
+        if isinstance(var1, int) and isinstance(var2, list):
             self.send_frame_starting_at(var1, var2)
-        if type(var1) == list and type(var2) == type(None):
+        if isinstance(var1, list) and var2 is None:
             self.send_frame(var1)
 
     def get_address_value(self, req_adr):

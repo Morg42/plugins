@@ -566,7 +566,7 @@ class OneWire(SmartPlugin):
             self.logger.error(f"_discovery: listing '/' failed with error '{e}'")
             return
         self.logger.dbghigh(f"Discovery: Got listing for '/' = '{listing}'  self.alive: {self.alive}")
-        if type(listing) != list:
+        if not isinstance(listing, list):
             self.logger.warning(f"_discovery: listing '{listing}' is not a list.")
             return
 

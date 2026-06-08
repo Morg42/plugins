@@ -261,9 +261,12 @@ class Resol(SmartPlugin):
     
     # Extract protocol Version from msg
     def get_protocolversion(self, msg):
-        if hex(ord(msg[4])) == '0x10': return "PV1"
-        if hex(ord(msg[4])) == '0x20': return "PV2"
-        if hex(ord(msg[4])) == '0x30': return "PV3"
+        if hex(ord(msg[4])) == '0x10':
+            return "PV1"
+        if hex(ord(msg[4])) == '0x20':
+            return "PV2"
+        if hex(ord(msg[4])) == '0x30':
+            return "PV3"
         return "UNKNOWN"
     
     # Extract Destination from msg NOT USED AT THE MOMENT

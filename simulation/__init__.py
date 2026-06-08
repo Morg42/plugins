@@ -149,12 +149,12 @@ class Simulation(SmartPlugin):
             self._schedule_recording_start(start)
 
     # ----------------------- _schedule_recording_start ---------------------------
-    def _schedule_recording_start(self, time):
+    def _schedule_recording_start(self, start_time):
         self.state(1, 'Simulation')
         self.scheduler_remove('startrecord')
-        self._message_item('Recording starts {}'.format(time), caller='Simulation')
-        self.logger.debug('Scheduling record start {}'.format(time))
-        self.scheduler_add('startrecord', self._start_recording, next=time)
+        self._message_item('Recording starts {}'.format(start_time), caller='Simulation')
+        self.logger.debug('Scheduling record start {}'.format(start_time))
+        self.scheduler_add('startrecord', self._start_recording, next=start_time)
 
     # ----------------------------- _start_recording --------------------------------
     def _start_recording(self):

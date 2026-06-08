@@ -295,7 +295,8 @@ def _getpayloadstr( message ):
     elif message[1] == 0x30:       # Login request
         wrk = message[4:4+message[2]]
         for i in range(0, message[2]):
-            if wrk[i] == 0: wrk[i] = 0x7f
+            if wrk[i] == 0:
+                wrk[i] = 0x7f
         wrk = wrk.decode('utf-8')
         resultstr = wrk.split(chr(0x7f))[0] + " / " + wrk.split(chr(0x7f))[1]
 
@@ -704,8 +705,10 @@ class Mlgw(SmartPlugin):
         self.log_mlgwtelegrams =  self.get_parameter_value('log_mlgwtelegrams')
 
         log_telegrams = self.log_mlgwtelegrams
-        if log_telegrams < 0: log_telegrams = 0
-        if log_telegrams > 4: log_telegrams = 2
+        if log_telegrams < 0:
+            log_telegrams = 0
+        if log_telegrams > 4:
+            log_telegrams = 2
         if log_telegrams == 4:
             loglevel_keepalivetelegrams = logging.WARNING
         if log_telegrams >= 3:

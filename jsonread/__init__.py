@@ -254,17 +254,23 @@ class JSONREAD(SmartPlugin):
                 pass
 
             if op == '==':
-                if val == cmp_val: return True
+                if val == cmp_val:
+                    return True
             elif op == '!=':
-                if val != cmp_val: return True
+                if val != cmp_val:
+                    return True
             elif op == '>':
-                if val > cmp_val: return True
+                if val > cmp_val:
+                    return True
             elif op == '<':
-                if val < cmp_val: return True
+                if val < cmp_val:
+                    return True
             elif op == '>=':
-                if val >= cmp_val: return True
+                if val >= cmp_val:
+                    return True
             elif op == '<=':
-                if val <= cmp_val: return True
+                if val <= cmp_val:
+                    return True
 
         return False
 

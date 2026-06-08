@@ -302,7 +302,7 @@ class Viessmann(SmartPlugin):
                         tdelay = 5  # default delay
                         if self.has_iattr(item.conf, 'viess_trigger_afterwrite'):
                             tdelay = float(self.get_iattr_value(item.conf, 'viess_trigger_afterwrite'))
-                        if type(trigger) != list:
+                        if not isinstance(trigger, list):
                             trigger = [trigger]
                         for triggername in trigger:
                             triggername = triggername.strip()

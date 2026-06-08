@@ -138,7 +138,8 @@ class WakeOnLan(SmartPlugin):
             if ip_adr.strip() == "":
                 ip_adr = None
         
-        if ip_adr is None: ip_adr = '<broadcast>'
+        if ip_adr is None:
+            ip_adr = '<broadcast>'
 
         if ip_adr:
             self.logger.debug(f"WakeOnLan: send magic paket {data} to ip/mac {ip_adr}/{mac_adr}")

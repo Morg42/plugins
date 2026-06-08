@@ -262,7 +262,8 @@ def _parse_knxproject(filename, password=None):
             return GAs
 
         top = ga_dict.get('GroupRange',None)
-        if top is None: return GAs
+        if top is None:
+            return GAs
 
         if not isinstance(top, list):
             # if there is only one child defined in xml, an ordered dict is
@@ -274,7 +275,8 @@ def _parse_knxproject(filename, password=None):
 
         for middle in main_ga:
             middle_dict = middle.get('GroupRange',None)
-            if middle_dict is None: continue
+            if middle_dict is None:
+                continue
 
             if not isinstance( middle_dict, list):
                 # same as above
@@ -285,7 +287,8 @@ def _parse_knxproject(filename, password=None):
             for last in middle_ga:
                 last_dict = last.get('GroupAddress', None)
 
-                if last_dict is None: continue
+                if last_dict is None:
+                    continue
 
                 if not isinstance( last_dict, list):
                     # same as above

@@ -241,13 +241,16 @@ class WebInterface(SmartPluginWebIf):
             value_dict['data'] = ''
             try:
                 value_dict['data'] = f"{sensor.light.light_level:,}".replace(",",".") + ' Lux'
-            except: pass
+            except:
+                pass
             try:
                 value_dict['data'] = sensor.motion.motion
-            except: pass
+            except:
+                pass
             try:
                 value_dict['data'] = str(sensor.temperature.temperature) + ' °C'
-            except: pass
+            except:
+                pass
 
             try:
                 value_dict['device_id'] = sensor.owner.rid

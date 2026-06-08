@@ -209,8 +209,8 @@ class SmartVisu(SmartPlugin):
         if os.path.isfile(os.path.join(self.smartvisu_dir, 'version-info.php')):
             with open(os.path.join(self.smartvisu_dir, 'version-info.php'), 'r') as content_file:
                 content = content_file.readlines()
-            for l in content:
-                line = l.strip('( defin\n;)')
+            for entry in content:
+                line = entry.strip('( defin\n;)')
                 if line.find('//') > -1:
                     line = line[:line.find('//')]
                 if line.startswith("'config_version'"):

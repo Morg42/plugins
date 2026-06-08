@@ -162,7 +162,7 @@ class Casambi(SmartPlugin):
             "ref": reference,
             "wire": self.wire,
             "type": socketType
-	    }
+        }
         # convert to JSON string:
         openMsgJson = json.dumps(openMsg)
         #self.logger.debug(f"Open msg as json: {openMsgJson}")

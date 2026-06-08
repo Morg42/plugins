@@ -920,7 +920,7 @@ class Indego4shNG(SmartPlugin):
         # Wait while login is pending
         myCounter = 1
         while self.login_pending and not nowait and myCounter <=2:
-            myCouner += 1
+            myCounter += 1
             time.sleep(2)
             
         headers = {'accept-encoding' : 'gzip',
@@ -1976,7 +1976,7 @@ class Indego4shNG(SmartPlugin):
     
     def _parse_dict_2_item(self,myDict, keyEntry):
         for m in myDict:
-            if type(myDict[m]) != dict:
+            if not isinstance(myDict[m], dict):
                 self._set_childitem(keyEntry+m, myDict[m])
             else:
                 self._parse_dict_2_item(myDict[m],keyEntry+m+'.')
@@ -2495,7 +2495,7 @@ class Indego4shNG(SmartPlugin):
             if 'error' in states:
                 error_code = states['error']
                 self._set_childitem('stateError',error_code)
-                self.logger.error("error_code : {]".format(str(error_code)))
+                self.logger.error("error_code : {}".format(str(error_code)))
             else:
                 error_code = 0
                 self._set_childitem('stateError',error_code)

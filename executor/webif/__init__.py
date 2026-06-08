@@ -167,7 +167,7 @@ class WebInterface(SmartPluginWebIf):
         result = ""
 
         g = {}
-        l = { 'sh': self.plugin.get_sh() }
+        loc = { 'sh': self.plugin.get_sh() }
         self.logger.debug(f"eval {eline} (raw) for item path {path}")
         eline = urllib.parse.unquote(eline)
         if path != '':
@@ -183,7 +183,7 @@ class WebInterface(SmartPluginWebIf):
 
         try:
             if eline:
-                res = eval(eline,g,l)
+                res = eval(eline,g,loc)
             else:
                 res = "Nothing to do"
         except Exception as e:
@@ -204,7 +204,7 @@ class WebInterface(SmartPluginWebIf):
         stub_logger = Stub(warning=print, info=print, debug=print, error=print, criticl=print, notice=print, dbghigh=print, dbgmed=print, dbglow=print)
 
         g = {}
-        l = { 'sh': self.plugin.get_sh(),
+        loc = { 'sh': self.plugin.get_sh(),
             'time': time,
             'datetime': datetime,
             'random': random,
@@ -219,7 +219,7 @@ class WebInterface(SmartPluginWebIf):
         with PrintCapture() as p:
             try:
                 if eline:
-                    exec(eline,g,l)
+                    exec(eline,g,loc)
                 res = ""
             except Exception as e:
                 res = f"Error '{e}' while evaluating"
