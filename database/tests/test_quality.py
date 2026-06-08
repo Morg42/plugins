@@ -104,16 +104,22 @@ class TestQualityStoreLevel(unittest.TestCase):
             def execute(self, s, p=(), cur=None):
                 c = cur or self._conn.cursor()
                 c.execute(s, p)
-                if cur is None: self._conn.commit(); c.close()
+                if cur is None:
+                    self._conn.commit()
+                    c.close()
             def fetchone(self, s, p=(), cur=None):
-                c = cur or self._conn.cursor(); c.execute(s, p)
+                c = cur or self._conn.cursor()
+                c.execute(s, p)
                 r = c.fetchone()
-                if cur is None: c.close()
+                if cur is None:
+                    c.close()
                 return tuple(r) if r else None
             def fetchall(self, s, p=(), cur=None):
-                c = cur or self._conn.cursor(); c.execute(s, p)
+                c = cur or self._conn.cursor()
+                c.execute(s, p)
                 rows = c.fetchall()
-                if cur is None: c.close()
+                if cur is None:
+                    c.close()
                 return [tuple(r) for r in rows]
             def commit(self): self._conn.commit()
             def rollback(self): self._conn.rollback()

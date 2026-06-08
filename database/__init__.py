@@ -41,7 +41,22 @@ from lib.utils import Utils
 from lib.model.smartplugin import SmartPlugin
 from lib.module import Modules
 
-from .constants import *
+from .constants import (
+    COL_ITEM,
+    COL_ITEM_ID,
+    COL_ITEM_NAME,
+    COL_ITEM_TIME,
+    COL_ITEM_VAL_BOOL,
+    COL_ITEM_VAL_NUM,
+    COL_ITEM_VAL_STR,
+    COL_LOG,
+    COL_LOG_CHANGED,
+    COL_LOG_DURATION,
+    COL_LOG_TIME,
+    COL_LOG_VAL_BOOL,
+    COL_LOG_VAL_NUM,
+    COL_LOG_VAL_STR,
+    )
 from .webif import WebInterface
 
 
@@ -160,7 +175,7 @@ class Database(SmartPlugin):
 
         # Setup db and test if connection is possible
         self._db = lib.db.Database(("" if self._prefix == ""  else self._prefix.capitalize()) + "Database", self.driver, self._connect)
-        if self._db.api_initialized == False:
+        if not self._db.api_initialized:
             # Error initializeng the database driver (e.g.: Python module for database driver not found)
             self.logger.error("Initialization of database API failed")
             self._init_complete = False
@@ -168,7 +183,7 @@ class Database(SmartPlugin):
 
         # Setup db maintenance connection and test if connection is possible
         self._db_maint = lib.db.Database(("" if self._prefix == ""  else self._prefix.capitalize()) + "Database", self.driver, self._connect)
-        if self._db_maint.api_initialized == False:
+        if not self._db_maint.api_initialized:
             # Error initializeng the database driver (e.g.: Python module for database driver not found)
             self.logger.error("Initialization of database API failed for maintenance connection")
             self._init_complete = False
@@ -385,7 +400,7 @@ class Database(SmartPlugin):
                 # This is because configuring database: init aims at avoiding the regular item initial value to appear inside the DB:
                 if self.get_iattr_value(item.conf, 'database').lower() == 'init' and item.property.prev_change_by =='Init:Initial_Value':
                     if debug_item:
-                        self.logger.warning(f"Debug 1b): Do not append previous value as it was set by Initial_Value")
+                        self.logger.warning("Debug 1b): Do not append previous value as it was set by Initial_Value")
                 else:
                     if debug_item:
                         self.logger.warning(f"Debug 1b): Appending prev_value: start: {start}, duration: {end-start}, prev_value: {item.prev_value()} to item '{item}'")
@@ -512,7 +527,7 @@ class Database(SmartPlugin):
         try:
             database_name = next((s for s in self._connect if s.startswith("database:")), '')
             database_name = database_name[9:].strip()
-        except:
+        except Exception:
             database_name = ''
 
         # copy the database file
@@ -545,7 +560,7 @@ class Database(SmartPlugin):
 
         try:
             item_path = str(item.property.path)
-        except:
+        except AttributeError:
             item_path = item
         try:
             id = self.readItem(item_path, cur=cur)
@@ -553,7 +568,7 @@ class Database(SmartPlugin):
             self.logger.warning(f"id(): No id found for item {item_path} - Exception {e}")
             id = None
 
-        if id is None and create == True:
+        if id is None and create:
             id = [self.insertItem(item.property.path, cur)]
 
         if (id is None) or (COL_ITEM_ID >= len(id)) :
@@ -575,7 +590,7 @@ class Database(SmartPlugin):
 
         try:
             item_path = str(item.property.path)
-        except:
+        except AttributeError:
             item_path = item
         try:
             row = self.readItem(item_path, cur=None)
@@ -586,7 +601,6 @@ class Database(SmartPlugin):
         if (row is None) or (COL_ITEM_ID >= len(row)) :
             return None
 
-        id = int(row[COL_ITEM_ID])
         strval = row[COL_ITEM_VAL_STR]
         numval = row[COL_ITEM_VAL_NUM]
         boolval = row[COL_ITEM_VAL_BOOL]
@@ -616,7 +630,7 @@ class Database(SmartPlugin):
 
         try:
             item_path = str(item.property.path)
-        except:
+        except AttributeError:
             item_path = item
         try:
             row = self.readItem(item_path, cur=None)
@@ -627,7 +641,6 @@ class Database(SmartPlugin):
         if (row is None) or (COL_ITEM_ID >= len(row)):
             return None
 
-        id = int(row[COL_ITEM_ID])
         last_change = row[COL_ITEM_TIME]
         if last_change is None:
             return None
@@ -688,7 +701,7 @@ class Database(SmartPlugin):
                 for key in [COL_ITEM_ID, COL_LOG_CHANGED]:
                     cols.append('' if row[key] is None else datetime.datetime.fromtimestamp(row[key] / 1000.0))
                 cols = map(lambda col: '' if col is None else col, cols)
-                cols = map(lambda col: str(col) if not '"' in str(col) else col.replace('"', '\\"'), cols)
+                cols = map(lambda col: str(col) if '"' not in str(col) else col.replace('"', '\\"'), cols)
                 f.write(s.join(cols) + "\n")
         f.close()
         self.logger.info("File dump completed ({} items) ...".format(len(item_ids)))
@@ -1187,12 +1200,12 @@ class Database(SmartPlugin):
                          changed_start=None, changed_end=None):
         params = {
             'id': id,
-            'time': time, 'time_flag': 1 if time == None else 0,
-            'time_start': time_start, 'time_start_flag': 1 if time_start == None else 0,
-            'time_end': time_end, 'time_end_flag': 1 if time_end == None else 0,
-            'changed': changed, 'changed_flag': 1 if changed == None else 0,
-            'changed_start': changed_start, 'changed_start_flag': 1 if changed_start == None else 0,
-            'changed_end': changed_end, 'changed_end_flag': 1 if changed_end == None else 0
+            'time': time, 'time_flag': 1 if time is None else 0,
+            'time_start': time_start, 'time_start_flag': 1 if time_start is None else 0,
+            'time_end': time_end, 'time_end_flag': 1 if time_end is None else 0,
+            'changed': changed, 'changed_flag': 1 if changed is None else 0,
+            'changed_start': changed_start, 'changed_start_flag': 1 if changed_start is None else 0,
+            'changed_end': changed_end, 'changed_end_flag': 1 if changed_end is None else 0
         }
 
         condition = "(item_id = :id                                      ) AND " + \
@@ -1445,7 +1458,7 @@ class Database(SmartPlugin):
         ts = self._timestamp(self.shtime.now())
         try:
             return min(ts, int(dts))    # rts, if dts is an integer value, return now, if dts is a timestamp in th future
-        except:
+        except (TypeError, ValueError):
             pass
 
         duration = 0
@@ -1482,7 +1495,7 @@ class Database(SmartPlugin):
         _frames = {'s': second, 'i': minute, 'h': hour, 'd': day, 'w': week, 'm': month, 'y': year}
         try:
             return int(frame)
-        except:
+        except (TypeError, ValueError):
             pass
         ts = self._timestamp(self.shtime.now())
         # if frame == 'now':
@@ -1496,7 +1509,7 @@ class Database(SmartPlugin):
             return frame
         try:
             ts = int(float(frame) * fac)
-        except:
+        except (TypeError, ValueError):
             self.logger.warning("Database: Unknown time frame '{0}'".format(frame))
         return ts
 
@@ -1515,7 +1528,7 @@ class Database(SmartPlugin):
         :param items:
         :return:
         """
-        if self._dump_lock.acquire(timeout=60) == False:
+        if not self._dump_lock.acquire(timeout=60):
             self.logger.notice('Skipping dump, since an other database operation running! Data is buffered and dumped later.')
             self.skipping_dump = True
             return
@@ -1530,7 +1543,7 @@ class Database(SmartPlugin):
             self._dump_lock.release()
             return
 
-        if items == None:
+        if items is None:
             # No item given on method call -> dump content of the buffer
             self._buffer_lock.acquire()
             items = list(self._buffer.keys())
@@ -1544,7 +1557,7 @@ class Database(SmartPlugin):
                 # Test connectivity
                 if self._db.verify(5) == 0:
                     self._buffer_insert(item, tuples)
-                    self.logger.error("Connection not recovered, skipping dump");
+                    self.logger.error("Connection not recovered, skipping dump")
                     self._dump_lock.release()
                     return
 
@@ -1589,7 +1602,7 @@ class Database(SmartPlugin):
                         # to the database and only the last entry is updated.
 
                         #self.logger.debug(f"DEBUG _dump: Finalizing item {item} with value {val}")
-                        if self.get_iattr_value(item.conf, 'database_write_on_shutdown') == False:
+                        if not self.get_iattr_value(item.conf, 'database_write_on_shutdown'):
                             self.logger.debug(f"DEBUG _dump: Blocking rewrite to DB for item {item} with value {val}")
 
                             #if item.property.path == 'xyz':
@@ -2017,5 +2030,5 @@ class Database(SmartPlugin):
         else:
             return ms
 
-    def _len(self, l):
-        return len(l)
+    def _len(self, lst):
+        return len(lst)
