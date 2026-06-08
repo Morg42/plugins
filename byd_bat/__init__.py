@@ -112,6 +112,7 @@ from lib.item import Items
 from .webif import WebInterface
 import cherrypy
 
+import random
 import socket
 import time
 import matplotlib
@@ -1614,7 +1615,7 @@ class byd_bat(SmartPlugin):
         self.log_debug("5) " + d5.hex())
 
         if (len(d1) != EVT_MSG_1_L) or (len(d2) != EVT_MSG_1_L) or (len(d3) != EVT_MSG_1_L) or (len(d4) != EVT_MSG_1_L) or (len(d5) != EVT_MSG_1_L):
-          self.log_info("EVT_MSG_1 answer length wrong ! (" + str(len(data)) + "/" + str(EVT_MSG_1_L) + ")")
+          self.log_info("EVT_MSG_1 answer length wrong ! (" + str(len(d1)) + "/" + str(EVT_MSG_1_L) + ")")
           return byd_error
         
         # Erzeuge eine Liste mit allen Datenbytes - 20 Log-Eintraege befinden sich in dieser Liste

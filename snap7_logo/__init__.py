@@ -22,6 +22,7 @@
 import ctypes
 import os
 import string
+import struct
 import time
 import snap7
 from lib.model.smartplugin import SmartPlugin
@@ -29,6 +30,11 @@ from lib.module import Modules
 from lib.logic import Logics
 from lib.item import Items
 from .webif import WebInterface
+
+
+class LOGO(Exception):
+    pass
+
 
 class snap7_logo(SmartPlugin):
 

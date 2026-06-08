@@ -994,6 +994,7 @@ class Shelly(MqttPlugin):
         for index, light in enumerate(sub_property):
             # is_dimmer = (shelly_id.find('dimmer') >= 0)
             is_dimmer = ('wire_mode' in payload.keys())
+            light_group = ''
             for property in light:
                 mode = light.get('mode', '')
                 if mode == '':
