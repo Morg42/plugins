@@ -1,6 +1,6 @@
 
-from mode import *
-from temperature import *
+from mode import Mode
+from temperature import Temperature
 
 m = Mode()
 t = Temperature(m, {'comfort': '20.x', 'frost': '8.5'})

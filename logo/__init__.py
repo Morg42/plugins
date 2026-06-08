@@ -32,7 +32,7 @@ import logging
 import threading
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 
 class LOGO(SmartPlugin):
@@ -140,7 +140,7 @@ class LOGO(SmartPlugin):
 
             # Init Adapter
             self.res = self.dave.daveInitAdapter(self.di)
-            if self.res is not 0:
+            if self.res != 0:
                 raise LOGO('{0}:Init Adapter N.O.K.'.format(self.get_instance_name()))
 
             # dave Connection
@@ -182,12 +182,12 @@ class LOGO(SmartPlugin):
             if len(self.writes) > 0:    # beim Schreiben sofort schreiben
                 self._write_cycle()
                 self._read_cycle()
-                cycletime = time.time() - start
+                time.time() - start
                 #self.logger.debug("{0}: logo_cycle takes {1} seconds".format(self.get_instance_name(), cycletime))
                 self.threadLastRead = time.time()
             elif t > self._io_wait:  # erneutes Lesen erst wenn Zeit um ist
                 self._read_cycle()
-                cycletime = time.time() - start
+                time.time() - start
                 #self.logger.debug("{0}: logo_cycle takes {1} seconds. Last read: {2}".format(self.get_instance_name(), cycletime, t))
                 self.threadLastRead = time.time()
 
@@ -224,7 +224,7 @@ class LOGO(SmartPlugin):
                 else:
                     raise LOGO('{0}:invalid typ: {1}'.format(self.get_instance_name(), typ))
 
-                if write_res is not 0:
+                if write_res != 0:
                     raise LOGO('{0}:LOGO: write failed: {1} {2} '.format(self.get_instance_name(), typ, value))
                     self.close()
                 else:
@@ -251,7 +251,7 @@ class LOGO(SmartPlugin):
 
             # lesen der I Q M AI AQ AM
             resVMIO = self.dave.daveReadManyBytes(self.dc, self.daveDB, 1, self._vmIO, self._vmIO_len, buf_VMIO_p)
-            if resVMIO is not 0:
+            if resVMIO != 0:
                 self.logger.error('{0}: read_cycle() failed ro read VM_IO-Buffer daveReadManyBytes'.format(self.get_instance_name()))
                 self.close()
                 return
@@ -261,7 +261,7 @@ class LOGO(SmartPlugin):
 
             # lesen der VM
             resVM = self.dave.daveReadManyBytes(self.dc, self.daveDB, 1, self._vm, self._vm_len, buf_VM_p)
-            if resVM is not 0:
+            if resVM != 0:
                 self.logger.error('{0}: read_cycle() failed ro read VM-Buffer daveReadManyBytes'.format(self.get_instance_name()))
                 self.close()
                 return

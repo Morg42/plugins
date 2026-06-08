@@ -23,7 +23,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, logging
 from lib.item import Items
 from .webif import WebInterface
 
@@ -152,8 +152,8 @@ class Casambi(SmartPlugin):
     def openWebsocket(self, networkID):
 
         self.logger.debug("start openWebsocket")
-        reference = 'REFERENCE-ID'; # Reference handle created by client to link messages to relevant callbacks
-        socketType = 1;             # Client type, use value 1 (FRONTEND)
+        reference = 'REFERENCE-ID' # Reference handle created by client to link messages to relevant callbacks
+        socketType = 1             # Client type, use value 1 (FRONTEND)
 
         openMsg = {
             "method": "open",
@@ -226,7 +226,7 @@ class Casambi(SmartPlugin):
         local_error_cnt = error_count
         
         if key == 'ON':
-            sendValue = int(item() == True)
+            sendValue = int(item())
         elif key == 'DIMMER' or key == 'VERTICAL':
             sendValue = item() / 100.0
         elif key == 'CCT':
@@ -264,7 +264,7 @@ class Casambi(SmartPlugin):
                 local_error_cnt = local_error_cnt + 1
             else:
                 # Command was sent without exceptions. Now, analyse backend status:
-                if self.casambiBackendStatus == False:
+                if not self.casambiBackendStatus:
                     self.logger.warning("Command sent but backend is not online.")
                 else:
                     self.logger.debug(f"Command {key} with value {sendValue} sent out via open websocket")
@@ -314,7 +314,6 @@ class Casambi(SmartPlugin):
             # This happens for example if a wireStatus response to an open message is received which does not contain a method attribute.
             self.logger.debug("Event: No method info received.")
         elif method == 'peerChanged':
-            online = None
             if 'online' in dataJson:
                 self.casambiBackendStatus = bool(dataJson ['online'])
                 for id in self._rx_items:
@@ -375,15 +374,15 @@ class Casambi(SmartPlugin):
                     elif item.conf['casambi_rx_key'].upper() == 'CCT':
                         item(cctValue, self.get_shortname())
 
-            elif unitID and not (unitID in self._rx_items):
+            elif unitID and unitID not in self._rx_items:
                 self.logger.warning(f"Received status information for ID {unitID} which has no equivalent item.")
 
         elif method == 'networkUpdated':
-            self.logger.warning(f"Casambi network has been updated with persistent changes")
+            self.logger.warning("Casambi network has been updated with persistent changes")
             self.logger.warning(f"Debug: decodeData(), receivedData: {receivedData}")
 
         elif method == 'networkLog':
-            self.logger.debug(f"Casambi network sent network logging information")
+            self.logger.debug("Casambi network sent network logging information")
             self.logger.debug(f"Debug: decodeData(), receivedData: {receivedData}")
 
         else:
@@ -425,7 +424,7 @@ class Casambi(SmartPlugin):
         while self.alive:
             #self.logger.debug("Starting loop")
 
-            if not self.websocket or self.websocket.connected == False:
+            if not self.websocket or not self.websocket.connected:
                 self.logger.debug("Websocket no longer connected.")
                 doReconnect = True
                 errorCount = errorCount  + 1
@@ -526,10 +525,10 @@ class Casambi(SmartPlugin):
                 if (id_item is self._sh):
                     self.logger.error(f"Could not find casambi_id for item {item}")
                     return None
-            rx_key = item.conf['casambi_rx_key'].upper()
+            item.conf['casambi_rx_key'].upper()
             id = int(id_item.conf['casambi_id'])
 
-            if (not id in self._rx_items):
+            if (id not in self._rx_items):
                 self._rx_items[id] = []
             self._rx_items[id].append(item)
             #self.logger.debug(f"rx-items dict: {self._rx_items}")
@@ -543,7 +542,7 @@ class Casambi(SmartPlugin):
                     self.logger.error(f"Could not find casambi_id for item {item}")
                     return None
 
-            tx_key = item.conf['casambi_tx_key'].upper()
+            item.conf['casambi_tx_key'].upper()
             id = int(id_item.conf['casambi_id'])
             #self.logger.debug(f"New TX-item: {item} with casambi ID: {id} and tx key: {tx_key}")
           

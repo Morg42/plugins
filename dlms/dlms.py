@@ -171,7 +171,7 @@ def query( config ):
     InitialBaudrate = config.get('baudrate', 300)
     QueryCode = config.get('querycode', '?')
     use_checksum = config.get('use_checksum', True)
-    baudrate_fix = config.get('baudrate_fix', False)
+    config.get('baudrate_fix', False)
     timeout = config.get('timeout', 3)
     OnlyListen = config.get('onlylisten', False)    # just for the case that smartmeter transmits data without a query first
     logger.debug(f"Config='{config}'")
@@ -205,13 +205,13 @@ def query( config ):
         if not SerialPort == dlms_serial.name:
             logger.debug(f"Asked for {SerialPort} as serial port, but really using now {dlms_serial.name}")
             
-    except FileNotFoundError as e:
+    except FileNotFoundError:
         logger.error(f"Serial port '{SerialPort}' does not exist, please check your port")
         return
-    except OSError as e:
+    except OSError:
         logger.error(f"Serial port '{SerialPort}' does not exist, please check the spelling")
         return
-    except serial.SerialException as e:
+    except serial.SerialException:
         if dlms_serial is None:
             logger.error(f"Serial port '{SerialPort}' could not be opened")
         else:
@@ -306,8 +306,6 @@ def query( config ):
                                     '7': "reserved", '8': "reserved", '9': "reserved"}
 
         # always '3' but it is always initiated by the metering device so it can't be encountered here
-        Baudrates_Protocol_Mode_D = { '3' : 2400}
-        Baudrates_Protocol_Mode_E = Baudrates_Protocol_Mode_C
 
         Baudrate_identification = chr(Identification_Message[4])
         if Baudrate_identification in Baudrates_Protocol_Mode_B:
@@ -362,7 +360,7 @@ def query( config ):
                 # change request to set higher baudrate
                 dlms_serial.baudrate = NewBaudrate
         else:
-            logger.debug(f"No change of readout baudrate, "
+            logger.debug("No change of readout baudrate, "
                             "smartmeter and reader will stay at {NewBaudrate} Baud")
 
         # now read the huge data block with all the OBIS codes

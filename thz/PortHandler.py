@@ -78,9 +78,9 @@ class PortHandler(threading.Thread):
         according to the low-level protocol (message start/end, escaping of special
         characters).
         """
-        data = b'';
+        data = b''
         while self._fd.inWaiting():
-          data = self._fd.read(1);
+          data = self._fd.read(1)
           #self.logger.debug('{}'.format(data))
           if self._state == IDLE:
             self._rxFrm = b''
@@ -90,7 +90,7 @@ class PortHandler(threading.Thread):
               pass
             elif data == STX:
               # acknowledge with DLE
-              self._fd.write(DLE);
+              self._fd.write(DLE)
 
               # start new frame and switch state
               self._state = MSG_BODY
@@ -109,9 +109,9 @@ class PortHandler(threading.Thread):
               # escaping 2B
               self._state = ESCAPING_2B
               #self.logger.debug("Escaping 2B")
-              self._rxFrm += data;
+              self._rxFrm += data
             else:
-              self._rxFrm += data;
+              self._rxFrm += data
 
           elif self._state == ESCAPING_2B:
             if data == CAN:
@@ -181,7 +181,7 @@ class PortHandler(threading.Thread):
         """implements the main loop of the port handler"""
         self.logger.info("PortHandler started")
         while self._alive:
-          if not self._fd == None:
+          if self._fd is not None:
             try:
               # use select to implement a timeout, otherwise it is not
               # possible to stop the thread
@@ -195,14 +195,14 @@ class PortHandler(threading.Thread):
                     self._processTxData()
               except:
                 self.logger.error("Data processing failed - {}".format(sys.exc_info()))
-                if not self._fd == None:
-                  self._fd.close();
+                if self._fd is not None:
+                  self._fd.close()
                   self._fd = None
 
             except:
               self.logger.error("select failed - {}".format(sys.exc_info()))
-              if not self._fd == None:
-                self._fd.close();
+              if self._fd is not None:
+                self._fd.close()
                 self._fd = None
           else:
             # discard tx messages
@@ -229,7 +229,7 @@ class PortHandler(threading.Thread):
 
     def isPortOpen(self):
         """returns the state of the serial port"""
-        if self._fd == None:
+        if self._fd is None:
             return False
         else:
             return True

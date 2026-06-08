@@ -75,8 +75,6 @@ class WebInterface(SmartPluginWebIf):
         if learn == 'on':
             self.plugin.hm.setInstallMode(self.plugin.hm_id)
 
-        username = self.plugin.username
-        host = self.plugin.host
         devices = []
         ipdevices = []
 

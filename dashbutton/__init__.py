@@ -2,7 +2,7 @@ __author__ = 'pfischi'
 
 import threading
 import time
-from scapy.all import *
+from scapy.all import sniff, Ether, DHCP
 import logging
 from lib.model.smartplugin import SmartPlugin
 

@@ -41,7 +41,26 @@ from requests.packages import urllib3
 
 from lib.model.smartplugin import SmartPlugin
 from .webif import WebInterface
-from .item_attributes import *
+from .item_attributes import (
+    AHA_ATTRIBUTES,
+    AHA_RW_ATTRIBUTES,
+    AHA_STATS_ATTRIBUTES,
+    AHA_WO_ATTRIBUTES,
+    ALL_ATTRIBUTES_WRITEABLE,
+    ALL_ATTRIBUTES_WRITEONLY,
+    CALL_MONITOR_ATTRIBUTES,
+    CALL_MONITOR_ATTRIBUTES_DURATION,
+    CALL_MONITOR_ATTRIBUTES_GEN,
+    CALL_MONITOR_ATTRIBUTES_IN,
+    CALL_MONITOR_ATTRIBUTES_OUT,
+    CALL_MONITOR_ATTRIBUTES_TRIGGER,
+    DEFLECTION_ATTRIBUTES,
+    HOST_ATTRIBUTES_CHILD,
+    TAM_ATTRIBUTES,
+    TR064_ATTRIBUTES,
+    TR064_RW_ATTRIBUTES,
+    WLAN_CONFIG_ATTRIBUTES,
+)
 
 ERROR_COUNT_TO_BE_BLACKLISTED = 2
 
@@ -818,7 +837,7 @@ class FritzDevice:
         cmd, args, wlan_index = _dispatcher[avm_data_type]
         self._set_fritz_device(cmd, args, wlan_index)
         if self.debug_log:
-            self.logger.debug(f"Setting command successfully sent.")
+            self.logger.debug("Setting command successfully sent.")
 
         # handle readafterwrite
         if readafterwrite:
@@ -1404,7 +1423,6 @@ class FritzDevice:
 
     def get_phone_numbers_by_name(self, name: str = '', phonebook_id: int = 0) -> dict:
         """Get phone number from phone book by contact"""
-        tel_type = {"mobile": "CELL", "work": "WORK", "home": "HOME"}
         result_numbers = {}
 
         # phonebook_url = self.client.InternetGatewayDevice.X_AVM_DE_OnTel.GetPhonebook(NewPhonebookID=phonebook_id)['NewPhonebookURL']
@@ -2800,7 +2818,7 @@ class FritzHome:
 
         saturation = getattr(self.get_devices_as_dict()[ain], 'unmapped_saturation', None)
         if not saturation:
-            self.logger.info(f"set_unmapped_hue: unable to get value for 'unmapped_saturation', try to use value for 'saturation'")
+            self.logger.info("set_unmapped_hue: unable to get value for 'unmapped_saturation', try to use value for 'saturation'")
             saturation = getattr(self.get_devices_as_dict()[ain], 'saturation', None)
 
         if saturation:
@@ -2831,7 +2849,7 @@ class FritzHome:
 
         hue = getattr(self.get_devices_as_dict()[ain], 'unmapped_hue', None)
         if not hue:
-            self.logger.info(f"set_unmapped_saturation: unable to get value for 'unmapped_hue', try to use value for 'hue'")
+            self.logger.info("set_unmapped_saturation: unable to get value for 'unmapped_hue', try to use value for 'hue'")
             hue = getattr(self.get_devices_as_dict()[ain], 'hue', None)
 
         if hue:
@@ -2900,7 +2918,7 @@ class FritzHome:
 
         # special mode for white color (hue=0, saturation=0):
         if (hue == 0) and (saturation == 0):
-            self.logger.debug(f"set_color, warm white color selected")
+            self.logger.debug("set_color, warm white color selected")
             return self.set_color_temp(ain, temperature=self.COLOR_TEMP_RANGE['min'], duration=1)
 
         if mapped:

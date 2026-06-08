@@ -22,7 +22,7 @@ class TestDatabaseBase(unittest.TestCase):
         return plugin
 
     def t(self, s):
-        return s * TestDatabaseBase.TIME_FACTOR;
+        return s * TestDatabaseBase.TIME_FACTOR
 
     def create_tmpfile(self):
         (fd, name) = tempfile.mkstemp()
@@ -85,7 +85,7 @@ class TestDatabaseBase(unittest.TestCase):
 
     def log_dump(self, values):
         func = [
-           lambda v, nv: "{0:5} - {1: >5} ({2: >3})".format(v, (nv if nv != None else 0), (nv if nv != None else 0)-v),
+           lambda v, nv: "{0:5} - {1: >5} ({2: >3})".format(v, (nv if nv is not None else 0), (nv if nv is not None else 0)-v),
            lambda v, nv: v,
            lambda v, nv: v
         ]
@@ -99,7 +99,7 @@ class TestDatabaseBase(unittest.TestCase):
                nv = None if j == len(values)-1 else values[j+1][i]
                res = func[i](v, nv)
                print(fmt.format(res if res is not None else "(none)"), end='')
-           print("");
+           print("")
 
     def assertLines(self, expected, actual):
         print(actual.split("\n"))

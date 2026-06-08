@@ -27,7 +27,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 from lib.shtime import Shtime
 shtime = Shtime.get_instance()
 
@@ -229,7 +229,7 @@ class THZ(SmartPlugin):
           return
 
         try:
-            if not self._thzProtocol.getMsgFromParameter(item.conf['thz']) == None:
+            if self._thzProtocol.getMsgFromParameter(item.conf['thz']) is not None:
               self._thzProtocol.sendSetRequest(item.conf['thz'], item())
             elif item.conf['thz'] == 'logFullScan':
               # request logging a full register scan
@@ -271,7 +271,7 @@ class THZ(SmartPlugin):
                   # add the message name to the list
                   self._msgList[msgName] = 1
 
-                  if not item.conf['thz'] in self._params:
+                  if item.conf['thz'] not in self._params:
                       # new parameter
                       self._params[item.conf['thz']] = {'lastValue': 0,
                                                         'lastUpdate': datetime.datetime.min,
@@ -287,7 +287,7 @@ class THZ(SmartPlugin):
               elif (item.conf['thz'] in self._thzProtocol.getStats() or
                     item.conf['thz'] in specialRequests):
                 # a plugin parameter
-                if not item.conf['thz'] in self._params:
+                if item.conf['thz'] not in self._params:
                     # new parameter
                     self._params[item.conf['thz']] = {'lastValue': 0,
                                                       'lastUpdate': datetime.datetime.min,
@@ -335,12 +335,12 @@ class THZ(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 

@@ -876,9 +876,7 @@ class SeValue(StateEngineTools.SeItemChild):
     # Determine value by executing eval-function
     def __get_eval(self, eval_get=None):
         # noinspection PyUnusedLocal
-        sh = self._sh
         # noinspection PyUnusedLocal
-        shtime = self._shtime
         patterns = [
             "get_variable('current.",
             'get_variable("current.',
@@ -896,7 +894,7 @@ class SeValue(StateEngineTools.SeItemChild):
                 eval_get = StateEngineTools.parse_relative(eval_get, 'sh.', ['()', '.property.'])
             if "stateengine_eval" in eval_get or "se_eval" in eval_get:
                 # noinspection PyUnusedLocal
-                stateengine_eval = se_eval = StateEngineEval.SeEval(self._abitem)
+                StateEngineEval.SeEval(self._abitem)
             self._log_debug("Checking eval: {0}", eval_get)
             if eval_get in self._abitem.cache:
                 self._log_increase_indent()
@@ -953,7 +951,7 @@ class SeValue(StateEngineTools.SeItemChild):
                     if isinstance(val, str):
                         if "stateengine_eval" in val or "se_eval" in val:
                             # noinspection PyUnusedLocal
-                            stateengine_eval = se_eval = StateEngineEval.SeEval(self._abitem)
+                            StateEngineEval.SeEval(self._abitem)
                         try:
                             _newvalue, _issue = self.__do_cast(eval(val))
                             _issue_dict = {val: _issue}

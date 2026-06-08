@@ -196,7 +196,7 @@ def SetThermostatMode(self, directive):
     
     AlexaItem = self.devices.get(device_id)
     myModes = AlexaItem.thermo_config
-    myValueList = self.GenerateThermoList(myModes,1)
+    self.GenerateThermoList(myModes,1)
     myModeList = self.GenerateThermoList(myModes,2)
     
     # End of Modes-List
@@ -247,7 +247,7 @@ def SetTargetTemperature(self, directive):
     items = self.items(device_id)
 
     target_temp = float( directive['payload']['targetSetpoint']['value'] )
-    previous_temp = items[0]() if items else 0
+    items[0]() if items else 0
 
     for item in items:
         item_range = self.item_range(item, DEFAULT_TEMP_RANGE)
@@ -276,7 +276,7 @@ def TurnOn(self, directive):
     for item in items:
         on, off = self.item_range(item, DEFAULT_RANGE_LOGIC)
         self.logger.info("Alexa: turnOn({}, {})".format(item.property.path, on))
-        if on != None:
+        if on is not None:
             item( on, "alexa4p3" )
             self.response_Value = 'ON'            
             self._proto.addEntry('INFO   ', 'Changed item :{} to {}'.format(item.property.name,self.response_Value))
@@ -291,7 +291,7 @@ def TurnOff(self, directive):
     for item in items:
         on, off = self.item_range(item, DEFAULT_RANGE_LOGIC)
         self.logger.info("Alexa: turnOff({}, {})".format(item.property.path, off))
-        if off != None:
+        if off is not None:
             item( off, "alexa4p3" )
             self.response_Value = 'OFF'
     return self.p3_respond(directive)
@@ -307,7 +307,7 @@ def Lock(self, directive):
     for item in items:
         on, off = self.item_range(item, DEFAULT_RANGE_LOGIC)
         self.logger.info("Alexa: Lock({}, {})".format(item.property.path, on))
-        if on != None:
+        if on is not None:
             item( on, "alexa4p3" )
             self.response_Value = None
             self.response_Value = 'LOCKED'
@@ -322,7 +322,7 @@ def Unlock(self, directive):
     for item in items:
         on, off = self.item_range(item, DEFAULT_RANGE_LOGIC)
         self.logger.info("Alexa: Unlock({}, {})".format(item.property.path, off))
-        if off != None:
+        if off is not None:
             item( on, "alexa4p3" )
             self.response_Value = None
             self.response_Value = 'UNLOCKED'

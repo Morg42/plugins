@@ -9,7 +9,7 @@ def turn_on(self, payload):
     for item in items:
         on, off = self.item_range(item, DEFAULT_RANGE)
         self.logger.info("Alexa: turnOn({}, {})".format(item.property.path, on))
-        if on != None:
+        if on is not None:
             item( on )
 
     return self.respond()
@@ -21,7 +21,7 @@ def turn_off(self, payload):
     for item in items:
         on, off = self.item_range(item, DEFAULT_RANGE)
         self.logger.info("Alexa: turnOff({}, {})".format(item.property.path, off))
-        if off != None:
+        if off is not None:
             item( off )
 
     return self.respond()

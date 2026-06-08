@@ -454,7 +454,6 @@ class GithubPlugin(SmartPlugin):
             'plugin': plugin,
             'owner': owner,
             'branch': branch,
-            'plugin': plugin,
             # default to plugins repo. No further repos are managed right now
             'gh_repo': 'plugins'
         }

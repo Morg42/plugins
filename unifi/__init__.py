@@ -27,7 +27,7 @@ import re
 from jinja2 import Environment, FileSystemLoader
 import cherrypy
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, logging
 from .webif import WebInterface
 from lib.utils import Utils
 from plugins.unifi.ubiquiti.unifi import API as UniFiAPI
@@ -240,7 +240,7 @@ class UniFiControllerClientModel():
         hr = "Fehler"
         try:
             hr = self._api.get_device_hierarchy()
-        except Exception as e:
+        except Exception:
             return traceback.format_exc()
 
         try:
@@ -267,7 +267,7 @@ class UniFiControllerClientModel():
                 model['unifi_network']['devices'][child_data[0]] = child_data[1]
 
             return yaml.dump(model, Dumper=yaml.SafeDumper, indent=4, width=768, allow_unicode=True, default_flow_style=False)
-        except Exception as e:
+        except Exception:
             return "{}\n\nRaw data:\n{}".format(traceback.format_exc(), json.dumps(hr, indent=4))
 
     def get_total_number_of_requests_to_controller(self):
@@ -396,7 +396,7 @@ class UniFiControllerClient(SmartPlugin):
 
         try:
             if item_type in item.conf:
-                if not check is None:
+                if check is not None:
                     if not check(item, item_type, leaf_item):
                         return None
                 if not (item.property.path == leaf_item.property.path):
@@ -418,7 +418,7 @@ class UniFiControllerClient(SmartPlugin):
         for item_type in item_types:
             try:
                 if item_type in item.conf:
-                    if not check is None:
+                    if check is not None:
                         if not check(item, item_type, leaf_item):
                             return None
                     if not (item.property.path == leaf_item.property.path):

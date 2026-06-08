@@ -22,7 +22,7 @@
 #
 #########################################################################
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 from .webif import WebInterface
 
@@ -129,12 +129,12 @@ class Philips_TV(SmartPlugin):
                     #self.logger.debug("Sending mute command")
                     self.post("input/key", body, verbose=self.verbose, err_count=0)
                 elif tx_key == 'POWEROFF':
-                    if item() == True:
+                    if item():
                         body = '{"key": "Standby"}'
                         #self.logger.debug("Sending poweroff command")
                         self.post("input/key", body=body, verbose=self.verbose, err_count=0)
                 elif tx_key == 'AMBILIGHT_STATE':
-                    if item() == False:
+                    if not item():
                         body = '{"power": "Off"}'
                         #self.logger.debug("Sending ambilight off command")
                         self.post("ambilight/power", body=body, verbose=self.verbose, err_count=0)
@@ -160,7 +160,7 @@ class Philips_TV(SmartPlugin):
                     #self.logger.debug(f"Preparing HSV command from list item with HSV: {hue},{saturation},{brightness}")
 
                     if (hue is None) or (saturation is None) or (brightness is None):
-                        self.logger.error(f"Cannot find all neccessary list entries for hue command (hue, saturation and brightness). Aborting.")
+                        self.logger.error("Cannot find all neccessary list entries for hue command (hue, saturation and brightness). Aborting.")
                         return
 
                     # Switch ambilight off for HSV = 0,0,0 with regular off command because API does not switch off via HSV = 0,0,0:
@@ -391,7 +391,7 @@ class Philips_TV(SmartPlugin):
             if err_count > 0:
                 self.logger.info("Resending pair confirm request")
             try:
-                r = self.session.post("https://" + str(self.ip) + ":1926/6/pair/grant", json=data, verify=False, auth=HTTPDigestAuth(self.deviceID, self.deviceKey), timeout=2)
+                self.session.post("https://" + str(self.ip) + ":1926/6/pair/grant", json=data, verify=False, auth=HTTPDigestAuth(self.deviceID, self.deviceKey), timeout=2)
                 self.logger.debug(f"Username for subsequent calls is: {self.deviceID}")
                 self.logger.debug(f"Password for subsequent calls is: {self.deviceKey}")
                 return True
@@ -485,7 +485,7 @@ class Philips_TV(SmartPlugin):
                 self.logger.info(f"Sending POST request to https://{str(self.ip)} ':1926/6/'{str(path)}")
             try:
                 r = self.session.post("https://" + str(self.ip) + ":1926/6/" + str(path), json=body, verify=False, auth=HTTPDigestAuth(str(self.deviceID), str(self.deviceKey)), timeout=2)
-            except Exception as e:
+            except Exception:
                 #self.logger.debug(f"Exception during post command: {e}")
                 err_count += 1
                 continue

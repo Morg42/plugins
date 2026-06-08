@@ -87,7 +87,6 @@ class WebInterface(MqttPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         if dataSet is None:
-            result_array = []
 
             # callect data for 'items' tab
             item_list = []

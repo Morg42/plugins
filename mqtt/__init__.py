@@ -23,7 +23,7 @@
 #########################################################################
 
 
-from lib.model.mqttplugin import *
+from lib.model.mqttplugin import MqttPlugin
 from lib.item import Items
 
 from lib.utils import Utils
@@ -166,7 +166,7 @@ class Mqtt2(MqttPlugin):
                 qos = -1
                 if Utils.is_int(self.get_iattr_value(item.conf, 'mqtt_qos')):
                     qos = int(self.get_iattr_value(item.conf, 'mqtt_qos'))
-                if not (qos in [0, 1, 2]):
+                if qos not in [0, 1, 2]:
                     self.logger.warning(
                         self.get_loginstance() + "Item '{}' invalid value specified for mqtt_qos, using plugin's default".format(
                             item.property.path))
@@ -231,7 +231,7 @@ class Mqtt2(MqttPlugin):
             if (self.has_iattr(item.conf, 'mqtt_topic_out')):
                 topic = self.get_iattr_value(item.conf, 'mqtt_topic_out')
                 retain = self.get_iattr_value(item.conf, 'mqtt_retain')
-                if retain == None:
+                if retain is None:
                     retain = False
                 else:
                     retain = Utils.to_bool(retain)

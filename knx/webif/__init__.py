@@ -32,7 +32,16 @@ import json
 
 from lib.item import Items
 from lib.model.smartplugin import SmartPluginWebIf
-from ..globals import *
+from ..globals import (
+    KNX_CACHE,
+    KNX_DPT,
+    KNX_INIT,
+    KNX_LISTEN,
+    KNX_POLL,
+    KNX_REPLY,
+    KNX_SEND,
+    KNX_STATUS,
+)
 
 
 # ------------------------------------------
@@ -94,7 +103,7 @@ class WebInterface(SmartPluginWebIf):
         (result, err) = p.communicate()
 
         ## Wait for date to terminate. Get return returncode ##
-        p_status = p.wait()
+        p.wait()
         return str(result, encoding='utf-8', errors='strict')
 
 

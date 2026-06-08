@@ -25,7 +25,7 @@
 import json
 
 from lib.module import Modules
-from lib.model.mqttplugin import *
+from lib.model.mqttplugin import MqttPlugin
 from lib.item import Items
 
 from .webif import WebInterface
@@ -59,7 +59,7 @@ class Shelly(MqttPlugin):
 
         # Call init code of parent class (MqttPlugin)
         super().__init__()
-        if self._init_complete == False:
+        if not self._init_complete:
             return
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
@@ -451,7 +451,7 @@ class Shelly(MqttPlugin):
     def list_attribute(self, shelly_id, group, attr, typ):
 
         # List attributes which are sent by a device, if configuration requests it
-        if not shelly_id + '-' + group + '-' + attr in self.logged_attrs:
+        if shelly_id + '-' + group + '-' + attr not in self.logged_attrs:
             msg = f"list_attrs '{self.shelly_devices[shelly_id]['conf_id']}' ({self.shelly_devices[shelly_id]['app']}): shelly_attr='{attr}' "
             if group == '':
                 msg += f"type={typ}"
@@ -471,7 +471,7 @@ class Shelly(MqttPlugin):
         if gen == 'Gen?' and device_data != {}:
             self.logger.warning(f"log_unhandled_status: Unknown API version for '{shelly_id}' device data={device_data} - param {param_name}={param_content}")
 
-        if not shelly_id in self.devices_with_unhandled_status:
+        if shelly_id not in self.devices_with_unhandled_status:
             self.logger.notice(self.translate("Unbekannter Status empfangen von '{shelly_id}' - Loglevel des Plugin-Loggers auf INFO setzen und das Details-Log beobachten", {'shelly_id': shelly_id}))
             self.devices_with_unhandled_status.append(shelly_id)
 

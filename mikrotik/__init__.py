@@ -191,10 +191,10 @@ class MikrotikPlugin(SmartPlugin):
             function = self.get_iattr_value(item.conf, 'mikrotik_parameter')
 
             if function == 'enabled':
-                self.set_port_enabled(port, 'true' if item() == True else 'false')
+                self.set_port_enabled(port, 'true' if item() else 'false')
 
             if function == 'poe':
-                self.set_port_poe(port, 'true' if item() == True else 'false')
+                self.set_port_poe(port, 'true' if item() else 'false')
 
     def update_items(self):
         """
@@ -332,13 +332,13 @@ class MikrotikPlugin(SmartPlugin):
 
         # send the command to the device
         try:
-            if (self.str2bool(status) == False):
+            if (not self.str2bool(status)):
                 self._api.get_binary_resource('/interface').call('disable', {'.id': port.encode()})
             else:
                 self._api.get_binary_resource('/interface').call('enable', {'.id': port.encode()})
             interface = next((sub for sub in self._interfaces if sub['name'] == port), None)
             if (interface):
-                interface['disabled'] = 'true' if self.str2bool(status) == False else 'false'
+                interface['disabled'] = 'true' if not self.str2bool(status) else 'false'
         except exceptions.RouterOsApiConnectionError:
             self.logger.error('Failed to connect to MikroTik device')
             return "NOK"
@@ -362,13 +362,13 @@ class MikrotikPlugin(SmartPlugin):
 
         # send the command to the device
         try:
-            if self.str2bool(status) == True:
+            if self.str2bool(status):
                 self._api.get_binary_resource('/interface/ethernet').call('set', {'.id': port.encode(), 'poe-out': b'auto-on'})
             else:
                 self._api.get_binary_resource('/interface/ethernet').call('set', {'.id': port.encode(), 'poe-out': b'off'})
             interface = next((sub for sub in self._interfaces if sub['name'] == port), None)
             if (interface):
-                interface['poe'] = 'auto-on' if (self.str2bool(status) == True) else 'off'
+                interface['poe'] = 'auto-on' if (self.str2bool(status)) else 'off'
         except exceptions.RouterOsApiConnectionError:
             self.logger.error('Failed to connect to MikroTik device')
             return "NOK"

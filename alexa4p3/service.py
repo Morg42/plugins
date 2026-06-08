@@ -61,7 +61,8 @@ class AlexaService(object):
         self._protocol = Proto
         self.logger.info("Alexa: service setup at {}:{}".format(host, port))
 
-        handler_factory = lambda *args: AlexaRequestHandler(self._proto,logger, version, devices, actions, *args)
+        def handler_factory(*args):
+            return AlexaRequestHandler(self._proto,logger, version, devices, actions, *args)
         self.server = HTTPServer((host, port), handler_factory)
 
         if https_certfile: # https://www.piware.de/2011/01/creating-an-https-server-in-python/
@@ -102,24 +103,24 @@ class AlexaRequestHandler(BaseHTTPRequestHandler):
         if type(p) is dict:  
             if strsearch in p:
                 tokenvalue = p[strsearch]
-                if not tokenvalue is None:
+                if tokenvalue is not None:
                  return tokenvalue
             else:
                 for i in p:
                     tokenvalue = self.search(p[i], strsearch)  
-                    if not tokenvalue is None:
+                    if tokenvalue is not None:
                         return tokenvalue    
     def replace(self,p, strsearch, newValue):
         if type(p) is dict:  
             if strsearch in p:
                 tokenvalue = p[strsearch]
                 p[strsearch] = newValue
-                if not tokenvalue is None:
+                if tokenvalue is not None:
                  return tokenvalue
             else:
                 for i in p:
                     tokenvalue = self.replace(p[i], strsearch,newValue)  
-                    if not tokenvalue is None:
+                    if tokenvalue is not None:
                         return tokenvalue
     
     def GenerateThermoList(self, myModes, listType):
@@ -180,7 +181,7 @@ class AlexaRequestHandler(BaseHTTPRequestHandler):
                 elif header['namespace'] == 'Alexa':
                     return self.p3_handle_control(header, payload,mydirective)
                 
-                elif mydirective != None:
+                elif mydirective is not None:
                     return self.p3_handle_control(header, payload,mydirective)
                 else:
                     msg = "unknown `header.namespace` '{}'".format(header['namespace'])
@@ -383,13 +384,13 @@ class AlexaRequestHandler(BaseHTTPRequestHandler):
                                 newcapa["configuration"] = ALEXA_Range_Controller["configuration"]
                                 newcapa["semantics"] = myConfig
    
-                        except Exception as e:
+                        except Exception:
                             pass
 
                             
                     # End Check special Namespace
                     mycapabilities.append(newcapa)
-                if device.icon == None:
+                if device.icon is None:
                     device.icon = ["SWITCH"]
                     
                     
@@ -583,7 +584,7 @@ class AlexaRequestHandler(BaseHTTPRequestHandler):
                                 myValue.append(0)
                             try:
                                 myColorTyp = Item.conf['alexa_color_value_type']
-                            except Exception as err:
+                            except Exception:
                                 # default = RGB
                                 myColorTyp = 'RGB'
                             if myColorTyp == 'HSB':
@@ -612,7 +613,7 @@ class AlexaRequestHandler(BaseHTTPRequestHandler):
                         # Add default values if nothing is reported
                         #====================================================
                         if myAction.namespace not in alreadyReportedControllers:
-                            if myAction.namespace == 'Alexa.LockController' and myValue == None:
+                            if myAction.namespace == 'Alexa.LockController' and myValue is None:
                                 myValue = 'LOCKED'
                         
                         MyNewProperty = {
@@ -648,7 +649,7 @@ class AlexaRequestHandler(BaseHTTPRequestHandler):
         
         Properties.append(MyNewProperty)
             
-        myEndpoint = self.search(directive,'endpoint')
+        self.search(directive,'endpoint')
         myScope = self.search(directive,'scope')
         myEndPointID = self.search(directive,'endpointId')
         myHeader = self.search(directive,'header')

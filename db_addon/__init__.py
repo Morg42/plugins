@@ -134,7 +134,7 @@ class DatabaseAddOn(SmartPlugin):
 
         # check existence of db-plugin, get parameters, and init connection to db
         if not self._check_db_existence():
-            self.logger.error(f"Check of existence of database plugin incl connection check failed. Plugin not loaded")
+            self.logger.error("Check of existence of database plugin incl connection check failed. Plugin not loaded")
             return self.deinit()
 
         # create db object
@@ -474,7 +474,7 @@ class DatabaseAddOn(SmartPlugin):
             if 'start' in new_db_addon_params and 'end' not in new_db_addon_params:
                 new_db_addon_params['end'] = new_db_addon_params['start']
                 if self.debug_log.prepare:
-                    self.logger.debug(f"'end' parameter has been added")
+                    self.logger.debug("'end' parameter has been added")
 
             return new_db_addon_params
 
@@ -1139,7 +1139,7 @@ class DatabaseAddOn(SmartPlugin):
             self.logger.debug(f"result is {result} for item '{item.property.path}' with '{db_addon_fct=}'")
 
         if result is None:
-            self.logger.info(f"  Result was None; No item value will be set.")
+            self.logger.info("  Result was None; No item value will be set.")
             return
 
         # set item value and put data into plugin_item_dict
@@ -1266,7 +1266,7 @@ class DatabaseAddOn(SmartPlugin):
             # handle all on_demand functions
             if db_addon_fct_sub_cat != 'onchange':
                 if self.debug_log.onchange:
-                    self.logger.debug(f"on demand function detected. Skip update.")
+                    self.logger.debug("on demand function detected. Skip update.")
                 continue
 
             # handle onchange tagesmittel items like tagesmitteltemperatur_heute
@@ -1627,7 +1627,7 @@ class DatabaseAddOn(SmartPlugin):
         if not value_start:
             value_start = 0
             if self.debug_log.prepare:
-                self.logger.debug(f"No start value available. Will be set to 0 as default")
+                self.logger.debug("No start value available. Will be set to 0 as default")
 
         # calculate consumption
         consumption = value_end - value_start
@@ -1980,7 +1980,7 @@ class DatabaseAddOn(SmartPlugin):
                 self.logger.info(f"Calculate 'Wachstumsgradtage' according to 'Modifizierte Berechnung des einfachen Durchschnitts' to {result=}.")
                 min_val_c = 'max(threshold, min_val)'
             else:
-                self.logger.warning(f"Requested variant of 'Wachstumsgradtage' not defined. Aborting...")
+                self.logger.warning("Requested variant of 'Wachstumsgradtage' not defined. Aborting...")
                 return
 
             # accumulate value
@@ -2288,9 +2288,9 @@ class DatabaseAddOn(SmartPlugin):
             return False
         else:
             if self.db_driver.lower() == 'pymysql':
-                self.logger.debug(f"Database is of type 'mysql' found.")
+                self.logger.debug("Database is of type 'mysql' found.")
             if self.db_driver.lower() == 'sqlite3':
-                self.logger.debug(f"Database is of type 'sqlite' found.")
+                self.logger.debug("Database is of type 'sqlite' found.")
 
         # get database plugin parameters
         try:
@@ -2528,7 +2528,7 @@ class DatabaseAddOn(SmartPlugin):
         init all cache dicts
         """
 
-        self.logger.info(f"All cache_dicts will be initiated.")
+        self.logger.info("All cache_dicts will be initiated.")
 
         self.item_cache = {}
 
@@ -2580,7 +2580,7 @@ class DatabaseAddOn(SmartPlugin):
         Clear working queue
         """
 
-        self.logger.info(f"Working queue will be cleared. Calculation run will end.")
+        self.logger.info("Working queue will be cleared. Calculation run will end.")
         self.item_queue.queue.clear()
 
     def _get_start_end_as_timestamp(self, timeframe: str, start: Union[int, str, None], end: Union[int, str, None]) -> tuple:
@@ -2899,10 +2899,10 @@ class DatabaseAddOn(SmartPlugin):
                 time_since_last_connect = time.time() - self.last_connect_time
                 if time_since_last_connect > 20:
                     self.last_connect_time = time.time()
-                    self.logger.debug(f"Connect to database.")
+                    self.logger.debug("Connect to database.")
                     self._db.connect()
                 else:
-                    self.logger.warning(f"Database reconnect suppressed since last connection is less then 20sec ago.")
+                    self.logger.warning("Database reconnect suppressed since last connection is less then 20sec ago.")
                     return False
 
         except Exception as e:

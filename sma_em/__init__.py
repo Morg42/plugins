@@ -28,7 +28,7 @@ import socket
 import time
 import struct
 import binascii
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 from lib.module import Modules
 
 sma_units = {
@@ -453,7 +453,7 @@ class SMA_EM(SmartPlugin):
             # self.logger.debug('seral: {}'.format(emID))
             emparts['serial'] = emID
             # timestamp
-            timestamp = int.from_bytes(datagram[24:28], byteorder='big')
+            int.from_bytes(datagram[24:28], byteorder='big')
             # self.logger.debug('timestamp: {}'.format(timestamp))
             # decode OBIS data blocks
             # start with header
@@ -550,7 +550,7 @@ class SMA_EM(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))
             return False
 

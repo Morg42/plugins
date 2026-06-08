@@ -24,7 +24,7 @@ import logging
 import socket
 
 from io import StringIO
-from lib.model.smartplugin import *
+from lib.model.smartplugin import Modules, SmartPlugin
 from lib.item import Items
 
 from .webif import WebInterface
@@ -416,7 +416,7 @@ class Yamaha(SmartPlugin):
             yamaha_host = self._lookup_host(item)
             # todo: abort if yamaha_host is empty
             yamaha_cmd = self.get_iattr_value(item.conf, 'yamaha_cmd').lower()
-            if not yamaha_cmd in self._yamaha_cmds:
+            if yamaha_cmd not in self._yamaha_cmds:
                 self.logger.warning("{} not in valid commands: {}".format(yamaha_cmd, self._yamaha_cmds))
                 return None
             else:
@@ -482,12 +482,12 @@ class Yamaha(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 

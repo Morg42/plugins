@@ -43,7 +43,7 @@ except Exception:
 
 from miio.discovery import Discovery
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.module import Modules
 from lib.item import Items
 from bin.smarthome import VERSION
@@ -140,7 +140,7 @@ class Robvac(SmartPlugin):
                     try:
                         self._data['clean_details_last0'] = (
                             self.vakuum.clean_details(self._data['clean_ids'][0]))
-                    except Exception as e:
+                    except Exception:
                         self._data['clean_details_last0'] = []
                         self.logger.info("No details for last0 clean found")
                 try:
@@ -169,7 +169,7 @@ class Robvac(SmartPlugin):
                     try:
                         self._data['clean_details_last1'] = (
                             self.vakuum.clean_details(self._data['clean_ids'][1]))
-                    except Exception as e:
+                    except Exception:
                         self._data['clean_details_last1'] = []
                         self.logger.info("No details for last1 clean found")
 
@@ -199,7 +199,7 @@ class Robvac(SmartPlugin):
                     try:
                         self._data['clean_details_last2'] = (
                             self.vakuum.clean_details(self._data['clean_ids'][2]))
-                    except Exception as e:
+                    except Exception:
                         self._data['clean_details_last2'] = []
                         self.logger.info("No details for last2 clean found")
 
@@ -229,7 +229,7 @@ class Robvac(SmartPlugin):
                     try:
                         self._data['clean_details_last3'] = (
                             self.vakuum.clean_details(self._data['clean_ids'][3]))
-                    except Exception as e:
+                    except Exception:
                         self._data['clean_details_last3'] = []
                         self.logger.info("No details for last3 clean found")
 

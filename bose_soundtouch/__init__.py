@@ -24,7 +24,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, logging
 from libsoundtouch import soundtouch_device
 from libsoundtouch.utils import Source, Type
 

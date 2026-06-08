@@ -351,7 +351,7 @@ class ComfoAir(SmartPlugin):
                         # In case of doubled special characters, the packet can be longer (try one byte more at a time)
                         if len(packet) >= packetlen and packet[-2:] != self._packetend:
                             packetlen = len(packet) + 1
-                            self.log_debug('Extended packet length because of encoded characters.'.format(self.bytes2hexstring(chunk)))
+                            self.log_debug('Extended packet length because of encoded characters.')
 
                         # Receive next chunk
                         bytestoreceive = packetlen - len(packet)

@@ -28,7 +28,7 @@
 import serial
 import array
 from   lib.module import Modules
-from   lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf, logging
 from   datetime import datetime
 from . import _coils
 from . import _listen
@@ -132,12 +132,12 @@ class trovis557x(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 
@@ -263,7 +263,7 @@ class trovis557x(SmartPlugin):
                     # daher sind im Ergebnis ggf mehr Elemente als angefragt:
                     if id_aktuell > _bereich[1]:
                         break
-        except Exception as e:
+        except Exception:
             _ids_mit_werten = []
             self.logger.debug('Im Bereich ' + str(_bereich) + ' liefert dieser Regler oder die Reglerkonfiguration keine lesbaren Register/Coils!')
         return _ids_mit_werten
@@ -276,7 +276,6 @@ class trovis557x(SmartPlugin):
         
         for id, buswert in _ids_mit_werten:
             
-            itemwert = ''
             kurzname = self.getKeyFromID(id, _datentyp)
 
             if _datentyp == 'register':
@@ -285,7 +284,7 @@ class trovis557x(SmartPlugin):
                 digits = alle_details['Digits']
             else:
                 alle_details = self._coil_tabelle[kurzname]
-            art = alle_details['Art']
+            alle_details['Art']
             typ = alle_details['Typ']
             einheit = alle_details['Einheit']
             
@@ -315,7 +314,7 @@ class trovis557x(SmartPlugin):
                     signed_int = buswert
 
                 if kurzname in self._trovis_itemlist.keys() and self.has_iattr(self._trovis_itemlist[kurzname].conf, 'invalid_to_zero'):
-                    if buswert == 32767 and self.get_iattr_value(self._trovis_itemlist[kurzname].conf, 'invalid_to_zero') == True:
+                    if buswert == 32767 and self.get_iattr_value(self._trovis_itemlist[kurzname].conf, 'invalid_to_zero'):
                         self.logger.debug('    ~~> Setze 32767 auf 0: ----> ' + kurzname)
                         signed_int = 0
 

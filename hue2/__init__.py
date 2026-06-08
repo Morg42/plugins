@@ -31,7 +31,7 @@ import xmltodict
 # for hostname retrieval for registering with the bridge
 from socket import getfqdn
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 
 from .webif import WebInterface
@@ -220,8 +220,8 @@ class Hue2(SmartPlugin):
                 # bridge updates are allways scheduled
                 self.logger.debug("parse_item: configured group item = {}".format(conf_data))
 
-            if not conf_data['function'] in ['reachable', 'colormode', 'battery'] and \
-               not conf_data['function'] in self.hue_sensor_state_values:
+            if conf_data['function'] not in ['reachable', 'colormode', 'battery'] and \
+               conf_data['function'] not in self.hue_sensor_state_values:
                 return self.update_item
             return
 
@@ -488,7 +488,7 @@ class Hue2(SmartPlugin):
                 if value is not None:
                     plugin_item['item'](value, self.get_shortname(), src)
             if plugin_item['resource'] == 'group':
-                if not "hue2_reference_light_id" in plugin_item:
+                if "hue2_reference_light_id" not in plugin_item:
                     if plugin_item['function'] != 'dict' and plugin_item['function'] != 'modify_scene':
                         if plugin_item['function'] == 'on':
                             value = self._get_group_item_value(plugin_item['id'], 'any_on', plugin_item['item'].id())
@@ -900,7 +900,7 @@ class Hue2(SmartPlugin):
             self.logger.error("remove_username: res-delete exception {}".format(e))
             response = [{'error': str(e)}]
 
-        if not('success' in response[0]):
+        if 'success' not in response[0]:
             self.logger.warning("remove_username: Error removing username/application key {} - {}".format(username, response[0]))
         else:
             self.logger.info("remove_username: username/application key {} removed".format(username))

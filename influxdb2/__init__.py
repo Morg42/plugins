@@ -453,7 +453,7 @@ class InfluxDB2(SmartPlugin):
             else:
                 r = requests.get(url_string + endpoint)
             self.logger.debug(f"Sent HTTP GET request [{url_string + endpoint}]")
-            if not (r.status_code in [200, 204]):
+            if r.status_code not in [200, 204]:
                 self.logger.error(f"Request {url_string + endpoint} returns http {r.status_code} [{r.text}]")
                 return json.loads(r.text)
             else:
@@ -466,7 +466,7 @@ class InfluxDB2(SmartPlugin):
             try:
                 self.logger.debug(f"Received datagram json: {json.loads(r.text)}")
                 return json.loads(r.text)
-            except Exception as e:
+            except Exception:
                 pass
             self.logger.debug(f"gethttp: Received datagram [{r}]")
         return

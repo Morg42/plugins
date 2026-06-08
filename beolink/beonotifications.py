@@ -64,7 +64,7 @@ class beo_notifications():
             ip = device_dict['device']['ip']
 
         if ip is None:
-            self.logger.error(f"No ip address specified for Beolink device")
+            self.logger.error("No ip address specified for Beolink device")
             return
 
         self.ip = ip
@@ -73,7 +73,7 @@ class beo_notifications():
             self.friendlyName = device_dict['device'].get('FriendlyName', ip)
 
         self.lock = threading.Lock()
-        self.log_notification( msg=f"--- New instance of class beo_notifications ---", level='dbghigh')
+        self.log_notification( msg="--- New instance of class beo_notifications ---", level='dbghigh')
 
 
     def log_notification(self, notification=None, msg=None, handled=True, level=None):
@@ -262,7 +262,7 @@ class beo_notifications():
         except Exception as e:
             self.log_notification(msg=f"Exception while opening: {e}", level='dbglow')
             if self.state != 'off':
-                self.log_notification(msg=f"_CONNECT_: Device ist offline", level='dbghigh')
+                self.log_notification(msg="_CONNECT_: Device ist offline", level='dbghigh')
             self.state = 'off'
             self._r = None
             return
@@ -270,7 +270,7 @@ class beo_notifications():
         if self._r.encoding is None:
             self._r.encoding = 'utf-8'
         self.state = 'on'
-        self.log_notification(msg=f"_CONNECT_: Connection opened", level='dbghigh' )
+        self.log_notification(msg="_CONNECT_: Connection opened", level='dbghigh' )
 
         self.lines = self._r.iter_lines(decode_unicode=True)
         return
@@ -297,13 +297,13 @@ class beo_notifications():
 
 
         if not self.lock.acquire(blocking=False):
-            self.log_notification(msg=f"Skipping, process_stream() is locked", level='debug')
+            self.log_notification(msg="Skipping, process_stream() is locked", level='debug')
             return
 
         if self._r is None:
             self.open_stream()
             if self._r is None:
-                self.log_notification(msg=f"process_stream() unlocked because stream could not be opened", level='dbglow')
+                self.log_notification(msg="process_stream() unlocked because stream could not be opened", level='dbglow')
                 self.lock.release()
                 return
 
@@ -314,8 +314,8 @@ class beo_notifications():
                 if line == 'OFFLINE':
                     line = None
                     self._r = None
-                    self.log_notification(msg=f"_LOOP_: Device ging offline", level='dbghigh')
-                    self.log_notification(msg=f"process_stream() unlocked (offline)", level='dbglow')
+                    self.log_notification(msg="_LOOP_: Device ging offline", level='dbghigh')
+                    self.log_notification(msg="process_stream() unlocked (offline)", level='dbglow')
                     self.lock.release()
                     return
 
@@ -326,6 +326,6 @@ class beo_notifications():
         except Exception as e:
             self.log_notification(msg=f"process_stream: Exception {e}")
 
-        self.log_notification(msg=f"process_stream() unlocked", level='debug')
+        self.log_notification(msg="process_stream() unlocked", level='debug')
         self.lock.release()
 

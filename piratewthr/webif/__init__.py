@@ -118,12 +118,11 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         if dataSet is None:
-            result_array = []
 
             # callect data for 'items' tab
             item_list = []
             for item in self.plugin.get_item_list():
-                item_config = self.plugin.get_item_config(item)
+                self.plugin.get_item_config(item)
                 value_dict = {}
                 value_dict['path'] = item.property.path
                 value_dict['type'] = item.type()

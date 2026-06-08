@@ -29,7 +29,7 @@ import asyncio
 import slixmpp
 
 from lib.plugin import Plugins
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 
 class XMPP(SmartPlugin):
 

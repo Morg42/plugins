@@ -26,7 +26,7 @@
 
 import cherrypy
 import datetime
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.shtime import Shtime
 from .webif import WebInterface
 from .api import HomeConnect
@@ -191,5 +191,5 @@ class SHNGHomeConnect(SmartPlugin):
                 self.logger.debug("WebIf of plugin {} found, callback is {}".format(self.get_fullname(),
                                                                        redirect_uri))
             return redirect_uri
-        self.logger.error("Redirect URL cannot be established.".format(self.get_fullname()))
+        self.logger.error("Redirect URL cannot be established.")
 

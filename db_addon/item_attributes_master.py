@@ -400,9 +400,9 @@ def check_plugin_yaml_structs():
                     attr_valid = False
 
     if attr_valid:
-        print(f"   All used attributes are valid.")
+        print("   All used attributes are valid.")
 
-    print(f'   Check complete.')
+    print('   Check complete.')
 
 
 def update_user_doc():

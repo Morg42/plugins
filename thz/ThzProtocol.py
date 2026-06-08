@@ -134,14 +134,14 @@ def decodeOpMode(data, offset, pos, dummy):
     try:
         str = OpMode[format(data[offset], '02d')]
     except:
-        str = 'Unknown mode: ' . format(data[offset], '02d')
+        str = 'Unknown mode: '
     return str
 
 def decodeOpModeHC(data, offset, pos, dummy):
     try:
         str = OpModeHC[format(data[offset], '02d')]
     except:
-        str = 'Unknown HC mode: ' . format(data[offset], '02d')
+        str = 'Unknown HC mode: '
     return str
 
 """
@@ -971,7 +971,7 @@ class ThzProtocol():
         if self._portHandler.isPortOpen():
           # check the software version and configure messages appropriately
           msg = self._sendGetRequest(MsgTemplate['sFirmware']['cmd1'])
-          if not msg == None:
+          if msg is not None:
             version = msg['sFirmware']['version']
             if version in VersionSpecificMsgData:
               # version-specific update available
@@ -1055,19 +1055,19 @@ class ThzProtocol():
 
         if data[0] == 0x15:
           self._rxNackCount += 1
-          self.logger.warning('NACK received (reg {})'.format(reg));
+          self.logger.warning('NACK received (reg {})'.format(reg))
         elif data[0] == 0x01 and data[1] == 0x01:
           self._rxNackCount += 1
-          self.logger.warning('NACK: Waiting for ACK');
+          self.logger.warning('NACK: Waiting for ACK')
         elif data[0] == 0x01 and data[1] == 0x02:
           self._rxNackCount += 1
-          self.logger.warning('NACK: Unknown command {}'.format(reg));
+          self.logger.warning('NACK: Unknown command {}'.format(reg))
         elif data[0] == 0x01 and data[1] == 0x03:
           self._rxNackCount += 1
-          self.logger.warning('NACK: Invalid CRC');
+          self.logger.warning('NACK: Invalid CRC')
         elif data[0] == 0x01 and data[1] == 0x04:
           self._rxNackCount += 1
-          self.logger.warning('NACK: Unknown register {}'.format(reg));
+          self.logger.warning('NACK: Unknown register {}'.format(reg))
         elif data[0] == 0x01 and data[1] == 0x00:
           # check the CRC
           crc = data[2]
@@ -1108,7 +1108,7 @@ class ThzProtocol():
           self._portHandler.sendData(msg)
           self._txCount += 1
           data = self._portHandler.readData()
-          if not data == None:
+          if data is not None:
             self._rxCount += 1
             self.logger.debug('Rx: ' + ' '.join(format(x, '02x') for x in data))
             msg = self._decodeMsg(data)
@@ -1171,7 +1171,7 @@ class ThzProtocol():
 
               # check the response
               data = self._portHandler.readData()
-              if data == None:
+              if data is None:
                 self.logger.warning('Set request timed out')
                 self._rxTimeoutCount += 1
               else:
@@ -1203,7 +1203,7 @@ class ThzProtocol():
 
             # check the response
             data = self._portHandler.readData()
-            if data == None:
+            if data is None:
               self.logger.warning('Set request timed out')
               self._rxTimeoutCount += 1
             else:
@@ -1230,12 +1230,12 @@ class ThzProtocol():
           noResponseCount = 0
           for name in request:
             msg1 = self._sendGetRequest(MsgTemplate[name]['cmd1'])
-            if not msg1 == None:
+            if msg1 is not None:
               noResponseCount = 0
               if 'cmd2' in MsgTemplate[name]:
                 # there is a second command to retrieve the most significant part
                 msg2 = self._sendGetRequest(MsgTemplate[name]['cmd2'])
-                if not msg2 == None:
+                if msg2 is not None:
                   # get the name of the one and only parameter
                   param = list(msg1[name].keys())[0]
                   try:
@@ -1286,7 +1286,7 @@ class ThzProtocol():
           msg = self._encodeGetMsg(cmd)
           self._portHandler.sendData(msg)
           data = self._portHandler.readData()
-          if not data == None:
+          if data is not None:
             data = bytearray(data)
             if data[0] == 0x01 and data[1] == 0x00:
               self.logger.info('Rx: ' + ' '.join(format(x, '02x') for x in data))

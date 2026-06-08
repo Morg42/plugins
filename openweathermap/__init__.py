@@ -319,7 +319,7 @@ class OpenWeatherMap(SmartPlugin):
             wrk_typ = self._data_source_key_onecall
         elif s.startswith('airpollution/forecast/'):
             wrk = self._data_sources[self._data_source_key_airpollution_forecast]['data']
-            prefix = f"airpollution/forecast/"
+            prefix = "airpollution/forecast/"
             s = s.replace(prefix, "list/")
             wrk_typ = self._data_source_key_airpollution_forecast
         elif s.startswith('airpollution/day/-'):
@@ -330,7 +330,7 @@ class OpenWeatherMap(SmartPlugin):
             wrk_typ = f"airpollution-{minus_days}"
         elif s.startswith('airpollution/hour/'):
             wrk = self._data_sources[self._data_source_key_airpollution_forecast]['data']
-            prefix = f"airpollution/hour/"
+            prefix = "airpollution/hour/"
             s = s.replace(prefix, "list/")
             wrk_typ = self._data_source_key_airpollution_forecast
         elif s.startswith('airpollution/'):
@@ -1089,7 +1089,7 @@ class OpenWeatherMap(SmartPlugin):
 
     def get_beaufort_description(self, speed_in_bft):
         if speed_in_bft is None:
-            self.logger.warning(f"speed_in_bft is given as None")
+            self.logger.warning("speed_in_bft is given as None")
             return None
         if type(speed_in_bft) is not int:
             self.logger.error(

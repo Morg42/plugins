@@ -43,7 +43,7 @@ from urllib.parse import unquote
 
 from . import utils
 
-from .soco import *
+from .soco import SoCo
 from .soco.exceptions import SoCoUPnPException
 from .soco.music_services import MusicService
 from .soco.data_structures import to_didl_string, DidlItem, DidlMusicTrack
@@ -201,7 +201,7 @@ class SubscriptionHandler(object):
     def subscribe(self):
         self.logger.dbglow(f"start subscribe for endpoint {self._endpoint}")
         if 'eventAvTransport' in self._threadName:
-            self.logger.dbghigh(f"subscribe(): endpoint av event detected. Enabling debugging logs")
+            self.logger.dbghigh("subscribe(): endpoint av event detected. Enabling debugging logs")
             debug = 1
         else:
             debug = 0
@@ -236,7 +236,7 @@ class SubscriptionHandler(object):
                     self._thread = threading.Thread(target=self._endpoint, name=self._threadName, args=(self,))
                     self._thread.setDaemon(True)
                     self._thread.start()
-                    self.logger.debug(f"start subscribe finished successfully")
+                    self.logger.debug("start subscribe finished successfully")
                     if not self._thread.is_alive(): 
                         self.logger.error("Critical error in subscribe method: Thread could not be startet and is not alive.")
                     else:
@@ -254,7 +254,7 @@ class SubscriptionHandler(object):
     def unsubscribe(self):
         self.logger.dbglow(f"unsubscribe(): start for endpoint {self._endpoint}")
         if 'eventAvTransport' in self._threadName:
-            self.logger.dbghigh(f"unsubscribe: endpoint av event detected. Enabling debugging logs")
+            self.logger.dbghigh("unsubscribe: endpoint av event detected. Enabling debugging logs")
             debug = 1
         else:
             debug = 0
@@ -701,7 +701,7 @@ class Speaker(object):
         :param sub_handler: SubscriptionHandler for the av transport event
         """
         if sub_handler is None:
-            self.logger.error(f"_av_transport_event: SubscriptionHandler is None.")
+            self.logger.error("_av_transport_event: SubscriptionHandler is None.")
 
         self.logger.dbghigh(f"_av_transport_event: {self.uid}: av transport event handler active.")
         while not sub_handler.signal.wait(1):
@@ -818,8 +818,7 @@ class Speaker(object):
 
                         if 'stream_content' in metadata:
                             stream_content = metadata['stream_content'].title()
-                            if not stream_content.lower() in \
-                                    ['zpstr_buffering', 'zpstr_connecting', 'x-sonosapi-stream']:
+                            if stream_content.lower() not in ['zpstr_buffering', 'zpstr_connecting', 'x-sonosapi-stream']:
                                 self.stream_content = stream_content
                             else:
                                 self.stream_content = ""
@@ -2320,7 +2319,7 @@ class Speaker(object):
         # if a patch is applied.
 
         # ------------------------------------------------------------------------------------------------------------ #
-        self.logger.debug(f"_play_tunein start")
+        self.logger.debug("_play_tunein start")
         if not self._check_property():
             return False, "Property check failed"
 
@@ -2385,7 +2384,7 @@ class Speaker(object):
                         #cls.from_music_service(MusicService(service_name='TuneIn', token_store=JsonFileTokenStore()), raw_item))
 
             if not items:
-                self.logger.warning(f"_play radio: No matching items found")
+                self.logger.warning("_play radio: No matching items found")
                 exit(0)
 
             item_id = items[0].metadata['id']
@@ -2398,10 +2397,10 @@ class Speaker(object):
             self.soco.avTransport.SetAVTransportURI([('InstanceID', 0),
                                                      ('CurrentURI', uri), ('CurrentURIMetaData', meta)])
             if start:
-                self.logger.debug(f"_play radio: Starting play")
+                self.logger.debug("_play radio: Starting play")
                 self.soco.play()
 
-            self.logger.debug(f"_play radio: finished function")
+            self.logger.debug("_play radio: finished function")
             return True, ""
 
     def _play_radio(self, station_name: str, music_service: str = 'TuneIn', start: bool = True) -> tuple:
@@ -3043,9 +3042,9 @@ class Sonos(SmartPlugin):
         # init TTS
         if self._tts:
             if self._init_tts(webservice_ip, webservice_port, local_webservice_path, local_webservice_path_snippet):
-                self.logger.info(f"TTS successfully enabled")
+                self.logger.info("TTS successfully enabled")
             else:
-                self.logger.info(f"TTS initialisation failed.")
+                self.logger.info("TTS initialisation failed.")
                 
         # read SoCo version:
         self.SoCo_version = self.get_soco_version()
@@ -3258,7 +3257,7 @@ class Sonos(SmartPlugin):
             volume_helper_item(_current_volume, self.get_fullname())
 
             if item()[1] == 1:
-                self.logger.debug(f"Starte relative Lautstärkeänderung.")
+                self.logger.debug("Starte relative Lautstärkeänderung.")
                 if item()[0] == 1:
                     # up
                     self.logger.debug(f"erhöhe Lautstärke mit {vol_step} Stufe(n) pro {vol_time}s")
@@ -3268,7 +3267,7 @@ class Sonos(SmartPlugin):
                     self.logger.debug(f"reduziere Lautstärke mit {vol_step} Stufe(n) pro {vol_time}s")
                     volume_helper_item.fade(0 - vol_step, vol_step, vol_time)
             else:
-                self.logger.debug(f"Stoppe relative Lautstärkeänderung.")
+                self.logger.debug("Stoppe relative Lautstärkeänderung.")
                 volume_helper_item(int(volume_helper_item()), self.get_fullname())
 
     def _check_webservice_ip(self, webservice_ip: str) -> bool:
@@ -3304,7 +3303,7 @@ class Sonos(SmartPlugin):
     
         # if path is not given, raise error log and disable TTS
         if local_webservice_path == '':
-            self.logger.warning(f"Mandatory path for local webserver for TTS not given in Plugin parameters. TTS disabled!")
+            self.logger.warning("Mandatory path for local webserver for TTS not given in Plugin parameters. TTS disabled!")
             return False
     
         # if path is given, check availability, create and check access rights
@@ -3397,7 +3396,7 @@ class Sonos(SmartPlugin):
                 self._check_webservice_port(webservice_port) and
                 self._check_local_webservice_path(local_webservice_path) and
                 self._check_local_webservice_path_snippet(local_webservice_path_snippet)):
-            self.logger.warning(f"Local webservice settings not correct. TTS disabled.")
+            self.logger.warning("Local webservice settings not correct. TTS disabled.")
             return False
             
         # Check diskspace
@@ -3878,7 +3877,7 @@ class Sonos(SmartPlugin):
         valid_zones = []
         for zone in self.zones:
             try:
-                uid = zone.uid
+                pass
             except Exception as e:
                 self.logger.warning(f"DEBUG get_reachable_zones: Exception: {e}")
                 pass

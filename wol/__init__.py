@@ -124,7 +124,7 @@ class WakeOnLan(SmartPlugin):
         """
         self.logger.debug(f"WakeOnLan: send magic paket to {mac_adr}")
         # check length and format 
-        if self.is_mac(mac_adr) != True:
+        if not self.is_mac(mac_adr):
             self.logger.warning(f"WakeOnLan: invalid mac address {mac_adr}!")
             return
         if len(mac_adr) == 12 + 5:

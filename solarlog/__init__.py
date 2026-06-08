@@ -25,7 +25,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 import re
 import logging
 
@@ -120,7 +120,7 @@ class SolarLog(SmartPlugin):
                 time_end = int(vars(self)['time_end'][now.month - 1])
 
                 # reset all out values at midnight
-                if now.hour is 0:
+                if now.hour == 0:
                     for name in list(self._items.keys()):
                         if 'out_' in name:
                             self._items[name](0)
@@ -148,7 +148,7 @@ class SolarLog(SmartPlugin):
                     item = self._items['curStatusCode_{0}'.format(x)]
                     status = int(vars(self)['curStatusCode'][x])
                     if isinstance(item(), str):
-                        if status is 255:
+                        if status == 255:
                             item('Offline')
                         elif status >= len(vars(self)['StatusCodes'][x]):
                             item('unbekannt')
@@ -175,7 +175,7 @@ class SolarLog(SmartPlugin):
                     if name in self._items:
                         if not self._is_online and ('pdc_' in name or 'udc_' in name or 'pac_' in name):
                             self._items[name](0)
-                        elif now.hour is 0 and 'out_' in name:
+                        elif now.hour == 0 and 'out_' in name:
                             self._items[name](0)
                         else:
                             self._items[name](groups[name])
@@ -368,7 +368,7 @@ class SolarLog(SmartPlugin):
         """
         for parameter in self._items:
              params = '{"801":{"170":null}}'
-             paramsbytes = params.encode('utf-8')
+             params.encode('utf-8')
              headers = {"Content-Type": "application/json",
                         "Accept": "text/plain"}
              conn = http.client.HTTPConnection(self.host)
@@ -394,12 +394,12 @@ class SolarLog(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 

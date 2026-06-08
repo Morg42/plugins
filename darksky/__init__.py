@@ -28,7 +28,7 @@ import datetime
 import json
 from collections import OrderedDict
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 
 from .webif import WebInterface
 
@@ -295,7 +295,7 @@ class DarkSky(SmartPlugin):
         :param item: The item to process.
         """
         if self.get_iattr_value(item.conf, 'ds_matchstring'):
-            if not self.get_iattr_value(item.conf, 'ds_matchstring') in self._items:
+            if self.get_iattr_value(item.conf, 'ds_matchstring') not in self._items:
                 self._items[self.get_iattr_value(item.conf, 'ds_matchstring')] = []
             self._items[self.get_iattr_value(item.conf, 'ds_matchstring')].append(item)
 

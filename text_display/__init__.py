@@ -25,7 +25,7 @@
 #
 #########################################################################
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 from .webif import WebInterface
 
@@ -142,7 +142,7 @@ class TextDisplay(SmartPlugin):
                 item.conf, 'text_display_sink_rings_with_prio')
             cycle_time = self.get_iattr_value(
                 item.conf, 'text_display_cycle_time')
-            if cycle_time == None:
+            if cycle_time is None:
                 cycle_time = 3
             sink_item_path = item.property.path
 
@@ -153,7 +153,7 @@ class TextDisplay(SmartPlugin):
                 sink_item_path, source_rings, default_value, tick_time_hint=cycle_time)
 
             if overruling_rings is None:
-                self.logger.debug(f"No overruling-rings")
+                self.logger.debug("No overruling-rings")
             else:
                 self.logger.debug(f"Overruling rings: {overruling_rings}")
                 self._model.append_message_sink_to_overruling_rings(

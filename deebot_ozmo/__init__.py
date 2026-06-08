@@ -25,7 +25,7 @@
 #
 #########################################################################
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import Modules, SmartPlugin
 from lib.item import Items
 from .webif import WebInterface
 
@@ -34,7 +34,7 @@ import datetime
 
 import string
 import random
-from deebotozmo import *
+from deebotozmo import EcoVacsAPI, VacBot, FAN_SPEED_TO_ECOVACS, WATER_LEVEL_TO_ECOVACS
 
 
 class DeebotOzmo(SmartPlugin):
@@ -184,7 +184,7 @@ class DeebotOzmo(SmartPlugin):
             #self.logger.debug(f"parse item: {item.property.path}")
             _item = self.get_iattr_value(item.conf, 'deebot_ozmo')
             # Add items to internal array
-            if not _item in self._items:
+            if _item not in self._items:
                 self._items[_item] = []
             self._items[_item].append(item)
             return self.update_item
@@ -240,12 +240,12 @@ class DeebotOzmo(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning(
                 "Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False

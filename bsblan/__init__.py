@@ -26,7 +26,7 @@ from urllib.request import urlopen
 import json
 import requests
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 
 
 class Bsblan(SmartPlugin):

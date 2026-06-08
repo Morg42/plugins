@@ -7,7 +7,7 @@ class PrioritizedRingMerger:
         self.__slots_cache = None
 
     def append_ring_model(self, ring_model):
-        if not ring_model is None:
+        if ring_model is not None:
             self.__rings.append(ring_model)
             self.__slots_cache = None
 
@@ -29,7 +29,7 @@ class PrioritizedRingMerger:
         return result
 
     def get_slots(self):
-        if not self.__slots_cache is None:
+        if self.__slots_cache is not None:
             return self.__slots_cache
 
         reversed_rings = list(reversed(self.__rings))

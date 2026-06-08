@@ -191,7 +191,7 @@ class ETA_PU(SmartPlugin):
         if parent_item is None:
             self.logger.error("skipping item: no parent with 'eta_pu_uri' found")
             return None
-        if False == (__ETA_URI__ in parent_item.conf):
+        if __ETA_URI__ not in parent_item.conf:
             return self._get_uri(parent_item)
         return parent_item.conf[__ETA_URI__]
 

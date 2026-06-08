@@ -108,7 +108,7 @@ class WebInterface(SmartPluginWebIf):
         try:
             token_expiry_val = datetime.datetime.fromtimestamp(
                 self.plugin.get_item('token_expiry').property.value, tz=self.plugin.shtime.tzinfo())
-        except Exception as e:
+        except Exception:
             self.logger.error("Please integrate the plugin struct to make the plugin work correctly.")
             token_expiry_val = 0
         return tmpl.render(plugin_shortname=self.plugin.get_shortname(), plugin_version=self.plugin.get_version(),

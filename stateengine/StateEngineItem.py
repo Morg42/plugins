@@ -1953,7 +1953,7 @@ class SeItem:
                         _converted_typelist.append(_returntype[i])
                     else:
                         _returnvalue_issue = "Found invalid definition in se_released_by attribute " \
-                                             "of state {}, original {}.".format(state.id, v, original_value)
+                                             "of state {}, original {}.".format(state.id, v, )
                         self.__logger.warning("{} Removing it.", _returnvalue_issue)
                 _converted_evaluatedlist.append(v_list)
             except Exception as ex:
@@ -2271,7 +2271,7 @@ class SeItem:
             if item_id.startswith("eval:"):
                 if "stateengine_eval" in item_id or "se_eval" in item_id:
                     # noinspection PyUnusedLocal
-                    stateengine_eval = se_eval = StateEngineEval.SeEval(self)
+                    StateEngineEval.SeEval(self)
                 item = item_id.replace('sh', 'self._sh')
                 item = item.replace('shtime', 'self._shtime')
                 _, _, item = item.partition(":")

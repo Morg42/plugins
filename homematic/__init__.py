@@ -30,7 +30,7 @@ from pyhomematic import HMConnection
 
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 
 from .webif import WebInterface
 
@@ -287,7 +287,7 @@ class Homematic(SmartPlugin):
                 else:
                     if (not init_error) and (hm_node != 'SE'):
                         # Dont log an error for sensors, since sensor data is not read during initialization
-                        self.logger.error("Not initializing {} from address={}:{}, function='{}'".format(item, hm_node, hm_address, hm_channel, hm_function))
+                        self.logger.error("Not initializing {} from address={}:{}, function='{}'".format(item, hm_node, hm_address, hm_channel, ))
 
             return self.update_item
 
@@ -325,7 +325,7 @@ class Homematic(SmartPlugin):
 
                 # Write item value to HomeMatic device
                 if dev is not None:
-                    hm_node = myitem[5]
+                    myitem[5]
                     hm_channel = myitem[3]
                     hm_function = myitem[4]
                     dev.CHANNELS[int(hm_channel)].setValue(hm_function, item())
@@ -334,7 +334,7 @@ class Homematic(SmartPlugin):
                     dev = self.hmip.devices[self.hmip_id].get(dev_id)
                     # Write item value to HomeMaticIP device
                     if dev is not None:
-                        hm_node = myitem[5]
+                        myitem[5]
                         hm_channel = myitem[3]
                         hm_function = myitem[4]
                         dev.CHANNELS[int(hm_channel)].setValue(hm_function, item())
@@ -412,7 +412,7 @@ class Homematic(SmartPlugin):
             if hm_channel is None:
                 hm_channel = node[hm_function][0]
             else:
-                if not int(hm_channel) in node[hm_function]:
+                if int(hm_channel) not in node[hm_function]:
 
                     hm_node = ''
                     self.logger.error("get_hmchannelforfunction: Invalid channel '{}' specified for {}".format(hm_channel, item))
@@ -488,8 +488,6 @@ class WebInterface(SmartPluginWebIf):
         if learn == 'on':
             self.plugin.hm.setInstallMode(self.plugin.hm_id)
 
-        username = self.plugin.username
-        host = self.plugin.host
         devices = []
         ipdevices = []
 

@@ -25,7 +25,7 @@
 from jinja2 import Environment, FileSystemLoader
 import cherrypy
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 from .webif import WebInterface
 
@@ -124,7 +124,7 @@ class AppleTV(SmartPlugin):
             self.logger.debug("parse item: {}".format(item.property.path))
             _item = self.get_iattr_value(item.conf, 'appletv')
             # Add items to internal array
-            if not _item in self._items:
+            if _item not in self._items:
                 self._items[_item] = []
             self._items[_item].append(item)
             return self.update_item
@@ -145,7 +145,7 @@ class AppleTV(SmartPlugin):
                 "Sending remote command {} to Apple TV {}".format(command, self._atv.name))
             if hasattr(self._atv_rc, command):
                 try:
-                    result = await getattr(self._atv_rc, command)()
+                    await getattr(self._atv_rc, command)()
                 except:
                     self.logger.error("Error launching coroutine {}".format(command))
             else:
@@ -175,7 +175,7 @@ class AppleTV(SmartPlugin):
                         self._loop.create_task(self._atv_pwc.turn_off())
                 elif (_value == 'playing_position_percent'):
                     _position_percent = item()
-                    if not 'playing_total_time' in self._state or not self._state['playing_total_time']:
+                    if 'playing_total_time' not in self._state or not self._state['playing_total_time']:
                         _total_time = 0
                     else:
                         _total_time = self._state['playing_total_time']
@@ -316,7 +316,7 @@ class AppleTV(SmartPlugin):
     def _update_position(self, new_position, from_device):
         if not new_position:
             new_position = 0
-        if not 'playing_total_time' in self._state or not self._state['playing_total_time']:
+        if 'playing_total_time' not in self._state or not self._state['playing_total_time']:
             self._update_items('playing_total_time', 0)
         if from_device:
             self._position = new_position

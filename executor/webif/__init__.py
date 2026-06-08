@@ -127,7 +127,7 @@ class WebInterface(SmartPluginWebIf):
         """
         if dataSet is None:
             # get the new data
-            data = {}
+            pass
 
             # data['item'] = {}
             # for i in self.plugin.items:
@@ -292,7 +292,8 @@ class WebInterface(SmartPluginWebIf):
         files2 = []
         subdir = "{}/examples".format(self.plugin.get_plugin_dir())
         self.logger.debug(f"list files in plugin examples {subdir}")
-        mtime = lambda f: os.stat(os.path.join(subdir, f)).st_mtime
+        def mtime(f):
+            return os.stat(os.path.join(subdir, f)).st_mtime
         files = list(reversed(sorted(os.listdir(subdir), key=mtime)))
         files = [f for f in files if os.path.isfile(os.path.join(subdir,f))]
         files = ["examples/{}".format(f) for f in files if f.endswith(".py")]

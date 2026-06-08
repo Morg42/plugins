@@ -53,7 +53,7 @@ def CreateStreamPayLoad(myItemConf):
         streamResolution = {}
         highestRes = 0
         for res in v['resolutions']:
-            test = res['width']
+            res['width']
             if res['width'] > highestRes:
                 streamResolution = res
                 highestRes = res['width']
@@ -182,7 +182,7 @@ def rgb_to_hsv(r, g, b):
                 h=(b-r)/C+2
             else:
                 h=(r-g)/C+4
-                h*=60;
+                h*=60
             if( h<0 ):
                 h+=360
             else:

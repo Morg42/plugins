@@ -75,7 +75,7 @@ class Crc(object):
 
         self.msb_mask = 0x1 << (self.width - 1)
         self.mask = ((self.msb_mask - 1) << 1) | 1
-        if self.tbl_idx_width != None:
+        if self.tbl_idx_width is not None:
             self.tbl_width = 1 << self.tbl_idx_width
         else:
             self.tbl_idx_width = 8

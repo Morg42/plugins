@@ -97,7 +97,6 @@ class WebInterface(SmartPluginWebIf):
         devicedata = self.get_devicesdata()
 
         #        self.logger.info(f"get_lightsdata() - Lights:")
-        first = True
         for light in self.plugin.v2bridge.lights:
             value_dict = {}
             value_dict['_full'] = light
@@ -132,7 +131,7 @@ class WebInterface(SmartPluginWebIf):
             value_dict['xy'] = [light.color.xy.x, light.color.xy.y]
             try:
                 value_dict['ct'] = light.color_temperature.mirek
-                if light.color_temperature.mirek_valid == False:
+                if not light.color_temperature.mirek_valid:
                     value_dict['ct'] = '(' + str(light.color_temperature.mirek) + ')'
             except:
                 value_dict['ct'] = ''
@@ -214,7 +213,7 @@ class WebInterface(SmartPluginWebIf):
                 value_dict['name'] = sensor.name
             except:
                 value_dict['name'] = ''
-                self.logger.debug(f"get_sensorsdata: Exception 'no name'")
+                self.logger.debug("get_sensorsdata: Exception 'no name'")
                 self.logger.debug(f"- sensor={sensor}")
                 self.logger.debug(f"- owner={sensor.owner}")
 
@@ -259,15 +258,15 @@ class WebInterface(SmartPluginWebIf):
                         if value_dict['name'] == '':
                             value_dict['name'] = devicedata[d]['name']
 
-            except Exception as ex:
+            except Exception:
                 value_dict['device_id'] = ''
             try:
                 value_dict['owner_type'] = sensor.owner.rtype.value
-            except Exception as ex:
+            except Exception:
                 value_dict['owner_type'] = ''
             try:
                 value_dict['status'] = sensor.status.value
-            except Exception as ex:
+            except Exception:
                 value_dict['status'] = ''
 
             value_dict['type'] = sensor.type.value
@@ -409,7 +408,6 @@ class WebInterface(SmartPluginWebIf):
         sensor_list = []
         device_list = []
         if dataSet is None or dataSet == 'bridge_info':
-            result_array = []
 
             # callect data for items
             items = self.get_itemsdata()

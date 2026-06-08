@@ -6,7 +6,6 @@ import time
 import logging
 import pymodbus
 
-from lib.model.smartplugin import *
 
 from pymodbus.client.tcp import ModbusTcpClient
 from pymodbus.payload import BinaryPayloadDecoder

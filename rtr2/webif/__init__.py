@@ -81,9 +81,9 @@ class WebInterface(SmartPluginWebIf):
 
     def get_value(self, param):
         try:
-            result = param
+            pass
         except:
-            result = None
+            pass
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):

@@ -20,7 +20,7 @@
 #########################################################################
 
 import logging
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 import threading
 import datetime
 import time

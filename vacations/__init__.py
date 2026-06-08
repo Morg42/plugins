@@ -24,7 +24,7 @@ import datetime
 import logging
 import ferien
 from lib.shtime import Shtime
-from lib.model.smartplugin import *
+from lib.model.smartplugin import Modules, SmartPlugin, SmartPluginWebIf
 
 
 class Vacations(SmartPlugin):
@@ -65,7 +65,6 @@ class Vacations(SmartPlugin):
         pass
 
     def _update_vacations(self):
-        new_vactions = None
         try:
             new_vacations = ferien.all_vacations()
         except Exception as e:
@@ -145,7 +144,7 @@ class Vacations(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))
             return False
 

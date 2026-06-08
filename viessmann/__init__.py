@@ -715,7 +715,7 @@ class Viessmann(SmartPlugin):
         '''
         Read all configured timer values from device and create uzsu timer dict
         '''
-        if self._application_timer is not []:
+        if self._application_timer != []:
             self.logger.debug('Starting timer read commands.')
             for timer_app in self._application_timer:
                 for commandcode in self._application_timer[timer_app]['commandcodes']:

@@ -91,11 +91,11 @@ class pioneer(SmartDevicePlugin):
 
         if command in ['zone1.control.input', 'zone2.control.input', 'zone3.control.input']:
             if value == 'INTERNET RADIO':
-                self.logger.debug(f"Zone is set to internet radio, checking tuner info.")
+                self.logger.debug("Zone is set to internet radio, checking tuner info.")
                 time.sleep(1)
                 read_group('tuner')
             if value == 'TUNER':
-                self.logger.debug(f"Zone is set to tuner, checking tuner preset.")
+                self.logger.debug("Zone is set to tuner, checking tuner preset.")
                 time.sleep(1)
                 self.send_command('tuner.tunerpreset')
 

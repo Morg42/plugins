@@ -7,7 +7,7 @@ import requests
 import json
 import logging
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import os
 
 
 class Robot:
@@ -403,7 +403,7 @@ class Robot:
 
         # If external fallback category is given, overwrite local_category:
         # This feature is needed for instance if this method shall be triggered explicitly for using the non-persistant map (category = 2)
-        if fallback_category != None:
+        if fallback_category is not None:
             self.logger.info(f"Robot: category changed via external category for send command from {local_category} (received) to {fallback_category}")
             local_category = fallback_category
   

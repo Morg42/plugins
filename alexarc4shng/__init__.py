@@ -24,7 +24,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf, logging
 from lib.item import Items
 from lib.shtime import Shtime
 
@@ -49,7 +49,7 @@ from urllib.parse import urlencode
 ImportPyOTPError = False
 try:
     import pyotp
-except Exception as err:
+except Exception:
     ImportPyOTPError = True
 
 class shngObjects(object):
@@ -154,7 +154,7 @@ class AlexaRc4shNG(SmartPlugin):
         self.update_file=self.sh.get_basedir()+"/plugins/alexarc4shng/lastlogin.txt"
         self.rotating_log = []
         # Check if MFA is possible
-        if (ImportPyOTPError == True):
+        if (ImportPyOTPError):
             self.logger.warning("Plugin '{}': problem during import of pyotp, you will not be able to use MFA-Authentication".format(self.get_fullname()))
             self.ImportPyOTPError = True
 
@@ -175,7 +175,7 @@ class AlexaRc4shNG(SmartPlugin):
         if os.path.isfile(self.cookiefile):
             self.login_state=self.check_login_state()
             self.check_refresh_login()
-        if (self.login_state == False and self.credentials != ''):
+        if (not self.login_state and self.credentials != ''):
             try:
                 os.remove(self.update_file)
             except:
@@ -254,7 +254,7 @@ class AlexaRc4shNG(SmartPlugin):
         # todo
         # if interesting item for sending values:
         #   return update_item
-        if itemFound == True:
+        if itemFound:
             return self.update_item
         else:
             return None
@@ -267,7 +267,7 @@ class AlexaRc4shNG(SmartPlugin):
         # Item was not changed but double triggered the Upate_Item-Function
         if (self.AlexaEnableItem != ""):
             AlexaEnabledItem = self.items.return_item(self.AlexaEnableItem) 
-            if AlexaEnabledItem() != True:
+            if not AlexaEnabledItem():
                 return
         
         if item._type == "str":
@@ -386,12 +386,12 @@ class AlexaRc4shNG(SmartPlugin):
         if type(p) is dict:  
             if strsearch in p:
                 tokenvalue = p[strsearch]
-                if not tokenvalue is None:
+                if tokenvalue is not None:
                  return tokenvalue
             else:
                 for i in p:
                     tokenvalue = self.search(p[i], strsearch)  
-                    if not tokenvalue is None:
+                    if tokenvalue is not None:
                         return tokenvalue
     
     # handle Protocoll Entries
@@ -472,7 +472,7 @@ class AlexaRc4shNG(SmartPlugin):
             self._insert_protocoll_entry(logline)
             
             myAuth =myDict['authentication']['authenticated']
-            if (myAuth == True):
+            if (myAuth):
                 self.logger.info('Login-State checked - Result: Logged ON' )
                 logline = str(self.shtime.now())[0:19] +' Login-State checked - Result: Logged ON'
                 self._insert_protocoll_entry(logline)
@@ -485,13 +485,13 @@ class AlexaRc4shNG(SmartPlugin):
             
         
         
-        except Exception as err:
+        except Exception:
             self.logger.error('Login-State checked - Result: Logged OFF - try to login again')
             return False
     
     
     def get_list(self, type=""):
-        if (self.login_state == False):
+        if (not self.login_state):
             return []
         myReturnList = []
         myHeader = { "Host": "alexa.amazon.de",
@@ -529,7 +529,6 @@ class AlexaRc4shNG(SmartPlugin):
     def receive_info_by_request(self,dvName,cmdName,mValue):
         actEcho = self.Echos.get(dvName)
         myUrl='https://'+self.host
-        myDescriptions = ''
         myDict = {}
         # replace the placeholders in URL
         myUrl=self.parse_url(myUrl,
@@ -608,7 +607,7 @@ class AlexaRc4shNG(SmartPlugin):
         mValue = self.replace_mutated_vowel(mValue)
                 
         
-        buffer = BytesIO()
+        BytesIO()
         actEcho = None
         try:
             actEcho = self.Echos.get(dvName)
@@ -616,14 +615,13 @@ class AlexaRc4shNG(SmartPlugin):
             self.logger.warning('found no Echo with Name : {}'.format(dvName))
             self._insert_protocoll_entry('found no Echo with Name : {}'.format(dvName))
             return
-        if actEcho == None:
+        if actEcho is None:
             self.logger.warning('found no Echo with Name : {}'.format(dvName))
             self._insert_protocoll_entry('found no Echo with Name : {}'.format(dvName))
             return
         
         myUrl='https://'+self.host
         
-        myDescriptions = ''
         myDict = {}
         
         
@@ -653,7 +651,7 @@ class AlexaRc4shNG(SmartPlugin):
         try:        
             logline = str(self.shtime.now())[0:19] + ' sending command to "{}" payload {}'.format(dvName, json.dumps(postfields)) 
             self._insert_protocoll_entry(logline)
-        except Exception as err:
+        except Exception:
             pass
         
         myStatus,myRespHeader, myRespCookie, myContent = self.send_post_request(myUrl,myHeaders,self.cookie,postfields)
@@ -699,7 +697,7 @@ class AlexaRc4shNG(SmartPlugin):
             return None
         
         for device in myDict['devices']:
-            deviceFamily=device['deviceFamily']
+            device['deviceFamily']
             #if deviceFamily == 'WHA' or deviceFamily == 'VOX' or deviceFamily == 'FIRE_TV' or deviceFamily == 'TABLET':
             #    continue
             try:
@@ -727,7 +725,7 @@ class AlexaRc4shNG(SmartPlugin):
                 for line in fp:
                     CookieFile += line
             fp.close()
-        except Exception as err:
+        except Exception:
             self.logger.debug('Cookiefile could not be opened %s' % cookiefile)
         
         return CookieFile
@@ -751,7 +749,7 @@ class AlexaRc4shNG(SmartPlugin):
                         if lineFields[5] == 'csrf':
                             csrf = lineFields[6]
             fp.close()
-        except Exception as err:
+        except Exception:
             self.logger.debug('Cookiefile could not be opened %s' % cookiefile)
         
         return csrf
@@ -764,12 +762,12 @@ class AlexaRc4shNG(SmartPlugin):
         # for String
         try:
             myDummy=myDummy.replace('<mValue>',mValue)
-        except Exception as err:
+        except Exception:
             print("no String")
         # for Numbers
         try:    
             myDummy=myDummy.replace('"<nValue>"',mValue)
-        except Exception as err:
+        except Exception:
             print("no Integer")
             
         # Inject the Device informations
@@ -817,12 +815,12 @@ class AlexaRc4shNG(SmartPlugin):
         # for String
         try:
             myDummy=myDummy.replace('<mValue>',mValue)
-        except Exception as err:
+        except Exception:
             print("no String")
         # for Numbers
         try:    
             myDummy=myDummy.replace('"<nValue>"',str(mValue))
-        except Exception as err:
+        except Exception:
             print("no Integer")
         
         # Inject the Device informations
@@ -855,7 +853,7 @@ class AlexaRc4shNG(SmartPlugin):
         myJson          = ''
         retJson         = {}
         
-        if path==None:
+        if path is None:
             path=self.sh.get_basedir()+"/plugins/alexarc4shng/cmd/"
             
         try:
@@ -898,7 +896,7 @@ class AlexaRc4shNG(SmartPlugin):
 
     def check_json(self,payload):
         try:
-            myDump = json.loads(payload)
+            json.loads(payload)
             return 'Json OK'
         except Exception as err:
             return 'Json - Not OK - '+ err.args[0]
@@ -986,11 +984,11 @@ class AlexaRc4shNG(SmartPlugin):
         
         
     def save_cmd_let(self,name,description,payload,ApiURL,path=None):
-        if path==None:
+        if path is None:
             path=self.sh.get_basedir()+"/plugins/alexarc4shng/cmd/"
         
         result = ""
-        mydummy = ApiURL[0:1]
+        ApiURL[0:1]
         if (ApiURL[0:1] != "/"):
             ApiURL = "/"+ApiURL
             
@@ -1095,7 +1093,6 @@ class AlexaRc4shNG(SmartPlugin):
                     "Connection":"keep-alive",
                     "Content-Type" : "text/plain;charset=UTF-8",
                     "User-Agent" : "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:65.0) Gecko/20100101 Firefox/65.0",
-                    "Connection" : "keep-alive",
                     "Accept-Encoding" : "gzip, deflate, br"
                   }
         myStatus,myRespHeader, myRespCookie, myContent,myLocation = self.send_get_request('https://'+self.host+'/spa/index.html',myHeaders)
@@ -1122,7 +1119,7 @@ class AlexaRc4shNG(SmartPlugin):
                     "Referer": myLocation
                    }
         newUrl = "https://www.amazon.de"+"/ap/signin/"+actSessionID
-        postfields = urlencode(PostData)
+        urlencode(PostData)
         
         myStatus,myRespHeader, myRespCookie, myContent = self.send_post_request(newUrl,myHeaders,myCollectionCookie,PostData)
         myCollectionTxtCookie = self.parse_response_cookie_2_txt(myRespCookie,myCollectionTxtCookie)
@@ -1156,7 +1153,7 @@ class AlexaRc4shNG(SmartPlugin):
         PostData['password'] = pwd
         
         # If MFA Secret is Set - try with MFA
-        if (self.mfa_Secret and self.ImportPyOTPError == False):
+        if (self.mfa_Secret and not self.ImportPyOTPError):
             self.logger.info("Plugin '{}': Try to login via MFA".format(self.get_fullname()))
             self.mfa_Secret = self.mfa_Secret.replace(" ","")
             totp = pyotp.TOTP(self.mfa_Secret)
@@ -1165,7 +1162,7 @@ class AlexaRc4shNG(SmartPlugin):
             myResults.append('MFA  : ' + 'use MFA/OTP - Login OTP : {}'.format(mfaCode))
             
         
-        postfields = urlencode(PostData)
+        urlencode(PostData)
         myStatus,myRespHeader, myRespCookie, myContent = self.send_post_request(newUrl,myHeaders,myCollectionCookie,PostData)
         myCollectionTxtCookie = self.parse_response_cookie_2_txt(myRespCookie,myCollectionTxtCookie)
         myCollectionCookie = self.parse_response_cookie(myRespCookie,myCollectionCookie)
@@ -1205,7 +1202,7 @@ class AlexaRc4shNG(SmartPlugin):
         # check the csrf
         ####################################################
         myCsrf = self.search(myCollectionCookie, "csrf")
-        if myCsrf != None:
+        if myCsrf is not None:
             myResults.append('check CSRF- Step 5 - got good csrf')
             self.logger.info('Status of Auto-Login fifth Step - got CSRF: %s' % myCsrf)
             self.csrf = myCsrf
@@ -1243,7 +1240,7 @@ class AlexaRc4shNG(SmartPlugin):
         for entry in myResults:
                 logline = str(self.shtime.now())[0:19] + ' ' + entry 
                 self._insert_protocoll_entry(logline)
-        if (self.mfa_Secret != "" and self.ImportPyOTPError == False):
+        if (self.mfa_Secret != "" and not self.ImportPyOTPError):
             myResults.append('use OTP-Code : '+mfaCode)
         
         return myResults
@@ -1288,7 +1285,7 @@ class AlexaRc4shNG(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))
             return False
 
@@ -1364,7 +1361,7 @@ class WebInterface(SmartPluginWebIf):
         srcBad = self.plugin.sh.get_basedir()+'/plugins/alexarc4shng/webif/static/img/alexa_cookie_bad.png'
         if os.path.isfile(dstFile):
                 os.remove(dstFile)
-        if CookieOK==True:
+        if CookieOK:
             if os.path.isfile(srcGood):
                 os.popen('cp '+srcGood + ' ' + dstFile)
         else:
@@ -1381,7 +1378,7 @@ class WebInterface(SmartPluginWebIf):
         :return: contents of the template after beeing rendered
         """
         
-        if (self.plugin.login_state == True):
+        if (self.plugin.login_state):
             self.set_cookie_pic(True)
         else:
             self.set_cookie_pic(False)
@@ -1437,7 +1434,7 @@ class WebInterface(SmartPluginWebIf):
                     txt_Result["Status"] = "OK"
                     txt_Result["Step"] = myOrder
                     txt_Result["data"] = { "OTPCode" : mfaCode }
-                except err as Exception:
+                except err:
                     txt_Result["Status"] = "ERROR"
                     txt_Result["Step"] = myOrder
                     txt_Result["data"] = { "Message" : "OTP could not calculated something seems to be wrong with the MFA<br>Try again" }
@@ -1505,7 +1502,7 @@ class WebInterface(SmartPluginWebIf):
     
     
     def get_device_list(self):
-        if (self.plugin.login_state == True):
+        if (self.plugin.login_state):
             self.plugin.Echos = self.plugin.get_devices_by_request()
         
         Device_items = []
@@ -1535,7 +1532,7 @@ class WebInterface(SmartPluginWebIf):
         txt_Result.append("encoded:"+encoded) 
         txt_Result.append("Encoding done")
         conf_file=self.plugin.sh.get_basedir()+'/etc/plugin.yaml'
-        if (store_2_config == True):
+        if (store_2_config):
             new_conf = ""
             with open (conf_file, 'r') as myFile:
                 for line in myFile:
@@ -1552,8 +1549,8 @@ class WebInterface(SmartPluginWebIf):
             myFile.close()
             txt_Result.append("stored new config to filesystem")
             self.plugin.credentials = myCredentials
-        if login == True:
-            if (mfa != '' and self.plugin.ImportPyOTPError == False):
+        if login:
+            if (mfa != '' and not self.plugin.ImportPyOTPError):
                 # Try to login asap with MFA
                 self.plugin.mfa_Secret = mfa
             else:
@@ -1580,13 +1577,13 @@ class WebInterface(SmartPluginWebIf):
         value1 = self.plugin.parse_cookie_file("/tmp/cookie.txt")
         self.plugin.login_state = self.plugin.check_login_state()
         
-        if (self.plugin.login_state == True):
+        if (self.plugin.login_state):
             self.set_cookie_pic(True)
         else:
             self.set_cookie_pic(False)
         
         
-        if (self.plugin.login_state == False) :
+        if (not self.plugin.login_state) :
             # Cookies not found give back an error
             
             '''
@@ -1610,7 +1607,7 @@ class WebInterface(SmartPluginWebIf):
         
         
         myDevices = self.get_device_list()
-        alexa_device_count = len(myDevices)
+        len(myDevices)
         
         '''
         tmpl = self.tplenv.get_template('index.html')

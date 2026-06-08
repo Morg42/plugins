@@ -24,7 +24,7 @@
 #
 #########################################################################
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 
 from .ksem import Ksem
 

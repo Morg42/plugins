@@ -159,7 +159,6 @@ class WebInterface(SmartPluginWebIf):
         #        self.plugin.logger.info(f"get_data_html: dataSet={dataSet}")
         item_list = []
         if dataSet is None :
-            result_array = []
 
             # callect data for items
             items = self.get_itemsdata()

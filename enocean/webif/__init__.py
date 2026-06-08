@@ -82,11 +82,11 @@ class WebInterface(SmartPluginWebIf):
                 self.logger.warning(f"UTE mode triggered via webinterface (Offset: {device_offset})")
             elif action == "toggle_log_unknown":
                 self.plugin.toggle_log_unknown_msg()
-                self.logger.info(f"Toogle state of log unknown messages triggered via webinterface")
+                self.logger.info("Toogle state of log unknown messages triggered via webinterface")
             elif action == "send_learn" and (device_id is not None) and not (device_id=="") and (device_offset is not None) and not(device_offset==""):
                 self.logger.warning(f"Learn telegram triggered via webinterface (ID:{device_id} Offset:{device_offset})")
                 ret = self.plugin.send_learn_protocol(int(device_offset), int(device_id))
-                if ret == True:
+                if ret:
                     learn_triggered = True
             else:
                 self.logger.error("Unknown comman received via webinterface")

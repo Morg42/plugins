@@ -36,7 +36,7 @@ import logging
 import datetime
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 from lib.utils import Utils
 from lib.shtime import Shtime
 shtime = Shtime.get_instance()
@@ -188,12 +188,12 @@ class DLMS(SmartPlugin, conversion.Conversion):
             self.mod_http = Modules.get_instance().get_module('http')   # try/except to handle running in a core version that does not support modules
         except:
              self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error(f"Plugin '{self.get_shortname()}': Not initializing the web interface")
             return False
         
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning(f"Plugin '{self.get_shortname()}': Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 
@@ -290,7 +290,7 @@ class DLMS(SmartPlugin, conversion.Conversion):
                         Key = attribute[2] if len(attribute)>2 else 'Value'
                     except:
                         pass
-                    if not Key in ['Value', 'Unit']: 
+                    if Key not in ['Value', 'Unit']: 
                         self.logger.warning(f"Key should be either 'Value' or 'Unit' but is '{Key}', change to 'Value'")
                         Key = 'Value'
                         
@@ -407,7 +407,7 @@ class DLMS(SmartPlugin, conversion.Conversion):
                         except:
                             self.logger.error(f"tried to update items for Obis Code {obis_code} to Values {values} failed with {sys.exc_info()[0]}")
             self.logger.debug("All lines inspected, no more data")
-        except Exception as e:
+        except Exception:
             self.logger.debug("Exception '{e}' occurred, please inform plugin author!")
 
 

@@ -95,7 +95,7 @@ class Casambi_bt(SmartPlugin):
         while not self.alive:
             time.sleep(0.1)
 
-        self.logger.info(f"Run function completed!")
+        self.logger.info("Run function completed!")
 
 
     def stop(self):
@@ -122,7 +122,7 @@ class Casambi_bt(SmartPlugin):
         self.alive = True
         self._devices = []
 
-        self.logger.debug(f"Starting discover() 1st")
+        self.logger.debug("Starting discover() 1st")
         try:
             self._devices = await discover()
         except Exception as e: 
@@ -140,17 +140,17 @@ class Casambi_bt(SmartPlugin):
         while self._running:
             
             if not self._casa.connected: 
-                self.logger.debug(f"Not connected. Starting discover()")
+                self.logger.debug("Not connected. Starting discover()")
                 self._devices = []
 
                 try:
                     self._devices = await discover()
-                except BluetoothError as err:
-                    self.logger.warning(f"Exception occurred during discover: BluetoothError")
-                except NetworkNotFoundError as err:
-                    self.logger.warning(f"Exception occurred during discover: NetworkNotFoundError")
-                except AuthenticationError as err:
-                    self.logger.warning(f"Exception occurred during discover: AuthenticationError")
+                except BluetoothError:
+                    self.logger.warning("Exception occurred during discover: BluetoothError")
+                except NetworkNotFoundError:
+                    self.logger.warning("Exception occurred during discover: NetworkNotFoundError")
+                except AuthenticationError:
+                    self.logger.warning("Exception occurred during discover: AuthenticationError")
                 except Exception as e: 
                     self.logger.warning(f"Exception occurred during discover: {e}")
                 
@@ -158,24 +158,24 @@ class Casambi_bt(SmartPlugin):
                     self.logger.info(f"Found Casambi device: {d}")
                     #self.logger.debug(f"Found Casambi device options: {dir(d)}")
 
-                self.logger.info(f"Now connecting...")
+                self.logger.info("Now connecting...")
 
                 try:
                     await self._casa.connect(self._mac, self._pwd)
-                except BluetoothError as err:
-                    self.logger.warning(f"Exception occurred during casa.connect: BluetoothError")
-                except NetworkNotFoundError as err:
-                    self.logger.warning(f"Exception occurred during casa.connect: NetworkNotFoundError")
-                except AuthenticationError as err:
-                    self.logger.warning(f"Exception occurred during casa.connect: AuthenticationError")
-                except EOFError as err:
-                    self.logger.warning(f"Exception occurred during casa.connect: EOFError ")
+                except BluetoothError:
+                    self.logger.warning("Exception occurred during casa.connect: BluetoothError")
+                except NetworkNotFoundError:
+                    self.logger.warning("Exception occurred during casa.connect: NetworkNotFoundError")
+                except AuthenticationError:
+                    self.logger.warning("Exception occurred during casa.connect: AuthenticationError")
+                except EOFError:
+                    self.logger.warning("Exception occurred during casa.connect: EOFError ")
                 except Exception as e: 
                     self.logger.warning(f"Exception occurred during casa.connect: {e}, type: {type(e)}, args: {e.args}")
                 else:
-                    self.logger.info(f"Connect successfull")
+                    self.logger.info("Connect successfull")
             else:
-                self.logger.debug(f"Casa already connected.")
+                self.logger.debug("Casa already connected.")
             
 
             # Turn all lights on
@@ -228,7 +228,7 @@ class Casambi_bt(SmartPlugin):
    
     def decodeCasambiUnit(self, unit):
         if unit is None: 
-            self.logger.error(f"Decoding unit is none. Aborting")
+            self.logger.error("Decoding unit is none. Aborting")
             return
         self.logger.debug(f"Decoding unit {unit.name}, {unit.deviceId}")
 
@@ -282,10 +282,10 @@ class Casambi_bt(SmartPlugin):
                 if id_item is self._sh:
                     self.logger.error(f"Could not find casambi_bt_id for item {item}")
                     return None
-            rx_key = item.conf['casambi_bt_rx_key'].upper()
+            item.conf['casambi_bt_rx_key'].upper()
             id = int(id_item.conf['casambi_bt_id'])
 
-            if (not id in self._rx_items):
+            if (id not in self._rx_items):
                 self._rx_items[id] = []
             self._rx_items[id].append(item)
             #self.logger.debug(f"rx-items dict: {self._rx_items}")
@@ -373,7 +373,7 @@ class Casambi_bt(SmartPlugin):
         self.decodeCasambiUnit(u)
 
     def _casa_disconnect_handler(self):
-        self.logger.warning(f"Disconnect handler triggered")
+        self.logger.warning("Disconnect handler triggered")
         #TODO: Implement reconnect
 
     def controlDevice(self, item, id, key, error_count = 0):
@@ -389,29 +389,29 @@ class Casambi_bt(SmartPlugin):
         unit_instance = Unit(_typeId=1,deviceId=id,uuid="abc-123",address="AA:BB:CC:DD:EE:FF",name="XYZ",firmwareVersion="1.0.5", unitType=None)
 
         if key == 'ON':
-            if item() == True:
-                self.logger.info(f"Switching on...")
+            if item():
+                self.logger.info("Switching on...")
                 try:
                     self.run_asyncio_coro(self._casa.turnOn(unit_instance), return_exeption=True)
-                except BluetoothError as err:
-                    self.logger.warning(f"Exception during switch on command: BluetoothError")
-                except NetworkNotFoundError as err:
-                    self.logger.warning(f"Exception during switch on command: NetworkNotFoundError")
-                except AuthenticationError as err:
-                    self.logger.warning(f"Exception during switch on command: AuthenticationError ")
+                except BluetoothError:
+                    self.logger.warning("Exception during switch on command: BluetoothError")
+                except NetworkNotFoundError:
+                    self.logger.warning("Exception during switch on command: NetworkNotFoundError")
+                except AuthenticationError:
+                    self.logger.warning("Exception during switch on command: AuthenticationError ")
                 except Exception as e:
                     self.logger.warning(f"Exception during switch on command: {e}, type: {type(e)}, args: {e.args}")
             else:
                 # Turn all lights off
-                self.logger.info(f"Switching off...")
+                self.logger.info("Switching off...")
                 try:
                     self.run_asyncio_coro(self._casa.setLevel(unit_instance, 0), return_exeption=True)
-                except BluetoothError as err:
-                    self.logger.warning(f"Exception during switch off command: BluetoothError")
-                except NetworkNotFoundError as err:
-                    self.logger.warning(f"Exception during switch off command: NetworkNotFoundError")
-                except AuthenticationError as err:
-                    self.logger.warning(f"Exception during switch off command: AuthenticationError ")
+                except BluetoothError:
+                    self.logger.warning("Exception during switch off command: BluetoothError")
+                except NetworkNotFoundError:
+                    self.logger.warning("Exception during switch off command: NetworkNotFoundError")
+                except AuthenticationError:
+                    self.logger.warning("Exception during switch off command: AuthenticationError ")
                 except Exception as e:
                     self.logger.warning(f"Exception during switch off command: {e}, type: {type(e)}, args: {e.args}")
         elif key == 'DIMMER':

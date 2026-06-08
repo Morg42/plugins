@@ -245,7 +245,7 @@ class modbus_tcp(SmartPlugin):
             return
             
         if self.lock.locked():
-            self.log_error(f"poll_device already called an not ready for next poll")
+            self.log_error("poll_device already called an not ready for next poll")
             return
 
         with self.lock:
@@ -599,7 +599,7 @@ class modbus_tcp(SmartPlugin):
                     return decoder.decode_bits()
             else:
                 self.logger.error(f"Number of bits or datatype not supported : {dataTypeStr}")
-        except struct.error as e:
+        except struct.error:
             self.logger.error(f"unable to unpack data for datatype={dataType.lower()} for read {objectType}.{address}.{slaveUnit} (address.slaveUnit) regCount:{registerCount}")
             raise ModbusException(f"Exception: unable to unpack data for datatype={dataType.lower()} for read {objectType}.{address}.{slaveUnit} (address.slaveUnit) regCount:{registerCount}")
 

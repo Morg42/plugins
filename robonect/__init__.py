@@ -26,7 +26,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.mqttplugin import *
+from lib.model.mqttplugin import MqttPlugin
 from .webif import WebInterface
 from lib.item import Items
 from requests.auth import HTTPBasicAuth
@@ -136,10 +136,10 @@ class Robonect(MqttPlugin):
                     callback = self.on_change
                 self.add_subscription(topic, payload_type, item=item, bool_values=bool_values, callback=callback)
 
-            if not self.get_iattr_value(item.conf, 'robonect_data_type') in self._battery_items and \
+            if self.get_iattr_value(item.conf, 'robonect_data_type') not in self._battery_items and \
                     self.has_iattr(item.conf, 'robonect_battery_index'):
                 self._battery_items[self.get_iattr_value(item.conf, 'robonect_data_type')] = []
-            if not self.get_iattr_value(item.conf, 'robonect_data_type') in self._remote_items and \
+            if self.get_iattr_value(item.conf, 'robonect_data_type') not in self._remote_items and \
                     self.has_iattr(item.conf, 'robonect_remote_index'):
                 self._remote_items[self.get_iattr_value(item.conf, 'robonect_data_type')] = []
 

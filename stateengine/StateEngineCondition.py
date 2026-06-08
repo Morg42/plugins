@@ -517,7 +517,7 @@ class SeCondition(StateEngineTools.SeItemChild):
                 self.__value.set_cast(StateEngineTools.cast_str)
                 convert_value = StateEngineTools.cast_str(convert_value)
                 convert_current = StateEngineTools.cast_str(convert_current)
-            if not type(_oldvalue) is type(convert_value):
+            if type(_oldvalue) is not type(convert_value):
                 self._log_debug("Value {} was type {} and therefore not the same"
                                 " type as item value {}. It got converted to {}.",
                                 _oldvalue, type(_oldvalue), convert_current, type(convert_value))
@@ -631,7 +631,7 @@ class SeCondition(StateEngineTools.SeItemChild):
                 self._abitem.update_webif(self.__webif_key('max'), str(max_value))
                 self._log_info(text, self.__name, min_value, max_value, self.__negate, current)
                 if diff_len != 0:
-                    self._log_debug(f"Min and max are always evaluated as valuepairs. "
+                    self._log_debug("Min and max are always evaluated as valuepairs. "
                                     "If needed you can also provide 'novalue' as a list value. "
                                     "Current min: {min_value}, current max: {max_value}")
                 self._log_increase_indent()
@@ -861,12 +861,10 @@ class SeCondition(StateEngineTools.SeItemChild):
         def check_eval(eval_or_status_eval):
             if isinstance(eval_or_status_eval, str):
                 # noinspection PyUnusedLocal
-                sh = self._sh
                 # noinspection PyUnusedLocal
-                shtime = self._shtime
                 if "stateengine_eval" in eval_or_status_eval or "se_eval" in eval_or_status_eval:
                     # noinspection PyUnusedLocal
-                    stateengine_eval = se_eval = StateEngineEval.SeEval(self._abitem)
+                    StateEngineEval.SeEval(self._abitem)
                 try:
                     eval_result = eval(eval_or_status_eval)
                     if isinstance(eval_result, self.__itemClass):

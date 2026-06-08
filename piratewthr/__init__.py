@@ -29,7 +29,7 @@ import datetime
 import json
 from collections import OrderedDict
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 
 from .webif import WebInterface
 
@@ -353,7 +353,7 @@ class PirateWeather(SmartPlugin):
         """
         pw_matchstring = self.get_iattr_value(item.conf, 'pw_matchstring')
         if pw_matchstring:
-            if not pw_matchstring in self._items:
+            if pw_matchstring not in self._items:
                 self._items[pw_matchstring] = []
             self._items[pw_matchstring].append(item)
 

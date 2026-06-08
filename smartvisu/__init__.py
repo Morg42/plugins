@@ -80,7 +80,7 @@ class SmartVisu(SmartPlugin):
         #self.protocol_over_reverseproxy = self.get_parameter_value('protocol_over_reverseproxy')
 
         # check parameter values
-        if not self.visu_style in ['std','blk']:
+        if self.visu_style not in ['std','blk']:
             self.visu_style = 'std'
             self.logger.error("smartVISU: Invalid value '" + self.get_parameter_value('visu_style') + "' configured for attribute visu_style in plugin.conf, using '" + str(self.visu_style) + "' instead")
 
@@ -140,7 +140,7 @@ class SmartVisu(SmartPlugin):
                 self.logger.info(f"Starting smartVISU v{self.smartvisu_version} handling for visu in {self.smartvisu_dir}")
                 if self._handle_widgets:
                     try:
-                        sv_iwdg = SmartVisuInstallWidgets(self)
+                        SmartVisuInstallWidgets(self)
                     except Exception as e:
                         self.logger.exception("SmartVisuInstallWidgets v{}: Exception: {}".format(self.get_smartvisu_version(), e))
                     if self.removed_plugin_widgets != []:
@@ -152,7 +152,7 @@ class SmartVisu(SmartPlugin):
                 if self._generate_pages:
                     if self.smartvisu_is_configured:
                         try:
-                            svgen = SmartVisuGenerator(self, self.visu_definition)
+                            SmartVisuGenerator(self, self.visu_definition)
                         except Exception as e:
                             self.logger.exception("SmartVisuGenerator: Exception: {}".format(e))
 
@@ -202,7 +202,6 @@ class SmartVisu(SmartPlugin):
 
 
     def read_version_info_php(self):
-        v = '?'
         v_major = '?'
         v_minor = '?'
         v_rev = '?'
@@ -215,7 +214,7 @@ class SmartVisu(SmartPlugin):
                 if line.find('//') > -1:
                     line = line[:line.find('//')]
                 if line.startswith("'config_version'"):
-                    v = line[len("'config_version'"):].strip(", ';)")
+                    line[len("'config_version'"):].strip(", ';)")
                 elif line.startswith("'config_version_major'"):
                     v_major = line[len("'config_version_major'"):].strip(", ';)")
                 elif line.startswith("'config_version_minor'"):
@@ -397,7 +396,7 @@ class SmartVisu(SmartPlugin):
         try:
             with open(filename) as stream:
                 config_parser.read_string("[dummy_section]\n" + stream.read())
-        except Exception as e:
+        except Exception:
 
             self.logger.info("smartVISU is not configured (no 'config.ini' file found)")
             return ''

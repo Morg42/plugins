@@ -208,43 +208,43 @@ loginstatusdict = dict( [
 #
 def _getpayloadtypestr( payloadtype ):
         result = payloadtypedict.get( payloadtype )
-        if result == None:
+        if result is None:
             result = "UNKNOWN (type=" + _hexbyte( payloadtype ) + ")"
         return result
 
 def _getraumstr( raum ):
     result = roomdict.get( raum )
-    if result == None:
+    if result is None:
         result = "Room=" + str( raum )
     return result
 
 def _getmlnstr( mln ):
     result = mlndict.get( mln )
-    if result == None:
+    if result is None:
         result = "MLN=" + str( mln )
     return result
 
 def _getbeo4commandstr( command ):
         result = beo4commanddict.get( command )
-        if result == None:
+        if result is None:
             result = "Cmd=" + _hexbyte( command )
         return result
 
 def _getselectedsourcestr( source ):
         result = selectedsourcedict.get( source )
-        if result == None:
+        if result is None:
             result = "Src=" + _hexbyte( source )
         return result
 
 def _getspeakermodestr( source ):
         result = speakermodedict.get( source )
-        if result == None:
+        if result is None:
             result = "mode=" + _hexbyte( source )
         return result
 
 def _getdictstr( mydict, mykey ):
         result = mydict.get( mykey )
-        if result == None:
+        if result is None:
             result = _hexbyte( mykey )
         return result
 
@@ -564,7 +564,7 @@ class mlgwlistener(threading.Thread):
                 if (self._mlgwdata[0] == 0x01) and (self._mlgwdata[3] == 0x00) and (self._mlgwdata[1] != 0x37):
                     # process telegram
                     telegram_handled = self.processtelegram()
-                    if (telegram_handled == False) and (log_telegrams >= 1):
+                    if (not telegram_handled) and (log_telegrams >= 1):
                         self.logger.log(loglevel, "UNHANDLED: " + _getpayloadtypestr( self._mlgwdata[1] ) + ": " + str(self._payloadstr))  # info
             if timeoutcount > 12:
                 self.logger.error("No answer received to mlgw-ping")
@@ -591,13 +591,13 @@ class mlgwlistener(threading.Thread):
                     return True
                 # update item, which is listening for all commands (return command string)
                 item = listenerlightdict.get(_hexword(self._mlgwdata[4], 255))
-                if item != None:
+                if item is not None:
 #                    self.logger.warning('processtelegram: L&C telegram: room='+str(self._mlgwdata[4])+', LC=LIGHT, command='+cmd+', item='+str(item))
                     item(cmd, 'mlgw', 'LIGHT <ALL>')
                     ishandled = True
                 # update item (return 1)
                 item = listenerlightdict.get(_hexword(self._mlgwdata[4], self._mlgwdata[6]))
-                if item != None:
+                if item is not None:
 #                    self.logger.warning('processtelegram: L&C telegram: room='+str(self._mlgwdata[4])+', LC=LIGHT, command='+cmd+', item='+str(item))
                     item(1, 'mlgw', 'LIGHT '+cmd)
                     ishandled = True
@@ -609,13 +609,13 @@ class mlgwlistener(threading.Thread):
                     return True
                 # update item, which is listening for all commands (return command string)
                 item = listenercontroldict.get(_hexword(self._mlgwdata[4], 255))	# room
-                if item != None:
+                if item is not None:
 #                    self.logger.warning('processtelegram: L&C telegram: room='+str(self._mlgwdata[4])+', LC=CONTROL, command='+cmd+', item='+str(item))
                     item(cmd, 'mlgw', 'CONTROL <ALL>')
                     ishandled = True
                 # update item (return 1)
                 item = listenercontroldict.get(_hexword(self._mlgwdata[4], self._mlgwdata[6]))
-                if item != None:
+                if item is not None:
 #                    self.logger.warning('processtelegram: L&C telegram: room='+str(self._mlgwdata[4])+', LC=CONTROL, command='+cmd+', item='+str(item))
                     item(1, 'mlgw', 'CONTROL '+cmd)
                     ishandled = True
@@ -625,13 +625,13 @@ class mlgwlistener(threading.Thread):
             source =  _getselectedsourcestr(self._mlgwdata[5])	# source
             # update item, which is listening for all commands (return source string)
             item = listenersourcestatusdict.get(_hexword(self._mlgwdata[4], 254))	# mln
-            if item != None:
+            if item is not None:
 #                self.logger.warning('processtelegram: Source Status telegram: mln='+str(self._mlgwdata[4])+', source='+source+', item='+str(item))
                 item(source, 'mlgw', 'SOURCE STATUS <ALL>')
                 ishandled = True
             # update item (return 1)
             item = listenersourcestatusdict.get(_hexword(self._mlgwdata[4], self._mlgwdata[5]))	#mln, source
-            if item != None:
+            if item is not None:
 #                self.logger.warning('processtelegram: Source Status telegram: mln='+str(self._mlgwdata[4])+', source='+source+', item='+str(item))
                 item(1, 'mlgw', 'SOURCE STATUS '+source)
                 ishandled = True
@@ -641,13 +641,13 @@ class mlgwlistener(threading.Thread):
             speakermode =  _getspeakermodestr(self._mlgwdata[6])	# speaker mode
             # update item, which is listening for all commands (return speakermode string)
             item = listenerspeakermodedict.get(_hexword(self._mlgwdata[4], 253))	# mln
-            if item != None:
+            if item is not None:
 #                self.logger.warning('processtelegram: Source Status telegram: mln='+str(self._mlgwdata[4])+', speakermode='+speakermode+', item='+str(item))
                 item(speakermode, 'mlgw', 'PICT&SND STATUS <ALL>')
                 ishandled = True
             # update item (return 1)
             item = listenerspeakermodedict.get(_hexword(self._mlgwdata[4], self._mlgwdata[6]))	#mln, speakermode
-            if item != None:
+            if item is not None:
 #                self.logger.warning('processtelegram: Source Status telegram: mln='+str(self._mlgwdata[4])+', speakermode='+speakermode+', item='+str(item))
                 item(1, 'mlgw', 'PICT&SND STATUS '+speakermode)
                 ishandled = True
@@ -776,7 +776,7 @@ class Mlgw(SmartPlugin):
             try:
                 time.sleep(3)
             except KeyboardInterrupt:
-                loop = 0;
+                loop = 0
                 self.logger.info("KeyboardInterrupt, terminating...")
         self._mlgwbase.CloseConnection()
 
@@ -807,7 +807,7 @@ class Mlgw(SmartPlugin):
 
         if 'mlgw_send' in item.conf:
             mln = reverse_mlndict.get(item.conf['mlgw_mln'].upper())
-            if mln == None:
+            if mln is None:
                 try:
                     mln = int(item.conf['mlgw_mln'])
                 except:
@@ -818,7 +818,7 @@ class Mlgw(SmartPlugin):
                 wrk = None
                 if item._type == 'bool':
                     wrk = reverse_beo4commanddict.get(item.conf['mlgw_cmd'].upper())
-                    if wrk == None:
+                    if wrk is None:
                         try:
                             wrk = int( item.conf['mlgw_cmd'], 16 )
                         except:
@@ -836,7 +836,7 @@ class Mlgw(SmartPlugin):
 
         if 'mlgw_listen' in item.conf:
             room = reverse_roomdict.get(item.conf['mlgw_room'].upper())
-            if room == None:
+            if room is None:
                 try:
                     room = int(item.conf['mlgw_room'])
                 except:
@@ -846,7 +846,7 @@ class Mlgw(SmartPlugin):
             if item.conf['mlgw_listen'].upper() == 'LIGHT':
                 if item._type == 'bool':
                     cmd = reverse_beo4commanddict.get(item.conf['mlgw_cmd'].upper())
-                    if cmd == None:
+                    if cmd is None:
                         try:
                             cmd = int( item.conf['mlgw_cmd'], 16 )
                         except:
@@ -862,7 +862,7 @@ class Mlgw(SmartPlugin):
             if item.conf['mlgw_listen'].upper() == 'CONTROL':
                 if item._type == 'bool':
                     cmd = reverse_beo4commanddict.get(item.conf['mlgw_cmd'].upper())
-                    if cmd == None:
+                    if cmd is None:
                         try:
                             cmd = int( item.conf['mlgw_cmd'], 16 )
                         except:
@@ -876,7 +876,7 @@ class Mlgw(SmartPlugin):
                 return None     # Keine update routine an sh.py zurueckmelden (item kann nicht gesetzt werden)
 
             mln = reverse_mlndict.get(item.conf['mlgw_mln'].upper())
-            if mln == None:
+            if mln is None:
                 try:
                     mln = int(item.conf['mlgw_mln'])
                 except:
@@ -886,7 +886,7 @@ class Mlgw(SmartPlugin):
             if item.conf['mlgw_listen'].upper() == 'SOURCE STATUS':
                 if item._type == 'bool':
                     source = reverse_selectedsourcedict.get(item.conf['mlgw_cmd'].upper())
-                    if source == None:
+                    if source is None:
                         try:
                             source = int( item.conf['mlgw_cmd'], 16 )
                         except:
@@ -902,7 +902,7 @@ class Mlgw(SmartPlugin):
             if item.conf['mlgw_listen'].upper() == 'PICT&SND STATUS':
                 if item._type == 'bool':
                     source = reverse_speakermodedict.get(item.conf['mlgw_cmd'].upper())
-                    if source == None:
+                    if source is None:
                         try:
                             source = int( item.conf['mlgw_cmd'], 16 )
                         except:
@@ -941,7 +941,7 @@ class Mlgw(SmartPlugin):
         if caller != 'mlgw':
 #            mln = int(item.conf['mlgw_mln'])
             mln = reverse_mlndict.get(item.conf['mlgw_mln'].upper())
-            if mln == None:
+            if mln is None:
                 try:
                     mln = int(item.conf['mlgw_mln'])
                 except:
@@ -975,7 +975,7 @@ class Mlgw(SmartPlugin):
         if caller != 'mlgw':
 #            mln = int(item.conf['mlgw_mln'])
             mln = reverse_mlndict.get(item.conf['mlgw_mln'].upper())
-            if mln == None:
+            if mln is None:
                 try:
                     mln = int(item.conf['mlgw_mln'])
                 except:
@@ -983,7 +983,7 @@ class Mlgw(SmartPlugin):
                     return None
             if item._type == 'str':
                 cmd = reverse_beo4commanddict.get(item().upper())
-                if cmd == None:
+                if cmd is None:
                     try:
                         cmd = int( item(), 16 )
                     except:
@@ -994,7 +994,7 @@ class Mlgw(SmartPlugin):
                 cmd = item()
             self.logger.warning("update item: {0}".format(item.property.path)+", value="+ str(item()) +", (MLN="+str(mln)+", cmd="+str(cmd)+")")   # info
 
-            if cmd != None:
+            if cmd is not None:
                 self._mlgwbase.SendBeo4Command( mln, 0x00, cmd )
 #                self._payload = bytearray()
 #                self._payload.append(mln)              # byte[0] MLN

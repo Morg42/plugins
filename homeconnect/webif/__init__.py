@@ -36,7 +36,6 @@ from lib.model.smartplugin import SmartPluginWebIf
 #    Webinterface of the plugin
 # ------------------------------------------
 
-import cherrypy
 import csv
 from jinja2 import Environment, FileSystemLoader
 

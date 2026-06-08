@@ -26,7 +26,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 
 import threading
 from datetime import timedelta
@@ -45,7 +45,7 @@ class OneWire(SmartPlugin):
 
     PLUGIN_VERSION = '1.9.5'
 
-    _flip = {0: '1', False: '1', 1: '0', True: '0', '0': True, '1': False}
+    _flip = {0: '1', 1: '0', '0': True, '1': False}
 
     _supported = {
         'T': 'Temperature',
@@ -478,7 +478,7 @@ class OneWire(SmartPlugin):
                     self.logger.warning(f"identify_sensor({sensor}) - Exception: {e}")
                 self.logger.debug(f"_discovery_process_bus: Sensor {sensor} - keys {keys}")
                 if keys is None:
-                    if not addr in self._webif_buses[bus]:
+                    if addr not in self._webif_buses[bus]:
                         self.logger.info(f"_discovery_process_bus: Skipping unsupported sensor {sensor} for {bus}")
                         self._webif_buses[bus][addr] = {}
                         self._webif_buses[bus][addr]['keys'] = {'UN': 'unsupported'}

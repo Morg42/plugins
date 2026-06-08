@@ -66,7 +66,7 @@ class SmartVisuInstallWidgets:
                 self.logger.warning( "install_widgets: Creating a copy of root.html" )
                 try:
                     shutil.copy2( self.pgbdir + '/root.html', self.pgbdir + '/root_master.html' )
-                except Exception as e:
+                except Exception:
                     self.logger.error("Could not copy {} from {} to {}".format('root.html', self.pgbdir, self.pgbdir + '/root_master.html'))
                     return
 

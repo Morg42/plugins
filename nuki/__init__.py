@@ -28,8 +28,8 @@ import json
 import requests
 import cherrypy
 import time
-from lib.model.mqttplugin import *
-from .webif import *
+from lib.model.mqttplugin import MqttPlugin, threading
+from .webif import NukiWebServiceInterface, WebInterface
 from lib.item import Items
 from bin.smarthome import VERSION
 from lib.utils import Utils

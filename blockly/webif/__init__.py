@@ -34,7 +34,7 @@ from lib.model.smartplugin import SmartPluginWebIf
 from lib.logic import Logics          # für update der /etc/logic.yaml
 from lib.logic import Logic           # für reload (bytecode)
 from lib.utils import Utils
-from ..utils import *
+from ..utils import html_escape, remove_prefix
 
 # ------------------------------------------
 #    Webinterface of the plugin
@@ -194,7 +194,7 @@ class WebInterface(SmartPluginWebIf):
         name = remove_prefix(item._path, parent+'.')
         if childitems != []:
             xml = ''
-            if (item.type() != 'foo') or (item() != None):
+            if (item.type() != 'foo') or (item() is not None):
 #                self.logger.info("item._path = '{}', item.type() = '{}', item() = '{}', childitems = '{}'".format(item._path, item.type(), str(item()), childitems))
                 xml += self._build_leaf(name, item, level+1)
                 xml += ''.ljust(3*(level)) + '<category name="{0} ({1})">\n'.format(name, len(childitems)+1)
@@ -270,7 +270,7 @@ class WebInterface(SmartPluginWebIf):
                     ack, acv = ac.split(':')
                     active = Utils.to_bool(acv.strip(), False)
                     if section == '':
-                        section = sc;
+                        section = sc
                         self.logger.info("blockly_update_config: #comment# section = '{}'".format(section))
                     config_list.append([fnk.strip(), fnv.strip(), fnco])
             elif line.startswith('#trigger#'):
@@ -281,7 +281,7 @@ class WebInterface(SmartPluginWebIf):
                     fnco = ''
                     config_list.append([fnk.strip(), fnv.strip(), fnco])
                 if section == '':
-                    section = sc;
+                    section = sc
                     self.logger.info("blockly_update_config: #trigger# section = '{}'".format(section))
                 config_list.append([trk.strip(), trv.strip(),co])
             elif line.startswith('"""'):    # initial .rst-comment reached, stop scanning

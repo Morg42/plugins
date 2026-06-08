@@ -433,7 +433,6 @@ class WebInterface(StateEngineTools.SeItemChild):
             actionlist_leave = ''
             actionlist_pass = ''
             condition_tooltip = ''
-            action_tooltip = ''
             j = 0
             new_x = 0.55
             actions_enter = self.__states[state].get('actions_enter') or []

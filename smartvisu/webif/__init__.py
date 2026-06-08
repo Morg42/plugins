@@ -89,7 +89,7 @@ class WebInterface(SmartPluginWebIf):
         clients = []
 
         for clientinfo in self.plugin.return_clients():
-            c = clientinfo.get('addr', '')
+            clientinfo.get('addr', '')
             client = dict()
             client['ip'] = clientinfo.get('ip', '')
             client['port'] = clientinfo.get('port', '')
@@ -147,7 +147,7 @@ class WebInterface(SmartPluginWebIf):
             # callect data for 'items' tab
             item_dict = {}
             for item in self.plugin.get_item_list():
-                item_config = self.plugin.get_item_config(item)
+                self.plugin.get_item_config(item)
                 value_dict = {}
                 value_dict['type'] = item.property.type
                 if ('visu_acl' in item.conf):

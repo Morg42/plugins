@@ -32,7 +32,7 @@ import errno
 
 from lib.module import Modules
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 
 if __name__ == '__main__':
     logger = logging.getLogger(__name__)
@@ -209,7 +209,6 @@ class Smlx(SmartPlugin):
 
     def connect(self):
         self._lock.acquire()
-        target = None
         try:
             if self.serialport is not None:
                 self._target = 'serial://{}'.format(self.serialport)
@@ -409,7 +408,7 @@ class Smlx(SmartPlugin):
                     # Add additional calculated fields
                     entry['obis'] = '{}-{}:{}.{}.{}*{}'.format(entry['objName'][0], entry['objName'][1], entry['objName'][2], entry['objName'][3], entry['objName'][4], entry['objName'][5])
                     entry['valueReal'] = entry['value'] * 10 ** entry['scaler'] if entry['scaler'] is not None else entry['value']
-                    entry['unitName'] = self._units[entry['unit']] if entry['unit'] != None and entry['unit'] in self._units else None
+                    entry['unitName'] = self._units[entry['unit']] if entry['unit'] is not None and entry['unit'] in self._units else None
                     entry['actualTime'] = time.ctime(self.date_offset + entry['valTime'][1]) if entry['valTime'] is not None else None # Decodes valTime into date/time string
                     # For a Holley DTZ541 with faulty Firmware remove the                ^[1] from this line ^.
                     
@@ -496,7 +495,7 @@ class Smlx(SmartPlugin):
         return data
 
     def _prepareHex(self, data):
-        data = data.decode("iso-8859-1").lower();
+        data = data.decode("iso-8859-1").lower()
         data = re.sub("[^a-f0-9]", " ", data)
         data = re.sub("( +[a-f0-9]|[a-f0-9] +)", "", data)
         data = data.encode()

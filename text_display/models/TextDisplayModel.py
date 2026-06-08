@@ -132,13 +132,13 @@ class TextDisplayModel():
     """
 
     def __prepare_ring_model(self, ring):
-        if not ring in self._message_rings:
+        if ring not in self._message_rings:
             self._message_rings[ring] = MessageRingModel(ring)
         return self._message_rings[ring]
 
     def __register_reader_to_rings(self, reader, ring_names):
         for ring_name in ring_names:
-            if not ring_name in self._ring_to_readers:
+            if ring_name not in self._ring_to_readers:
                 self._ring_to_readers[ring_name] = []
             self._ring_to_readers[ring_name].append(reader)
 

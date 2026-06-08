@@ -28,7 +28,7 @@ import datetime
 import os
 import json
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 from lib.shtime import Shtime
 
@@ -277,7 +277,7 @@ class Rtr2(SmartPlugin):
         """
         Open and close valves of all RTRs periodically to protect them
         """
-        self.logger.info(f"Starting valve protection for all RTRs")
+        self.logger.info("Starting valve protection for all RTRs")
         for r in self._rtr:
             if self._rtr[r].valve_protect:
                 self.logger.info(f"- rtr {r}: Valve protection is opening valve")
@@ -299,7 +299,7 @@ class Rtr2(SmartPlugin):
 
         :return:
         """
-        self.logger.info(f"Ending valve protection for all RTRs")
+        self.logger.info("Ending valve protection for all RTRs")
         for r in self._rtr:
             if self._rtr[r].valve_protect_active:
                 self.logger.info(f"- rtr {r}: Valve protection is closing valve (returning to regular state)")
@@ -405,9 +405,9 @@ class Rtr2(SmartPlugin):
 # ==================================================================================================
 
 
-from .mode import *
-from .temperature import *
-from .pi_controller import *
+from .mode import Mode
+from .temperature import Temperature
+from .pi_controller import Pi_controller
 
 class Rtr_object():
 
@@ -435,7 +435,6 @@ class Rtr_object():
 
         Kp = self.plugin.default_Kp
         Ki = self.plugin.default_Ki
-        Kd = self.plugin.default_Kd
         if controller_settings is not None and isinstance(controller_settings, list):
             # use inividual controller settings for Kp, Ki (and Kd)
             if len(controller_settings) > 0:
@@ -443,7 +442,7 @@ class Rtr_object():
             if len(controller_settings) > 1:
                 Ki = controller_settings[1]
             if len(controller_settings) > 2:
-                Kd = controller_settings[2]
+                controller_settings[2]
 
         self._mode = Mode()
 
@@ -484,7 +483,7 @@ class Rtr_object():
         if self.temp_actual_item is not None:
             # If valve protection is active, overrule lock and controler values
             if self.valve_protect_active:
-                dummy = self.controller.update(self.temp_actual_item())
+                self.controller.update(self.temp_actual_item())
                 output = 100
                 if (self.setting_max_output_item is not None) and (output > self.setting_max_output_item()):
                     output = self.setting_max_output_item()
@@ -493,7 +492,7 @@ class Rtr_object():
             # test if RTR is locked
             elif (self.lock_status_item is not None) and self.lock_status_item:
                 # if RTR is locked, set output to 0
-                dummy = self.controller.update(self.temp_actual_item())
+                self.controller.update(self.temp_actual_item())
                 self._update_item(self.control_output_item, 0)
                 self._update_item(self.heating_status_item, False)
             else:

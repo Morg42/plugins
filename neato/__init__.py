@@ -20,7 +20,7 @@
 #
 #########################################################################
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, os
 from lib.item import Items
 from .webif import WebInterface
 import binascii
@@ -85,7 +85,7 @@ class Neato(SmartPlugin):
         :param item: The item to process.
         """
         if self.get_iattr_value(item.conf, 'neato_attribute'):
-            if not self.get_iattr_value(item.conf, 'neato_attribute') in self._items:
+            if self.get_iattr_value(item.conf, 'neato_attribute') not in self._items:
                 self._items[self.get_iattr_value(item.conf, 'neato_attribute')] = []
             self._items[self.get_iattr_value(item.conf, 'neato_attribute')].append(item)
 
@@ -124,7 +124,7 @@ class Neato(SmartPlugin):
                     self.logger.warning("Update item: {}, item has no command equivalent for value '{}'".format(item.id(),item() ))
 
             elif self.get_iattr_value(item.conf, 'neato_attribute') == 'is_schedule_enabled':
-                if item._value == True:
+                if item._value:
                     self.robot.robot_command("enableSchedule")
                     self.logger.debug("enabling neato scheduler")
                 else:

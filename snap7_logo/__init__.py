@@ -24,7 +24,7 @@ import os
 import string
 import time
 import snap7
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.module import Modules
 from lib.logic import Logics
 from lib.item import Items
@@ -185,7 +185,7 @@ class snap7_logo(SmartPlugin):
                 else:
                     raise LOGO('invalid typ: {0}'.format(typ))
 
-                if write_res is not 0:
+                if write_res != 0:
                     raise LOGO('LOGO: write failed: {0} {1} '.format(typ, value))
                     self.close()
                 else:

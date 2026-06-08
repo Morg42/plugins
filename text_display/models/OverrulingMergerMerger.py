@@ -10,7 +10,7 @@ class OverrulingMergerMerger():
         self.__slots_cache = None
 
     def get_slots(self):
-        if not self.__slots_cache is None:
+        if self.__slots_cache is not None:
             return self.__slots_cache
 
         temp = []

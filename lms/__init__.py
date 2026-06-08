@@ -82,9 +82,9 @@ class lms(SmartDevicePlugin):
         self._parameters['CURRENT_LIST_ID'] = {}
 
     def on_connect(self, by=None):
-        self.logger.debug(f"Activating listen mode after connection.")
+        self.logger.debug("Activating listen mode after connection.")
         self.send_command('server.listenmode', True)
-        self.logger.debug(f"Subscribing all players to playlist changes.")
+        self.logger.debug("Subscribing all players to playlist changes.")
         for player in self._custom_values.get(1):
             if player == '-':
                 continue
@@ -109,7 +109,7 @@ class lms(SmartDevicePlugin):
         def trigger_read(command):
             self.send_command(command + CUSTOM_SEP + custom)
 
-        if command == f'server.newclient':
+        if command == 'server.newclient':
             self.logger.debug(f"Got new client connection {command}, re-reading players.")
             self.send_command('server.players')
             if value in self._custom_values.get(1):
@@ -118,11 +118,11 @@ class lms(SmartDevicePlugin):
                 self.read_all_commands('player.info.currentsong' + CUSTOM_SEP + value)
                 self.read_all_commands('player.control' + CUSTOM_SEP + value)
 
-        if command == f'server.forgetclient':
+        if command == 'server.forgetclient':
             self.logger.debug(f"Got forget client connection {command}: {value}, re-reading players")
             self.send_command('server.players')
 
-        if command == f'server.players':
+        if command == 'server.players':
             self.logger.debug(f"Got command players {command} data {data} value {value} by {by}")
             for player in self._custom_values.get(1):
                 if player == '-':
@@ -131,15 +131,15 @@ class lms(SmartDevicePlugin):
                     self._dispatch_callback('player.info.player.modelname' + CUSTOM_SEP + player, value[player].get('modelname'), by)
                     self._dispatch_callback('player.info.player.firmware' + CUSTOM_SEP + player, value[player].get('firmware'), by)
 
-        if command == f'database.rescan.running' and value is False:
+        if command == 'database.rescan.running' and value is False:
             self.logger.debug(f"Got command rescan not running, {command} data {data} value {value} by {by}")
             self._dispatch_callback('database.rescan.progress', "", by)
 
-        if command == f'server.playlists.delete':
+        if command == 'server.playlists.delete':
             self.logger.debug(f"Got command delete playlist {command}, re-reading playlists")
             self.send_command('server.playlists.available')
 
-        if command == f'server.syncgroups.members' and data:
+        if command == 'server.syncgroups.members' and data:
             def find_player_index(target, mac_list):
                 for index, item in enumerate(mac_list):
                     if re.search(rf'\b{re.escape(target)}\b', item):

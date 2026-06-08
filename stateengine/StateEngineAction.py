@@ -277,7 +277,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
             #self._log_develop("Get item from eval on {} {}", self._function, check_item)
             if "stateengine_eval" in check_item or "se_eval" in check_item:
                 # noinspection PyUnusedLocal
-                stateengine_eval = se_eval = StateEngineEval.SeEval(self._abitem)
+                StateEngineEval.SeEval(self._abitem)
             try:
                 item = check_item.replace('sh', 'self._sh')
                 item = item.replace('shtime', 'self._shtime')
@@ -1190,11 +1190,9 @@ class SeActionRun(SeActionBase):
         eval_result = ''
         if isinstance(self.__eval, str):
             # noinspection PyUnusedLocal
-            sh = self._sh
-            shtime = self._shtime
             if "stateengine_eval" in self.__eval or "se_eval" in self.__eval:
                 # noinspection PyUnusedLocal
-                stateengine_eval = se_eval = StateEngineEval.SeEval(self._abitem)
+                StateEngineEval.SeEval(self._abitem)
             try:
                 if returnvalue:
                     self._log_decrease_indent()

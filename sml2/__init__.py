@@ -40,7 +40,7 @@ from .const import FURTHER_OBIS_NAMES
 from lib.module import Modules
 from lib.item import Items
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from .webif import WebInterface
 
 SML_SCHEDULER_NAME = 'Sml2'

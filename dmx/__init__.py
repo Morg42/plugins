@@ -24,7 +24,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf, logging
 import threading
 
 try:
@@ -160,7 +160,7 @@ class DMX(SmartPlugin):
 
         START_DATA = 0x00
 
-        self._enttec_data[channel] = int(value);
+        self._enttec_data[channel] = int(value)
 
         packet = bytearray()
         packet.append(START_VAL)
@@ -254,12 +254,12 @@ class DMX(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 

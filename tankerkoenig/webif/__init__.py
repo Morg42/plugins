@@ -138,5 +138,5 @@ class WebInterface(SmartPluginWebIf):
 
     @cherrypy.expose
     def recalc_all(self):
-        self.logger.debug(f"recalc_all called")
+        self.logger.debug("recalc_all called")
         self.plugin.update_status_data()

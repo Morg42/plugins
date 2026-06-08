@@ -328,7 +328,7 @@ class SmartVisuGenerator:
             return
 
         for item in self.items.find_items('sv_page'):
-            if ((item.conf['sv_page'] == 'overview') or (item.conf['sv_page'] == 'cat_overview')) and (not 'sv_overview' in item.conf):
+            if ((item.conf['sv_page'] == 'overview') or (item.conf['sv_page'] == 'cat_overview')) and ('sv_overview' not in item.conf):
                 self.logger.error("missing sv_overview for {0}".format(item.property.path))
                 continue
 
@@ -336,7 +336,7 @@ class SmartVisuGenerator:
 
             # Add entry to navigation list for page
 
-            if not item.conf['sv_page'] in self.valid_sv_page_entries:
+            if item.conf['sv_page'] not in self.valid_sv_page_entries:
                 self.logger.warning(f"{item.property.path}: 'sv_page' attribute contains unknown value '{item.conf['sv_page']}'")
             else:
                 # find out to which navigation menu the page belongs
@@ -577,7 +577,7 @@ class SmartVisuGenerator:
             destname = tplname
         try:
             shutil.copy(os.path.join(self.gen_tpldir, tplname), os.path.join(self.pages_dir, destname))
-        except Exception as e:
+        except Exception:
             self.logger.error(f"Could not copy {tplname} from {self.gen_tpldir} to {self.pages_dir}")
 
 
@@ -653,6 +653,6 @@ class SmartVisuGenerator:
                     self.logger.debug(f"copy_templates: Copying template '{fn}' from plugin to smartVISU v{self.smartvisu_version}")
                     try:
                         shutil.copy2(os.path.join(self.shng_tpldir, fn), self.gen_tpldir)
-                    except Exception as e:
+                    except Exception:
                         self.logger.error(f"Could not copy {fn} from {self.shng_tpldir} to {self.gen_tpldir}")
         return

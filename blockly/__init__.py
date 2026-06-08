@@ -35,7 +35,6 @@ from .webif import WebInterface
 #from lib.module import Modules
 
 
-from .utils import *
 
 import lib.shyaml as shyaml
 #from lib.constants import (YAML_FILE, CONF_FILE)

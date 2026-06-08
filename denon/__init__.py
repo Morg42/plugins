@@ -87,7 +87,7 @@ class denon(SmartDevicePlugin):
 
     def update_item(self, item: Item, caller: str | None = None, source: str | None = None, dest: str | None = None):
         cond_custominputnames = item.conf.get('denon_command') == 'general.custom_inputnames'
-        cond_commandexists = f'general.custom_inputnames' in self._commands._commands
+        cond_commandexists = 'general.custom_inputnames' in self._commands._commands
         cond_caller = caller not in [self.get_fullname(), "custom_inputnames"]
         if self.alive and cond_custominputnames and cond_commandexists and cond_caller:
             self.logger.debug(f'Custom input command dictionary got changed by {caller}')
@@ -161,10 +161,10 @@ class denon(SmartDevicePlugin):
             self.send_command(f'zone{zone}.control.listeningmode')
 
         if command == 'general.inputrate' and value != 0:
-            self.send_command(f'general.inputsignal')
-            self.send_command(f'general.inputformat')
-            self.send_command(f'general.inputresolution')
-            self.send_command(f'general.outputresolution')
+            self.send_command('general.inputsignal')
+            self.send_command('general.inputformat')
+            self.send_command('general.inputresolution')
+            self.send_command('general.outputresolution')
 
 
 if __name__ == '__main__':

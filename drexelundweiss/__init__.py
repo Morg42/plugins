@@ -257,7 +257,7 @@ class DuW(SmartPlugin):
                         item(data, 'DuW', 'init process')
                     else:
                         self.logger.debug("Init LU register failed: {}".format(register))
-                except Exception as e:
+                except Exception:
                     self.logger.error("Init LU register not possible: {}".format(register))
 
         # WP register init
@@ -273,7 +273,7 @@ class DuW(SmartPlugin):
                         item(data, 'DuW', 'init process')
                     else:
                         self.logger.debug("Init WP register failed: {}".format(register))
-                except Exception as e:
+                except Exception:
                     self.logger.error("Init WP register not possible: {}".format(register))
 
         # PANEL register init
@@ -289,7 +289,7 @@ class DuW(SmartPlugin):
                         item(data, 'DuW', 'init process')
                     else:
                         self.logger.debug("Init PANEL register failed: {}".format(register))
-                except Exception as e:
+                except Exception:
                     self.logger.error("Init PANEL register not possible: {}".format(register))
 
         # poll DuW interface
@@ -426,7 +426,7 @@ class DuW(SmartPlugin):
     def stop(self):
         self.alive = False
         self.logger.debug("stop method called")
-        while self._pollservice == True:
+        while self._pollservice:
             pass
 
         try:
@@ -507,11 +507,11 @@ class DuW(SmartPlugin):
             register = int(self.get_iattr_value(item.conf, 'DuW_LU_register'))
             reginfo = self._get_register_info(register, 'LU')
             if reginfo:
-                if not register in self.LUregl:
+                if register not in self.LUregl:
                     self.LUregl[register] = {'reginfo':
                                              reginfo, 'items': [item]}
                 else:
-                    if not item in self.LUregl[register]['items']:
+                    if item not in self.LUregl[register]['items']:
                         self.LUregl[register]['items'].append(item)
 
                 return self.update_item
@@ -522,11 +522,11 @@ class DuW(SmartPlugin):
             register = int(self.get_iattr_value(item.conf, 'DuW_WP_register'))
             reginfo = self._get_register_info(register, 'WP')
             if reginfo:
-                if not register in self.WPregl:
+                if register not in self.WPregl:
                     self.WPregl[register] = {'reginfo':
                                              reginfo, 'items': [item]}
                 else:
-                    if not item in self.WPregl[register]['items']:
+                    if item not in self.WPregl[register]['items']:
                         self.WPregl[register]['items'].append(item)
 
                 return self.update_item
@@ -537,11 +537,11 @@ class DuW(SmartPlugin):
             register = int(self.get_iattr_value(item.conf, 'DuW_PANEL_register'))
             reginfo = self._get_register_info(register, 'PANEL')
             if reginfo:
-                if not register in self.PANELregl:
+                if register not in self.PANELregl:
                     self.PANELregl[register] = {'reginfo':
                                              reginfo, 'items': [item]}
                 else:
-                    if not item in self.PANELregl[register]['items']:
+                    if item not in self.PANELregl[register]['items']:
                         self.PANELregl[register]['items'].append(item)
 
                 return self.update_item

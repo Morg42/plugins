@@ -6,10 +6,6 @@ _defaults2= {
     'HVACModeItem': None,       # - NICHT für den PI Regler
     'HVACMode': 0,              # - NICHT für den PI Regler
 
-    'timerendItem': None,       # - NICHT für den PI Regler
-    'HVACModeItem': None,       # - NICHT für den PI Regler
-    'HVACMode': 0,              # - NICHT für den PI Regler
-
     'tempDefault': 0,           # - NICHT für den PI Regler
     'tempDrop': 0,              # - NICHT für den PI Regler
     'tempBoost': 0,             # - NICHT für den PI Regler
@@ -87,7 +83,7 @@ def pi_controller(self, c):
     Kp = 1.0 / self._controller[c]['Kp']
     self._controller[c]['eSum'] = self._controller[c]['eSum'] + e * Ta
     i = self._controller[c]['eSum'] / (60.0 * self._controller[c]['Ki'])
-    y = 100.0 * Kp * (e + i);
+    y = 100.0 * Kp * (e + i)
 
     # limit the new actuator value to [0 ... 100]
     if y > 100:

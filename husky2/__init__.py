@@ -32,7 +32,7 @@ import time
 import json
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 
 import cherrypy
 from aioautomower import session
@@ -440,7 +440,7 @@ class Husky2(SmartPlugin):
         :param dest: if given it represents the dest
         """
 
-        if self.alive and not self.get_fullname() in caller:
+        if self.alive and self.get_fullname() not in caller:
             # code to execute if the plugin is not stopped
             # and only, if the item has not been changed by this this plugin:
             item_value = "{0}".format(item())
@@ -591,7 +591,7 @@ class Husky2(SmartPlugin):
 
         # Login to get a token and connect to the api
         await self.apiSession.logincc(self.apisecret)
-        self.logger.debug(f"Logged in successfully")
+        self.logger.debug("Logged in successfully")
 
         await self.apiSession.connect()
         self.logger.debug("Connected successfully")
@@ -778,12 +778,12 @@ class Husky2(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 

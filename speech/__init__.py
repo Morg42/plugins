@@ -25,7 +25,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 from lib.network import Tcp_server
 
 from speech import varParse, dictError

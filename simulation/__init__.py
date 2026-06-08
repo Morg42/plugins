@@ -39,7 +39,7 @@
 
 import logging
 from datetime import datetime, timedelta
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf, time
 from lib.shtime import Shtime
 from lib.module import Modules
 from lib.item import Items
@@ -112,7 +112,6 @@ class Simulation(SmartPlugin):
     def update_item(self, item, caller=None, source=None, dest=None):
         if (item.conf['sim'] == 'track') and (self.state() == 2) and (self._callers is None or caller in self._callers):
             now = self.shtime.now()
-            day = now.day
             self.file.write(now.strftime('%a;%H:%M:%S'))
             self.file.write(';')
             self.file.write(item.property.path)
@@ -123,7 +122,7 @@ class Simulation(SmartPlugin):
             self.file.write('\n')
             self.file.flush()
             self._message_item(
-                'Last event recorded: {}<br>{}   {}'.format(now.strftime('%H:%M:%S'), item.property.path, item(), 'Simulation'))
+                'Last event recorded: {}<br>{}   {}'.format(now.strftime('%H:%M:%S'), item.property.path, item(), ))
             return None
         if (item.conf['sim'] == 'control') and (caller != 'Simulation'):
             self.state_selector[self.state(), self.control()](self)
@@ -237,11 +236,11 @@ class Simulation(SmartPlugin):
             seconds = int(time.split(':')[2])
             now = self.shtime.now()
             next = now.replace(hour=hour, minute=minute, second=seconds)
-            dif = next - now
+            next - now
             if (self.lastday != '') and (self.lastday != day):
                 self.logger.debug('Found next day {} {} {} shitfing to tomorrow.'.format(target, value, next))
                 next = next + timedelta(1)
-            self._message_item('Next event: {}<br>{}   {}'.format(time, target, value, 'Simulation'))
+            self._message_item('Next event: {}<br>{}   {}'.format(time, target, value, ))
             self.logger.debug('Scheduling {} {} {}'.format(target, value, next))
             self.scheduler_add('simulate', self._set_item, value={'target': target, 'value': value}, next=next)
             self.lastday = day
@@ -269,7 +268,7 @@ class Simulation(SmartPlugin):
                 seconds = int(time.split(':')[2])
                 now = self.shtime.now()
                 next = now.replace(hour=hour, minute=minute, second=seconds)
-                dif = next - now
+                next - now
             else:
                 self.logger.info('End of file reached, simulation ended')
                 self._message_item('Simulation ended', 'Simulation')
@@ -307,7 +306,7 @@ class Simulation(SmartPlugin):
             self.logger.error('NoFile {}'.format(error))
             return 0
         entry = 'bla'
-        tank = 0;
+        tank = 0
         while entry != '':
             entry = self.file.readline()
             if entry in ['NextDay', 'NextDay\n']:
@@ -390,7 +389,7 @@ class Simulation(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))
             return False
 

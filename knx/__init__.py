@@ -41,7 +41,29 @@ from lib.shtime import Shtime
 from . import dpts
 from . import knxproj
 from .knxd import KNXD
-from .globals import *
+from .globals import (
+    DPT,
+    FLAG_KNXREAD,
+    FLAG_KNXRESPONSE,
+    FLAG_KNXWRITE,
+    FLAG_RESERVED,
+    ITEM,
+    ITEMS,
+    KNXD_CACHEREAD_DELAY,
+    KNX_CACHE,
+    KNX_DATA_MASK,
+    KNX_DPT,
+    KNX_DTP,
+    KNX_FLAG_MASK,
+    KNX_INIT,
+    KNX_LISTEN,
+    KNX_POLL,
+    KNX_REPLY,
+    KNX_SEND,
+    KNX_STATUS,
+    LOGIC,
+    LOGICS,
+)
 from .webif import WebInterface
 
 
@@ -370,7 +392,7 @@ class KNX(SmartPlugin):
         knxd_msg_type = struct.unpack(">H", data[0:2])[0]
 
         # knxd
-        if not knxd_msg_type in [KNXD.GROUP_PACKET, KNXD.CACHE_READ, KNXD.CACHE_READ_NOWAIT]:
+        if knxd_msg_type not in [KNXD.GROUP_PACKET, KNXD.CACHE_READ, KNXD.CACHE_READ_NOWAIT]:
             self.handle_other_knxd_messages(knxd_msg_type, data[2:])
             return
 
@@ -412,7 +434,7 @@ class KNX(SmartPlugin):
         dst = self.decode(knx_data[2:4], 'ga')
 
         flg = knx_data[5] & KNX_FLAG_MASK
-        is_ga = knx_data[4] & 0b1000000
+        knx_data[4] & 0b1000000
         if flg == FLAG_KNXWRITE:
             flg = 'write'
         elif flg == FLAG_KNXREAD:
@@ -671,7 +693,7 @@ class KNX(SmartPlugin):
                 self.logger.info(
                     "Item {} is polled on GA {} every {} seconds".format(item, poll_ga, poll_interval))
                 randomwait = random.randrange(15)
-                next = self.shtime.now() + timedelta(seconds=poll_interval + randomwait)
+                self.shtime.now() + timedelta(seconds=poll_interval + randomwait)
                 self._startup_polling.update({item: {'ga': poll_ga, 'interval': poll_interval}})
             else:
                 self.logger.warning("Ignoring knx_poll for item {}: We need two parameters, one for the GA and one for the polling interval.".format(item))

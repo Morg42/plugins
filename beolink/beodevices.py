@@ -321,11 +321,9 @@ class BeoDevices():
         :param json_elements:
         :return:
         """
-        result = ''
         device = 'http://' + ip + ':8080'
 
         self.logger.info("send_beo_api: mode {}, ip {}, url {}, data {}".format(mode, ip, api_url, json_elements))
-        result = '-'
         try:
             if mode.lower() == 'post':
                 r = requests.post(device + api_url, data=json_elements, timeout=0.5)
@@ -336,7 +334,6 @@ class BeoDevices():
         except:
             self.logger.debug("Could not get data from device {} for {}".format(device, api_url))
             request_result = False
-            result = 'unknown'
 
         return request_result
 
@@ -381,10 +378,10 @@ class BeoDevices():
     def set_speaker_volume(self, beo_id, volume):
 
         ip = self.beodeviceinfo[beo_id]['device']['ip']
-        fn = self.beodeviceinfo[beo_id]['device'].get('FriendlyName', ip)
+        self.beodeviceinfo[beo_id]['device'].get('FriendlyName', ip)
 
         data = '{'+'"level": {}'.format(volume)+'}'
-        req_result = self.beo_put_request(ip, '/BeoZone/Zone/Sound/Volume/Speaker/Level', data)
+        self.beo_put_request(ip, '/BeoZone/Zone/Sound/Volume/Speaker/Level', data)
 
         return
 
@@ -392,10 +389,10 @@ class BeoDevices():
     def set_speaker_muted(self, beo_id, state):
 
         ip = self.beodeviceinfo[beo_id]['device']['ip']
-        fn = self.beodeviceinfo[beo_id]['device'].get('FriendlyName', ip)
+        self.beodeviceinfo[beo_id]['device'].get('FriendlyName', ip)
 
         data = '{'+'"muted": {}'.format(str(state).lower())+'}'
-        req_result = self.beo_put_request(ip, '/BeoZone/Zone/Sound/Volume/Speaker/Muted', data)
+        self.beo_put_request(ip, '/BeoZone/Zone/Sound/Volume/Speaker/Muted', data)
 
         return
 
@@ -423,10 +420,10 @@ class BeoDevices():
     def set_stand(self, beo_id, position):
 
         ip = self.beodeviceinfo[beo_id]['device']['ip']
-        fn = self.beodeviceinfo[beo_id]['device'].get('FriendlyName', ip)
+        self.beodeviceinfo[beo_id]['device'].get('FriendlyName', ip)
 
         data = '{'+'"active": {}'.format(str(position).lower())+'}'
-        req_result = self.beo_put_request(ip, '/BeoZone/Zone/Stand/Active', data)
+        self.beo_put_request(ip, '/BeoZone/Zone/Stand/Active', data)
 
         return
 

@@ -381,7 +381,7 @@ def check_plugin_yaml_structs():
 
     if not failure_found:
         print(f'   All selected {ATTRIBUTE}s are valid.')
-    print(f'   Check complete.')
+    print('   Check complete.')
 
 
 def update_user_doc():

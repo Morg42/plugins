@@ -40,7 +40,7 @@ from aiohue import HueBridgeV2
 # for hostname retrieval for registering with the bridge
 from socket import getfqdn
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 
 from .webif import WebInterface
@@ -180,7 +180,7 @@ class HueApiV2(SmartPlugin):
         self.logger.debug("plugin_coro: Opening session")
 
         if not self.bridge_is_configured():
-            self.logger.notice(f"No bridge configured - waiting until bridge is configured..")
+            self.logger.notice("No bridge configured - waiting until bridge is configured..")
             while not self.bridge_is_configured():
                 await asyncio.sleep(1)
             self.logger.notice(f"Connecting to bridge {self.bridge_ip} / {self.bridge_user}")
@@ -413,7 +413,7 @@ class HueApiV2(SmartPlugin):
 
         try:
             last_event = event_item.button.last_event.value
-        except Exception as ex:
+        except Exception:
             last_event = ''
 
         self.update_items_with_mapping(event_item, mapping_root, 'event', last_event, initialize)
@@ -712,12 +712,11 @@ class HueApiV2(SmartPlugin):
         elif config_data['function'] == 'bri_inc':
             if float(value) >= -100 and float(value) <= 100:
                 if float(value) < 0:
-                    action = 'down'
                     value = -1 * float(value)
                 elif float(value) > 0:
-                    action = 'up'
+                    pass
                 else:
-                    action = 'stop'
+                    pass
 
                 # TODO: bri_inc implementieren (ist in aiohue nicht implememntiert)
                 self.logger.warning(f"Lights: {config_data['function']} not implemented in aiohue")
@@ -739,9 +738,8 @@ class HueApiV2(SmartPlugin):
 
         value = item()
         self.logger.debug(f"update_scene_from_item: config_data = {config_data}")
-        hue_transition_time = self._default_transition_time
         if config_data['transition_time'] is not None:
-            hue_transition_time = int(float(config_data['transition_time']) * 1000)
+            int(float(config_data['transition_time']) * 1000)
 
         if config_data['function'] == 'activate':
             self.run_asyncio_coro(self.v2bridge.scenes.recall(id=config_data['id']))
@@ -956,7 +954,7 @@ class HueApiV2(SmartPlugin):
             # There is no bridge to disconnect from
             return
 
-        self.logger.notice(f"Disconnect: Disconnecting bridge")
+        self.logger.notice("Disconnect: Disconnecting bridge")
         self.stop()
         self.bridge_ip = '0.0.0.0'
 

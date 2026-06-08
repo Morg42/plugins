@@ -70,7 +70,7 @@ class WebInterface(SmartPluginWebIf):
         :return: contents of the template after beeing rendered
         """
 
-        if (learn != None):
+        if (learn is not None):
             self.logger.debug(f"Found learn: {learn}")
 
         pagelength = self.plugin.get_parameter_value('webif_pagelength')

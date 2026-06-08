@@ -90,24 +90,24 @@ class AlexaAction(object):
         if type(p) is dict:  # im Dictionary nach 'language' suchen
             if strsearch in p:
                 tokenvalue = p[strsearch]
-                if not tokenvalue is None:
+                if tokenvalue is not None:
                  return tokenvalue
             else:
                 for i in p:
                     tokenvalue = self.search(p[i], strsearch)  # in den anderen Elementen weiter suchen
-                    if not tokenvalue is None:
+                    if tokenvalue is not None:
                         return tokenvalue
     def replace(self,p, strsearch, newValue):
         if type(p) is dict:  
             if strsearch in p:
                 tokenvalue = p[strsearch]
                 p[strsearch] = newValue
-                if not tokenvalue is None:
+                if tokenvalue is not None:
                  return tokenvalue
             else:
                 for i in p:
                     tokenvalue = self.replace(p[i], strsearch,newValue)  
-                    if not tokenvalue is None:
+                    if tokenvalue is not None:
                         return tokenvalue
     
     def GenerateThermoList(self, myModes, listType):
@@ -160,13 +160,13 @@ class AlexaAction(object):
                                       "timeOfSample": myTimeStamp,
                                       "uncertaintyInMilliseconds": 5000
                                     }
-                    if myAddName != None:
+                    if myAddName is not None:
                         orgDirective['context']['properties'].append(myAddName)
         
         return orgDirective
     
     def p3_respond(self, Request):
-        myEndpoint = self.search(Request,'endpoint')
+        self.search(Request,'endpoint')
         myScope = self.search(Request,'scope')
         myEndPointID = self.search(Request,'endpointId')
         myHeader = self.search(Request,'header')

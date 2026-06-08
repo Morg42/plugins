@@ -30,7 +30,7 @@ from email.mime.base import MIMEBase
 from email.mime.image import MIMEImage
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, os
 from lib.item import Items
 
 class SMTP(SmartPlugin):

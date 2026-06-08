@@ -21,7 +21,7 @@
 #  along with SmartHomeNG If not, see <http://www.gnu.org/licenses/>.
 #########################################################################
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, logging
 from lib.network import Http
 
 import time

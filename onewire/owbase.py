@@ -153,7 +153,7 @@ class OwBase(object):
                     if with_values:
                         try:
                             value = self.read(item)
-                        except Exception as e:
+                        except Exception:
                             value = ">>> value could not be read <<<"
                         else:
                             if value is not None:

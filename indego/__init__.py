@@ -25,7 +25,7 @@
 #########################################################################
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf, logging
 
 import base64
 import os
@@ -353,7 +353,7 @@ class Indego(SmartPlugin):
     def auth(self):
         auth_response = self.fetch_url(self.indego_url + 'authenticate', self.user, self.password, 25,
                                        '{"device":"","os_type":"Android","os_version":"4.0","dvc_manuf":"unknown","dvc_type":"unknown"}')
-        if auth_response == False:
+        if not auth_response:
             self.logger.error('AUTHENTICATION INDEGO FAILED! Plugin not working now.')
         else:
             auth_response = json.loads(auth_response.decode(encoding='UTF-8', errors='strict'))
@@ -369,7 +369,7 @@ class Indego(SmartPlugin):
         next_time = self.get_url(
             self.indego_url + 'alms/' + self.alm_sn + '/predictive/nextcutting?last=YYYY-MM-DDTHH:MM:SS%2BHH:MM',
             self.context_id, 10)
-        if next_time == False:
+        if not next_time:
             self.logger.error("Error getting next smartmow time")
         else:
             self.logger.debug("Next time raw" + str(next_time))
@@ -459,7 +459,7 @@ class Indego(SmartPlugin):
     def alert(self):
         self.logger.debug("ÄLÄRMCHEN START")
         alert_response = self.get_url(self.indego_url + 'alerts', self.context_id, 10)
-        if alert_response == False:
+        if not alert_response:
             self.logger.debug("No Alert or error")
             self.alert_reset = False
         else:
@@ -526,7 +526,7 @@ class Indego(SmartPlugin):
     def device_data(self):
         self.logger.debug('device_date')
         device_data_response = self.get_url(self.indego_url + 'alms/' + self.alm_sn, self.context_id)
-        if device_data_response == False:
+        if not device_data_response:
             self.logger.error('Device Data disconnected')
         else:
             self.logger.debug('device data RAW: ' + str(device_data_response))
@@ -600,7 +600,7 @@ class Indego(SmartPlugin):
         #	self.set_childitem('online',False)
         #	self.auth()
 
-        if state_response != False:
+        if state_response:
             state_response = state_response.decode(encoding='UTF-8', errors='ignore')
             self.set_childitem('online', True)
             self.logger.debug("indego state received " + str(state_response))
@@ -645,7 +645,7 @@ class Indego(SmartPlugin):
                 self.set_childitem('moving', False)
                 self.set_childitem('pause', False)
                 self.set_childitem('help', True)
-                if self.alert_reset == True:
+                if self.alert_reset:
                     self.logger.debug("Alert aufgefrufen, self_alert_reset = True")
                     self.alert()
                 else:
@@ -717,7 +717,7 @@ class Indego(SmartPlugin):
             if map_update:
                 self.logger.debug('lade neue Karte')
                 garden = self.get_url(self.indego_url + 'alms/' + self.alm_sn + '/map', self.context_id, 120)
-                if garden == False:
+                if not garden:
                     self.logger.warning('Map returned false')
                 else:
                     with open(self.img_pfad, 'wb') as outfile:
@@ -736,12 +736,12 @@ class Indego(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 

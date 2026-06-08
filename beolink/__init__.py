@@ -29,7 +29,7 @@ from lib.module import Modules
 from lib.model.smartplugin import SmartPlugin
 
 from .webif import WebInterface
-from .beodevices import *
+from .beodevices import BeoDevices, os
 import plugins.beolink.beonotifications as beonotify
 
 # If a needed package is imported, which might be not installed in the Python environment,
@@ -61,7 +61,7 @@ class BeoNetlink(SmartPlugin):
 
         # Call init code of parent class (MqttPlugin)
         super().__init__()
-        if self._init_complete == False:
+        if not self._init_complete:
             return
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
@@ -214,7 +214,7 @@ class BeoNetlink(SmartPlugin):
 
                 beo_id = self.get_iattr_value(item.conf, 'beo_id').upper()
                 beo_command = self.get_iattr_value(item.conf, 'beo_command').lower()
-                value = item()
+                item()
                 if beo_command == 'muted':
                     self.beodevices.set_speaker_muted(beo_id, item())
                     api_url = ''
@@ -317,7 +317,7 @@ class BeoNetlink(SmartPlugin):
                     item(beo_value, self.get_shortname())
                     self._update_item_values(item, beo_value)
             else:
-                self.logger.info(f"poll_device: No beo_status")
+                self.logger.info("poll_device: No beo_status")
         return
 
 

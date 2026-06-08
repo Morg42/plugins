@@ -26,7 +26,7 @@ import uuid
 
 
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import Modules, SmartPlugin, SmartPluginWebIf
 from lib.item import Items
 from lib.shtime import Shtime
 import logging
@@ -58,7 +58,7 @@ class protocoll(object):
     
     def addEntry(self,type, _text ):
         myLog = self.log
-        if (myLog == None):
+        if (myLog is None):
             return
         try:
             if len (myLog) >= 500:
@@ -246,7 +246,7 @@ class Alexa4P3(SmartPlugin):
                         device.proxied_Urls['alexa_proxy_url-{}'.format(i)] = myProxiedurl
                         myNewEntry='alexa_proxy_url-{}'.format(i)
                         item.conf[myNewEntry]=myProxiedurl
-                except Exception as e:
+                except Exception:
                     self.logger.debug("Alexa4P3: {}-wrong Stream Settings = {}".format(item.property.path, camera_uri))
             i +=1    
         
@@ -281,13 +281,13 @@ class Alexa4P3(SmartPlugin):
         
         
         if 'alexa_thermo_config' in item.conf:
-            thermo_config = item.conf['alexa_thermo_config']
+            item.conf['alexa_thermo_config']
             device.thermo_config =item.conf['alexa_thermo_config']
             self.logger.debug("Alexa4P3: {}-Thermo-Config = {}".format(item.property.path, device.thermo_config))
         # Icon for Alexa-App - default = SWITCH
         if 'alexa_icon' in item.conf:
             icon = item.conf['alexa_icon']
-            if not icon in str(device.icon):
+            if icon not in str(device.icon):
                 device.icon.append(icon)
                 self.logger.debug("Alexa4P3: {}-added alexa_icon = {}".format(item.property.path, device.icon))
         # allows to get status of ITEM, default = false
@@ -307,8 +307,8 @@ class Alexa4P3(SmartPlugin):
         if action_names:
             for action_name in action_names:
                 device.register(action_name, item)
-            self.logger.info("Alexa: {} supports {} as device {}".format(item.property.path, action_names, device_id, device.supported_actions()))
-            self._proto.addEntry('INFO   ', "Alexa: {} supports {} as device {}".format(item.property.path, action_names, device_id, device.supported_actions()))
+            self.logger.info("Alexa: {} supports {} as device {}".format(item.property.path, action_names, device_id, ))
+            self._proto.addEntry('INFO   ', "Alexa: {} supports {} as device {}".format(item.property.path, action_names, device_id, ))
 
         return None
 
@@ -344,7 +344,7 @@ class Alexa4P3(SmartPlugin):
         myJson          = ''
         retJson         = {}
         
-        if path==None:
+        if path is None:
             path=self.sh.get_basedir()+"/plugins/alexa4p3/directives/"
             
         try:
@@ -387,7 +387,7 @@ class Alexa4P3(SmartPlugin):
 
     def check_json(self,payload):
         try:
-            myDump = json.loads(payload)
+            json.loads(payload)
             return 'Json OK'
         except Exception as err:
             return 'Json - Not OK - '+ err.args[0]
@@ -477,11 +477,11 @@ class Alexa4P3(SmartPlugin):
         
         
     def save_cmd_let(self,name,description,payload,ApiURL,path=None):
-        if path==None:
+        if path is None:
             path=self.sh.get_basedir()+"/plugins/alexa4p3/directives/"
         
         result = ""
-        mydummy = ApiURL[0:1]
+        ApiURL[0:1]
         if (ApiURL[0:1] != "/"):
             ApiURL = "/"+ApiURL
             
@@ -535,12 +535,11 @@ class Alexa4P3(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
-        import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 
@@ -614,7 +613,7 @@ class WebInterface(SmartPluginWebIf):
             newEntry['Actions']=newEntry['Actions'][:-2]
             newEntry['Items'] = ""
             for action_items in device.action_items:
-                if not str(device.action_items[action_items][0]) in newEntry['Items']:
+                if str(device.action_items[action_items][0]) not in newEntry['Items']:
                     newEntry['Items'] +=str(device.action_items[action_items][0])+ ' / ' 
             newEntry['Items']=newEntry['Items'][:-2]
             newEntry['DeviceID']=device.id

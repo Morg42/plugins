@@ -28,7 +28,7 @@ import time
 import colorsys
 
 from lib.module import Modules
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 
 MILIGHT_SW          = 'milight_sw'
 MILIGHT_DIM         = 'milight_dim'
@@ -249,7 +249,6 @@ class Milight(SmartPlugin):
 
     # disco function  - 2nd command after switch (on)
     def disco(self, group, value):
-        value = 1                     # Avoid switch off
         self.logger.info("disco")
         time.sleep(0.1)               # wait 100 ms
 
@@ -259,7 +258,6 @@ class Milight(SmartPlugin):
         
     # disco speed up  - 2nd command after switch (on)
     def disco_up(self, group, value):
-        value = 1                      # Avoid switch off
         self.logger.info("disco up")
         time.sleep(0.1)               # wait 100 ms
 
@@ -269,7 +267,6 @@ class Milight(SmartPlugin):
         
     # disco speed down - 2nd command after switch (on)
     def disco_down(self, group, value):
-        value = 1
         self.logger.info("disco down")      # Avoid switch off
 
         time.sleep(0.1)               # wait 100 ms
@@ -437,12 +434,12 @@ class Milight(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 

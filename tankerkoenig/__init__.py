@@ -267,7 +267,7 @@ class TankerKoenig(SmartPlugin):
         """
         _station_id_prices = self._request_station_prices(station_ids)
         if _station_id_prices is None:
-            self.logger.notice(f"get_petrol_station_prices: self._request_station_prices(station_ids) returned invalid result")
+            self.logger.notice("get_petrol_station_prices: self._request_station_prices(station_ids) returned invalid result")
             return {}
         _price_dict = _station_id_prices.get('prices', None)
         for station_id in station_ids:

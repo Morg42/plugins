@@ -549,9 +549,9 @@ class MPD(SmartPlugin):
                 self.logger.debug(f"send {command} to MPD")
                 self._client.send((command + '\n').encode())
                 if wait:
-                    self.logger.debug(f"waiting for reply")
+                    self.logger.debug("waiting for reply")
                     self._reply_lock.wait(1)
-                    self.logger.debug(f"waiting for reply done")
+                    self.logger.debug("waiting for reply done")
             reply = self._reply
             self._reply = {}
 

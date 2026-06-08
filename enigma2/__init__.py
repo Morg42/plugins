@@ -28,7 +28,7 @@ from xml.dom import minidom
 import requests
 from requests.packages import urllib3
 from requests.auth import HTTPBasicAuth
-from lib.model.smartplugin import *
+from lib.model.smartplugin import Modules, SmartPlugin, SmartPluginWebIf
 
 
 class Enigma2Device:
@@ -225,7 +225,7 @@ class Enigma2(SmartPlugin):
                 return
             if self.get_iattr_value(item.conf, 'enigma2_data_type') in self._key_event_information:
                 self._update_event_items(cache, fast)
-            elif not self.get_iattr_value(item.conf, 'enigma2_page') is None:
+            elif self.get_iattr_value(item.conf, 'enigma2_page') is not None:
                 self._update(item, fast)
             elif self.get_iattr_value(item.conf, 'enigma2_data_type') == 'current_volume':
                 self._update_volume(item, cache, fast)
@@ -314,7 +314,7 @@ class Enigma2(SmartPlugin):
         e2result_xml = xml.getElementsByTagName('e2result')
         e2resulttext_xml = xml.getElementsByTagName('e2resulttext')
         if len(e2resulttext_xml) > 0 and len(e2result_xml) > 0:
-            if not e2resulttext_xml[0].firstChild is None and not e2result_xml[0].firstChild is None:
+            if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
                 if e2result_xml[0].firstChild.data == 'True':
                     self.logger.debug(e2resulttext_xml[0].firstChild.data)
 
@@ -373,7 +373,7 @@ class Enigma2(SmartPlugin):
         e2state_xml = xml.getElementsByTagName('e2state')
         e2statetext_xml = xml.getElementsByTagName('e2statetext')
         if (len(e2statetext_xml) > 0 and len(e2state_xml) > 0):
-            if not e2statetext_xml[0].firstChild is None and not e2state_xml[0].firstChild is None:
+            if e2statetext_xml[0].firstChild is not None and e2state_xml[0].firstChild is not None:
                 if e2state_xml[0].firstChild.data == 'True':
                     self.logger.debug(e2statetext_xml[0].firstChild.data)
 
@@ -388,7 +388,7 @@ class Enigma2(SmartPlugin):
         e2result_xml = xml.getElementsByTagName('e2result')
         e2resulttext_xml = xml.getElementsByTagName('e2resulttext')
         if len(e2resulttext_xml) > 0 and len(e2result_xml) > 0:
-            if not e2resulttext_xml[0].firstChild is None and not e2result_xml[0].firstChild is None:
+            if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
                 if e2result_xml[0].firstChild.data == 'True':
                     self.logger.debug(e2resulttext_xml[0].firstChild.data)
 
@@ -409,7 +409,7 @@ class Enigma2(SmartPlugin):
         e2result_xml = xml.getElementsByTagName('e2result')
         e2resulttext_xml = xml.getElementsByTagName('e2resulttext')
         if len(e2resulttext_xml) > 0 and len(e2result_xml) > 0:
-            if not e2resulttext_xml[0].firstChild is None and not e2result_xml[0].firstChild is None:
+            if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
                 if e2result_xml[0].firstChild.data == 'True':
                     self.logger.debug(e2resulttext_xml[0].firstChild.data)
 
@@ -427,7 +427,7 @@ class Enigma2(SmartPlugin):
         e2result_xml = xml.getElementsByTagName('e2result')
         e2resulttext_xml = xml.getElementsByTagName('e2resulttext')
         if len(e2resulttext_xml) > 0 and len(e2result_xml) > 0:
-            if not e2resulttext_xml[0].firstChild is None and not e2result_xml[0].firstChild is None:
+            if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
                 if e2result_xml[0].firstChild.data == 'True':
                     self.logger.debug(e2resulttext_xml[0].firstChild.data)
 
@@ -440,7 +440,7 @@ class Enigma2(SmartPlugin):
         e2result_xml = xml.getElementsByTagName('e2state')
         e2resulttext_xml = xml.getElementsByTagName('e2statetext')
         if (len(e2resulttext_xml) > 0 and len(e2result_xml) > 0):
-            if not e2resulttext_xml[0].firstChild is None and not e2result_xml[0].firstChild is None:
+            if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
                 self.logger.debug(e2resulttext_xml[0].firstChild.data)
                 if e2result_xml[0].firstChild.data == 'True':
                     return e2resulttext_xml[0].firstChild.data
@@ -580,11 +580,11 @@ class Enigma2(SmartPlugin):
         if (len(element_xml) > 0):
             # self.logger.debug(element_xml[0].firstChild.data)
             if item.type() == 'bool':
-                if not element_xml[0].firstChild is None:
+                if element_xml[0].firstChild is not None:
                     boolVal = self.to_bool(element_xml[0].firstChild.data.rstrip().lstrip())
                     item(boolVal)
             elif item.type() == 'num':
-                if not element_xml[0].firstChild is None:
+                if element_xml[0].firstChild is not None:
                     if self.is_int(element_xml[0].firstChild.data):
                         item(int(element_xml[0].firstChild.data))
                     elif self.is_float(element_xml[0].firstChild.data):
@@ -597,7 +597,7 @@ class Enigma2(SmartPlugin):
                 else:
                     item(0)  # 0 if no value is provided
             else:
-                if not element_xml[0].firstChild is None:
+                if element_xml[0].firstChild is not None:
                     if element_xml[0].firstChild.data == "N/A":
                         item("-")
                     else:
@@ -637,7 +637,7 @@ class Enigma2(SmartPlugin):
         data = None
         xml = node.getElementsByTagName(tag_name)
         if (len(xml) > 0):
-            if not xml[0].firstChild is None:
+            if xml[0].firstChild is not None:
                 data = xml[0].firstChild.data
         return data
 
@@ -655,7 +655,7 @@ class Enigma2(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))
             return False
 

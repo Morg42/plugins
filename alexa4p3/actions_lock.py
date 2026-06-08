@@ -10,7 +10,7 @@ def get_lock_state(self, payload):
     current_lock_state = None
     for item in items:
         locked, unlocked = self.item_range(item, DEFAULT_RANGE)
-        self.logger.info("Alexa: getLockState({})".format(item.property.path, on))
+        self.logger.info("Alexa: getLockState({})".format(item.property.path, ))
         current_lock_state = 'LOCKED' if item() == locked else 'UNLOCKED'
 
     return self.respond({

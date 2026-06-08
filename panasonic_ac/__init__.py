@@ -122,7 +122,7 @@ class PanComfortCloud(SmartPlugin):
 
         self.pcc_readdevicelist()
         for idx, device in enumerate(self._devices):
-            index = idx + 1
+            idx + 1
             self.poll_device()
             #self.logger.notice(f"- Device {index} status: {self._devices[str(index)]['parameters']}")
 
@@ -188,7 +188,7 @@ class PanComfortCloud(SmartPlugin):
             auth.login()
         except Exception as ex:
             self.logger.notice(f"Exception on auth.login: {ex}")
-            self.logger.notice(f"Retrying login without old token")
+            self.logger.notice("Retrying login without old token")
             json_token = None
             auth = pcomfortcloud.Authentication(
                 self._username, self._password,

@@ -28,7 +28,7 @@ import socket
 import threading
 import time
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 
 
 class eBus(SmartPlugin):
@@ -62,7 +62,7 @@ class eBus(SmartPlugin):
         # Call init code of parent class (SmartPlugin)
         super().__init__()
 
-        logger = logging.getLogger(__name__)   # remove for shNG v1.6
+        logging.getLogger(__name__)   # remove for shNG v1.6
         self.host = self.get_parameter_value('host')
         self.port = self.get_parameter_value('port')
         self._cycle = self.get_parameter_value('cycle')
@@ -97,7 +97,7 @@ class eBus(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called".format(self.get_fullname()))
+        self.logger.debug("Run method called")
         self.alive = True
         self.scheduler_add(self.get_fullname(), self.refresh, prio=5, cycle=self._cycle, offset=2)
 
@@ -205,7 +205,7 @@ class eBus(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called".format(self.get_fullname()))
+        self.logger.debug("Stop method called")
         self.close()
         self.scheduler_remove(self.get_fullname())
         self.alive = False

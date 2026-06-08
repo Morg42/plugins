@@ -177,7 +177,7 @@ class piusv(SmartPlugin):
             if self.has_iattr(item.conf, 'piusv_sys'):
                 self.logger.debug(f"update_item was called with item {item.property.path} from caller {caller}, source {source} and dest {dest}")
                 if self.get_iattr_value(item.conf, 'piusv_sys') == 'update' and bool(item()):
-                    self.logger.info(f"Update of all items of piusv Plugin requested. ")
+                    self.logger.info("Update of all items of piusv Plugin requested. ")
                     self.poll_device()
                     item(False)
             pass

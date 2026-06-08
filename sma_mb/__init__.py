@@ -187,7 +187,7 @@ class SMAModbus(SmartPlugin):
         This method is called by the scheduler which is set within run() method.
         """
         if self.lock.locked():
-            self.logger.error(f"poll_device already called and not ready for next poll - please adjust cycle or crontab")
+            self.logger.error("poll_device already called and not ready for next poll - please adjust cycle or crontab")
             return
 
         with self.lock:

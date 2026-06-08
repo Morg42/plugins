@@ -24,7 +24,7 @@ import logging
 from miflora.miflora_poller import MiFloraPoller, \
     MI_CONDUCTIVITY, MI_MOISTURE, MI_LIGHT, MI_TEMPERATURE, MI_BATTERY
 from btlewrap import available_backends, BluepyBackend, GatttoolBackend, PygattBackend
-from lib.model.smartplugin import *
+from lib.model.smartplugin import Modules, SmartPlugin, SmartPluginWebIf
 
 class Miflora(SmartPlugin):
     PLUGIN_VERSION = "1.6.2"
@@ -111,7 +111,7 @@ class Miflora(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))
             return False
 

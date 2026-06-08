@@ -133,7 +133,7 @@ class RPi_Info(SmartPlugin):
             if self.has_iattr(item.conf, 'rpiinfo_sys'):
                 self.logger.debug(f"update_item was called with item {item.property.path} from caller {caller}, source {source} and dest {dest}")
                 if self.get_iattr_value(item.conf, 'rpiinfo_sys') == 'update' and bool(item()):
-                    self.logger.info(f"Update of all items of RPi_Info Plugin requested. ")
+                    self.logger.info("Update of all items of RPi_Info Plugin requested. ")
                     self.poll_device()
                     item(False)
             pass

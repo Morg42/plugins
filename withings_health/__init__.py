@@ -133,7 +133,7 @@ class WithingsHealth(SmartPlugin):
                         consumer_secret=self._consumer_secret)
                     try:
                         self._client = WithingsApi(self._creds, refresh_cb=self._store_tokens)
-                    except Exception as e:
+                    except Exception:
                         self.logger.error("Client can not be initialized.")
                 else:
                     self.logger.error(

@@ -176,17 +176,17 @@ class WebInterface(SmartPluginWebIf):
 
     @cherrypy.expose
     def recalc_all(self):
-        self.logger.debug(f"recalc_all called")
+        self.logger.debug("recalc_all called")
         self.plugin.execute_items('all')
 
     @cherrypy.expose
     def clean_cache_dicts(self):
-        self.logger.debug(f"_clean_cache_dicts called")
+        self.logger.debug("_clean_cache_dicts called")
         self.plugin._init_cache_dicts()
 
     @cherrypy.expose
     def clear_queue(self):
-        self.logger.debug(f"_clear_queue called")
+        self.logger.debug("_clear_queue called")
         self.plugin._clear_queue()
 
     @cherrypy.expose

@@ -33,7 +33,7 @@ from garminconnect import (
     GarminConnectAuthenticationError,
 )
 from enum import Enum, auto
-from lib.model.smartplugin import *
+from lib.model.smartplugin import Modules, Shtime, SmartPlugin, SmartPluginWebIf
 
 class GarminConnect(SmartPlugin):
     """
@@ -118,7 +118,7 @@ class GarminConnect(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Plugin '{}': Not initializing the web interface".format(self.get_shortname()))
             return False
 
@@ -149,7 +149,6 @@ class GarminConnect(SmartPlugin):
 # ------------------------------------------
 
 import cherrypy
-import json
 from jinja2 import Environment, FileSystemLoader
 
 

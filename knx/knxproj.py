@@ -241,7 +241,7 @@ def _parse_knxproject(filename, password=None):
             try:
                 xmlfile = subproject.open(file.filename, pwd=password)
                 xmldict = xmltodict.parse(xmlfile.read())
-            except (RuntimeError, ValueError) as known_exception:
+            except (RuntimeError, ValueError):
                 logger.error(f"provided password does not work to open {file.filename}")
             except Exception as ex:
                 logger.error(f"Error {ex}: could not open {file.filename} and read project file")

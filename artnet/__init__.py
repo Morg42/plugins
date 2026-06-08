@@ -27,7 +27,7 @@ import logging
 import socket
 import struct
 
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.module import Modules
 from .webif import WebInterface
 

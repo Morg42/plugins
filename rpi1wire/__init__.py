@@ -205,7 +205,7 @@ class Rpi1Wire(SmartPlugin):
         """
         Search for connected sensors and insert into self.sensors, self.values and self._sensordata
         """
-        self.logger.debug(f"get_sensors called to read directory for new onewire data.")
+        self.logger.debug("get_sensors called to read directory for new onewire data.")
         objects = self.folder_objects(self.dirname)
         if objects:
             # walking through the path objects

@@ -39,7 +39,7 @@ class Snmp(SmartPlugin):
     ALLOW_MULTIINSTANCE = True
     PLUGIN_VERSION = '1.6.1'
 
-    _flip = {0: '1', False: '1', 1: '0', True: '0', '0': True, '1': False}
+    _flip = {0: '1', 1: '0', '0': True, '1': False}
 
     _supported = {
         'value': 'Value',                    # Wert wird erwartet
@@ -55,7 +55,6 @@ class Snmp(SmartPlugin):
         Initalizes the plugin. The parameters describe for this method are pulled from the entry in plugin.conf.
         """
 
-        from bin.smarthome import VERSION
         if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
             self.logger = logging.getLogger(__name__)
 
@@ -138,7 +137,7 @@ class Snmp(SmartPlugin):
 
         for oid in self._items:
             if not self.alive:
-                self.logger.debug("Self not alive".format(oid))
+                self.logger.debug("Self not alive")
                 break
             for prop in self._items[oid]:
                 item = self._items[oid][prop]['item']
@@ -306,12 +305,12 @@ class Snmp(SmartPlugin):
                 'http')  # try/except to handle running in a core version that does not support modules
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 
@@ -387,7 +386,7 @@ class WebInterface(SmartPluginWebIf):
         """
         if dataSet is None:
             # get the new data
-            data = {}
+            pass
 
             # data['item'] = {}
             # for i in self.plugin.items:

@@ -60,7 +60,7 @@ class BaseScheduler:
 
     def remove(self, key, callback=None):
         with self._lock:
-            removed = (
+            (
                 self._scheduled.pop(key, None) is not None
                 or self._pending.pop(key, None) is not None
             )

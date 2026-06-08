@@ -71,7 +71,7 @@ class Executor(SmartPlugin):
 
         # no start without web interface
         if not self.init_webinterface():
-            self.logger.warning(f"could not init webinterface")
+            self.logger.warning("could not init webinterface")
             return
 
         self.logger.debug("init done")
@@ -113,12 +113,12 @@ class Executor(SmartPlugin):
             self.mod_http = Modules.get_instance().get_module('http')
         except:
             self.mod_http = None
-        if self.mod_http == None:
+        if self.mod_http is None:
             self.logger.error("Not initializing the web interface")
             return False
 
         import sys
-        if not "SmartPluginWebIf" in list(sys.modules['lib.model.smartplugin'].__dict__):
+        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.9 and up. Not initializing the web interface")
             return False
 

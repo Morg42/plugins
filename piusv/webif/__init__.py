@@ -115,10 +115,10 @@ class WebInterface(SmartPluginWebIf):
 
     @cherrypy.expose
     def activate(self):
-        self.logger.debug(f"active called")
+        self.logger.debug("active called")
         self.plugin.suspend(False)
 
     @cherrypy.expose
     def suspend(self):
-        self.logger.debug(f"suspend called")
+        self.logger.debug("suspend called")
         self.plugin.suspend(True)
