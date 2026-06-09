@@ -1350,7 +1350,8 @@ class SeActionSpecial(SeActionBase):
         # determine remaining suspend time and write to variable item.suspend_remaining
         suspend_time = self._abitem.get_variable("item.suspend_time")
         suspend_over = suspend_item.property.last_change_age
-        suspend_remaining = int(suspend_time - suspend_over + 0.5)   # adding 0.5 causes round up ...
+        suspend_remaining = max(-1, int(suspend_time - suspend_over + 0.5)) # adding 0.5 causes round up ...
+
         self._abitem.set_variable("item.suspend_remaining", suspend_remaining)
         self._log_debug("Updated variable 'item.suspend_remaining' to {0}", suspend_remaining)
         self._action_status = _issue
