@@ -1881,7 +1881,7 @@ class SeItem:
                         _converted_typelist.append(_returntype[i])
                     else:
                         _returnvalue_issue = "Found invalid definition in se_released_by attribute " \
-                                             "of state {}, original {}.".format(state.id, original_value)
+                                             "of state {}: {}, original {}.".format(state.id, v, original_value)
                         self.__logger.warning("{} Removing it.", _returnvalue_issue)
                 _converted_evaluatedlist.append(v_list)
             except Exception as ex:
