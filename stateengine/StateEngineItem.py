@@ -1463,19 +1463,19 @@ class SeItem:
     def __update_check_can_enter(self, state, instant_leaveaction, refill=True):
         try:
             wasreleasedby = state.was_releasedby.id
-        except:
+        except Exception:
             wasreleasedby = state.was_releasedby
         try:
             iscopyfor = state.is_copy_for.id
-        except:
+        except Exception:
             iscopyfor = state.is_copy_for
         try:
             hasreleased = state.has_released.id
-        except:
+        except Exception:
             hasreleased = state.has_released
         try:
             canrelease = state.can_release.id
-        except:
+        except Exception:
             canrelease = state.can_release
         try:
             self.__variables["release.can_release"] = canrelease
@@ -1881,7 +1881,7 @@ class SeItem:
                         _converted_typelist.append(_returntype[i])
                     else:
                         _returnvalue_issue = "Found invalid definition in se_released_by attribute " \
-                                             "of state {}, original {}.".format(state.id, v, original_value)
+                                             "of state {}: {}, original {}.".format(state.id, v, original_value)
                         self.__logger.warning("{} Removing it.", _returnvalue_issue)
                 _converted_evaluatedlist.append(v_list)
             except Exception as ex:

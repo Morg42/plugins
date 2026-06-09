@@ -32,7 +32,7 @@ from . import StateEngineStructs
 import logging
 import os
 import copy
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 from .webif import WebInterface
 from datetime import datetime
@@ -60,7 +60,7 @@ class StateEngine(SmartPlugin):
         self.__cli = None
         self.vis_enabled = self._test_visualization()
         if not self.vis_enabled:
-            self.logger.warning(f'StateEngine is missing the PyDotPlus package or GraphViz, WebIf visualization is disabled')
+            self.logger.warning('StateEngine is missing the PyDotPlus package or GraphViz, WebIf visualization is disabled')
         self.init_webinterface(WebInterface)
         self.__sh.stateengine_plugin_functions = StateEngineFunctions.SeFunctions(self.__sh, self.logger)
         try:
