@@ -517,7 +517,7 @@ class SeCondition(StateEngineTools.SeItemChild):
                 self.__value.set_cast(StateEngineTools.cast_str)
                 convert_value = StateEngineTools.cast_str(convert_value)
                 convert_current = StateEngineTools.cast_str(convert_current)
-            if not type(_oldvalue) is type(convert_value):
+            if type(_oldvalue) is not type(convert_value):
                 self._log_debug("Value {} was type {} and therefore not the same"
                                 " type as item value {}. It got converted to {}.",
                                 _oldvalue, type(_oldvalue), convert_current, type(convert_value))
