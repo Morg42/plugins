@@ -101,10 +101,9 @@ class TestDelayedExecuteQueueArity(unittest.TestCase):
     @unittest.expectedFailure
     def test_with_state_none_puts_11_items(self):
         """
-        state=None → currently puts 10 items (BUG).
-        This test is written for the FIXED behaviour (11 items).
-        It will FAIL against unpatched code (marked expectedFailure) and
-        must be un-decorated (or the decorator removed) once the bug is fixed.
+        state=None → currently puts 10 items (BUG — still present after upstream merge).
+        run_queue() unpacks 11; the else-branch in _delayed_execute omits state.
+        Written for the fixed behaviour; xfail until the bug is addressed.
         """
         self.action._delayed_execute(
             actionname="Action 'test_action'",
