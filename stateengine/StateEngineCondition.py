@@ -860,13 +860,11 @@ class SeCondition(StateEngineTools.SeItemChild):
     def __get_current(self, eval_type='value'):
         def check_eval(eval_or_status_eval):
             if isinstance(eval_or_status_eval, str):
-                # noinspection PyUnusedLocal
-                # noinspection PyUnusedLocal
+                _eval_ns = {'sh': self._sh, 'shtime': self._shtime, '__builtins__': __builtins__}
                 if "stateengine_eval" in eval_or_status_eval or "se_eval" in eval_or_status_eval:
-                    # noinspection PyUnusedLocal
-                    StateEngineEval.SeEval(self._abitem)
+                    _eval_ns['stateengine_eval'] = _eval_ns['se_eval'] = StateEngineEval.SeEval(self._abitem)
                 try:
-                    eval_result = eval(eval_or_status_eval)
+                    eval_result = eval(eval_or_status_eval, _eval_ns)
                     if isinstance(eval_result, self.__itemClass):
                         value = eval_result.property.last_change_age if eval_type == 'age' else \
                             eval_result.property.last_change_by if eval_type == 'changedby' else \

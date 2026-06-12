@@ -277,7 +277,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
             #self._log_develop("Get item from eval on {} {}", self._function, check_item)
             if "stateengine_eval" in check_item or "se_eval" in check_item:
                 # noinspection PyUnusedLocal
-                StateEngineEval.SeEval(self._abitem)
+                stateengine_eval = se_eval = StateEngineEval.SeEval(self._abitem)  # noqa: F841  # eval setup
             try:
                 item = check_item.replace('sh', 'self._sh')
                 item = item.replace('shtime', 'self._shtime')
@@ -1189,16 +1189,15 @@ class SeActionRun(SeActionBase):
         self._log_increase_indent()
         eval_result = ''
         if isinstance(self.__eval, str):
-            # noinspection PyUnusedLocal
+            _eval_ns = {'sh': self._sh, 'shtime': self._shtime, '__builtins__': __builtins__}
             if "stateengine_eval" in self.__eval or "se_eval" in self.__eval:
-                # noinspection PyUnusedLocal
-                StateEngineEval.SeEval(self._abitem)
+                _eval_ns['stateengine_eval'] = _eval_ns['se_eval'] = StateEngineEval.SeEval(self._abitem)
             try:
                 if returnvalue:
                     self._log_decrease_indent()
-                    return eval(self.__eval)
+                    return eval(self.__eval, _eval_ns)
                 log_conditions()
-                eval_result = eval(self.__eval)
+                eval_result = eval(self.__eval, _eval_ns)
                 self.update_webif_actionstatus(state, self._name, 'True')
                 self._log_decrease_indent()
             except Exception as ex:

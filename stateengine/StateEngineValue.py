@@ -875,8 +875,7 @@ class SeValue(StateEngineTools.SeItemChild):
 
     # Determine value by executing eval-function
     def __get_eval(self, eval_get=None):
-        # noinspection PyUnusedLocal
-        # noinspection PyUnusedLocal
+        _eval_ns = {'sh': self._sh, 'shtime': self._shtime, '__builtins__': __builtins__}
         patterns = [
             "get_variable('current.",
             'get_variable("current.',
@@ -893,8 +892,7 @@ class SeValue(StateEngineTools.SeItemChild):
             else:
                 eval_get = StateEngineTools.parse_relative(eval_get, 'sh.', ['()', '.property.'])
             if "stateengine_eval" in eval_get or "se_eval" in eval_get:
-                # noinspection PyUnusedLocal
-                StateEngineEval.SeEval(self._abitem)
+                _eval_ns['stateengine_eval'] = _eval_ns['se_eval'] = StateEngineEval.SeEval(self._abitem)
             self._log_debug("Checking eval: {0}", eval_get)
             if eval_get in self._abitem.cache:
                 self._log_increase_indent()
@@ -906,7 +904,7 @@ class SeValue(StateEngineTools.SeItemChild):
                 return result
             self._log_increase_indent()
             try:
-                _newvalue, _issue = self.__do_cast(eval(eval_get))
+                _newvalue, _issue = self.__do_cast(eval(eval_get, _eval_ns))
                 _issue_dict = {StateEngineTools.get_eval_name(eval_get): _issue}
                 if _issue not in [[], None, [None]] and _issue_dict not in self.__get_issues['eval']:
                     self.__get_issues['eval'].append(_issue_dict)
@@ -950,10 +948,9 @@ class SeValue(StateEngineTools.SeItemChild):
                         continue
                     if isinstance(val, str):
                         if "stateengine_eval" in val or "se_eval" in val:
-                            # noinspection PyUnusedLocal
-                            StateEngineEval.SeEval(self._abitem)
+                            _eval_ns['stateengine_eval'] = _eval_ns['se_eval'] = StateEngineEval.SeEval(self._abitem)
                         try:
-                            _newvalue, _issue = self.__do_cast(eval(val))
+                            _newvalue, _issue = self.__do_cast(eval(val, _eval_ns))
                             _issue_dict = {val: _issue}
                             if _issue not in [[], None, [None]] and _issue_dict not in self.__get_issues['eval']:
                                 self.__get_issues['eval'].append(_issue_dict)
