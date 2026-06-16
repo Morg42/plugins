@@ -404,9 +404,9 @@ class UZSU(SmartPlugin):
             items_to_change = [item]
         if isinstance(set, str):
             if set.lower() in ['1', 'yes', 'true', 'on']:
-                reset = True
+                set = True
             elif set.lower() in ['0', 'no', 'false', 'off']:
-                reset = False
+                set = False
             else:
                 self.logger.warning(f'Value to reset activeToday of item "{item}" has to be boolean.')
         if isinstance(set, bool):
