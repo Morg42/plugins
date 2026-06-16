@@ -1023,7 +1023,7 @@ class SeActionTrigger(SeActionBase):
         self._log_develop('Completing action {}, action type {}, state {}', self._name, self._action_type, self._state)
         self._abitem.set_variable('current.action_name', self._name)
         self._abitem.set_variable('current.state_name', self._state.name)
-        delay = 0 if self._delay.is_empty() else self._delay.get()
+        # delay = 0 if self._delay.is_empty() else self._delay.get()
         self._scheduler_name = "{}-SeLogicDelayTimer".format(self.__logic)
         _issue = {self._name: {'issue': None, 'logic': self.__logic,
                                'issueorigin': [{'state': self._state.id, 'action': self._function}]}}

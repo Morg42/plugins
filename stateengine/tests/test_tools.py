@@ -119,7 +119,8 @@ class TestGetOriginalCaller(unittest.TestCase):
 
     def test_single_eval_hop_resolved(self):
         """Eval:knx with source item that has last_update_by='knx:item.path'."""
-        src = self._add_item('room.light', last_update_by='knx:bus.path')
+        # src = 
+        self._add_item('room.light', last_update_by='knx:bus.path')
         caller, source = StateEngineTools.get_original_caller(
             self.sh, self.elog, 'Eval:trigger', 'room.light')
         self.assertEqual(caller, 'knx')
