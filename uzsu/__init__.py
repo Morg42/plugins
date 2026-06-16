@@ -1219,7 +1219,7 @@ class UZSU(SmartPlugin):
                         int(mydict['series']['timeSeriesIntervall'].split(":")[1])
                     exceptions = 0
                     for day in list(rrule):
-                        if not mydays[day.weekday()] in mydict['rrule']:
+                        if mydays[day.weekday()] not in mydict['rrule']:
                             continue
                         myrulenext = f'FREQ=MINUTELY;COUNT={daycount};INTERVAL={interval}'
 
