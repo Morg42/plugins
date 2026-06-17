@@ -25,7 +25,7 @@ import builtins
 import os
 import sys
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     builtins.SDP_standalone = True
 
     class SmartPlugin:
@@ -53,7 +53,7 @@ from lib.model.smartdeviceplugin import SmartDevicePlugin, Standalone
 class epson(SmartDevicePlugin):
     """Device class for Epson projectors."""
 
-    PLUGIN_VERSION = "1.0.0"
+    PLUGIN_VERSION = '1.0.0'
 
     def _set_device_defaults(self):
 
@@ -61,18 +61,18 @@ class epson(SmartDevicePlugin):
             self._parameters[PLUGIN_ATTR_CONNECTION] = CONN_SER_ASYNC
         else:
             self.logger.error(
-                "No serialport set, connection not possible. Using dummy connection, plugin will not work"
+                'No serialport set, connection not possible. Using dummy connection, plugin will not work'
             )
             self._parameters[PLUGIN_ATTR_CONNECTION] = CONN_NULL
 
         b = self._parameters[PLUGIN_ATTR_CONN_TERMINATOR].encode()
-        b = b.decode("unicode-escape").encode()
+        b = b.decode('unicode-escape').encode()
         self._parameters[PLUGIN_ATTR_CONN_TERMINATOR] = b
 
     def _transform_send_data(self, data=None, **kwargs):
         if isinstance(data, dict):
-            data["limit_response"] = self._parameters[PLUGIN_ATTR_CONN_TERMINATOR]
-            data["payload"] = f"{data.get('payload', '')}{data['limit_response'].decode('unicode-escape')}"
+            data['limit_response'] = self._parameters[PLUGIN_ATTR_CONN_TERMINATOR]
+            data['payload'] = f'{data.get("payload", "")}{data["limit_response"].decode("unicode-escape")}'
         return data
 
     def on_data_received(self, by, data, command=None):
@@ -124,5 +124,5 @@ class epson(SmartDevicePlugin):
             self._process_additional_data(base_command, data, value, custom, by)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     s = Standalone(epson, sys.argv[0])

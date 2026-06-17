@@ -128,9 +128,9 @@ from decimal import Decimal, ROUND_DOWN
 
 # import random    # only for internal test [TEST]
 
-byd_ip_default = "192.168.16.254"
+byd_ip_default = '192.168.16.254'
 
-scheduler_name = "byd_bat"
+scheduler_name = 'byd_bat'
 
 byd_sample_basics = 60  # Abfrage fuer Basisdaten [s]
 byd_sample_diag = 300  # Abfrage fuer Diagnosedaten [s]
@@ -150,12 +150,12 @@ byd_no_of_col_7 = 7
 byd_no_of_col_8 = 8
 byd_no_of_col_12 = 12
 
-byd_webif_img = "/webif/static/img/"
-byd_path_empty = "x"
-byd_fname_volt = "bydvt"
-byd_fname_volt2 = "bydvbt"
-byd_fname_temp = "bydtt"
-byd_fname_ext = ".png"
+byd_webif_img = '/webif/static/img/'
+byd_path_empty = 'x'
+byd_fname_volt = 'bydvt'
+byd_fname_volt2 = 'bydvbt'
+byd_fname_temp = 'bydtt'
+byd_fname_ext = '.png'
 
 byd_ok = 1
 byd_error = 0
@@ -168,11 +168,11 @@ byd_module_vdif = 3
 BUFFER_SIZE = 4096  # Groesse Empfangsbuffer
 
 byd_log_max_rows = 40  # maximale Anzahl Eintraege (html/json)
-byd_log_directory = "byd_logs"
-byd_log_extension = "log"
-byd_log_special = "byd_special"
-byd_log_newline = "\n"
-byd_log_sep = "\t"
+byd_log_directory = 'byd_logs'
+byd_log_extension = 'log'
+byd_log_special = 'byd_special'
+byd_log_newline = '\n'
+byd_log_sep = '\t'
 
 # Log-Daten Indizes in der Liste
 byd_log_year = 0  # Jahr
@@ -185,332 +185,332 @@ byd_log_codex = 6  # Code des Log-Eintrages
 byd_log_data = 7  # Daten zum Log-Eintrag
 byd_log_raw = 8  # Roh-Daten des Log-Eintrages
 byd_log_str = 9  # 'byd_log_data' als String
-byd_log_str_sep = " | "
-byd_log_degree = "*C"
+byd_log_str_sep = ' | '
+byd_log_degree = '*C'
 
-MESSAGE_0 = "010300000066c5e0"
+MESSAGE_0 = '010300000066c5e0'
 MESSAGE_0_L = 209
-MESSAGE_1 = "01030500001984cc"
+MESSAGE_1 = '01030500001984cc'
 MESSAGE_1_L = 55
-MESSAGE_2 = "010300100003040e"
+MESSAGE_2 = '010300100003040e'
 MESSAGE_2_L = 11
 
-MESSAGE_3_1 = "0110055000020400018100f853"  # Start Messung Turm 1
-MESSAGE_3_2 = "01100550000204000281000853"  # Start Messung Turm 2
-MESSAGE_3_3 = "01100550000204000381005993"  # Start Messung Turm 3
+MESSAGE_3_1 = '0110055000020400018100f853'  # Start Messung Turm 1
+MESSAGE_3_2 = '01100550000204000281000853'  # Start Messung Turm 2
+MESSAGE_3_3 = '01100550000204000381005993'  # Start Messung Turm 3
 MESSAGE_3_L = 8
-MESSAGE_4 = "010305510001d517"
+MESSAGE_4 = '010305510001d517'
 MESSAGE_4_L = 7
-MESSAGE_5 = "01030558004104e5"
+MESSAGE_5 = '01030558004104e5'
 MESSAGE_5_L = 135
-MESSAGE_6 = "01030558004104e5"
+MESSAGE_6 = '01030558004104e5'
 MESSAGE_6_L = 135
-MESSAGE_7 = "01030558004104e5"
+MESSAGE_7 = '01030558004104e5'
 MESSAGE_7_L = 135
-MESSAGE_8 = "01030558004104e5"
+MESSAGE_8 = '01030558004104e5'
 MESSAGE_8_L = 135
-MESSAGE_9 = "01100100000306444542554700176f"  # switch to second turn for the last few cells
+MESSAGE_9 = '01100100000306444542554700176f'  # switch to second turn for the last few cells
 MESSAGE_9_L = 0  # UNBEKANNT !!
-MESSAGE_10_1 = "0110055000020400018100f853"  # start measuring remaining cells in tower 1 (like 3)
-MESSAGE_10_2 = "01100550000204000281000853"  # start measuring remaining cells in tower 2 (like 3)
-MESSAGE_10_3 = "01100550000204000381005993"  # start measuring remaining cells in tower 3 (like 3)
+MESSAGE_10_1 = '0110055000020400018100f853'  # start measuring remaining cells in tower 1 (like 3)
+MESSAGE_10_2 = '01100550000204000281000853'  # start measuring remaining cells in tower 2 (like 3)
+MESSAGE_10_3 = '01100550000204000381005993'  # start measuring remaining cells in tower 3 (like 3)
 MESSAGE_10_L = 8
-MESSAGE_11 = "010305510001d517"  # (like 4)
+MESSAGE_11 = '010305510001d517'  # (like 4)
 MESSAGE_11_L = 7
-MESSAGE_12 = "01030558004104e5"  # (like 5)
+MESSAGE_12 = '01030558004104e5'  # (like 5)
 MESSAGE_12_L = 135
-MESSAGE_13 = "01030558004104e5"  # (like 6)
+MESSAGE_13 = '01030558004104e5'  # (like 6)
 MESSAGE_13_L = 135
-MESSAGE_14 = "01030558004104e5"  # (like 7)
+MESSAGE_14 = '01030558004104e5'  # (like 7)
 MESSAGE_14_L = 135
-MESSAGE_15 = "01030558004104e5"  # (like 8)
+MESSAGE_15 = '01030558004104e5'  # (like 8)
 MESSAGE_15_L = 135
 
-EVT_MSG_0_0 = "011005a000020400008100A6D7"  # BMU
-EVT_MSG_0_1 = "011005a000020400018100f717"  # BMS tower 1
-EVT_MSG_0_2 = "011005a0000204000281000717"  # BMS tower 2
-EVT_MSG_0_3 = "011005a00002040003810056D7"  # BMS tower 3
+EVT_MSG_0_0 = '011005a000020400008100A6D7'  # BMU
+EVT_MSG_0_1 = '011005a000020400018100f717'  # BMS tower 1
+EVT_MSG_0_2 = '011005a0000204000281000717'  # BMS tower 2
+EVT_MSG_0_3 = '011005a00002040003810056D7'  # BMS tower 3
 EVT_MSG_0_L = 8
-EVT_MSG_1 = "010305A8004104D6"  # request log-data
+EVT_MSG_1 = '010305A8004104D6'  # request log-data
 EVT_MSG_1_L = 135
 
 byd_errors = [
-    "High Temperature Charging (Cells)",  #  0
-    "Low Temperature Charging (Cells)",  #  1
-    "Over Current Discharging",  #  2
-    "Over Current Charging",  #  3
-    "Main circuit Failure",  #  4
-    "Short Current Alarm",  #  5
-    "Cells Imbalance",  #  6
-    "Current Sensor Failure",  #  7
-    "Battery Over Voltage",  #  8
-    "Battery Under Voltage",  #  9
-    "Cell Over Voltage",  # 10
-    "Cell Under Voltage",  # 11
-    "Voltage Sensor Failure",  # 12
-    "Temperature Sensor Failure",  # 13
-    "High Temperature Discharging (Cells)",  # 14
-    "Low Temperature Discharging (Cells)",  # 15
+    'High Temperature Charging (Cells)',  #  0
+    'Low Temperature Charging (Cells)',  #  1
+    'Over Current Discharging',  #  2
+    'Over Current Charging',  #  3
+    'Main circuit Failure',  #  4
+    'Short Current Alarm',  #  5
+    'Cells Imbalance',  #  6
+    'Current Sensor Failure',  #  7
+    'Battery Over Voltage',  #  8
+    'Battery Under Voltage',  #  9
+    'Cell Over Voltage',  # 10
+    'Cell Under Voltage',  # 11
+    'Voltage Sensor Failure',  # 12
+    'Temperature Sensor Failure',  # 13
+    'High Temperature Discharging (Cells)',  # 14
+    'Low Temperature Discharging (Cells)',  # 15
 ]
 
 # Liste der Wechselrichter (entnommen aus Be_Connect)
 byd_inverters = [
-    "Fronius HV",  #  0
-    "Goodwe HV/Viessmann HV",  #  1
-    "KOSTAL HV",  #  2
-    "SMA SBS3.7/5.0/6.0 HV",  #  3
-    "Sungrow HV",  #  4
-    "KACO_HV",  #  5
-    "Ingeteam HV",  #  6
-    "SMA SBS2.5 HV",  #  7
-    "Solis HV",  #  8
-    "SMA STP 5.0-10.0 SE HV",  #  9
-    "GE HV",  # 10
-    "Deye HV",  # 11
-    "KACO_NH",  # 12
-    "Solplanet",  # 13
-    "Western HV",  # 14
-    "SOSEN",  # 15
-    "Hoymiles HV",  # 16
-    "SAJ HV",  # 17
-    "Selectronic LV",  # 18
-    "SMA LV",  # 19
-    "Victron LV",  # 20
-    "Studer LV",  # 21
-    "Schneider LV",  # 22
-    "Solis LV",  # 23
-    "Deye LV",  # 24
-    "Raion LV",  # 25
-    "Hoymiles LV",  # 26
-    "Goodwe LV/Viessmann LV",  # 27
-    "SolarEdge LV",  # 28
-    "Sungrow LV Phocos LV",  # 29
-    "Suntech LV",  # 30  (nicht im Hauptblock von Be_Connect)
+    'Fronius HV',  #  0
+    'Goodwe HV/Viessmann HV',  #  1
+    'KOSTAL HV',  #  2
+    'SMA SBS3.7/5.0/6.0 HV',  #  3
+    'Sungrow HV',  #  4
+    'KACO_HV',  #  5
+    'Ingeteam HV',  #  6
+    'SMA SBS2.5 HV',  #  7
+    'Solis HV',  #  8
+    'SMA STP 5.0-10.0 SE HV',  #  9
+    'GE HV',  # 10
+    'Deye HV',  # 11
+    'KACO_NH',  # 12
+    'Solplanet',  # 13
+    'Western HV',  # 14
+    'SOSEN',  # 15
+    'Hoymiles HV',  # 16
+    'SAJ HV',  # 17
+    'Selectronic LV',  # 18
+    'SMA LV',  # 19
+    'Victron LV',  # 20
+    'Studer LV',  # 21
+    'Schneider LV',  # 22
+    'Solis LV',  # 23
+    'Deye LV',  # 24
+    'Raion LV',  # 25
+    'Hoymiles LV',  # 26
+    'Goodwe LV/Viessmann LV',  # 27
+    'SolarEdge LV',  # 28
+    'Sungrow LV Phocos LV',  # 29
+    'Suntech LV',  # 30  (nicht im Hauptblock von Be_Connect)
 ]
 
 # Status eines Turms (2 Byte, 16 Bit)
 byd_stat_tower = [
-    "Battery Over Voltage",  # Bit 0
-    "Battery Under Voltage",  # Bit 1
-    "Cells OverVoltage",  # Bit 2
-    "Cells UnderVoltage",  # Bit 3
-    "Cells Imbalance",  # Bit 4
-    "Charging High Temperature(Cells)",  # Bit 5
-    "Charging Low Temperature(Cells)",  # Bit 6
-    "DisCharging High Temperature(Cells)",  # Bit 7
-    "DisCharging Low Temperature(Cells)",  # Bit 8
-    "Charging OverCurrent(Cells)",  # Bit 9
-    "DisCharging OverCurrent(Cells)",  # Bit 10
-    "Charging OverCurrent(Hardware)",  # Bit 11
-    "Short Circuit",  # Bit 12
-    "Inversly Connection",  # Bit 13
-    "Interlock switch Abnormal",  # Bit 14
-    "AirSwitch Abnormal",  # Bit 15
+    'Battery Over Voltage',  # Bit 0
+    'Battery Under Voltage',  # Bit 1
+    'Cells OverVoltage',  # Bit 2
+    'Cells UnderVoltage',  # Bit 3
+    'Cells Imbalance',  # Bit 4
+    'Charging High Temperature(Cells)',  # Bit 5
+    'Charging Low Temperature(Cells)',  # Bit 6
+    'DisCharging High Temperature(Cells)',  # Bit 7
+    'DisCharging Low Temperature(Cells)',  # Bit 8
+    'Charging OverCurrent(Cells)',  # Bit 9
+    'DisCharging OverCurrent(Cells)',  # Bit 10
+    'Charging OverCurrent(Hardware)',  # Bit 11
+    'Short Circuit',  # Bit 12
+    'Inversly Connection',  # Bit 13
+    'Interlock switch Abnormal',  # Bit 14
+    'AirSwitch Abnormal',  # Bit 15
 ]
 
 byd_log_code = [
-    [0, "Power ON"],  # [  0]
-    [1, "Power OFF"],  # [  1]
-    [2, "Events record"],  # [  2]  Events appear, Events disappear
-    [3, "Timing Record"],  # [  3]
-    [4, "Start Charging"],  # [  4]
-    [5, "Stop Charging"],  # [  5]
-    [6, "Start DisCharging"],  # [  6]
-    [7, "Stop DisCharging"],  # [  7]
-    [8, "SOC calibration rough"],  # [  8]
-    [9, "??"],  # [  9]
-    [10, "SOC calibration Stop"],  # [ 10]
-    [11, "CAN Communication failed"],  # [ 11]
-    [12, "Serial Communication failed"],  # [ 12]
-    [13, "Receive PreCharge Command"],  # [ 13]
-    [14, "PreCharge Successful"],  # [ 14]
-    [15, "PreCharge Failure"],  # [ 15]
-    [16, "Start end SOC calibration"],  # [ 16]
-    [17, "Start Balancing"],  # [ 17]
-    [18, "Stop Balancing"],  # [ 18]
-    [19, "Address Registered"],  # [ 19]
-    [20, "System Functional Safety Fault"],  # [ 20]
-    [21, "Events additional info"],  # [ 21]
-    [22, "Start Firmware Update"],  # [ 22]
-    [23, "Firmware Update finish"],  # [ 23]
-    [24, "Firmware Update fails"],  # [ 24]
-    [25, "SN Code was Changed"],  # [ 25]
-    [26, "Current Calibration"],  # [ 26]
-    [27, "Battery Voltage Calibration"],  # [ 27]
-    [28, "PackVoltage Calibration"],  # [ 28]
-    [29, "SOC/SOH Calibration"],  # [ 29]
-    [30, "??"],  # [ 30]
-    [31, "??"],  # [ 31]
-    [32, "System status changed"],  # [ 32]
-    [33, "Erase BMS Firmware"],  # [ 33]
-    [34, "BMS update start"],  # [ 34]
-    [35, "BMS update done"],  # [ 35]
-    [36, "Functional Safety Info"],  # [ 36]
-    [37, "No Defined"],  # [ 37]
-    [38, "SOP Info"],  # [ 38]
-    [39, "??"],  # [ 39]
-    [40, "BMS Firmware list"],  # [ 40]
-    [41, "MCU list of BMS"],  # [ 41]
+    [0, 'Power ON'],  # [  0]
+    [1, 'Power OFF'],  # [  1]
+    [2, 'Events record'],  # [  2]  Events appear, Events disappear
+    [3, 'Timing Record'],  # [  3]
+    [4, 'Start Charging'],  # [  4]
+    [5, 'Stop Charging'],  # [  5]
+    [6, 'Start DisCharging'],  # [  6]
+    [7, 'Stop DisCharging'],  # [  7]
+    [8, 'SOC calibration rough'],  # [  8]
+    [9, '??'],  # [  9]
+    [10, 'SOC calibration Stop'],  # [ 10]
+    [11, 'CAN Communication failed'],  # [ 11]
+    [12, 'Serial Communication failed'],  # [ 12]
+    [13, 'Receive PreCharge Command'],  # [ 13]
+    [14, 'PreCharge Successful'],  # [ 14]
+    [15, 'PreCharge Failure'],  # [ 15]
+    [16, 'Start end SOC calibration'],  # [ 16]
+    [17, 'Start Balancing'],  # [ 17]
+    [18, 'Stop Balancing'],  # [ 18]
+    [19, 'Address Registered'],  # [ 19]
+    [20, 'System Functional Safety Fault'],  # [ 20]
+    [21, 'Events additional info'],  # [ 21]
+    [22, 'Start Firmware Update'],  # [ 22]
+    [23, 'Firmware Update finish'],  # [ 23]
+    [24, 'Firmware Update fails'],  # [ 24]
+    [25, 'SN Code was Changed'],  # [ 25]
+    [26, 'Current Calibration'],  # [ 26]
+    [27, 'Battery Voltage Calibration'],  # [ 27]
+    [28, 'PackVoltage Calibration'],  # [ 28]
+    [29, 'SOC/SOH Calibration'],  # [ 29]
+    [30, '??'],  # [ 30]
+    [31, '??'],  # [ 31]
+    [32, 'System status changed'],  # [ 32]
+    [33, 'Erase BMS Firmware'],  # [ 33]
+    [34, 'BMS update start'],  # [ 34]
+    [35, 'BMS update done'],  # [ 35]
+    [36, 'Functional Safety Info'],  # [ 36]
+    [37, 'No Defined'],  # [ 37]
+    [38, 'SOP Info'],  # [ 38]
+    [39, '??'],  # [ 39]
+    [40, 'BMS Firmware list'],  # [ 40]
+    [41, 'MCU list of BMS'],  # [ 41]
     # BCU Hardware failt
     # Firmware Update failure
     # Firmware Jumpinto other section
-    [101, "Firmware Start to Update"],  # [101]  BMS: Start Firmware Update
-    [102, "Firmware Update Successful"],  # [102]  BMS: Firmware Update finish
-    [105, "Parameters table Update"],  # [105]
-    [106, "SN Code was Changed"],  # [106]
-    [111, "DateTime Calibration"],  # [111]
-    [112, "BMS disconnected with BMU"],  # [112]
-    [113, "MU F/W Reset"],  # [113]
-    [114, "BMU Watchdog Reset"],  # [114]
-    [115, "PreCharge Failed"],  # [115]
-    [116, "Address registration failed"],  # [116]
-    [117, "Parameters table Load Failed"],  # [117]
-    [118, "System timing log"],  # [118]
+    [101, 'Firmware Start to Update'],  # [101]  BMS: Start Firmware Update
+    [102, 'Firmware Update Successful'],  # [102]  BMS: Firmware Update finish
+    [105, 'Parameters table Update'],  # [105]
+    [106, 'SN Code was Changed'],  # [106]
+    [111, 'DateTime Calibration'],  # [111]
+    [112, 'BMS disconnected with BMU'],  # [112]
+    [113, 'MU F/W Reset'],  # [113]
+    [114, 'BMU Watchdog Reset'],  # [114]
+    [115, 'PreCharge Failed'],  # [115]
+    [116, 'Address registration failed'],  # [116]
+    [117, 'Parameters table Load Failed'],  # [117]
+    [118, 'System timing log'],  # [118]
     # Parameters table updating done
 ]
 
 # System-Code (Log SOP Info (38), Quelle: Be_Connect 2.0.9, * = aus eigenen Log-Dateien)
 byd_log_status = [
-    "SYS_STANDBY",  # 0 *
-    "SYS_INACTIVE",  # 1 *
-    "SYS_BLACK_START",  # 2
-    "SYS_ACTIVE",  # 3 *
-    "SYS_FAULT",  # 4
-    "SYS_UPDATING",  # 5
-    "SYS_SHUTDOWN",  # 6 *
-    "SYS_PRECHARGE",  # 7 *
-    "SYS_BATT_CHECK",  # 8 *
-    "SYS_ASSIGN_ADDR",  # 9 *
-    "SYS_LOAD_PARAM",  # 10 *
-    "SYS_INIT",  # 11 *
-    "SYS_UNKNOWN12",  # 12
+    'SYS_STANDBY',  # 0 *
+    'SYS_INACTIVE',  # 1 *
+    'SYS_BLACK_START',  # 2
+    'SYS_ACTIVE',  # 3 *
+    'SYS_FAULT',  # 4
+    'SYS_UPDATING',  # 5
+    'SYS_SHUTDOWN',  # 6 *
+    'SYS_PRECHARGE',  # 7 *
+    'SYS_BATT_CHECK',  # 8 *
+    'SYS_ASSIGN_ADDR',  # 9 *
+    'SYS_LOAD_PARAM',  # 10 *
+    'SYS_INIT',  # 11 *
+    'SYS_UNKNOWN12',  # 12
 ]
 
-byd_module_type = ["HVL", "HVM", "HVS", "Not defined"]
+byd_module_type = ['HVL', 'HVM', 'HVS', 'Not defined']
 
 # Warnungen fuer Events record (2) (16 Bit)
 byd_log_bmu_warnings = [
-    "??",  # 0
-    "??",  # 1
-    "Cells OverVoltage",  # 2
-    "Cells UnderVoltage",  # 3
-    "V-sensor failure",  # 4
-    "??",  # 5
-    "??",  # 6
-    "Cell discharge Temp-Low",  # 7
-    "??",  # 8
-    "Cell charge Temp-Low",  # 9
-    "??",  # 10
-    "??",  # 11
-    "??",  # 12
-    "??",  # 13
-    "Cells imbalance",  # 14
-    "??",  # 15
+    '??',  # 0
+    '??',  # 1
+    'Cells OverVoltage',  # 2
+    'Cells UnderVoltage',  # 3
+    'V-sensor failure',  # 4
+    '??',  # 5
+    '??',  # 6
+    'Cell discharge Temp-Low',  # 7
+    '??',  # 8
+    'Cell charge Temp-Low',  # 9
+    '??',  # 10
+    '??',  # 11
+    '??',  # 12
+    '??',  # 13
+    'Cells imbalance',  # 14
+    '??',  # 15
 ]
 
 # Fehlermeldungen fuer Events record (2) (Enum)
 byd_log_bmu_errors = [
-    "Total Voltage too High",  # 0
-    "Total Voltage too Low",  # 1
-    "Cell Voltage too High",  # 2
-    "Cell Voltage too Low",  # 3
-    "Voltage Sensor Fault",  # 4
-    "Temperature Sersor Fault",  # 5
-    "Cell Discharging Temp. too High",  # 6
-    "Cell Discharging Temp. too Low",  # 7
-    "Cell Charging Temp. too High",  # 8
-    "Cell Charging Temp. too Low",  # 9
-    "Discharging Over Current",  # 10
-    "Charging Over Current",  # 11
-    "Major loop Fault",  # 12
-    "Short Circuit warning",  # 13
-    "Battery Imbalance",  # 14
-    "Current Sensor Fault",  # 15
-    "??",  # 16
-    "??",  # 17
-    "??",  # 18
-    "??",  # 19
-    "??",  # 20
-    "??",  # 21
-    "??",  # 22
-    "",  # 23 (Wert, wenn keine Meldung)
+    'Total Voltage too High',  # 0
+    'Total Voltage too Low',  # 1
+    'Cell Voltage too High',  # 2
+    'Cell Voltage too Low',  # 3
+    'Voltage Sensor Fault',  # 4
+    'Temperature Sersor Fault',  # 5
+    'Cell Discharging Temp. too High',  # 6
+    'Cell Discharging Temp. too Low',  # 7
+    'Cell Charging Temp. too High',  # 8
+    'Cell Charging Temp. too Low',  # 9
+    'Discharging Over Current',  # 10
+    'Charging Over Current',  # 11
+    'Major loop Fault',  # 12
+    'Short Circuit warning',  # 13
+    'Battery Imbalance',  # 14
+    'Current Sensor Fault',  # 15
+    '??',  # 16
+    '??',  # 17
+    '??',  # 18
+    '??',  # 19
+    '??',  # 20
+    '??',  # 21
+    '??',  # 22
+    '',  # 23 (Wert, wenn keine Meldung)
 ]
 
 # Warnungen fuer BMS (16 Bit)
 byd_log_bms_warnings = [
-    "Battery Over Voltage",  # 0
-    "Battery Under Voltage",  # 1
-    "Cells OverVoltage",  # 2 *
-    "Cells UnderVoltage",  # 3 *
-    "Cells Imbalance",  # 4 *
-    "Charging High Temperature(Cells)",  # 5
-    "Charging Low Temperature(Cells)",  # 6
-    "DisCharging High Temperature(Cells)",  # 7
-    "DisCharging Low Temperature(Cells)",  # 8
-    "Charging OverCurrent(Cells)",  # 9
-    "DisCharging OverCurrent(Cells)",  # 10
-    "Charging OverCurrent(Hardware)",  # 11
-    "Short Circuit",  # 12
-    "Inversly Connection",  # 13
-    "Interlock switch Abnormal",  # 14
-    "AirSwitch Abnormal",  # 15
+    'Battery Over Voltage',  # 0
+    'Battery Under Voltage',  # 1
+    'Cells OverVoltage',  # 2 *
+    'Cells UnderVoltage',  # 3 *
+    'Cells Imbalance',  # 4 *
+    'Charging High Temperature(Cells)',  # 5
+    'Charging Low Temperature(Cells)',  # 6
+    'DisCharging High Temperature(Cells)',  # 7
+    'DisCharging Low Temperature(Cells)',  # 8
+    'Charging OverCurrent(Cells)',  # 9
+    'DisCharging OverCurrent(Cells)',  # 10
+    'Charging OverCurrent(Hardware)',  # 11
+    'Short Circuit',  # 12
+    'Inversly Connection',  # 13
+    'Interlock switch Abnormal',  # 14
+    'AirSwitch Abnormal',  # 15
 ]
 
 # Fehler fuer BMS (16 Bit)
 byd_log_bms_failures = [
-    "Cells Voltage Sensor Failure",  # 0 *
-    "Temperature Sensor Failure",  # 1
-    "BIC Communication Failure",  # 2
-    "Pack Voltage Sensor Failure",  # 3
-    "Current Sensor Failure",  # 4
-    "Charging Mos Failure",  # 5
-    "DisCharging Mos Failure",  # 6
-    "PreCharging Mos Failure",  # 7
-    "Main Relay Failure",  # 8
-    "PreCharging Failed",  # 9
-    "Heating Device Failure",  # 10
-    "Radiator Failure",  # 11
-    "BIC Balance Failure",  # 12
-    "Cells Failure",  # 13
-    "PCB Temperature Sensor Failure",  # 14
-    "Functional Safety Failure",  # 15
+    'Cells Voltage Sensor Failure',  # 0 *
+    'Temperature Sensor Failure',  # 1
+    'BIC Communication Failure',  # 2
+    'Pack Voltage Sensor Failure',  # 3
+    'Current Sensor Failure',  # 4
+    'Charging Mos Failure',  # 5
+    'DisCharging Mos Failure',  # 6
+    'PreCharging Mos Failure',  # 7
+    'Main Relay Failure',  # 8
+    'PreCharging Failed',  # 9
+    'Heating Device Failure',  # 10
+    'Radiator Failure',  # 11
+    'BIC Balance Failure',  # 12
+    'Cells Failure',  # 13
+    'PCB Temperature Sensor Failure',  # 14
+    'Functional Safety Failure',  # 15
 ]
 
 # Switch Status fuer BMS (8 Bit)
 byd_log_bms_switch_status_on = [
-    "Charge Mos_Switch is on",  # 0
-    "DisCharge Mos_Switch is on",  # 1
-    "PreCharge Mos_Switch is on",  # 2
-    "Relay is on",  # 3 *
-    "Air Switch is on",  # 4 *
-    "PreCharge_2 Mos_Switch is on",  # 5
-    "??",  # 6
-    "??",  # 7
+    'Charge Mos_Switch is on',  # 0
+    'DisCharge Mos_Switch is on',  # 1
+    'PreCharge Mos_Switch is on',  # 2
+    'Relay is on',  # 3 *
+    'Air Switch is on',  # 4 *
+    'PreCharge_2 Mos_Switch is on',  # 5
+    '??',  # 6
+    '??',  # 7
 ]
 
 byd_log_bms_switch_status_off = [
-    "Charge Mos_Switch is off",  # 0
-    "DisCharge Mos_Switch is off",  # 1
-    "PreCharge Mos_Switch is off",  # 2
-    "Relay is off",  # 3 *  -> nur diesen Wert in einem Log gesehen
-    "Air Switch is off",  # 4 *
-    "PreCharge_2 Mos_Switch is off",  # 5
-    "??",  # 6
-    "??",  # 7
+    'Charge Mos_Switch is off',  # 0
+    'DisCharge Mos_Switch is off',  # 1
+    'PreCharge Mos_Switch is off',  # 2
+    'Relay is off',  # 3 *  -> nur diesen Wert in einem Log gesehen
+    'Air Switch is off',  # 4 *
+    'PreCharge_2 Mos_Switch is off',  # 5
+    '??',  # 6
+    '??',  # 7
 ]
 
 # Power-Off fuer BMS (Enum 1 Byte)
 byd_log_bms_poweroff = [
-    ""  # 0
-    "Press BMS LED button to Switch off",  # 1
-    "BMU requires to switch off",  # 2 *
-    "BMU Power off And communication between BMU and BMS failed",  # 3 *
-    "Power off while communication failed(after 30 minutes)",  # 4
-    "Premium LV BMU requires to Power off",  # 5
-    "Press BMS LED to Power off",  # 6
-    "Power off due to communication failed with BMU",  # 7
-    "BMS off due to battery UnderVoltage",  # 8
-    "??",  # 9
+    ''  # 0
+    'Press BMS LED button to Switch off',  # 1
+    'BMU requires to switch off',  # 2 *
+    'BMU Power off And communication between BMU and BMS failed',  # 3 *
+    'Power off while communication failed(after 30 minutes)',  # 4
+    'Premium LV BMU requires to Power off',  # 5
+    'Press BMS LED to Power off',  # 6
+    'Power off due to communication failed with BMU',  # 7
+    'BMS off due to battery UnderVoltage',  # 8
+    '??',  # 9
 ]
 
 
@@ -529,7 +529,7 @@ class byd_bat(SmartPlugin):
     are already available!
     """
 
-    PLUGIN_VERSION = "0.1.3"
+    PLUGIN_VERSION = '0.1.3'
     ALLOW_MULTIINSTANCE = False
 
     def __init__(self, sh):
@@ -550,23 +550,23 @@ class byd_bat(SmartPlugin):
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
 
-        if self.get_parameter_value("ip") != "":
-            self.ip = self.get_parameter_value("ip")
+        if self.get_parameter_value('ip') != '':
+            self.ip = self.get_parameter_value('ip')
         else:
             self.log_info("no ip defined => use default '" + byd_ip_default + "'")
             self.ip = byd_ip_default
 
-        if self.get_parameter_value("imgpath") != "":
-            self.bpath = self.get_parameter_value("imgpath")
+        if self.get_parameter_value('imgpath') != '':
+            self.bpath = self.get_parameter_value('imgpath')
             if self.bpath is None:
-                self.log_debug("path is None")
+                self.log_debug('path is None')
                 self.bpath = byd_path_empty
         else:
-            self.log_debug("no path defined")
+            self.log_debug('no path defined')
             self.bpath = byd_path_empty
 
-        if self.get_parameter_value("diag_cycle") != "":
-            self.diag_cycle = self.get_parameter_value("diag_cycle")
+        if self.get_parameter_value('diag_cycle') != '':
+            self.diag_cycle = self.get_parameter_value('diag_cycle')
             if self.diag_cycle is None:
                 self.diag_cycle = byd_sample_diag
         else:
@@ -575,16 +575,16 @@ class byd_bat(SmartPlugin):
         if self.diag_cycle < byd_sample_basics:
             self.diag_cycle = byd_sample_basics
 
-        if self.get_parameter_value("log_data") != "":
-            self.log_data = self.get_parameter_value("log_data")
+        if self.get_parameter_value('log_data') != '':
+            self.log_data = self.get_parameter_value('log_data')
             if self.log_data is None:
                 self.log_data = False
         else:
-            self.log_debug("log_data not defined => log_data=false")
+            self.log_debug('log_data not defined => log_data=false')
             self.log_data = False
 
-        if self.get_parameter_value("log_age") != "":
-            self.log_age = self.get_parameter_value("log_age")
+        if self.get_parameter_value('log_age') != '':
+            self.log_age = self.get_parameter_value('log_age')
             if self.log_age is None:
                 self.log_age = 365
         else:
@@ -593,11 +593,11 @@ class byd_bat(SmartPlugin):
         if self.log_age < 0:
             self.log_age = 0
 
-        self.log_debug("BYD ip               = " + self.ip)
-        self.log_debug("BYD path             = " + self.bpath)
-        self.log_debug("BYD diagnostic cycle = " + f"{self.diag_cycle:.0f}" + "s")
-        self.log_debug("BYD log data         = " + str(self.log_data))
-        self.log_debug("BYD log age          = " + str(self.log_age) + " days")
+        self.log_debug('BYD ip               = ' + self.ip)
+        self.log_debug('BYD path             = ' + self.bpath)
+        self.log_debug('BYD diagnostic cycle = ' + f'{self.diag_cycle:.0f}' + 's')
+        self.log_debug('BYD log data         = ' + str(self.log_data))
+        self.log_debug('BYD log age          = ' + str(self.log_age) + ' days')
 
         # cycle time in seconds, only needed, if hardware/interface needs to be
         # polled for value changes by adding a scheduler entry in the run method of this plugin
@@ -636,20 +636,20 @@ class byd_bat(SmartPlugin):
         self.byd_eta = 0
 
         # System
-        self.byd_bms = ""
-        self.byd_bmu = ""
-        self.byd_bmu_a = ""
-        self.byd_bmu_b = ""
-        self.byd_batt_str = ""
+        self.byd_bms = ''
+        self.byd_bmu = ''
+        self.byd_bmu_a = ''
+        self.byd_bmu_b = ''
+        self.byd_batt_str = ''
         self.byd_error_nr = 0
-        self.byd_error_str = ""
-        self.byd_application = ""
-        self.byd_inv_str = ""
+        self.byd_error_str = ''
+        self.byd_application = ''
+        self.byd_inv_str = ''
         self.byd_modules = 0
         self.byd_bms_qty = 0
         self.byd_capacity_total = 0
-        self.byd_param_t = ""
-        self.byd_serial = ""
+        self.byd_param_t = ''
+        self.byd_serial = ''
 
         self.last_homedata = self.now_str()
         self.last_diagdata = self.now_str()
@@ -681,7 +681,7 @@ class byd_bat(SmartPlugin):
         self.byd_balance_cell = []
         self.byd_temp_cell = []
         self.byd_bmu_log = []
-        self.byd_bmu_log_html = ""
+        self.byd_bmu_log_html = ''
         for x in range(0, byd_towers_max + 1):  # 0..3
             self.byd_diag_soc.append(0)
             self.byd_diag_soh.append(0)
@@ -704,7 +704,7 @@ class byd_bat(SmartPlugin):
             self.byd_diag_balance_active.append(0)
             self.byd_diag_balance_number.append(0)
             self.byd_diag_bms_log.append([])
-            self.byd_diag_bms_log_html.append("")
+            self.byd_diag_bms_log_html.append('')
             self.byd_diag_module.append([])
             a = []
             for xx in range(0, byd_cells_max + 1):  # 0..160
@@ -724,7 +724,7 @@ class byd_bat(SmartPlugin):
         # Log-Verzeichnis erstellen
         if self.log_data:
             self.log_dir = self.create_logdirectory(self.get_sh().get_basedir(), byd_log_directory)
-            self.log_debug("log_dir=" + self.log_dir)
+            self.log_debug('log_dir=' + self.log_dir)
 
         #        self.simulate_data()  # for internal tests only [TEST]
 
@@ -750,8 +750,8 @@ class byd_bat(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
-        self.scheduler_remove("poll_device")
+        self.logger.debug('Stop method called')
+        self.scheduler_remove('poll_device')
         self.alive = False
 
     def parse_item(self, item):
@@ -768,12 +768,12 @@ class byd_bat(SmartPlugin):
                         can be sent to the knx with a knx write function within the knx plugin.
         """
 
-        if self.get_iattr_value(item.conf, "byd_root"):
+        if self.get_iattr_value(item.conf, 'byd_root'):
             self.byd_root = item
             self.byd_root_found = True
-            self.log_debug("BYD root = " + "{0}".format(self.byd_root))
+            self.log_debug('BYD root = ' + '{0}'.format(self.byd_root))
 
-        if self.has_iattr(item.conf, "byd_para"):
+        if self.has_iattr(item.conf, 'byd_para'):
             self._itemlist.append(item)
             return self.update_item
 
@@ -781,7 +781,7 @@ class byd_bat(SmartPlugin):
         """
         Default plugin parse_logic method
         """
-        if "xxx" in logic.conf:
+        if 'xxx' in logic.conf:
             # self.function(logic['name'])
             pass
 
@@ -789,7 +789,7 @@ class byd_bat(SmartPlugin):
         # Wird aufgerufen, wenn ein Item mit dem Attribut 'byd_para' geaendert wird
 
         self.log_debug(
-            "update_auto_item path=" + item.property.path + " name=" + item.property.name + " v=" + str(item())
+            'update_auto_item path=' + item.property.path + ' name=' + item.property.name + ' v=' + str(item())
         )
 
         if self.alive and caller != self.get_shortname():
@@ -797,12 +797,12 @@ class byd_bat(SmartPlugin):
             # and only, if the item has not been changed by this plugin:
 
             s1 = item.property.path
-            if s1.find("enable_connection") != -1:
+            if s1.find('enable_connection') != -1:
                 self.byd_root.info.connection(item())
                 if item():
-                    self.log_info("communication disabled => enabled !")
+                    self.log_info('communication disabled => enabled !')
                 else:
-                    self.log_info("communication enabled => disabled !")
+                    self.log_info('communication enabled => disabled !')
 
         return
 
@@ -816,17 +816,17 @@ class byd_bat(SmartPlugin):
             return
 
         if self.byd_root.enable_connection() is False:
-            self.log_debug("communication disabled !")
+            self.log_debug('communication disabled !')
             return
 
-        self.log_debug("BYD Start *********************")
+        self.log_debug('BYD Start *********************')
 
         # Verbindung herstellen
         client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             client.connect((self.ip, 8080))
         except Exception:
-            self.log_info("client.connect failed (" + self.ip + ")")
+            self.log_info('client.connect failed (' + self.ip + ')')
             self.byd_root.info.connection(False)
             client.close()
             return
@@ -834,7 +834,7 @@ class byd_bat(SmartPlugin):
         # 0.Befehl senden
         res, data = self.send_msg(client, MESSAGE_0, byd_timeout_1s)
         if res != byd_ok:
-            self.log_info("client.recv 0 failed")
+            self.log_info('client.recv 0 failed')
             self.byd_root.info.connection(False)
             client.close()
             return
@@ -844,7 +844,7 @@ class byd_bat(SmartPlugin):
         # 1.Befehl senden
         res, data = self.send_msg(client, MESSAGE_1, byd_timeout_1s)
         if res != byd_ok:
-            self.log_info("client.recv 1 failed")
+            self.log_info('client.recv 1 failed')
             self.byd_root.info.connection(False)
             client.close()
             return
@@ -854,7 +854,7 @@ class byd_bat(SmartPlugin):
         # 2.Befehl senden
         res, data = self.send_msg(client, MESSAGE_2, byd_timeout_1s)
         if res != byd_ok:
-            self.log_info("client.recv 1 failed")
+            self.log_info('client.recv 1 failed')
             self.byd_root.info.connection(False)
             client.close()
             return
@@ -862,7 +862,7 @@ class byd_bat(SmartPlugin):
             return
         if self.byd_cells_n == 0:
             # Batterietyp wird nicht unterstuetzt !
-            self.log_info("battery type " + self.byd_batt_str + " not supported !")
+            self.log_info('battery type ' + self.byd_batt_str + ' not supported !')
             self.byd_root.info.connection(False)
             client.close()
             return
@@ -877,7 +877,7 @@ class byd_bat(SmartPlugin):
 
             # Durchlaufe alle Tuerme
             for x in range(1, self.byd_bms_qty + 1):  # 1 ... self.byd_bms_qty
-                self.log_debug("Diagnose Turm " + str(x))
+                self.log_debug('Diagnose Turm ' + str(x))
 
                 # 3.Befehl senden
                 if x == 1:
@@ -888,7 +888,7 @@ class byd_bat(SmartPlugin):
                     m = MESSAGE_3_3
                 res, data = self.send_msg(client, m, byd_timeout_2s)
                 if res != byd_ok:
-                    self.log_info("client.recv 3 failed")
+                    self.log_info('client.recv 3 failed')
                     self.byd_root.info.connection(False)
                     client.close()
                     return
@@ -899,7 +899,7 @@ class byd_bat(SmartPlugin):
                 # 4.Befehl senden
                 res, data = self.send_msg(client, MESSAGE_4, byd_timeout_10s)
                 if res != byd_ok:
-                    self.log_info("client.recv 4 failed")
+                    self.log_info('client.recv 4 failed')
                     self.byd_root.info.connection(False)
                     client.close()
                     return
@@ -909,7 +909,7 @@ class byd_bat(SmartPlugin):
                 # 5.Befehl senden
                 res, data = self.send_msg(client, MESSAGE_5, byd_timeout_1s)
                 if res != byd_ok:
-                    self.log_info("client.recv 5 failed")
+                    self.log_info('client.recv 5 failed')
                     self.byd_root.info.connection(False)
                     client.close()
                     return
@@ -919,7 +919,7 @@ class byd_bat(SmartPlugin):
                 # 6.Befehl senden
                 res, data = self.send_msg(client, MESSAGE_6, byd_timeout_1s)
                 if res != byd_ok:
-                    self.log_info("client.recv 6 failed")
+                    self.log_info('client.recv 6 failed')
                     self.byd_root.info.connection(False)
                     client.close()
                     return
@@ -929,7 +929,7 @@ class byd_bat(SmartPlugin):
                 # 7.Befehl senden
                 res, data = self.send_msg(client, MESSAGE_7, byd_timeout_1s)
                 if res != byd_ok:
-                    self.log_info("client.recv 7 failed")
+                    self.log_info('client.recv 7 failed')
                     self.byd_root.info.connection(False)
                     client.close()
                     return
@@ -939,7 +939,7 @@ class byd_bat(SmartPlugin):
                 # 8.Befehl senden
                 res, data = self.send_msg(client, MESSAGE_8, byd_timeout_1s)
                 if res != byd_ok:
-                    self.log_info("client.recv 8 failed")
+                    self.log_info('client.recv 8 failed')
                     self.byd_root.info.connection(False)
                     client.close()
                     return
@@ -950,7 +950,7 @@ class byd_bat(SmartPlugin):
                     # Switch to second turn for the last module - 9.Befehl senden
                     res, data = self.send_msg(client, MESSAGE_9, byd_timeout_1s)
                     if res != byd_ok:
-                        self.log_info("client.recv 9 failed")
+                        self.log_info('client.recv 9 failed')
                         self.byd_root.info.connection(False)
                         client.close()
                         return
@@ -968,7 +968,7 @@ class byd_bat(SmartPlugin):
                         m = MESSAGE_10_3
                     res, data = self.send_msg(client, m, byd_timeout_2s)
                     if res != byd_ok:
-                        self.log_info("client.recv 10 failed")
+                        self.log_info('client.recv 10 failed')
                         self.byd_root.info.connection(False)
                         client.close()
                         return
@@ -979,7 +979,7 @@ class byd_bat(SmartPlugin):
                     # 11.Befehl senden (wie Befehl 4)
                     res, data = self.send_msg(client, MESSAGE_11, byd_timeout_10s)
                     if res != byd_ok:
-                        self.log_info("client.recv 11 failed")
+                        self.log_info('client.recv 11 failed')
                         self.byd_root.info.connection(False)
                         client.close()
                         return
@@ -989,7 +989,7 @@ class byd_bat(SmartPlugin):
                     # 12.Befehl senden (wie Befehl 5)
                     res, data = self.send_msg(client, MESSAGE_12, byd_timeout_1s)
                     if res != byd_ok:
-                        self.log_info("client.recv 12 failed")
+                        self.log_info('client.recv 12 failed')
                         self.byd_root.info.connection(False)
                         client.close()
                         return
@@ -999,7 +999,7 @@ class byd_bat(SmartPlugin):
                     # 13.Befehl senden (wie Befehl 6)
                     res, data = self.send_msg(client, MESSAGE_13, byd_timeout_1s)
                     if res != byd_ok:
-                        self.log_info("client.recv 13 failed")
+                        self.log_info('client.recv 13 failed')
                         self.byd_root.info.connection(False)
                         client.close()
                         return
@@ -1009,7 +1009,7 @@ class byd_bat(SmartPlugin):
                     # 14.Befehl senden (wie Befehl 7)
                     res, data = self.send_msg(client, MESSAGE_14, byd_timeout_1s)
                     if res != byd_ok:
-                        self.log_info("client.recv 14 failed")
+                        self.log_info('client.recv 14 failed')
                         self.byd_root.info.connection(False)
                         client.close()
                         return
@@ -1019,7 +1019,7 @@ class byd_bat(SmartPlugin):
                     # 15.Befehl senden (wie Befehl 8)
                     res, data = self.send_msg(client, MESSAGE_15, byd_timeout_1s)
                     if res != byd_ok:
-                        self.log_info("client.recv 15 failed")
+                        self.log_info('client.recv 15 failed')
                         self.byd_root.info.connection(False)
                         client.close()
                         return
@@ -1031,7 +1031,7 @@ class byd_bat(SmartPlugin):
             self.diagdata_save(self.byd_root)
             self.byd_root.info.connection(True)
 
-            self.log_debug("BYD Diag Done +++++++++++++++++")
+            self.log_debug('BYD Diag Done +++++++++++++++++')
 
         # Pruefe, ob die Logdaten ausgelesen werden sollen
         if self.log_data:
@@ -1040,7 +1040,7 @@ class byd_bat(SmartPlugin):
                 self.last_log_secs = 0
                 if self.read_log_data(client) == byd_error:
                     # Etwas ist schief gelaufen
-                    self.log_info("read_log_data failed")
+                    self.log_info('read_log_data failed')
                     self.byd_root.info.connection(False)
                     client.close()
                     return
@@ -1058,26 +1058,26 @@ class byd_bat(SmartPlugin):
     def decode_0(self, data):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_0'.
 
-        self.log_debug("decode_0: " + data.hex())
+        self.log_debug('decode_0: ' + data.hex())
 
         if len(data) != MESSAGE_0_L:
-            self.log_info("MESSAGE_0 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_0_L) + ")")
+            self.log_info('MESSAGE_0 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_0_L) + ')')
             return byd_error
 
         # Serienummer
-        self.byd_serial = ""
+        self.byd_serial = ''
         for x in range(3, 22):  # 3..21
             self.byd_serial = self.byd_serial + chr(data[x])  # Byte 3 .. 21
         # self.byd_serial = "xxxxxxxxxxxxxxxxxxx"  # fuer Screenshots
 
         # Firmware-Versionen
-        self.byd_bmu_a = "V" + str(data[27]) + "." + str(data[28])  # Byte 27+28 (Register 12)
-        self.byd_bmu_b = "V" + str(data[29]) + "." + str(data[30])  # Byte 29+30 (Register 13)
-        self.byd_bms = "V" + str(data[31]) + "." + str(data[32]) + "-" + chr(data[34] + 65)  # Byte 31+32+34
+        self.byd_bmu_a = 'V' + str(data[27]) + '.' + str(data[28])  # Byte 27+28 (Register 12)
+        self.byd_bmu_b = 'V' + str(data[29]) + '.' + str(data[30])  # Byte 29+30 (Register 13)
+        self.byd_bms = 'V' + str(data[31]) + '.' + str(data[32]) + '-' + chr(data[34] + 65)  # Byte 31+32+34
         if data[33] == 0:  # Byte 33
-            self.byd_bmu = self.byd_bmu_a + "-A"
+            self.byd_bmu = self.byd_bmu_a + '-A'
         else:
-            self.byd_bmu = self.byd_bmu_b + "-B"
+            self.byd_bmu = self.byd_bmu_b + '-B'
 
         # Anzahl Tuerme und Anzahl Module pro Turm
         self.byd_bms_qty = data[36] // 0x10  # Byte 36 Bit 4-7 (Anzahl Tuerme)
@@ -1088,32 +1088,32 @@ class byd_bat(SmartPlugin):
 
         # Application
         if data[38] == 0:  # Byte 38
-            self.byd_application = "OffGrid"
+            self.byd_application = 'OffGrid'
         elif data[38] == 1:
-            self.byd_application = "OnGrid"
+            self.byd_application = 'OnGrid'
         elif data[38] == 2:
-            self.byd_application = "Backup"
+            self.byd_application = 'Backup'
         else:
-            self.byd_application = "unknown"
+            self.byd_application = 'unknown'
 
-        self.log_debug("Serial      : " + self.byd_serial)
-        self.log_debug("BMU A       : " + self.byd_bmu_a)
-        self.log_debug("BMU B       : " + self.byd_bmu_b)
-        self.log_debug("BMU         : " + self.byd_bmu)
-        self.log_debug("BMS         : " + self.byd_bms)
-        self.log_debug("BMS QTY     : " + str(self.byd_bms_qty))
-        self.log_debug("Modules     : " + str(self.byd_modules))
-        self.log_debug("Application : " + self.byd_application)
+        self.log_debug('Serial      : ' + self.byd_serial)
+        self.log_debug('BMU A       : ' + self.byd_bmu_a)
+        self.log_debug('BMU B       : ' + self.byd_bmu_b)
+        self.log_debug('BMU         : ' + self.byd_bmu)
+        self.log_debug('BMS         : ' + self.byd_bms)
+        self.log_debug('BMS QTY     : ' + str(self.byd_bms_qty))
+        self.log_debug('Modules     : ' + str(self.byd_modules))
+        self.log_debug('Application : ' + self.byd_application)
 
         return byd_ok
 
     def decode_1(self, data):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_1'.
 
-        self.log_debug("decode_1: " + data.hex())
+        self.log_debug('decode_1: ' + data.hex())
 
         if len(data) != MESSAGE_1_L:
-            self.log_info("MESSAGE_1 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_1_L) + ")")
+            self.log_info('MESSAGE_1 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_1_L) + ')')
             return byd_error
 
         self.byd_soc = self.buf2int16SI(data, 3)  # Byte 3+4   (Register  0)
@@ -1127,16 +1127,16 @@ class byd_bat(SmartPlugin):
         self.byd_temp_bat = self.buf2int16SI(data, 19)  # Byte 19+20 (Register  8)
 
         self.byd_error_nr = self.buf2int16SI(data, 29)  # Byte 29+30 (Register 13)
-        self.byd_error_str = ""
+        self.byd_error_str = ''
         for x in range(0, 16):
             if ((1 << x) & self.byd_error_nr) != 0:
                 if len(self.byd_error_str) > 0:
-                    self.byd_error_str = self.byd_error_str + ";"
+                    self.byd_error_str = self.byd_error_str + ';'
                 self.byd_error_str = self.byd_error_str + byd_errors[x]
         if len(self.byd_error_str) == 0:
-            self.byd_error_str = "no error"
+            self.byd_error_str = 'no error'
 
-        self.byd_param_t = str(data[31]) + "." + str(data[32])  # Byte 31+32 (Register 14)
+        self.byd_param_t = str(data[31]) + '.' + str(data[32])  # Byte 31+32 (Register 14)
 
         self.byd_volt_out = self.buf2int16US(data, 35) * 1.0 / 100.0  # Byte 35+36 (Register 16)
         self.byd_volt_diff = self.byd_volt_max - self.byd_volt_min
@@ -1152,39 +1152,39 @@ class byd_bat(SmartPlugin):
         self.byd_discharge_total = self.buf2int32US(data, 41) / 10.0  # Byte 41-44 (Register 19+20) (in 100Wh in data)
         self.byd_eta = (self.byd_discharge_total / self.byd_charge_total) * 100.0
 
-        self.log_debug("SOC             : " + f"{self.byd_soc:.1f}")
-        self.log_debug("SOH             : " + f"{self.byd_soh:.1f}")
-        self.log_debug("Volt Battery    : " + f"{self.byd_volt_bat:.1f}")
-        self.log_debug("Volt Out        : " + f"{self.byd_volt_out:.1f}")
-        self.log_debug("Volt max        : " + f"{self.byd_volt_max:.1f}")
-        self.log_debug("Volt min        : " + f"{self.byd_volt_min:.1f}")
-        self.log_debug("Volt diff       : " + f"{self.byd_volt_diff:.1f}")
-        self.log_debug("Current         : " + f"{self.byd_current:.1f}")
-        self.log_debug("Power           : " + f"{self.byd_power:.1f}")
-        self.log_debug("Temp Battery    : " + f"{self.byd_temp_bat:.1f}")
-        self.log_debug("Temp max        : " + f"{self.byd_temp_max:.1f}")
-        self.log_debug("Temp min        : " + f"{self.byd_temp_min:.1f}")
-        self.log_debug("Error           : " + f"{self.byd_error_nr:.0f}" + " " + self.byd_error_str)
-        self.log_debug("ParamT          : " + self.byd_param_t)
-        self.log_debug("Charge total    : " + f"{self.byd_charge_total:.1f}")
-        self.log_debug("Discharge total : " + f"{self.byd_discharge_total:.1f}")
-        self.log_debug("ETA             : " + f"{self.byd_eta:.1f}")
+        self.log_debug('SOC             : ' + f'{self.byd_soc:.1f}')
+        self.log_debug('SOH             : ' + f'{self.byd_soh:.1f}')
+        self.log_debug('Volt Battery    : ' + f'{self.byd_volt_bat:.1f}')
+        self.log_debug('Volt Out        : ' + f'{self.byd_volt_out:.1f}')
+        self.log_debug('Volt max        : ' + f'{self.byd_volt_max:.1f}')
+        self.log_debug('Volt min        : ' + f'{self.byd_volt_min:.1f}')
+        self.log_debug('Volt diff       : ' + f'{self.byd_volt_diff:.1f}')
+        self.log_debug('Current         : ' + f'{self.byd_current:.1f}')
+        self.log_debug('Power           : ' + f'{self.byd_power:.1f}')
+        self.log_debug('Temp Battery    : ' + f'{self.byd_temp_bat:.1f}')
+        self.log_debug('Temp max        : ' + f'{self.byd_temp_max:.1f}')
+        self.log_debug('Temp min        : ' + f'{self.byd_temp_min:.1f}')
+        self.log_debug('Error           : ' + f'{self.byd_error_nr:.0f}' + ' ' + self.byd_error_str)
+        self.log_debug('ParamT          : ' + self.byd_param_t)
+        self.log_debug('Charge total    : ' + f'{self.byd_charge_total:.1f}')
+        self.log_debug('Discharge total : ' + f'{self.byd_discharge_total:.1f}')
+        self.log_debug('ETA             : ' + f'{self.byd_eta:.1f}')
 
         return byd_ok
 
     def decode_2(self, data):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_2'.
 
-        self.log_debug("decode_2: " + data.hex())
+        self.log_debug('decode_2: ' + data.hex())
 
         if len(data) != MESSAGE_2_L:
-            self.log_info("MESSAGE_2 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_2_L) + ")")
+            self.log_info('MESSAGE_2 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_2_L) + ')')
             return byd_error
 
         self.byd_batt_type = data[5]
         if self.byd_batt_type == 0:
             # HVL -> Lithium Iron Phosphate (LFP), 3-8 Module (12kWh-32kWh), unknown specification, so 0 cells and 0 temps
-            self.byd_batt_str = "HVL"
+            self.byd_batt_str = 'HVL'
             self.byd_capacity_module = 4.0
             self.byd_volt_n = 0
             self.byd_temp_n = 0
@@ -1192,7 +1192,7 @@ class byd_bat(SmartPlugin):
             self.byd_temps_n = 0
         elif self.byd_batt_type == 1:
             # HVM 16 Cells per module
-            self.byd_batt_str = "HVM"
+            self.byd_batt_str = 'HVM'
             self.byd_capacity_module = 2.76
             self.byd_volt_n = 16
             self.byd_temp_n = 8
@@ -1200,7 +1200,7 @@ class byd_bat(SmartPlugin):
             self.byd_temps_n = self.byd_modules * self.byd_temp_n
         elif self.byd_batt_type == 2:
             # HVS 32 cells per module
-            self.byd_batt_str = "HVS"
+            self.byd_batt_str = 'HVS'
             self.byd_capacity_module = 2.56
             self.byd_volt_n = 32
             self.byd_temp_n = 12
@@ -1208,14 +1208,14 @@ class byd_bat(SmartPlugin):
             self.byd_temps_n = self.byd_modules * self.byd_temp_n
         else:
             if (self.byd_batt_type_snr == 49) or (self.byd_batt_type_snr == 50):
-                self.byd_batt_str = "LVS"
+                self.byd_batt_str = 'LVS'
                 self.byd_capacity_module = 4.0
                 self.byd_volt_n = 7
                 self.byd_temp_n = 0
                 self.byd_cells_n = self.byd_modules * self.byd_volt_n
                 self.byd_temps_n = 0
             else:
-                self.byd_batt_str = "???"
+                self.byd_batt_str = '???'
                 self.byd_capacity_module = 0.0
                 self.byd_volt_n = 0
                 self.byd_temp_n = 0
@@ -1227,10 +1227,10 @@ class byd_bat(SmartPlugin):
         self.byd_inv_type = data[3]
         self.byd_inv_str = self.get_inverter_name(self.byd_batt_str, self.byd_inv_type)
 
-        self.log_debug("Inv Type  : " + self.byd_inv_str + " (" + str(self.byd_inv_type) + ")")
-        self.log_debug("Batt Type : " + self.byd_batt_str + " (" + str(self.byd_batt_type) + ")")
-        self.log_debug("Cells n   : " + f"{self.byd_cells_n:.0f}")
-        self.log_debug("Temps n   : " + f"{self.byd_temps_n:.0f}")
+        self.log_debug('Inv Type  : ' + self.byd_inv_str + ' (' + str(self.byd_inv_type) + ')')
+        self.log_debug('Batt Type : ' + self.byd_batt_str + ' (' + str(self.byd_batt_type) + ')')
+        self.log_debug('Cells n   : ' + f'{self.byd_cells_n:.0f}')
+        self.log_debug('Temps n   : ' + f'{self.byd_temps_n:.0f}')
 
         if self.byd_cells_n > byd_cells_max:
             self.byd_cells_n = byd_cells_max
@@ -1242,10 +1242,10 @@ class byd_bat(SmartPlugin):
     def decode_5(self, data, x):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_5'.
 
-        self.log_debug("decode_5 (" + str(x) + ") : " + data.hex())
+        self.log_debug('decode_5 (' + str(x) + ') : ' + data.hex())
 
         if len(data) != MESSAGE_5_L:
-            self.log_info("MESSAGE_5 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_5_L) + ")")
+            self.log_info('MESSAGE_5 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_5_L) + ')')
             return byd_error
 
         self.byd_diag_volt_max[x] = self.buf2int16SI(data, 5) / 1000.0  # Byte 5+6   (Index 1)
@@ -1297,28 +1297,28 @@ class byd_bat(SmartPlugin):
         for xx in range(0, 16):  # 0..15
             self.byd_volt_cell[x][xx] = self.buf2int16SI(data, 101 + (xx * 2)) / 1000.0
 
-        self.log_debug("SOC             : " + f"{self.byd_diag_soc[x]:.1f}")
-        self.log_debug("SOH             : " + f"{self.byd_diag_soh[x]:.1f}")
-        self.log_debug("Bat Voltag      : " + f"{self.byd_diag_bat_voltag[x]:.2f}")
-        self.log_debug("V-Out           : " + f"{self.byd_diag_v_out[x]:.2f}")
-        self.log_debug("Current         : " + f"{self.byd_diag_current[x]:.2f}")
+        self.log_debug('SOC             : ' + f'{self.byd_diag_soc[x]:.1f}')
+        self.log_debug('SOH             : ' + f'{self.byd_diag_soh[x]:.1f}')
+        self.log_debug('Bat Voltag      : ' + f'{self.byd_diag_bat_voltag[x]:.2f}')
+        self.log_debug('V-Out           : ' + f'{self.byd_diag_v_out[x]:.2f}')
+        self.log_debug('Current         : ' + f'{self.byd_diag_current[x]:.2f}')
         self.log_debug(
-            "Volt max        : " + f"{self.byd_diag_volt_max[x]:.3f}" + " c=" + f"{self.byd_diag_volt_max_c[x]:.0f}"
+            'Volt max        : ' + f'{self.byd_diag_volt_max[x]:.3f}' + ' c=' + f'{self.byd_diag_volt_max_c[x]:.0f}'
         )
         self.log_debug(
-            "Volt min        : " + f"{self.byd_diag_volt_min[x]:.3f}" + " c=" + f"{self.byd_diag_volt_min_c[x]:.0f}"
+            'Volt min        : ' + f'{self.byd_diag_volt_min[x]:.3f}' + ' c=' + f'{self.byd_diag_volt_min_c[x]:.0f}'
         )
-        self.log_debug("Volt diff       : " + f"{self.byd_diag_volt_diff[x]:.1f}")
+        self.log_debug('Volt diff       : ' + f'{self.byd_diag_volt_diff[x]:.1f}')
         self.log_debug(
-            "Temp max        : " + f"{self.byd_diag_temp_max[x]:.1f}" + " c=" + f"{self.byd_diag_temp_max_c[x]:.0f}"
+            'Temp max        : ' + f'{self.byd_diag_temp_max[x]:.1f}' + ' c=' + f'{self.byd_diag_temp_max_c[x]:.0f}'
         )
         self.log_debug(
-            "Temp min        : " + f"{self.byd_diag_temp_min[x]:.1f}" + " c=" + f"{self.byd_diag_temp_min_c[x]:.0f}"
+            'Temp min        : ' + f'{self.byd_diag_temp_min[x]:.1f}' + ' c=' + f'{self.byd_diag_temp_min_c[x]:.0f}'
         )
-        self.log_debug("Charge total    : " + f"{self.byd_diag_charge_total[x]:.3f}")
-        self.log_debug("Discharge total : " + f"{self.byd_diag_discharge_total[x]:.3f}")
-        self.log_debug("Status          : " + "0x" + f"{self.byd_diag_state[x]:04x}")
-        self.log_debug("Balancing       : " + f"{nnn:.0f}")
+        self.log_debug('Charge total    : ' + f'{self.byd_diag_charge_total[x]:.3f}')
+        self.log_debug('Discharge total : ' + f'{self.byd_diag_discharge_total[x]:.3f}')
+        self.log_debug('Status          : ' + '0x' + f'{self.byd_diag_state[x]:04x}')
+        self.log_debug('Balancing       : ' + f'{nnn:.0f}')
         #        for xx in range(0,16):
         #          self.log_debug("Turm " + str(x) + " Volt " + str(xx) + " : " + str(self.byd_volt_cell[x][xx]))
 
@@ -1327,10 +1327,10 @@ class byd_bat(SmartPlugin):
     def decode_6(self, data, x):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_6'.
 
-        self.log_debug("decode_6 (" + str(x) + ") : " + data.hex())
+        self.log_debug('decode_6 (' + str(x) + ') : ' + data.hex())
 
         if len(data) != MESSAGE_6_L:
-            self.log_info("MESSAGE_6 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_6_L) + ")")
+            self.log_info('MESSAGE_6 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_6_L) + ')')
             return byd_error
 
         for xx in range(0, 64):  # 0..63, Cell voltage 16-79
@@ -1344,10 +1344,10 @@ class byd_bat(SmartPlugin):
     def decode_7(self, data, x):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_7'.
 
-        self.log_debug("decode_7 (" + str(x) + ") : " + data.hex())
+        self.log_debug('decode_7 (' + str(x) + ') : ' + data.hex())
 
         if len(data) != MESSAGE_7_L:
-            self.log_info("MESSAGE_7 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_7_L) + ")")
+            self.log_info('MESSAGE_7 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_7_L) + ')')
             return byd_error
 
         # starting with byte 5, ending 101, voltage for cell 81 to 128
@@ -1368,10 +1368,10 @@ class byd_bat(SmartPlugin):
     def decode_8(self, data, x):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_8'.
 
-        self.log_debug("decode_8 (" + str(x) + ") : " + data.hex())
+        self.log_debug('decode_8 (' + str(x) + ') : ' + data.hex())
 
         if len(data) != MESSAGE_8_L:
-            self.log_info("MESSAGE_8 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_8_L) + ")")
+            self.log_info('MESSAGE_8 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_8_L) + ')')
             return byd_error
 
         for xx in range(0, 34):  # 0..33
@@ -1385,10 +1385,10 @@ class byd_bat(SmartPlugin):
     def decode_12(self, data, x):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_12' fuer den Turm 'x'.
 
-        self.log_debug("decode_12 (" + str(x) + ") : " + data.hex())
+        self.log_debug('decode_12 (' + str(x) + ') : ' + data.hex())
 
         if len(data) != MESSAGE_12_L:
-            self.log_info("MESSAGE_12 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_12_L) + ")")
+            self.log_info('MESSAGE_12 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_12_L) + ')')
             return byd_error
 
         # Balancing-Flags. Es folgen 8x 16-bit-Worte (MSB,LSB!) = 16 Byte => 0..127 Bits
@@ -1420,10 +1420,10 @@ class byd_bat(SmartPlugin):
     def decode_13(self, data, x):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_13'.
 
-        self.log_debug("decode_13 (" + str(x) + ") : " + data.hex())
+        self.log_debug('decode_13 (' + str(x) + ') : ' + data.hex())
 
         if len(data) != MESSAGE_13_L:
-            self.log_info("MESSAGE_13 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_13_L) + ")")
+            self.log_info('MESSAGE_13 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_13_L) + ')')
             return byd_error
 
         # The first round measured up to 128 cells, request[12] then get another 16
@@ -1438,10 +1438,10 @@ class byd_bat(SmartPlugin):
     def decode_14(self, data, x):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_14'.
 
-        self.log_debug("decode_14 (" + str(x) + ") : " + data.hex())
+        self.log_debug('decode_14 (' + str(x) + ') : ' + data.hex())
 
         if len(data) != MESSAGE_14_L:
-            self.log_info("MESSAGE_14 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_14_L) + ")")
+            self.log_info('MESSAGE_14 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_14_L) + ')')
             return byd_error
 
         return byd_ok
@@ -1449,10 +1449,10 @@ class byd_bat(SmartPlugin):
     def decode_15(self, data, x):
         # Decodieren der Nachricht auf Befehl 'MESSAGE_15'.
 
-        self.log_debug("decode_15 (" + str(x) + ") : " + data.hex())
+        self.log_debug('decode_15 (' + str(x) + ') : ' + data.hex())
 
         if len(data) != MESSAGE_15_L:
-            self.log_info("MESSAGE_15 answer length wrong ! (" + str(len(data)) + "/" + str(MESSAGE_15_L) + ")")
+            self.log_info('MESSAGE_15 answer length wrong ! (' + str(len(data)) + '/' + str(MESSAGE_15_L) + ')')
             return byd_error
 
         return byd_ok
@@ -1461,7 +1461,7 @@ class byd_bat(SmartPlugin):
         #        self.log_debug("decode_nop (" + str(x) + ") : " + data.hex())
 
         if len(data) != lenx:
-            self.log_info("MESSAGE nop answer length wrong ! (" + str(len(data)) + "/" + str(lenx) + ")")
+            self.log_info('MESSAGE nop answer length wrong ! (' + str(len(data)) + '/' + str(lenx) + ')')
             return byd_error
 
         return byd_ok
@@ -1524,9 +1524,9 @@ class byd_bat(SmartPlugin):
         # Log-Daten aus dem BMU (0) und jedem Turm (1-3) auslesen
         for x in range(0, self.byd_bms_qty + 1):  # 0 ... self.byd_bms_qty
             if x == 0:
-                self.log_debug("read_log_data BMU")
+                self.log_debug('read_log_data BMU')
             else:
-                self.log_debug("read_log_data BMS tower " + str(x))
+                self.log_debug('read_log_data BMS tower ' + str(x))
 
             # Trigger zum Auslesen senden
             bmu = False
@@ -1541,7 +1541,7 @@ class byd_bat(SmartPlugin):
                 m = EVT_MSG_0_3
             res, data = self.send_msg(client, m, byd_timeout_1s)
             if res == byd_error:
-                self.log_info("read_log_data message " + m + " failed")
+                self.log_info('read_log_data message ' + m + ' failed')
                 return byd_error
             if self.decode_log_0(data, x) == byd_error:
                 return
@@ -1550,40 +1550,40 @@ class byd_bat(SmartPlugin):
             # Register 0x05A1 auslesen -> Log-Daten verfuerbar ?
             res, r = self.read_reg(client, 0x05A1, 0x01)
             if res == byd_error:
-                self.log_info("read_log_data read_reg 0x05A1 failed")
+                self.log_info('read_log_data read_reg 0x05A1 failed')
                 return byd_error
             if (r % 0x100) == 0:
-                self.log_debug("read_log_data no data (" + str(x) + ")")
+                self.log_debug('read_log_data no data (' + str(x) + ')')
                 continue
 
             # 1.Paket auslesen
             res, data1 = self.send_msg(client, EVT_MSG_1, byd_timeout_1s)
             if res == byd_error:
-                self.log_info("read_log_data message " + m + " failed")
+                self.log_info('read_log_data message ' + m + ' failed')
                 return byd_error
 
             # 2.Paket auslesen
             res, data2 = self.send_msg(client, EVT_MSG_1, byd_timeout_1s)
             if res == byd_error:
-                self.log_info("read_log_data message " + m + " failed")
+                self.log_info('read_log_data message ' + m + ' failed')
                 return byd_error
 
             # 3.Paket auslesen
             res, data3 = self.send_msg(client, EVT_MSG_1, byd_timeout_1s)
             if res == byd_error:
-                self.log_info("read_log_data message " + m + " failed")
+                self.log_info('read_log_data message ' + m + ' failed')
                 return byd_error
 
             # 4.Paket auslesen
             res, data4 = self.send_msg(client, EVT_MSG_1, byd_timeout_1s)
             if res == byd_error:
-                self.log_info("read_log_data message " + m + " failed")
+                self.log_info('read_log_data message ' + m + ' failed')
                 return byd_error
 
             # 5.Paket auslesen
             res, data5 = self.send_msg(client, EVT_MSG_1, byd_timeout_1s)
             if res == byd_error:
-                self.log_info("read_log_data message " + m + " failed")
+                self.log_info('read_log_data message ' + m + ' failed')
                 return byd_error
 
             # Daten extrahieren und speichern
@@ -1591,12 +1591,12 @@ class byd_bat(SmartPlugin):
                 return
 
         if self.byd_bms_qty == 1:
-            self.byd_root.visu.tower2_log.log_html("")
+            self.byd_root.visu.tower2_log.log_html('')
             self.byd_root.visu.tower2_log.log_jsonlist([])
-            self.byd_root.visu.tower3_log.log_html("")
+            self.byd_root.visu.tower3_log.log_html('')
             self.byd_root.visu.tower3_log.log_jsonlist([])
         elif self.byd_bms_qty == 2:
-            self.byd_root.visu.tower3_log.log_html("")
+            self.byd_root.visu.tower3_log.log_html('')
             self.byd_root.visu.tower3_log.log_jsonlist([])
 
         return byd_ok
@@ -1604,10 +1604,10 @@ class byd_bat(SmartPlugin):
     def decode_log_0(self, data, x):
         # Decodieren der Nachricht auf Befehl 'EVT_MSG_0_1'.
 
-        self.log_debug("decode_log_0 (" + str(x) + ") : " + data.hex())
+        self.log_debug('decode_log_0 (' + str(x) + ') : ' + data.hex())
 
         if len(data) != EVT_MSG_0_L:
-            self.log_info("EVT_MSG_0_x answer length wrong ! (" + str(len(data)) + "/" + str(EVT_MSG_0_L) + ")")
+            self.log_info('EVT_MSG_0_x answer length wrong ! (' + str(len(data)) + '/' + str(EVT_MSG_0_L) + ')')
             return byd_error
 
         return byd_ok
@@ -1615,12 +1615,12 @@ class byd_bat(SmartPlugin):
     def decode_log_1(self, bmu, d1, d2, d3, d4, d5, xx):
         # Decodieren Log-Daten.
 
-        self.log_debug("decode_log_1 (" + str(xx) + ")")
-        self.log_debug("1) " + d1.hex())
-        self.log_debug("2) " + d2.hex())
-        self.log_debug("3) " + d3.hex())
-        self.log_debug("4) " + d4.hex())
-        self.log_debug("5) " + d5.hex())
+        self.log_debug('decode_log_1 (' + str(xx) + ')')
+        self.log_debug('1) ' + d1.hex())
+        self.log_debug('2) ' + d2.hex())
+        self.log_debug('3) ' + d3.hex())
+        self.log_debug('4) ' + d4.hex())
+        self.log_debug('5) ' + d5.hex())
 
         if (
             (len(d1) != EVT_MSG_1_L)
@@ -1629,7 +1629,7 @@ class byd_bat(SmartPlugin):
             or (len(d4) != EVT_MSG_1_L)
             or (len(d5) != EVT_MSG_1_L)
         ):
-            self.log_info("EVT_MSG_1 answer length wrong ! (" + str(len(d1)) + "/" + str(EVT_MSG_1_L) + ")")
+            self.log_info('EVT_MSG_1 answer length wrong ! (' + str(len(d1)) + '/' + str(EVT_MSG_1_L) + ')')
             return byd_error
 
         # Erzeuge eine Liste mit allen Datenbytes - 20 Log-Eintraege befinden sich in dieser Liste
@@ -1647,7 +1647,7 @@ class byd_bat(SmartPlugin):
                 elif x == 5:
                     d.append(d5[y])
 
-        self.log_debug("=> " + bytearray(d).hex())
+        self.log_debug('=> ' + bytearray(d).hex())
 
         # https://smarthomeng.github.io/smarthome/plugins/database/README.html
 
@@ -1742,70 +1742,70 @@ class byd_bat(SmartPlugin):
         for i in range(len(byd_log_code)):
             if code == byd_log_code[i][0]:
                 return byd_log_code[i][1]
-        return "??"
+        return '??'
 
     def logdata2str(self, bmu, ld, xx):
         # Erzeugt aus 'data' in 'ld' einen lesbaren Text (aehnlich Be_Connect).
 
         data = ld[byd_log_data]
-        s1 = ""
+        s1 = ''
         unknown = False
         if ld[byd_log_codex] == 0:  # Power ON (0)
             if bmu:
                 if data[0] == 0:
-                    s1 = s1 + "Bootloader" + byd_log_str_sep
+                    s1 = s1 + 'Bootloader' + byd_log_str_sep
                 else:
-                    s1 = s1 + "??" + byd_log_str_sep
+                    s1 = s1 + '??' + byd_log_str_sep
                 if data[1] == 0:
-                    s1 = s1 + "Running section: A" + byd_log_str_sep
+                    s1 = s1 + 'Running section: A' + byd_log_str_sep
                 elif data[1] == 1:
-                    s1 = s1 + "Running section: B" + byd_log_str_sep
+                    s1 = s1 + 'Running section: B' + byd_log_str_sep
                 else:
-                    s1 = s1 + "??" + byd_log_str_sep
-                s2 = f"{data[2]:d}" + "." + f"{data[3]:d}"
-                s1 = s1 + "Current Version:V" + s2 + byd_log_str_sep
+                    s1 = s1 + '??' + byd_log_str_sep
+                s2 = f'{data[2]:d}' + '.' + f'{data[3]:d}'
+                s1 = s1 + 'Current Version:V' + s2 + byd_log_str_sep
             else:
                 if data[0] == 0:
-                    s1 = s1 + "Bootloader" + byd_log_str_sep
+                    s1 = s1 + 'Bootloader' + byd_log_str_sep
                 else:
-                    s1 = s1 + "??" + byd_log_str_sep
+                    s1 = s1 + '??' + byd_log_str_sep
                 if data[2] == 0:
-                    s1 = s1 + "Running section: A" + byd_log_str_sep
+                    s1 = s1 + 'Running section: A' + byd_log_str_sep
                 elif data[2] == 1:
-                    s1 = s1 + "Running section: B" + byd_log_str_sep
+                    s1 = s1 + 'Running section: B' + byd_log_str_sep
                 else:
-                    s1 = s1 + "??" + byd_log_str_sep
-                s2 = f"{data[3]:d}" + "." + f"{data[4]:d}"
-                s1 = s1 + "FW version:V" + s2 + byd_log_str_sep
+                    s1 = s1 + '??' + byd_log_str_sep
+                s2 = f'{data[3]:d}' + '.' + f'{data[4]:d}'
+                s1 = s1 + 'FW version:V' + s2 + byd_log_str_sep
 
         elif ld[byd_log_codex] == 1:  # Power OFF (1)
             if bmu:
                 if data[0] == 0:
-                    s1 = s1 + "??" + byd_log_str_sep
+                    s1 = s1 + '??' + byd_log_str_sep
                 elif data[0] == 1:
-                    s1 = s1 + "Switch off by pressing LED button." + byd_log_str_sep
+                    s1 = s1 + 'Switch off by pressing LED button.' + byd_log_str_sep
                 else:
-                    s1 = s1 + "??" + byd_log_str_sep
+                    s1 = s1 + '??' + byd_log_str_sep
             else:
                 if data[1] < len(byd_log_bms_poweroff):
                     s1 = s1 + byd_log_bms_poweroff[data[1]] + byd_log_str_sep
                 else:
                     s1 = s1 + byd_log_bms_poweroff[len(byd_log_bms_poweroff) - 1] + byd_log_str_sep
                 if data[2] == 0:
-                    s1 = s1 + "Running section: A" + byd_log_str_sep
+                    s1 = s1 + 'Running section: A' + byd_log_str_sep
                 elif data[2] == 1:
-                    s1 = s1 + "Running section: B" + byd_log_str_sep
+                    s1 = s1 + 'Running section: B' + byd_log_str_sep
                 else:
-                    s1 = s1 + "??" + byd_log_str_sep
-                s2 = f"{data[3]:d}" + "." + f"{data[4]:d}"
-                s1 = s1 + "FW version:V" + s2 + byd_log_str_sep
+                    s1 = s1 + '??' + byd_log_str_sep
+                s2 = f'{data[3]:d}' + '.' + f'{data[4]:d}'
+                s1 = s1 + 'FW version:V' + s2 + byd_log_str_sep
 
         elif ld[byd_log_codex] == 2:  # Events record (2)
             if bmu:
                 if data[0] == 0:
-                    s1 = s1 + "disappear" + byd_log_str_sep
+                    s1 = s1 + 'disappear' + byd_log_str_sep
                 else:
-                    s1 = s1 + "appear" + byd_log_str_sep
+                    s1 = s1 + 'appear' + byd_log_str_sep
                 if data[1] < len(byd_log_bmu_errors):
                     s2 = byd_log_bmu_errors[data[1]]
                     if len(s2) > 0:
@@ -1814,30 +1814,30 @@ class byd_bat(SmartPlugin):
                     s1 = s1 + byd_log_bmu_errors[len(byd_log_bmu_errors) - 1] + byd_log_str_sep
                 x = int(data[2] * 0x100 + data[3])
                 if x == 0:
-                    s1 = s1 + "No warning" + byd_log_str_sep
+                    s1 = s1 + 'No warning' + byd_log_str_sep
                 else:
-                    s2 = ""
+                    s2 = ''
                     for i in range(0, 16):  # 0..15
                         if (int(x) % 2) == 1:
                             if len(s2) > 0:
-                                s2 = s2 + ";"
+                                s2 = s2 + ';'
                             s2 = s2 + byd_log_bmu_warnings[i]
                         x = int(x / 2)
                     s1 = s1 + s2 + byd_log_str_sep
                 x = self.buf2int16US(data, 4)
-                s1 = s1 + "Cell_Max._V:" + f"{x:d}" + "mV" + byd_log_str_sep
+                s1 = s1 + 'Cell_Max._V:' + f'{x:d}' + 'mV' + byd_log_str_sep
                 x = self.buf2int16US(data, 6)
-                s1 = s1 + "Cell_Min._V:" + f"{x:d}" + "mV" + byd_log_str_sep
+                s1 = s1 + 'Cell_Min._V:' + f'{x:d}' + 'mV' + byd_log_str_sep
                 x = data[8]
-                s1 = s1 + "Battery_Temp_Max:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'Battery_Temp_Max:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
                 x = data[9]
-                s1 = s1 + "Battery_Temp_Min:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'Battery_Temp_Min:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
                 x = self.buf2int16US(data, 10) / 10.0
-                s1 = s1 + "Battery Total Voltage:" + f"{x:.1f}" + "V" + byd_log_str_sep
+                s1 = s1 + 'Battery Total Voltage:' + f'{x:.1f}' + 'V' + byd_log_str_sep
                 x = data[12]
-                s1 = s1 + "SOC:" + f"{x:d}" + "%" + byd_log_str_sep
+                s1 = s1 + 'SOC:' + f'{x:d}' + '%' + byd_log_str_sep
                 x = data[13]
-                s1 = s1 + "SOH:" + f"{x:d}" + "%" + byd_log_str_sep
+                s1 = s1 + 'SOH:' + f'{x:d}' + '%' + byd_log_str_sep
             else:
                 s1 = self.logdatabms2str(ld, False)
 
@@ -1845,82 +1845,82 @@ class byd_bat(SmartPlugin):
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 4:  # Start Charging(4)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 5:  # Stop Charging(5)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 6:  # Start DisCharging (6)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 7:  # Stop DisCharging (7)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 8:  # SOC calibration rough (8)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 9:  # SOC calibration fine (8)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 10:  # SOC calibration Stop (10)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 13:  # Receive PreCharge Command (13)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 14:  # PreCharge Successful (14)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 16:  # Start end SOC calibration (16)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 17:  # Start Balancing (17)
             if not bmu:
-                s2 = ""
+                s2 = ''
                 nn = 0
                 ci = 0
                 for i in range(0, 20):  # 0..19
@@ -1928,229 +1928,229 @@ class byd_bat(SmartPlugin):
                     for ii in range(0, 8):  # 0..7
                         if (int(x) % 2) == 1:
                             if len(s2) > 0:
-                                s2 = s2 + ";"
+                                s2 = s2 + ';'
                             s2 = s2 + str(ci)
                             nn = nn + 1
                         x = int(x / 2)
                         ci = ci + 1
                 if len(s2) > 0:
-                    s1 = s1 + "Balancing Cells:#=" + str(nn) + "[" + s2 + "]" + byd_log_str_sep
+                    s1 = s1 + 'Balancing Cells:#=' + str(nn) + '[' + s2 + ']' + byd_log_str_sep
                 x = self.buf2int16USx(data, 21)
-                s1 = s1 + "Cell_Min_V:" + f"{x:d}" + "mV" + byd_log_str_sep
+                s1 = s1 + 'Cell_Min_V:' + f'{x:d}' + 'mV' + byd_log_str_sep
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 18:  # Stop Balancing (18)
             if not bmu:
                 x = self.buf2int16USx(data, 21)
-                s1 = s1 + "Cell_Min_V:" + f"{x:d}" + "mV" + byd_log_str_sep
+                s1 = s1 + 'Cell_Min_V:' + f'{x:d}' + 'mV' + byd_log_str_sep
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 19:  # Address Registered (19)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 20:  # System Functional Safety Fault (20)
             if not bmu:
                 s1 = self.logdatabms2str(ld, False)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 21:  # Events additional info (21)
             if not bmu:
                 s1 = self.logdatabms2str(ld, True)
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 32:  # System status changed (32)
             if bmu:
                 if data[1] < len(byd_log_status):
-                    s1 = s1 + byd_log_status[data[1]] + " => "
+                    s1 = s1 + byd_log_status[data[1]] + ' => '
                 else:
-                    s1 = s1 + byd_log_status[len(byd_log_status) - 1] + " => "
+                    s1 = s1 + byd_log_status[len(byd_log_status) - 1] + ' => '
                 if data[0] < len(byd_log_status):
                     s1 = s1 + byd_log_status[data[0]]
                 else:
                     s1 = s1 + byd_log_status[len(byd_log_status) - 1]
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 34:  # BMS update start (34)
             if bmu:
-                s1 = s1 + "FW Version:V" + f"{data[1]:d}" + "." + f"{data[2]:d}" + byd_log_str_sep
-                s1 = s1 + "MCU Type:" + f"{data[4]:d}" + byd_log_str_sep
+                s1 = s1 + 'FW Version:V' + f'{data[1]:d}' + '.' + f'{data[2]:d}' + byd_log_str_sep
+                s1 = s1 + 'MCU Type:' + f'{data[4]:d}' + byd_log_str_sep
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 35:  # BMS update start (35)
             if bmu:
-                s1 = s1 + "FW Version:V" + f"{data[1]:d}" + "." + f"{data[2]:d}" + byd_log_str_sep
-                s1 = s1 + "MCU Type:" + f"{data[4]:d}" + byd_log_str_sep
+                s1 = s1 + 'FW Version:V' + f'{data[1]:d}' + '.' + f'{data[2]:d}' + byd_log_str_sep
+                s1 = s1 + 'MCU Type:' + f'{data[4]:d}' + byd_log_str_sep
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 36:  # Functional Safety Info (36)
             if bmu:
                 x = data[0] * 0x01000000 + data[1] * 0x00010000 + data[2] * 0x00000100 + data[3]
-                s1 = s1 + "Running Time:" + f"{x:d}" + "s" + byd_log_str_sep
+                s1 = s1 + 'Running Time:' + f'{x:d}' + 's' + byd_log_str_sep
                 x = data[4]
-                s1 = s1 + "BMU detected Cells Qty:" + f"{x:d}" + byd_log_str_sep
+                s1 = s1 + 'BMU detected Cells Qty:' + f'{x:d}' + byd_log_str_sep
                 x = data[5]
-                s1 = s1 + "BMU detected Temp. Qty:" + f"{x:d}" + byd_log_str_sep
+                s1 = s1 + 'BMU detected Temp. Qty:' + f'{x:d}' + byd_log_str_sep
                 x = self.buf2int16US(data, 6)
-                s1 = s1 + "BMU detected Cell_V_Max:" + f"{x:d}" + "mV" + byd_log_str_sep
+                s1 = s1 + 'BMU detected Cell_V_Max:' + f'{x:d}' + 'mV' + byd_log_str_sep
                 x = self.buf2int16US(data, 8)
-                s1 = s1 + "BMU detected Cell_V_Min:" + f"{x:d}" + "mV" + byd_log_str_sep
+                s1 = s1 + 'BMU detected Cell_V_Min:' + f'{x:d}' + 'mV' + byd_log_str_sep
                 x = data[10]
-                s1 = s1 + "BMU detected Temp_Max:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'BMU detected Temp_Max:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
                 x = data[11]
-                s1 = s1 + "BMU detected Temp_Min:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'BMU detected Temp_Min:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
                 x = self.buf2int16US(data, 12) / 10.0
-                s1 = s1 + "BMU detected Current:" + f"{x:.1f}" + "A" + byd_log_str_sep
+                s1 = s1 + 'BMU detected Current:' + f'{x:.1f}' + 'A' + byd_log_str_sep
                 x = self.buf2int16US(data, 14) / 10.0
-                s1 = s1 + "BMU detected Output_V:" + f"{x:.1f}" + "V" + byd_log_str_sep
+                s1 = s1 + 'BMU detected Output_V:' + f'{x:.1f}' + 'V' + byd_log_str_sep
                 x = self.buf2int16US(data, 16) / 10.0
-                s1 = s1 + "BMU detected All Cells Accum_V:" + f"{x:.1f}" + "V" + byd_log_str_sep
+                s1 = s1 + 'BMU detected All Cells Accum_V:' + f'{x:.1f}' + 'V' + byd_log_str_sep
                 x = data[18]
-                s1 = s1 + "BMS Address:" + f"{x:d}" + byd_log_str_sep
+                s1 = s1 + 'BMS Address:' + f'{x:d}' + byd_log_str_sep
                 if data[19] < len(byd_module_type):
-                    s1 = s1 + "Module type:" + byd_module_type[data[19]] + byd_log_str_sep
+                    s1 = s1 + 'Module type:' + byd_module_type[data[19]] + byd_log_str_sep
                 else:
-                    s1 = s1 + "Module type:" + byd_module_type[len(byd_module_type) - 1] + byd_log_str_sep
+                    s1 = s1 + 'Module type:' + byd_module_type[len(byd_module_type) - 1] + byd_log_str_sep
                 x = data[20]
-                s1 = s1 + "Module Number:" + f"{x:d}" + byd_log_str_sep
+                s1 = s1 + 'Module Number:' + f'{x:d}' + byd_log_str_sep
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 37:  # No Defined (37)
             if bmu:
-                s1 = s1 + "not defined - " + bytearray(ld[byd_log_data]).hex()
+                s1 = s1 + 'not defined - ' + bytearray(ld[byd_log_data]).hex()
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 38:  # SOP Info (38)
             if bmu:
                 x = self.buf2int16US(data, 0) / 10.0
-                s1 = s1 + "Charge Max. Current:" + f"{x:.1f}" + "A" + byd_log_str_sep
+                s1 = s1 + 'Charge Max. Current:' + f'{x:.1f}' + 'A' + byd_log_str_sep
                 x = self.buf2int16US(data, 2) / 10.0
-                s1 = s1 + "Discharge Max. Current:" + f"{x:.1f}" + "A" + byd_log_str_sep
+                s1 = s1 + 'Discharge Max. Current:' + f'{x:.1f}' + 'A' + byd_log_str_sep
                 x = self.buf2int16US(data, 4) / 10.0
-                s1 = s1 + "Charge Max. Voltage:" + f"{x:.1f}" + "V" + byd_log_str_sep
+                s1 = s1 + 'Charge Max. Voltage:' + f'{x:.1f}' + 'V' + byd_log_str_sep
                 x = self.buf2int16US(data, 6) / 10.0
-                s1 = s1 + "Discharge Min. Voltage:" + f"{x:.1f}" + "V" + byd_log_str_sep
+                s1 = s1 + 'Discharge Min. Voltage:' + f'{x:.1f}' + 'V' + byd_log_str_sep
                 if data[8] < len(byd_log_status):
                     s1 = s1 + byd_log_status[data[8]] + byd_log_str_sep
                 else:
                     s1 = s1 + byd_log_status[len(byd_log_status) - 1] + byd_log_str_sep
                 x = data[9]
-                s1 = s1 + "Battery Temperature:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'Battery Temperature:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
                 s1 = s1 + self.get_inverter_name(self.byd_batt_str, data[10]) + byd_log_str_sep
                 x = data[11]
-                s1 = s1 + "BMS Qty:" + f"{x:d}" + byd_log_str_sep
+                s1 = s1 + 'BMS Qty:' + f'{x:d}' + byd_log_str_sep
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 40:  # BMS Firmware list (40)
             if bmu:
                 x = data[0]
-                s1 = s1 + "Firmware Num:" + f"{x:d}" + byd_log_str_sep
-                s1 = s1 + "FW Version:V" + f"{data[1]:d}" + "." + f"{data[2]:d}" + byd_log_str_sep
+                s1 = s1 + 'Firmware Num:' + f'{x:d}' + byd_log_str_sep
+                s1 = s1 + 'FW Version:V' + f'{data[1]:d}' + '.' + f'{data[2]:d}' + byd_log_str_sep
                 x = data[3]
-                s1 = s1 + "Firmware Num:" + f"{x:d}" + byd_log_str_sep
-                s1 = s1 + "FW Version:V" + f"{data[4]:d}" + "." + f"{data[5]:d}" + byd_log_str_sep
+                s1 = s1 + 'Firmware Num:' + f'{x:d}' + byd_log_str_sep
+                s1 = s1 + 'FW Version:V' + f'{data[4]:d}' + '.' + f'{data[5]:d}' + byd_log_str_sep
                 x = data[6]
                 if x != 0xFF:
-                    s1 = s1 + "Firmware Num:" + f"{x:d}" + byd_log_str_sep
-                    s1 = s1 + "FW Version:V" + f"{data[7]:d}" + "." + f"{data[8]:d}" + byd_log_str_sep
+                    s1 = s1 + 'Firmware Num:' + f'{x:d}' + byd_log_str_sep
+                    s1 = s1 + 'FW Version:V' + f'{data[7]:d}' + '.' + f'{data[8]:d}' + byd_log_str_sep
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 41:  # No Defined (41)
             if bmu:
-                s1 = s1 + "not defined - " + bytearray(ld[byd_log_data]).hex()
+                s1 = s1 + 'not defined - ' + bytearray(ld[byd_log_data]).hex()
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         elif ld[byd_log_codex] == 101:  # Firmware Start to Update (101)
             if bmu:
                 x = data[0]
                 if x == 0:
-                    s1 = s1 + "BMS A Updating" + byd_log_str_sep
+                    s1 = s1 + 'BMS A Updating' + byd_log_str_sep
                 else:
-                    s1 = s1 + "BMS B Updating" + byd_log_str_sep
-                s1 = s1 + "Version:V" + f"{data[1]:d}" + "." + f"{data[2]:d}" + byd_log_str_sep
+                    s1 = s1 + 'BMS B Updating' + byd_log_str_sep
+                s1 = s1 + 'Version:V' + f'{data[1]:d}' + '.' + f'{data[2]:d}' + byd_log_str_sep
             else:
                 x = data[0]
                 if x == 0:
-                    s1 = s1 + "Target Area:A" + byd_log_str_sep
+                    s1 = s1 + 'Target Area:A' + byd_log_str_sep
                 else:
-                    s1 = s1 + "Target Area:B" + byd_log_str_sep
-                s1 = s1 + "Before Update:V" + f"{data[2]:d}" + "." + f"{data[1]:d}" + byd_log_str_sep
-                s1 = s1 + "After Update:V" + f"{data[4]:d}" + "." + f"{data[3]:d}" + byd_log_str_sep
+                    s1 = s1 + 'Target Area:B' + byd_log_str_sep
+                s1 = s1 + 'Before Update:V' + f'{data[2]:d}' + '.' + f'{data[1]:d}' + byd_log_str_sep
+                s1 = s1 + 'After Update:V' + f'{data[4]:d}' + '.' + f'{data[3]:d}' + byd_log_str_sep
 
         elif ld[byd_log_codex] == 102:  # Firmware Update Successful (102)
             if bmu:
                 x = data[0]
                 if x == 0:
-                    s1 = s1 + "BMS A Update Finish" + byd_log_str_sep
+                    s1 = s1 + 'BMS A Update Finish' + byd_log_str_sep
                 else:
-                    s1 = s1 + "BMS B Update Finish" + byd_log_str_sep
-                s1 = s1 + "Version:V" + f"{data[1]:d}" + "." + f"{data[2]:d}" + byd_log_str_sep
+                    s1 = s1 + 'BMS B Update Finish' + byd_log_str_sep
+                s1 = s1 + 'Version:V' + f'{data[1]:d}' + '.' + f'{data[2]:d}' + byd_log_str_sep
             else:
                 x = data[0]
                 if x == 0:
-                    s1 = s1 + "Target Area:A" + byd_log_str_sep
+                    s1 = s1 + 'Target Area:A' + byd_log_str_sep
                 else:
-                    s1 = s1 + "Target Area:B" + byd_log_str_sep
-                s1 = s1 + "Before Update:V" + f"{data[2]:d}" + "." + f"{data[1]:d}" + byd_log_str_sep
-                s1 = s1 + "After Update:V" + f"{data[4]:d}" + "." + f"{data[3]:d}" + byd_log_str_sep
+                    s1 = s1 + 'Target Area:B' + byd_log_str_sep
+                s1 = s1 + 'Before Update:V' + f'{data[2]:d}' + '.' + f'{data[1]:d}' + byd_log_str_sep
+                s1 = s1 + 'After Update:V' + f'{data[4]:d}' + '.' + f'{data[3]:d}' + byd_log_str_sep
 
         elif ld[byd_log_codex] == 105:  # Parameters table Update (105)
             if bmu:
                 if (data[0] == 0) or (data[0] == 1) or (data[0] == 2):
-                    s1 = s1 + "BMU Parameters table Update" + byd_log_str_sep
+                    s1 = s1 + 'BMU Parameters table Update' + byd_log_str_sep
                 else:
-                    s1 = s1 + "??" + byd_log_str_sep
-                s2 = f"{data[1]:d}" + "." + f"{data[2]:d}"
-                s1 = s1 + "Parameters table：V" + s2 + byd_log_str_sep
+                    s1 = s1 + '??' + byd_log_str_sep
+                s2 = f'{data[1]:d}' + '.' + f'{data[2]:d}'
+                s1 = s1 + 'Parameters table：V' + s2 + byd_log_str_sep
             else:
                 x = self.buf2int16USx(data, 0)
                 y = self.buf2int16USx(data, 2)
-                s1 = s1 + "Threshold table version:V" + f"{x:d}" + "." + f"{y:d}" + byd_log_str_sep
+                s1 = s1 + 'Threshold table version:V' + f'{x:d}' + '.' + f'{y:d}' + byd_log_str_sep
 
         elif ld[byd_log_codex] == 106:  # SN Code was Changed (106)
             if bmu:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
             else:
-                s1 = s1 + "serial number was changed" + byd_log_str_sep
+                s1 = s1 + 'serial number was changed' + byd_log_str_sep
 
         elif ld[byd_log_codex] == 111:  # DateTime Calibration (111)
             if bmu:
                 if data[0] == 0:
-                    s1 = s1 + "Calibrated by Upper computer" + byd_log_str_sep
+                    s1 = s1 + 'Calibrated by Upper computer' + byd_log_str_sep
                 elif data[0] == 1:
-                    s1 = s1 + "Calibrated by Inverter" + byd_log_str_sep
+                    s1 = s1 + 'Calibrated by Inverter' + byd_log_str_sep
                 elif data[0] == 2:
-                    s1 = s1 + "Calibrated by Internet" + byd_log_str_sep
+                    s1 = s1 + 'Calibrated by Internet' + byd_log_str_sep
                 else:
-                    s1 = s1 + "??" + byd_log_str_sep
+                    s1 = s1 + '??' + byd_log_str_sep
             else:
                 dtl = self.log_datetime_2_local(
                     ld[byd_log_year],
@@ -2167,84 +2167,84 @@ class byd_bat(SmartPlugin):
                 #            self.log_debug("x=" + f"{x:.3f}" + " seconds=" + f"{dtx.seconds:.3f}" + " us=" + f"{dtx.microseconds:.1f}" + " - " + dtl.strftime("%d.%m.%Y %H:%M:%S") + " - " + dtc.strftime("%d.%m.%Y %H:%M:%S"))
                 s1 = (
                     s1
-                    + "New Time:"
-                    + dtc.strftime("%d.%m.%Y %H:%M:%S")
-                    + " Delta:"
-                    + f"{x:.1f}"
-                    + "s"
+                    + 'New Time:'
+                    + dtc.strftime('%d.%m.%Y %H:%M:%S')
+                    + ' Delta:'
+                    + f'{x:.1f}'
+                    + 's'
                     + byd_log_str_sep
                 )
 
         elif ld[byd_log_codex] == 118:  # System timing log (118)
             if bmu:
                 if data[0] < len(byd_log_status):
-                    s1 = s1 + "System Status:" + byd_log_status[data[0]] + byd_log_str_sep
+                    s1 = s1 + 'System Status:' + byd_log_status[data[0]] + byd_log_str_sep
                 else:
-                    s1 = s1 + "System Status:" + byd_log_status[len(byd_log_status) - 1] + byd_log_str_sep
+                    s1 = s1 + 'System Status:' + byd_log_status[len(byd_log_status) - 1] + byd_log_str_sep
                 x = data[1]
-                s1 = s1 + "Environment_Temp_Min:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'Environment_Temp_Min:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
                 x = data[2]
-                s1 = s1 + "Environment_Temp_Max:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'Environment_Temp_Max:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
                 x = data[3]
-                s1 = s1 + "SOC:" + f"{x:.0f}" + "%" + byd_log_str_sep
+                s1 = s1 + 'SOC:' + f'{x:.0f}' + '%' + byd_log_str_sep
                 x = data[4]
-                s1 = s1 + "SOH:" + f"{x:.0f}" + "%" + byd_log_str_sep
+                s1 = s1 + 'SOH:' + f'{x:.0f}' + '%' + byd_log_str_sep
                 x = self.buf2int16US(data, 6) / 10.0
-                s1 = s1 + "Battery Total Voltage:" + f"{x:.1f}" + "V" + byd_log_str_sep
+                s1 = s1 + 'Battery Total Voltage:' + f'{x:.1f}' + 'V' + byd_log_str_sep
                 x = self.buf2int16US(data, 8)
-                s1 = s1 + "Cell_HV:" + f"{x:d}" + "mV" + byd_log_str_sep
+                s1 = s1 + 'Cell_HV:' + f'{x:d}' + 'mV' + byd_log_str_sep
                 x = self.buf2int16US(data, 10)
-                s1 = s1 + "Cell_LV:" + f"{x:d}" + "mV" + byd_log_str_sep
+                s1 = s1 + 'Cell_LV:' + f'{x:d}' + 'mV' + byd_log_str_sep
                 x = data[5]
-                s1 = s1 + "Battery Current_Temp:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'Battery Current_Temp:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
                 x = data[13]
-                s1 = s1 + "Battery_Temp_Max:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'Battery_Temp_Max:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
                 x = data[15]
-                s1 = s1 + "Battery_Temp_Min:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+                s1 = s1 + 'Battery_Temp_Min:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
             else:
-                s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+                s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
                 unknown = True
 
         else:
-            s1 = "not implemented yet (" + bytearray(ld[byd_log_data]).hex() + ")"
+            s1 = 'not implemented yet (' + bytearray(ld[byd_log_data]).hex() + ')'
             unknown = True
 
         if unknown:
             # Wir haben einen Log-Eintrag gefunden, den wir noch nicht decodieren
-            s1x = "logdata2str "
+            s1x = 'logdata2str '
             if bmu:
-                s1x = s1x + "BMU "
+                s1x = s1x + 'BMU '
             else:
-                s1x = s1x + "BMS Tower " + str(xx)
+                s1x = s1x + 'BMS Tower ' + str(xx)
             s1x = (
                 s1x
-                + " : code "
+                + ' : code '
                 + str(ld[byd_log_codex])
-                + " ("
+                + ' ('
                 + self.logcode2str(ld[byd_log_codex])
-                + ") not implemented yet"
+                + ') not implemented yet'
             )
             s1x = (
                 s1x
-                + " ("
-                + f"{ld[byd_log_day]:02d}"
-                + "."
-                + f"{ld[byd_log_month]:02d}"
-                + "."
-                + f"{2000 + ld[byd_log_year]:4d}"
+                + ' ('
+                + f'{ld[byd_log_day]:02d}'
+                + '.'
+                + f'{ld[byd_log_month]:02d}'
+                + '.'
+                + f'{2000 + ld[byd_log_year]:4d}'
             )
             s1x = (
                 s1x
-                + " "
-                + f"{ld[byd_log_hour]:2d}"
-                + ":"
-                + f"{ld[byd_log_minute]:02d}"
-                + ":"
-                + f"{ld[byd_log_second]:02d}"
-                + ")"
+                + ' '
+                + f'{ld[byd_log_hour]:2d}'
+                + ':'
+                + f'{ld[byd_log_minute]:02d}'
+                + ':'
+                + f'{ld[byd_log_second]:02d}'
+                + ')'
             )
-            s2 = "Raw Data: " + ld[byd_log_raw]
-            s3 = "Data: " + bytearray(ld[byd_log_data]).hex()
+            s2 = 'Raw Data: ' + ld[byd_log_raw]
+            s3 = 'Data: ' + bytearray(ld[byd_log_data]).hex()
             self.logging_special(s1x, s2, s3)
 
         return s1
@@ -2256,107 +2256,107 @@ class byd_bat(SmartPlugin):
         #       False -> Byte 17-22 normale Bedeutung
         co = ld[byd_log_codex]
         data = ld[byd_log_data]
-        s1 = ""
+        s1 = ''
         # Warnungen (3x16Bit)
         y1 = int(data[1] * 0x100 + data[0])
         y2 = int(data[3] * 0x100 + data[2])
         y3 = int(data[5] * 0x100 + data[4])
         y = y1 | y2 | y3  # Bitweise Oder
         if y > 0:
-            s2 = "Warning:"
+            s2 = 'Warning:'
             for i in range(0, 16):  # 0..15
                 if (int(y) % 2) == 1:
                     if len(s2) > 0:
-                        s2 = s2 + ";"
+                        s2 = s2 + ';'
                     s2 = s2 + byd_log_bms_warnings[i]
                 y = int(y / 2)
             s1 = s1 + s2 + byd_log_str_sep
         else:
-            s1 = s1 + "No Warning" + byd_log_str_sep
+            s1 = s1 + 'No Warning' + byd_log_str_sep
         # Fehler
         y = int(data[7] * 0x100 + data[6])
         if y > 0:
-            s2 = "Fault:"
+            s2 = 'Fault:'
             for i in range(0, 16):  # 0..15
                 if (int(y) % 2) == 1:
                     if len(s2) > 0:
-                        s2 = s2 + ";"
+                        s2 = s2 + ';'
                     s2 = s2 + byd_log_bms_failures[i]
                 y = int(y / 2)
             s1 = s1 + s2 + byd_log_str_sep
         # Status
         y = int(data[8])
         if y > 0:
-            s2 = ""
+            s2 = ''
             for i in range(0, 8):  # 0..7
                 if (int(y) % 2) == 1:
                     if len(s2) > 0:
-                        s2 = s2 + ";"
+                        s2 = s2 + ';'
                     s2 = s2 + byd_log_bms_switch_status_on[i]
                 else:
                     if i == 3:
                         if len(s2) > 0:
-                            s2 = s2 + ";"
+                            s2 = s2 + ';'
                         s2 = s2 + byd_log_bms_switch_status_off[i]
                 y = int(y / 2)
             s1 = s1 + s2 + byd_log_str_sep
         x = data[9]
         if co == 9:
             # Battery Idling
-            s1 = s1 + "Battery Idling:" + f"{x:d}" + "%" + byd_log_str_sep
+            s1 = s1 + 'Battery Idling:' + f'{x:d}' + '%' + byd_log_str_sep
         elif co == 20:
             # BMU serial port
-            s1 = s1 + "BMU serial port:V" + f"{x:d}" + byd_log_str_sep
+            s1 = s1 + 'BMU serial port:V' + f'{x:d}' + byd_log_str_sep
         else:
             # SOC
-            s1 = s1 + "SOC:" + f"{x:d}" + "%" + byd_log_str_sep
+            s1 = s1 + 'SOC:' + f'{x:d}' + '%' + byd_log_str_sep
         x = data[10]
         if co == 9:
             # SOC
-            s1 = s1 + "Target SOC:" + f"{x:d}" + "%" + byd_log_str_sep
+            s1 = s1 + 'Target SOC:' + f'{x:d}' + '%' + byd_log_str_sep
         elif co == 20:
             # BMS serial port
-            s1 = s1 + "BMS serial port:V" + f"{x:d}" + byd_log_str_sep
+            s1 = s1 + 'BMS serial port:V' + f'{x:d}' + byd_log_str_sep
         else:
             # SOH
-            s1 = s1 + "SOH:" + f"{x:d}" + "%" + byd_log_str_sep
+            s1 = s1 + 'SOH:' + f'{x:d}' + '%' + byd_log_str_sep
         # Spannung Batterie
         x = self.buf2int16USx(data, 11) / 10.0
-        s1 = s1 + "Bat_V:" + f"{x:.1f}" + "V" + byd_log_str_sep
+        s1 = s1 + 'Bat_V:' + f'{x:.1f}' + 'V' + byd_log_str_sep
         # Spannung Ausgang
         x = self.buf2int16USx(data, 13) / 10.0
-        s1 = s1 + "Output_V:" + f"{x:.1f}" + "V" + byd_log_str_sep
+        s1 = s1 + 'Output_V:' + f'{x:.1f}' + 'V' + byd_log_str_sep
         # Strom
         x = self.buf2int16SIx(data, 15) / 10.0
-        s1 = s1 + "Current:" + f"{x:.1f}" + "A" + byd_log_str_sep
+        s1 = s1 + 'Current:' + f'{x:.1f}' + 'A' + byd_log_str_sep
         # Zellenspannung max
         if not cnr:
             x = self.buf2int16USx(data, 17)
-            s1 = s1 + "Cell_Max_V:" + f"{x:d}" + "mV" + byd_log_str_sep
+            s1 = s1 + 'Cell_Max_V:' + f'{x:d}' + 'mV' + byd_log_str_sep
         else:
             x = data[17]
-            s1 = s1 + "Cell_Max_V:No" + f"{x:d}" + byd_log_str_sep
+            s1 = s1 + 'Cell_Max_V:No' + f'{x:d}' + byd_log_str_sep
         # Zellenspannung min
         if not cnr:
             x = self.buf2int16USx(data, 19)
-            s1 = s1 + "Cell_Min_V:" + f"{x:d}" + "mV" + byd_log_str_sep
+            s1 = s1 + 'Cell_Min_V:' + f'{x:d}' + 'mV' + byd_log_str_sep
         else:
             x = data[18]
-            s1 = s1 + "Cell_Min_V:No" + f"{x:d}" + byd_log_str_sep
+            s1 = s1 + 'Cell_Min_V:No' + f'{x:d}' + byd_log_str_sep
         # Temperatur max
         if not cnr:
             x = data[21]
-            s1 = s1 + "Cell_Max_T:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+            s1 = s1 + 'Cell_Max_T:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
         else:
             x = data[19]
-            s1 = s1 + "Cell_Max_T:No" + f"{x:d}" + byd_log_str_sep
+            s1 = s1 + 'Cell_Max_T:No' + f'{x:d}' + byd_log_str_sep
         # Temperatur min
         if not cnr:
             x = data[22]
-            s1 = s1 + "Cell_Min_T:" + f"{x:d}" + byd_log_degree + byd_log_str_sep
+            s1 = s1 + 'Cell_Min_T:' + f'{x:d}' + byd_log_degree + byd_log_str_sep
         else:
             x = data[20]
-            s1 = s1 + "Cell_Min_T:No" + f"{x:d}" + byd_log_str_sep
+            s1 = s1 + 'Cell_Min_T:No' + f'{x:d}' + byd_log_str_sep
 
         return s1
 
@@ -2370,7 +2370,7 @@ class byd_bat(SmartPlugin):
             ld = self.byd_bmu_log
         else:
             ld = self.byd_diag_bms_log[x]
-        line_string = ""
+        line_string = ''
         json_list = []
         for i in range(len(ld)):  # 0..len(ld)-1
             dd = ld[i]
@@ -2384,32 +2384,32 @@ class byd_bat(SmartPlugin):
                 0,
             )
             # HTML
-            line_string = line_string + "<tr>"
-            line_string = line_string + "<td align=right valign=top>" + dt.strftime("%d.%m.%Y") + "</td>"
-            line_string = line_string + "<td align=right valign=top>" + dt.strftime("%H:%M:%S") + "</td>"
+            line_string = line_string + '<tr>'
+            line_string = line_string + '<td align=right valign=top>' + dt.strftime('%d.%m.%Y') + '</td>'
+            line_string = line_string + '<td align=right valign=top>' + dt.strftime('%H:%M:%S') + '</td>'
             line_string = (
                 line_string
-                + "<td valign=top>"
+                + '<td valign=top>'
                 + self.logcode2str(dd[byd_log_codex])
-                + " ("
-                + f"{dd[byd_log_codex]:d}"
-                + ")"
-                + "</td>"
+                + ' ('
+                + f'{dd[byd_log_codex]:d}'
+                + ')'
+                + '</td>'
             )
-            line_string = line_string + "<td valign=top>" + dd[byd_log_str] + "</td>"
-            line_string = line_string + "</tr>"
+            line_string = line_string + '<td valign=top>' + dd[byd_log_str] + '</td>'
+            line_string = line_string + '</tr>'
             # JSON
             jd = {
-                "id": str(i),
-                "title": self.logcode2str(dd[byd_log_codex]) + " (" + f"{dd[byd_log_codex]:d}" + ")",
-                "content": dd[byd_log_str],
-                "level": "info",
-                "date": dt.strftime("%d.%m.%Y %H:%M:%S"),
+                'id': str(i),
+                'title': self.logcode2str(dd[byd_log_codex]) + ' (' + f'{dd[byd_log_codex]:d}' + ')',
+                'content': dd[byd_log_str],
+                'level': 'info',
+                'date': dt.strftime('%d.%m.%Y %H:%M:%S'),
             }
             json_list.append(jd)
             if i == byd_log_max_rows:
                 break
-        html_string = '<table cellpadding="2" border="1" style="border-collapse:collapse">' + line_string + "</table>"
+        html_string = '<table cellpadding="2" border="1" style="border-collapse:collapse">' + line_string + '</table>'
 
         if bmu:
             old = self.byd_root.visu.bmu_log.log_html()
@@ -2452,25 +2452,25 @@ class byd_bat(SmartPlugin):
             ld = self.byd_diag_bms_log[x]
         for i in range(len(ld)):
             dd = ld[i]
-            s1 = "+ " + f"{i:2d}"
-            s1 = s1 + " " + f"{dd[byd_log_year]:2d}" + "." + f"{dd[byd_log_month]:02d}" + "." + f"{dd[byd_log_day]:02d}"
+            s1 = '+ ' + f'{i:2d}'
+            s1 = s1 + ' ' + f'{dd[byd_log_year]:2d}' + '.' + f'{dd[byd_log_month]:02d}' + '.' + f'{dd[byd_log_day]:02d}'
             s1 = (
                 s1
-                + " "
-                + f"{dd[byd_log_hour]:2d}"
-                + ":"
-                + f"{dd[byd_log_minute]:02d}"
-                + ":"
-                + f"{dd[byd_log_second]:02d}"
+                + ' '
+                + f'{dd[byd_log_hour]:2d}'
+                + ':'
+                + f'{dd[byd_log_minute]:02d}'
+                + ':'
+                + f'{dd[byd_log_second]:02d}'
             )
-            s1 = s1 + " d=" + bytearray(dd[byd_log_data]).hex()
-            s1 = s1 + " c=" + f"{dd[byd_log_codex]:3d}" + " - " + self.logcode2str(dd[byd_log_codex])
+            s1 = s1 + ' d=' + bytearray(dd[byd_log_data]).hex()
+            s1 = s1 + ' c=' + f'{dd[byd_log_codex]:3d}' + ' - ' + self.logcode2str(dd[byd_log_codex])
             self.log_debug(s1)
 
     def log_datetime_2_local(self, y, m, d, h, mi, s, ms):
         dt = datetime(2000 + y, m, d, h, mi, s, ms)
-        dtx = dt.replace(tzinfo=ZoneInfo("UTC"))  # make aware
-        dtxx = dtx.astimezone(ZoneInfo("localtime"))  # convert
+        dtx = dt.replace(tzinfo=ZoneInfo('UTC'))  # make aware
+        dtxx = dtx.astimezone(ZoneInfo('localtime'))  # convert
         return dtxx
 
     # -----------------------------------------------------------------------
@@ -2480,7 +2480,7 @@ class byd_bat(SmartPlugin):
     def basisdata_save(self, device):
         # Speichert die Basisdaten in der sh-Struktur.
 
-        self.log_debug("basisdata_save")
+        self.log_debug('basisdata_save')
 
         device.state.current(self.byd_current)
         device.state.power(self.byd_power)
@@ -2523,7 +2523,7 @@ class byd_bat(SmartPlugin):
     def diagdata_save(self, device):
         # Speichert die Diagnosedaten in der sh-Struktur und erzeugt die Heatmaps.
 
-        self.log_debug("diagdata_save")
+        self.log_debug('diagdata_save')
 
         self.diagdata_save_one(device.diagnosis.tower1, 1)
         if self.byd_bms_qty > 1:
@@ -2568,16 +2568,16 @@ class byd_bat(SmartPlugin):
         # Status des Turms = Hex-Wert 'byd_diag_state' (2 Byte)
         device.state.raw(self.byd_diag_state[x])
         if self.byd_diag_state[x] == 0:
-            s = "normal"
+            s = 'normal'
         else:
             # Fuege alle Bit-Texte in einem String zusammen
-            s = ""
+            s = ''
             xx = int()
             xx = self.byd_diag_state[x]
             for yy in range(0, 16):  # 0..15
                 if (int(xx) & 1) == 1:
                     if len(s) != 0:
-                        s = s + ","
+                        s = s + ','
                     s = s + byd_stat_tower[yy]  # Enum mit den Bit-Texten
                     xx = xx / 2
         self.byd_diag_state_str[x] = s
@@ -2718,30 +2718,30 @@ class byd_bat(SmartPlugin):
         nn = []
         # Modulnamen fuer X-Achse
         for jj in range(0, self.byd_modules):
-            nn.append("M" + str(jj + 1))
+            nn.append('M' + str(jj + 1))
         # Daten fuer Titel zusammensetzen
         delta = (ymax - ymin) * 1000.0
         title_data = (
-            " (SOC="
-            + f"{self.byd_diag_soc[x]:.1f}"
-            + "% P="
-            + f"{self.byd_power:.1f}"
-            + "W min="
-            + f"{ymin:.3f}"
-            + "V max="
-            + f"{ymax:.3f}"
-            + "V delta="
-            + f"{delta:.0f}"
-            + "mV)"
+            ' (SOC='
+            + f'{self.byd_diag_soc[x]:.1f}'
+            + '% P='
+            + f'{self.byd_power:.1f}'
+            + 'W min='
+            + f'{ymin:.3f}'
+            + 'V max='
+            + f'{ymax:.3f}'
+            + 'V delta='
+            + f'{delta:.0f}'
+            + 'mV)'
         )
 
         # Berechne bestimmte Parameter fuer die optimale Darstellung
         width = 1.0 / (self.byd_volt_n + 1)
         ddd = width
-        y1 = self.round_decimal(ymax, Decimal("0.05"))
+        y1 = self.round_decimal(ymax, Decimal('0.05'))
         if y1 < ymax:
             y1 = y1 + 0.05
-        y0 = self.round_decimal(ymin, Decimal("0.05"))
+        y0 = self.round_decimal(ymin, Decimal('0.05'))
         if (y1 - y0) < 0.1:
             yyy = (y0 + y1) / 2
             y0 = yyy - 0.05
@@ -2752,58 +2752,58 @@ class byd_bat(SmartPlugin):
         x1 = -((self.byd_volt_n / 2) * ddd)
         for ii in range(0, self.byd_volt_n):  # alle Zellen eines Moduls
             if (ii % 2) == 0:
-                col = "#ff0000"  # 'rot'
+                col = '#ff0000'  # 'rot'
             else:
-                col = "#ff8c00"  # 'orange'
+                col = '#ff8c00'  # 'orange'
             b = plt.bar(xx + x1, yy[ii], width, color=col, zorder=3)
             for jj in range(0, self.byd_modules):
                 if ii == yminl[jj]:
-                    b[jj].set_color("#05b4ff")  # 'blau'
+                    b[jj].set_color('#05b4ff')  # 'blau'
                 elif ii == ymaxl[jj]:
-                    b[jj].set_color("#c505ff")  # 'violett'
+                    b[jj].set_color('#c505ff')  # 'violett'
             if balance_n > 0:
-                plt.bar(xx + x1, ba[ii], width, color="#1cfc03", zorder=4)  # 'giftgruen'
+                plt.bar(xx + x1, ba[ii], width, color='#1cfc03', zorder=4)  # 'giftgruen'
             x1 = x1 + ddd
 
         plt.ylim(y0, y1)
         plt.xticks(xx, nn)
-        plt.ylabel("Volt [V]")
-        plt.grid(axis="y", color="#999999", linestyle="dashed", zorder=0)
-        ax.tick_params(axis="x", colors="white")
-        ax.tick_params(axis="y", colors="white")
-        ax.yaxis.label.set_color("white")
-        ax.spines["bottom"].set_color("white")
-        ax.spines["top"].set_color("white")
-        ax.spines["right"].set_color("white")
-        ax.spines["left"].set_color("white")
+        plt.ylabel('Volt [V]')
+        plt.grid(axis='y', color='#999999', linestyle='dashed', zorder=0)
+        ax.tick_params(axis='x', colors='white')
+        ax.tick_params(axis='y', colors='white')
+        ax.yaxis.label.set_color('white')
+        ax.spines['bottom'].set_color('white')
+        ax.spines['top'].set_color('white')
+        ax.spines['right'].set_color('white')
+        ax.spines['left'].set_color('white')
         ax.set_title(
-            "Turm " + str(x) + " - Spannungen [V]" + " (" + self.now_str() + ")" + title_data, size=10, color="white"
+            'Turm ' + str(x) + ' - Spannungen [V]' + ' (' + self.now_str() + ')' + title_data, size=10, color='white'
         )
         if balance_n > 0:
             n_col = 3
             custom_lines = [
-                Line2D([0], [0], color="#05b4ff", lw=4),
-                Line2D([0], [0], color="#c505ff", lw=4),
-                Line2D([0], [0], color="#1cfc03", lw=4),
+                Line2D([0], [0], color='#05b4ff', lw=4),
+                Line2D([0], [0], color='#c505ff', lw=4),
+                Line2D([0], [0], color='#1cfc03', lw=4),
             ]
-            legend_text = ["Min", "Max", "Balancing"]
+            legend_text = ['Min', 'Max', 'Balancing']
         else:
             n_col = 2
-            custom_lines = [Line2D([0], [0], color="#05b4ff", lw=4), Line2D([0], [0], color="#c505ff", lw=4)]
-            legend_text = ["Min", "Max"]
-        ax.legend(custom_lines, legend_text, fancybox=True, framealpha=0.0, labelcolor="white", fontsize=9, ncol=n_col)
+            custom_lines = [Line2D([0], [0], color='#05b4ff', lw=4), Line2D([0], [0], color='#c505ff', lw=4)]
+            legend_text = ['Min', 'Max']
+        ax.legend(custom_lines, legend_text, fancybox=True, framealpha=0.0, labelcolor='white', fontsize=9, ncol=n_col)
 
         fig.tight_layout()
         if len(self.bpath) != byd_path_empty:
-            fig.savefig(self.bpath + byd_fname_volt2 + str(x) + byd_fname_ext, format="png", transparent=True)
-            self.log_debug("save " + self.bpath + byd_fname_volt2 + str(x) + byd_fname_ext)
+            fig.savefig(self.bpath + byd_fname_volt2 + str(x) + byd_fname_ext, format='png', transparent=True)
+            self.log_debug('save ' + self.bpath + byd_fname_volt2 + str(x) + byd_fname_ext)
         fig.savefig(
             self.get_plugin_dir() + byd_webif_img + byd_fname_volt2 + str(x) + byd_fname_ext,
-            format="png",
+            format='png',
             transparent=True,
         )
-        self.log_debug("save " + self.get_plugin_dir() + byd_webif_img + byd_fname_volt2 + str(x) + byd_fname_ext)
-        plt.close("all")
+        self.log_debug('save ' + self.get_plugin_dir() + byd_webif_img + byd_fname_volt2 + str(x) + byd_fname_ext)
+        plt.close('all')
 
         #        # Simulationsdaten fuer Pruefung des Plots !!!!!!!!!!!!!!!
         #        self.byd_volt_n = old_n
@@ -2830,7 +2830,7 @@ class byd_bat(SmartPlugin):
                 c.append(self.byd_volt_cell[x][i])
                 i = i + 1
             d.append(c)
-            rt.append("M" + str(j))
+            rt.append('M' + str(j))
             if ((r + 1) % (self.byd_volt_n // no_of_col)) == 0:
                 j = j + 1
         dd = np.array(d)
@@ -2839,9 +2839,9 @@ class byd_bat(SmartPlugin):
 
         im = ax.imshow(dd)  # Befehl fuer Heatmap
         cbar = ax.figure.colorbar(im, ax=ax, shrink=0.5)
-        cbar.ax.yaxis.set_tick_params(color="white")
-        cbar.outline.set_edgecolor("white")
-        plt.setp(plt.getp(cbar.ax.axes, "yticklabels"), color="white")
+        cbar.ax.yaxis.set_tick_params(color='white')
+        cbar.outline.set_edgecolor('white')
+        plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='white')
 
         ax.set_aspect(0.25)
         ax.get_xaxis().set_visible(False)
@@ -2850,13 +2850,13 @@ class byd_bat(SmartPlugin):
         ax.spines[:].set_visible(False)
         ax.set_xticks(np.arange(dd.shape[1] + 1) - 0.5, minor=True)
         ax.set_yticks(np.arange(dd.shape[0] + 1) - 0.5, minor=True)
-        ax.tick_params(which="minor", bottom=False, left=False)
-        ax.tick_params(axis="y", colors="white", labelsize=10)
+        ax.tick_params(which='minor', bottom=False, left=False)
+        ax.tick_params(axis='y', colors='white', labelsize=10)
 
-        textcolors = ("white", "black")
+        textcolors = ('white', 'black')
         threshold = im.norm(dd.max()) / 2.0
-        kw = dict(horizontalalignment="center", verticalalignment="center", size=9)
-        valfmt = matplotlib.ticker.StrMethodFormatter("{x:.3f}")
+        kw = dict(horizontalalignment='center', verticalalignment='center', size=9)
+        valfmt = matplotlib.ticker.StrMethodFormatter('{x:.3f}')
 
         # Loop over data dimensions and create text annotations including colored frame around balancing cells.
         k = 0
@@ -2865,24 +2865,24 @@ class byd_bat(SmartPlugin):
                 kw.update(color=textcolors[int(im.norm(dd[i, j]) > threshold)])
                 ax.text(j, i, valfmt(dd[i, j], None), **kw)
                 if self.byd_balance_cell[x][k] > 0:
-                    ax.add_patch(patches.Rectangle((-0.5 + j, -0.5 + i), 1, 1, edgecolor="red", fill=False, lw=2))
+                    ax.add_patch(patches.Rectangle((-0.5 + j, -0.5 + i), 1, 1, edgecolor='red', fill=False, lw=2))
                 k = k + 1
 
         ax.set_title(
-            "Turm " + str(x) + " - Spannungen [V]" + " (" + self.now_str() + ")" + title_data, size=10, color="white"
+            'Turm ' + str(x) + ' - Spannungen [V]' + ' (' + self.now_str() + ')' + title_data, size=10, color='white'
         )
 
         fig.tight_layout()
         if len(self.bpath) != byd_path_empty:
-            fig.savefig(self.bpath + byd_fname_volt + str(x) + byd_fname_ext, format="png", transparent=True)
+            fig.savefig(self.bpath + byd_fname_volt + str(x) + byd_fname_ext, format='png', transparent=True)
         #          self.log_debug("save " + self.bpath + byd_fname_temp + str(x) + byd_fname_ext)
         fig.savefig(
             self.get_plugin_dir() + byd_webif_img + byd_fname_volt + str(x) + byd_fname_ext,
-            format="png",
+            format='png',
             transparent=True,
         )
         #        self.log_debug("save " + self.get_plugin_dir() + byd_webif_img + byd_fname_temp + str(x) + byd_fname_ext)
-        plt.close("all")
+        plt.close('all')
 
         # Heatmap der Temperaturen ------------------------------------------------------
         if self.byd_temps_n == 0:
@@ -2902,11 +2902,11 @@ class byd_bat(SmartPlugin):
                 c.append(self.byd_temp_cell[x][i])
                 i = i + 1
             d.append(c)
-            rt.append("M" + str(j))
+            rt.append('M' + str(j))
             if ((r + 1) % (self.byd_temp_n // no_of_col)) == 0:
                 j = j + 1
         dd = np.array(d)
-        cmap = matplotlib.colors.LinearSegmentedColormap.from_list("", ["#f5f242", "#ffaf38", "#fc270f"])
+        cmap = matplotlib.colors.LinearSegmentedColormap.from_list('', ['#f5f242', '#ffaf38', '#fc270f'])
         norm = matplotlib.colors.TwoSlopeNorm(
             vcenter=dd.min() + (dd.max() - dd.min()) / 2, vmin=dd.min(), vmax=dd.max()
         )
@@ -2915,9 +2915,9 @@ class byd_bat(SmartPlugin):
 
         im = ax.imshow(dd, cmap=cmap, norm=norm)
         cbar = ax.figure.colorbar(im, ax=ax, shrink=0.5)
-        cbar.ax.yaxis.set_tick_params(color="white")
-        cbar.outline.set_edgecolor("white")
-        plt.setp(plt.getp(cbar.ax.axes, "yticklabels"), color="white")
+        cbar.ax.yaxis.set_tick_params(color='white')
+        cbar.outline.set_edgecolor('white')
+        plt.setp(plt.getp(cbar.ax.axes, 'yticklabels'), color='white')
 
         ax.set_aspect(0.28)
         ax.get_xaxis().set_visible(False)
@@ -2926,13 +2926,13 @@ class byd_bat(SmartPlugin):
         ax.spines[:].set_visible(False)
         ax.set_xticks(np.arange(dd.shape[1] + 1) - 0.5, minor=True)
         ax.set_yticks(np.arange(dd.shape[0] + 1) - 0.5, minor=True)
-        ax.tick_params(which="minor", bottom=False, left=False)
-        ax.tick_params(axis="y", colors="white", labelsize=10)
+        ax.tick_params(which='minor', bottom=False, left=False)
+        ax.tick_params(axis='y', colors='white', labelsize=10)
 
-        textcolors = ("black", "white")
+        textcolors = ('black', 'white')
         threshold = im.norm(dd.max()) / 2.0
-        kw = dict(horizontalalignment="center", verticalalignment="center", size=9)
-        valfmt = matplotlib.ticker.StrMethodFormatter("{x:.0f}")
+        kw = dict(horizontalalignment='center', verticalalignment='center', size=9)
+        valfmt = matplotlib.ticker.StrMethodFormatter('{x:.0f}')
 
         # Loop over data dimensions and create text annotations.
         for i in range(0, rows):
@@ -2940,19 +2940,19 @@ class byd_bat(SmartPlugin):
                 kw.update(color=textcolors[int(im.norm(dd[i, j]) > threshold)])
                 ax.text(j, i, valfmt(dd[i, j], None), **kw)
 
-        ax.set_title("Turm " + str(x) + " - Temperaturen [°C]" + " (" + self.now_str() + ")", size=10, color="white")
+        ax.set_title('Turm ' + str(x) + ' - Temperaturen [°C]' + ' (' + self.now_str() + ')', size=10, color='white')
 
         fig.tight_layout()
         if len(self.bpath) != byd_path_empty:
-            fig.savefig(self.bpath + byd_fname_temp + str(x) + byd_fname_ext, format="png", transparent=True)
+            fig.savefig(self.bpath + byd_fname_temp + str(x) + byd_fname_ext, format='png', transparent=True)
         #          self.log_debug("save " + self.bpath + byd_fname_temp + str(x) + byd_fname_ext)
         fig.savefig(
             self.get_plugin_dir() + byd_webif_img + byd_fname_temp + str(x) + byd_fname_ext,
-            format="png",
+            format='png',
             transparent=True,
         )
         #        self.log_debug("save " + self.get_plugin_dir() + byd_webif_img + byd_fname_temp + str(x) + byd_fname_ext)
-        plt.close("all")
+        plt.close('all')
 
         return
 
@@ -3001,8 +3001,8 @@ class byd_bat(SmartPlugin):
 
     def create_dummy_png(self, fn):
         fig, ax = plt.subplots(figsize=(10, 0.1))  # Erzeugt ein Bitmap von 1000x10 Pixel
-        fig.savefig(fn, format="png", transparent=True)
-        plt.close("all")
+        fig.savefig(fn, format='png', transparent=True)
+        plt.close('all')
         return
 
     # -----------------------------------------------------------------------
@@ -3011,10 +3011,10 @@ class byd_bat(SmartPlugin):
 
     def create_logdirectory(self, base, log_directory):
         # Erstellt das Verzeichnis 'log_directory' im Log-Verzeichnis von smarthomeNG.
-        if log_directory[0] != "/":
-            if base[-1] != "/":
-                base += "/"
-            log_directory = base + "var/log/" + log_directory
+        if log_directory[0] != '/':
+            if base[-1] != '/':
+                base += '/'
+            log_directory = base + 'var/log/' + log_directory
         if not os.path.exists(log_directory):
             os.makedirs(log_directory)
         return log_directory
@@ -3025,14 +3025,14 @@ class byd_bat(SmartPlugin):
 
         # Dateiname erstellen und zugehoerige Log-Liste holen
         tn = self.now()
-        fn = f"{tn.year - 2000:2d}" + f"{tn.month:02d}" + f"{tn.day:02d}" + "_BYD_"
+        fn = f'{tn.year - 2000:2d}' + f'{tn.month:02d}' + f'{tn.day:02d}' + '_BYD_'
         if bmu:
-            fn = fn + "BMU"
+            fn = fn + 'BMU'
             ld = self.byd_bmu_log
         else:
-            fn = fn + "BMS_Tower_" + str(x)
+            fn = fn + 'BMS_Tower_' + str(x)
             ld = self.byd_diag_bms_log[x]
-        fn = self.log_dir + "/" + fn + "." + byd_log_extension
+        fn = self.log_dir + '/' + fn + '.' + byd_log_extension
         #        self.log_debug("logging_update fn=" + fn)
 
         # Wir suchen den aeltesten Eintrag in der Liste 'ld' vom heutigen Tag
@@ -3048,18 +3048,18 @@ class byd_bat(SmartPlugin):
 
         if not os.path.exists(fn):
             # Datei existiert noch nicht - erstellen mit Headerzeile
-            self.log_debug("logging_update file not exist yet => create (" + fn + ")")
-            f = open(fn, "wt", encoding="utf-8")
+            self.log_debug('logging_update file not exist yet => create (' + fn + ')')
+            f = open(fn, 'wt', encoding='utf-8')
             s1 = (
-                "Date/Time (local)"
+                'Date/Time (local)'
                 + byd_log_sep
-                + "Code"
+                + 'Code'
                 + byd_log_sep
-                + "Code Description"
+                + 'Code Description'
                 + byd_log_sep
-                + "Data"
+                + 'Data'
                 + byd_log_sep
-                + "Data Raw"
+                + 'Data Raw'
                 + byd_log_newline
             )
             sx = []
@@ -3071,7 +3071,7 @@ class byd_bat(SmartPlugin):
 
         # Datei oeffnen und alle Zeilen einlesen
         fl = []
-        with open(fn, "rt", encoding="utf-8") as f:
+        with open(fn, 'rt', encoding='utf-8') as f:
             fl = f.readlines()
         f.close()
 
@@ -3098,11 +3098,11 @@ class byd_bat(SmartPlugin):
 
         if len(fl) - 1 == nn:
             # Anzahl Zeilen in der aktuellen Log unveraendert.
-            self.log_debug("logging_update rows not changed ! " + str(len(fl) - 1) + "/" + str(nn))
+            self.log_debug('logging_update rows not changed ! ' + str(len(fl) - 1) + '/' + str(nn))
             return
 
         # Schreibe die Log-Datei mit den neuen Daten
-        f = open(fn, "wt", encoding="utf-8")
+        f = open(fn, 'wt', encoding='utf-8')
         f.writelines(wl)
         f.close()
 
@@ -3117,9 +3117,9 @@ class byd_bat(SmartPlugin):
             0,
         )
         s1 = (
-            dt.strftime("%d.%m.%Y %H:%M:%S")
+            dt.strftime('%d.%m.%Y %H:%M:%S')
             + byd_log_sep
-            + f"{dd[byd_log_codex]:d}"
+            + f'{dd[byd_log_codex]:d}'
             + byd_log_sep
             + self.logcode2str(dd[byd_log_codex])
             + byd_log_sep
@@ -3146,23 +3146,23 @@ class byd_bat(SmartPlugin):
             #          self.log_debug("i:" + str(i) + " -> " + files[i] + " / " + " y=" + str(yy) + " m=" + str(mm) + " d=" + str(da) + " - " + dt.strftime("%d.%m.%Y %H:%M:%S") + " dx=" + str(dx.total_seconds()) + " dx=" + str(dx.days))
             if dx.days > 0:
                 # Positiv = Datei zu alt, wird geloescht !
-                os.remove(self.log_dir + "/" + files[i])
-                self.log_info("Log file " + files[i] + " too old -> deleted")
+                os.remove(self.log_dir + '/' + files[i])
+                self.log_info('Log file ' + files[i] + ' too old -> deleted')
 
     def logging_special(self, s1, s2, s3):
         # Schreibt die Texte in die Spezial-Log-Datei.
-        fn = self.log_dir + "/" + byd_log_special + "." + byd_log_extension
+        fn = self.log_dir + '/' + byd_log_special + '.' + byd_log_extension
         if not os.path.exists(fn):
-            f = open(fn, "wt", encoding="utf-8")
+            f = open(fn, 'wt', encoding='utf-8')
             sx = []
-            sx.append("BYD_BAT Plugin - special notes" + byd_log_newline)
+            sx.append('BYD_BAT Plugin - special notes' + byd_log_newline)
             sx.append(byd_log_newline)
             f.writelines(sx)
             f.close()
 
         # Datei oeffnen und alle Zeilen einlesen.
         fl = []
-        with open(fn, "rt", encoding="utf-8") as f:
+        with open(fn, 'rt', encoding='utf-8') as f:
             fl = f.readlines()
         f.close()
 
@@ -3179,18 +3179,18 @@ class byd_bat(SmartPlugin):
                 s3x = fl[i + 3]
                 if (s1 == s1x) and (s2 == s2x) and (s3 == s3x):
                     # Eintrag ist schon vorhanden
-                    self.log_debug("logging_special record exists ! " + s1)
+                    self.log_debug('logging_special record exists ! ' + s1)
                     return
 
         # Neuer Eintrag - an die Datei anfuegen.
         s = []
         tn = self.now()
-        s.append(tn.strftime("%d.%m.%Y %H:%M:%S") + byd_log_newline)
+        s.append(tn.strftime('%d.%m.%Y %H:%M:%S') + byd_log_newline)
         s.append(s1)
         s.append(s2)
         s.append(s3)
         s.append(byd_log_newline)
-        f = open(fn, "at", encoding="utf-8")
+        f = open(fn, 'at', encoding='utf-8')
         f.writelines(s)
         f.close()
         return
@@ -3207,12 +3207,12 @@ class byd_bat(SmartPlugin):
 
     def read_reg(self, client, reg, xx):
         # Liest ein Register (MODBUS/RTU) ein.
-        msg = "0103" + f"{reg:04x}" + "00" + f"{xx:02x}"
+        msg = '0103' + f'{reg:04x}' + '00' + f'{xx:02x}'
         #        self.log_debug("read_reg msg=" + msg)
         msgb = bytes.fromhex(msg)
         crc = self.modbus_crc(msgb)
-        ba = crc.to_bytes(2, byteorder="little")
-        msg = msg + f"{ba[0]:02x}" + f"{ba[1]:02x}"
+        ba = crc.to_bytes(2, byteorder='little')
+        msg = msg + f'{ba[0]:02x}' + f'{ba[1]:02x}'
         #        self.log_debug("read_reg msg=" + msg)
 
         client.send(bytes.fromhex(msg))
@@ -3221,7 +3221,7 @@ class byd_bat(SmartPlugin):
         try:
             data = client.recv(BUFFER_SIZE)
         except Exception:
-            self.log_info("read_reg 0x" + f"{reg:04x}" + " failed !")
+            self.log_info('read_reg 0x' + f'{reg:04x}' + ' failed !')
             return byd_error, 0
 
         v = data[3] * 0x100 + data[4]
@@ -3246,7 +3246,7 @@ class byd_bat(SmartPlugin):
         crc = self.modbus_crc(d)
         crcx = data[len(data) - 1] * 0x100 + data[len(data) - 2]
         if crc != crcx:
-            self.log_info("send_msg recv crc not ok (" + f"{crc:04x}" + "/" + f"{crcx:04x}" + ")")
+            self.log_info('send_msg recv crc not ok (' + f'{crc:04x}' + '/' + f'{crcx:04x}' + ')')
             return byd_error, 0
         #        self.log_debug("send_msg crc=" + f"{crc:04x}" + " / " + f"{crcx:04x}" + " len=" + str(len(data)))
         return byd_ok, data
@@ -3331,12 +3331,12 @@ class byd_bat(SmartPlugin):
         return result
 
     def now_str(self):
-        return self.now().strftime("%d.%m.%Y, %H:%M:%S")
+        return self.now().strftime('%d.%m.%Y, %H:%M:%S')
 
     def get_inverter_name(self, batt, type):
         # Bestimmt den Namen des Wechselrichters.
         # Das Mapping wurde Be_Connect (Hauptseite Setup) entnommen.
-        if batt == "LVS":  # LVS
+        if batt == 'LVS':  # LVS
             if type == 0:
                 return byd_inverters[0]  # Fronius HV
             elif (type == 1) or (type == 2):
@@ -3363,7 +3363,7 @@ class byd_bat(SmartPlugin):
                 return byd_inverters[28]  # SolarEdge LV
             elif type == 13:
                 return byd_inverters[6]  # Ingeteam HV
-        elif batt == "HVL":  # HVL
+        elif batt == 'HVL':  # HVL
             if type == 0:
                 return byd_inverters[1]
             elif type == 1:
@@ -3377,7 +3377,7 @@ class byd_bat(SmartPlugin):
         else:  # HVM, HVS
             if (type >= 0) and (type <= 16):
                 return byd_inverters[type]
-        return "unknown"
+        return 'unknown'
 
     def round_decimal(self, decimal_number, base, rounding=ROUND_DOWN):
         """
@@ -3404,26 +3404,24 @@ class byd_bat(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
-            self.logger.error("Not initializing the web interface")
+            self.logger.error('Not initializing the web interface')
             return False
 
         import sys
 
-        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
-            self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
+        if 'SmartPluginWebIf' not in list(sys.modules['lib.model.smartplugin'].__dict__):
+            self.logger.warning('Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface')
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
+        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            "/": {
-                "tools.staticdir.root": webif_dir,
-            },
-            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
         # Register the web interface as a cherrypy app
@@ -3433,7 +3431,7 @@ class byd_bat(SmartPlugin):
             config,
             self.get_classname(),
             self.get_instance_name(),
-            description="",
+            description='',
         )
 
         return True
@@ -3452,19 +3450,19 @@ class byd_bat(SmartPlugin):
         twr = 3
 
         if simul == 1:
-            self.byd_batt_str = "HVM"
+            self.byd_batt_str = 'HVM'
             self.byd_modules = 7
             self.byd_capacity_module = 2.76
             self.byd_volt_n = 16
             self.byd_temp_n = 8
         elif simul == 2:
-            self.byd_batt_str = "HVS"
+            self.byd_batt_str = 'HVS'
             self.byd_modules = 5
             self.byd_capacity_module = 2.56
             self.byd_volt_n = 32
             self.byd_temp_n = 12
         elif simul == 3:
-            self.byd_batt_str = "LVS"
+            self.byd_batt_str = 'LVS'
             self.byd_modules = 3
             self.byd_capacity_module = 4.0
             self.byd_volt_n = 7

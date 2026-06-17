@@ -1,12 +1,12 @@
 """TR-064 exceptions."""
 
 __all__ = [
-    "TR064UnknownDeviceException",
-    "TR064UnknownServiceException",
-    "TR064UnknownServiceIndexException",
-    "TR064UnknownActionException",
-    "TR064UnknownArgumentException",
-    "TR064MissingArgumentException",
+    'TR064UnknownDeviceException',
+    'TR064UnknownServiceException',
+    'TR064UnknownServiceIndexException',
+    'TR064UnknownActionException',
+    'TR064UnknownArgumentException',
+    'TR064MissingArgumentException',
 ]
 
 

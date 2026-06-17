@@ -32,23 +32,23 @@ from lib.model.mqttplugin import MqttPlugin
 from .rgbxy import Converter
 from .webif import WebInterface
 
-Z2M_TOPIC = "z2m_topic"
-Z2M_ATTR = "z2m_attr"
-Z2M_RO = "z2m_readonly"
-Z2M_WO = "z2m_writeonly"
-Z2M_BVAL = "z2m_bool_values"
-MSEP = "#"
+Z2M_TOPIC = 'z2m_topic'
+Z2M_ATTR = 'z2m_attr'
+Z2M_RO = 'z2m_readonly'
+Z2M_WO = 'z2m_writeonly'
+Z2M_BVAL = 'z2m_bool_values'
+MSEP = '#'
 
-HANDLE_IN_PREFIX = "_handle_in_"
-HANDLE_OUT_PREFIX = "_handle_out_"
-HANDLE_DEV = "dev_"
-HANDLE_ATTR = "attr_"
+HANDLE_IN_PREFIX = '_handle_in_'
+HANDLE_OUT_PREFIX = '_handle_out_'
+HANDLE_DEV = 'dev_'
+HANDLE_ATTR = 'attr_'
 
 
 class Zigbee2Mqtt(MqttPlugin):
     """Main class of the Plugin. Does all plugin specific stuff and provides the update functions for the items"""
 
-    PLUGIN_VERSION = "2.0.2"
+    PLUGIN_VERSION = '2.0.2'
 
     def __init__(self, sh, **kwargs):
         """Initializes the plugin."""
@@ -60,14 +60,14 @@ class Zigbee2Mqtt(MqttPlugin):
 
         # self.logger = logging.getLogger(__name__)
 
-        self.logger.info(f"Init {self.get_fullname()} plugin {self.PLUGIN_VERSION}")
+        self.logger.info(f'Init {self.get_fullname()} plugin {self.PLUGIN_VERSION}')
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
-        self.z2m_base = self.get_parameter_value("base_topic")
-        self.cycle = self.get_parameter_value("poll_period")
-        self.read_at_init = self.get_parameter_value("read_at_init")
-        self._z2m_gui = self.get_parameter_value("z2m_gui")
-        self._pause_item_path = self.get_parameter_value("pause_item")
+        self.z2m_base = self.get_parameter_value('base_topic')
+        self.cycle = self.get_parameter_value('poll_period')
+        self.read_at_init = self.get_parameter_value('read_at_init')
+        self._z2m_gui = self.get_parameter_value('z2m_gui')
+        self._pause_item_path = self.get_parameter_value('pause_item')
 
         # bool_values is only good if used internally, because MQTT data is
         # usually sent in JSON. So just make this easy...
@@ -75,7 +75,7 @@ class Zigbee2Mqtt(MqttPlugin):
 
         self._items_read = []
         self._items_write = []
-        self._devices = {"bridge": {}}
+        self._devices = {'bridge': {}}
         # {
         #   'dev1': {
         #       'lastseen': <timestamp>,
@@ -97,20 +97,20 @@ class Zigbee2Mqtt(MqttPlugin):
 
         # Add subscription to get bridge announces
         bridge_subs = [
-            ["devices", "list"],
-            ["state", "str"],
-            ["info", "dict"],
-            ["log", "dict"],
-            ["extensions", "list"],
-            ["config", "dict"],
-            ["groups", "list"],
-            ["response", "dict"],
+            ['devices', 'list'],
+            ['state', 'str'],
+            ['info', 'dict'],
+            ['log', 'dict'],
+            ['extensions', 'list'],
+            ['config', 'dict'],
+            ['groups', 'list'],
+            ['response', 'dict'],
         ]
         for attr, dtype in bridge_subs:
-            self.add_z2m_subscription("bridge", attr, "", "", dtype, callback=self.on_mqtt_msg)
+            self.add_z2m_subscription('bridge', attr, '', '', dtype, callback=self.on_mqtt_msg)
 
         # Add subscription to get device announces
-        self.add_z2m_subscription("+", "", "", "", "dict", callback=self.on_mqtt_msg)
+        self.add_z2m_subscription('+', '', '', '', 'dict', callback=self.on_mqtt_msg)
 
         # try to load webif
         self.init_webinterface(WebInterface)
@@ -118,7 +118,7 @@ class Zigbee2Mqtt(MqttPlugin):
     def run(self):
         """Run method for the plugin"""
 
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
 
         self.alive = True
         if self._pause_item:
@@ -127,11 +127,11 @@ class Zigbee2Mqtt(MqttPlugin):
         # start subscription to all topics
         self.start_subscriptions()
 
-        self.scheduler_add("z2m_cycle", self.poll_bridge, cycle=self.cycle)
-        self.publish_z2m_topic("bridge", "config", "devices", "get")
+        self.scheduler_add('z2m_cycle', self.poll_bridge, cycle=self.cycle)
+        self.publish_z2m_topic('bridge', 'config', 'devices', 'get')
 
         if self.read_at_init:
-            self.publish_z2m_topic("bridge", "request", "restart")
+            self.publish_z2m_topic('bridge', 'request', 'restart')
 
         try:
             self._read_all_data()
@@ -144,8 +144,8 @@ class Zigbee2Mqtt(MqttPlugin):
         self.alive = False
         if self._pause_item:
             self._pause_item(True, self.get_fullname())
-        self.logger.debug("Stop method called")
-        self.scheduler_remove("z2m_cycle")
+        self.logger.debug('Stop method called')
+        self.scheduler_remove('z2m_cycle')
 
         # stop subscription to all topics
         self.stop_subscriptions()
@@ -166,17 +166,17 @@ class Zigbee2Mqtt(MqttPlugin):
 
         # check for pause item
         if item.property.path == self._pause_item_path:
-            self.logger.debug(f"pause item {item.property.path} registered")
+            self.logger.debug(f'pause item {item.property.path} registered')
             self._pause_item = item
             self.add_item(item, updating=True)
             return self.update_item
 
         if self.has_iattr(item.conf, Z2M_ATTR):
-            self.logger.debug(f"parsing item: {item}")
+            self.logger.debug(f'parsing item: {item}')
 
             device = self._get_z2m_topic_from_item(item)
             if not device:
-                self.logger.warning(f"parsed item {item} has no {Z2M_TOPIC} set, ignoring")
+                self.logger.warning(f'parsed item {item} has no {Z2M_TOPIC} set, ignoring')
                 return
 
             attr = self.get_iattr_value(item.conf, Z2M_ATTR)
@@ -191,17 +191,12 @@ class Zigbee2Mqtt(MqttPlugin):
             if attr not in self._devices[device]:
                 self._devices[device][attr] = {}
 
-            data = {
-                "value": None,
-                "item": item,
-                "read": read,
-                "write": write,
-            }
-            if item.type() == "bool":
+            data = {'value': None, 'item': item, 'read': read, 'write': write}
+            if item.type() == 'bool':
                 bval = self.get_iattr_value(item.conf, Z2M_BVAL)
                 if bval is None or bval == [] or type(bval) is not list:
                     bval = self.bool_values
-                data["bool_values"] = bval
+                data['bool_values'] = bval
 
             self._devices[device][attr].update(data)
 
@@ -253,7 +248,7 @@ class Zigbee2Mqtt(MqttPlugin):
         :param source:  if given it represents the source
         :param dest:    if given it represents the dest
         """
-        self.logger.debug(f"update_item: {item} called by {caller} and source {source}")
+        self.logger.debug(f'update_item: {item} called by {caller} and source {source}')
 
         # ignore calls explicitly coming from self (typicalls from on_mqtt_msg -> caller = self.get_fullname() + ":" + device)
         if caller == self.get_fullname() or (type(caller) is str and caller.startswith(self.get_fullname())):
@@ -261,7 +256,7 @@ class Zigbee2Mqtt(MqttPlugin):
 
         # check for pause item
         if item is self._pause_item:
-            self.logger.debug(f"pause item changed to {item()}")
+            self.logger.debug(f'pause item changed to {item()}')
             if item() and self.alive:
                 self.stop()
             elif not item() and not self.alive:
@@ -278,7 +273,7 @@ class Zigbee2Mqtt(MqttPlugin):
                     return
 
                 self.logger.info(
-                    f"update_item: {item}, item has been changed outside of this plugin in {caller} with value {item()}"
+                    f'update_item: {item}, item has been changed outside of this plugin in {caller} with value {item()}'
                 )
 
                 device, attr = mapping.split(MSEP)
@@ -288,13 +283,13 @@ class Zigbee2Mqtt(MqttPlugin):
                 _attr = _device[attr]
 
                 # pre-set values
-                topic_3 = "set"
-                topic_4 = topic_5 = ""
+                topic_3 = 'set'
+                topic_4 = topic_5 = ''
                 payload = None
-                bool_values = _attr.get("bool_values")
+                bool_values = _attr.get('bool_values')
                 if bool_values is None:
                     bool_values = self.bool_values
-                scenes = _device.get("scenes")
+                scenes = _device.get('scenes')
                 value = item()
 
                 # apply bool_values if present and applicable
@@ -302,11 +297,11 @@ class Zigbee2Mqtt(MqttPlugin):
                     value = bool_values[value]
 
                 # replace scene with index
-                if attr == "scene_recall" and scenes:
+                if attr == 'scene_recall' and scenes:
                     try:
                         value = scenes[value]
                     except KeyError:
-                        self.logger.warning(f"scene {value} not defined for {device}")
+                        self.logger.warning(f'scene {value} not defined for {device}')
                         return
 
                 # check device handler
@@ -316,7 +311,7 @@ class Zigbee2Mqtt(MqttPlugin):
                     )(item, value, topic_3, topic_4, topic_5, device, attr)
                     if abort:
                         self.logger.debug(
-                            f"processing of item {item} stopped due to abort statement from handler {HANDLE_OUT_PREFIX + HANDLE_DEV + device}"
+                            f'processing of item {item} stopped due to abort statement from handler {HANDLE_OUT_PREFIX + HANDLE_DEV + device}'
                         )
                         return
 
@@ -327,7 +322,7 @@ class Zigbee2Mqtt(MqttPlugin):
                     )(item, value, topic_3, topic_4, topic_5, device, attr)
                     if abort:
                         self.logger.debug(
-                            f"processing of item {item} stopped due to abort statement from handler {HANDLE_OUT_PREFIX + HANDLE_ATTR + attr}"
+                            f'processing of item {item} stopped due to abort statement from handler {HANDLE_OUT_PREFIX + HANDLE_ATTR + attr}'
                         )
                         return
 
@@ -338,21 +333,21 @@ class Zigbee2Mqtt(MqttPlugin):
                     # catch 'datetime is not JSON serializable' error.
                     # TODO: find way to keep data
                     except TypeError:
-                        payload = ""
+                        payload = ''
                 else:
-                    payload = ""
+                    payload = ''
 
                 self.publish_z2m_topic(device, topic_3, topic_4, topic_5, payload, item, bool_values=bool_values)
             else:
                 self.logger.warning(
-                    f"update_item: {item}, trying to change item in SmartHomeNG that is readonly (by {caller})"
+                    f'update_item: {item}, trying to change item in SmartHomeNG that is readonly (by {caller})'
                 )
 
     def poll_bridge(self):
         """Polls for health state of the bridge"""
 
-        self.logger.info("poll_bridge: Checking health status of bridge")
-        self.publish_z2m_topic("bridge", "request", "health_check")
+        self.logger.info('poll_bridge: Checking health status of bridge')
+        self.publish_z2m_topic('bridge', 'request', 'health_check')
 
     def add_z2m_subscription(
         self,
@@ -373,10 +368,10 @@ class Zigbee2Mqtt(MqttPlugin):
     def publish_z2m_topic(
         self,
         device: str,
-        topic_3: str = "",
-        topic_4: str = "",
-        topic_5: str = "",
-        payload="",
+        topic_3: str = '',
+        topic_4: str = '',
+        topic_5: str = '',
+        payload='',
         item=None,
         qos: int = 0,
         retain: bool = False,
@@ -397,13 +392,13 @@ class Zigbee2Mqtt(MqttPlugin):
         :param retain:          retain flag for this message (unused)
         """
 
-        z2m_base, device, topic_3, topic_4, topic_5, *_ = (topic + "////").split("/")
+        z2m_base, device, topic_3, topic_4, topic_5, *_ = (topic + '////').split('/')
         self.logger.debug(
-            f"received mqtt msg: z2m_base={z2m_base}, device={device}, topic_3={topic_3}, topic_4={topic_4}, topic_5={topic_5}, payload={payload}"
+            f'received mqtt msg: z2m_base={z2m_base}, device={device}, topic_3={topic_3}, topic_4={topic_4}, topic_5={topic_5}, payload={payload}'
         )
 
         if z2m_base != self.z2m_base:
-            self.logger.error(f"received mqtt msg with wrong base topic {topic}. Please report")
+            self.logger.error(f'received mqtt msg with wrong base topic {topic}. Please report')
             return
 
         # check / call handlers
@@ -423,48 +418,48 @@ class Zigbee2Mqtt(MqttPlugin):
         # Wenn Geräte zur Laufzeit des Plugins hinzugefügt werden, werden diese im dict ergänzt
         if device not in self._devices:
             self._devices[device] = {}
-            self.logger.info(f"New device discovered: {device}")
+            self.logger.info(f'New device discovered: {device}')
 
         # Korrekturen in der Payload
 
         # Umbenennen des Key 'friendlyName' in 'friendly_name', damit er identisch zu denen aus Log Topic und Config Topic ist
-        if "device" in payload:
-            meta = payload["device"]
-            if "friendlyName" in meta:
-                meta["friendly_name"] = meta.pop("friendlyName")
-            del payload["device"]
+        if 'device' in payload:
+            meta = payload['device']
+            if 'friendlyName' in meta:
+                meta['friendly_name'] = meta.pop('friendlyName')
+            del payload['device']
 
-            if "meta" not in self._devices[device]:
-                self._devices[device]["meta"] = {}
-            self._devices[device]["meta"].update(meta)
+            if 'meta' not in self._devices[device]:
+                self._devices[device]['meta'] = {}
+            self._devices[device]['meta'].update(meta)
 
         # Korrektur des Lastseen
-        if "last_seen" in payload:
-            last_seen = payload["last_seen"]
+        if 'last_seen' in payload:
+            last_seen = payload['last_seen']
             if isinstance(last_seen, int):
-                payload.update({"last_seen": datetime.fromtimestamp(last_seen / 1000)})
+                payload.update({'last_seen': datetime.fromtimestamp(last_seen / 1000)})
             elif isinstance(last_seen, str):
                 try:
                     payload.update(
-                        {"last_seen": datetime.strptime(last_seen, "%Y-%m-%dT%H:%M:%S.%fZ").replace(microsecond=0)}
+                        {'last_seen': datetime.strptime(last_seen, '%Y-%m-%dT%H:%M:%S.%fZ').replace(microsecond=0)}
                     )
                 except Exception:
                     try:
-                        payload.update({"last_seen": datetime.strptime(last_seen, "%Y-%m-%dT%H:%M:%SZ")})
+                        payload.update({'last_seen': datetime.strptime(last_seen, '%Y-%m-%dT%H:%M:%SZ')})
                     except Exception as e:
                         self.logger.debug(
                             f"Error {e} occurred during decoding of last_seen using format '%Y-%m-%dT%H:%M:%SZ'."
                         )
 
-        if "data" not in self._devices[device]:
-            self._devices[device]["data"] = {}
-        self._devices[device]["data"].update(payload)
+        if 'data' not in self._devices[device]:
+            self._devices[device]['data'] = {}
+        self._devices[device]['data'].update(payload)
 
         # Setzen des Itemwertes
         for attr in payload:
             if attr in self._devices[device]:
-                item = self._devices[device][attr].get("item")
-                caller = self.get_fullname() + ":" + device
+                item = self._devices[device][attr].get('item')
+                caller = self.get_fullname() + ':' + device
 
                 # check handlers
                 if hasattr(self, HANDLE_IN_PREFIX + HANDLE_ATTR + attr):
@@ -472,12 +467,12 @@ class Zigbee2Mqtt(MqttPlugin):
                         continue
 
                 value = payload[attr]
-                self._devices[device][attr]["value"] = value
-                self.logger.debug(f"attribute: {attr}, value: {value}, item: {item}")
+                self._devices[device][attr]['value'] = value
+                self.logger.debug(f'attribute: {attr}, value: {value}, item: {item}')
 
                 if item is not None:
                     item(value, caller)
-                    if device == "bridge" and (isinstance(value, list) or isinstance(value, dict)):
+                    if device == 'bridge' and (isinstance(value, list) or isinstance(value, dict)):
                         if self.logger.isEnabledFor(DEBUG):
                             self.logger.debug(f"{device}: Item '{item}' set to value {value}")
                         else:
@@ -491,7 +486,7 @@ class Zigbee2Mqtt(MqttPlugin):
 
     def _build_topic_str(self, device: str, topic_3: str, topic_4: str, topic_5: str) -> str:
         """Build the mqtt topic as string"""
-        return "/".join(filter(None, (self.z2m_base, device, topic_3, topic_4, topic_5)))
+        return '/'.join(filter(None, (self.z2m_base, device, topic_3, topic_4, topic_5)))
 
     def _get_device_data(self, device_data: list, is_group=False):
         """
@@ -503,53 +498,53 @@ class Zigbee2Mqtt(MqttPlugin):
         # device_data is list of dicts
         for element in device_data:
             if type(element) is dict:
-                device = element.get("friendly_name")
+                device = element.get('friendly_name')
                 if device:
-                    if "lastSeen" in element:
-                        element.update({"lastSeen": datetime.fromtimestamp(element["lastSeen"] / 1000)})
+                    if 'lastSeen' in element:
+                        element.update({'lastSeen': datetime.fromtimestamp(element['lastSeen'] / 1000)})
 
                     # create device entry if needed
                     if device not in self._devices:
-                        self._devices[device] = {"isgroup": is_group}
+                        self._devices[device] = {'isgroup': is_group}
 
                     # easier to read
                     _device = self._devices[device]
 
                     # scenes in devices
                     try:
-                        for endpoint in element["endpoints"]:
-                            if element["endpoints"][endpoint].get("scenes"):
-                                _device["scenes"] = {
+                        for endpoint in element['endpoints']:
+                            if element['endpoints'][endpoint].get('scenes'):
+                                _device['scenes'] = {
                                     name: id
-                                    for id, name in (x.values() for x in element["endpoints"][endpoint]["scenes"])
+                                    for id, name in (x.values() for x in element['endpoints'][endpoint]['scenes'])
                                 }
                     except KeyError:
                         pass
 
                     # scenes in groups
-                    if element.get("scenes"):
-                        _device["scenes"] = {name: id for id, name in (scene.values() for scene in element["scenes"])}
+                    if element.get('scenes'):
+                        _device['scenes'] = {name: id for id, name in (scene.values() for scene in element['scenes'])}
 
                     # put list of scene names in scenelist item
                     # key "scenelist" only present if attr/device requested in item tree
-                    if _device.get("scenelist"):
+                    if _device.get('scenelist'):
                         try:
-                            scenelist = list(_device["scenes"].keys())
-                            _device["scenelist"]["item"](scenelist)
+                            scenelist = list(_device['scenes'].keys())
+                            _device['scenelist']['item'](scenelist)
                         except (KeyError, ValueError, TypeError):
                             pass
 
                     # TODO: possibly remove after further parsing
                     # just copy meta
-                    if "meta" not in _device:
-                        _device["meta"] = {}
-                    _device["meta"].update(element)
+                    if 'meta' not in _device:
+                        _device['meta'] = {}
+                    _device['meta'].update(element)
 
                     # TODO: parse meta and extract valid values for attrs
 
-                    self.logger.info(f"Imported {'group' if is_group else 'device'} {device}")
+                    self.logger.info(f'Imported {"group" if is_group else "device"} {device}')
             else:
-                self.logger.debug(f"(Received payload {device_data} is not of type dict")
+                self.logger.debug(f'(Received payload {device_data} is not of type dict')
 
     def _read_all_data(self):
         """Try to get current status of all devices linked to items"""
@@ -557,13 +552,13 @@ class Zigbee2Mqtt(MqttPlugin):
         for device in self._devices:
             for attr in self._devices[device]:
                 a = self._devices[device][attr]
-                if a.get("read", False) and a.get("item") is not None:
-                    self.publish_z2m_topic(device, attr, "get")
+                if a.get('read', False) and a.get('item') is not None:
+                    self.publish_z2m_topic(device, attr, 'get')
 
     def _get_z2m_topic_from_item(self, item) -> str:
         """Get z2m_topic for given item search from given item in parent direction"""
 
-        topic = ""
+        topic = ''
         lookup_item = item
         for _ in range(3):
             topic = self.get_iattr_value(lookup_item.conf, Z2M_TOPIC)
@@ -588,7 +583,7 @@ class Zigbee2Mqtt(MqttPlugin):
     #
 
     def _handle_in_dev_bridge(
-        self, device: str, topic_3: str = "", topic_4: str = "", topic_5: str = "", payload={}, qos=None, retain=None
+        self, device: str, topic_3: str = '', topic_4: str = '', topic_5: str = '', payload={}, qos=None, retain=None
     ):
         """handle device topics for "bridge" """
 
@@ -597,68 +592,68 @@ class Zigbee2Mqtt(MqttPlugin):
             # easier to read
             _bridge = self._devices[device]
 
-            if topic_3 == "state":
+            if topic_3 == 'state':
                 try:
                     data = json.loads(payload)
                 except json.JSONDecodeError:
-                    data = {"state": payload}
-                return {"online": bool(["offline", "online"].index(data.get(topic_3)))}
+                    data = {'state': payload}
+                return {'online': bool(['offline', 'online'].index(data.get(topic_3)))}
 
-            elif topic_3 in ("config", "info"):
-                assert isinstance(payload, dict), "dict"
+            elif topic_3 in ('config', 'info'):
+                assert isinstance(payload, dict), 'dict'
                 _bridge[topic_3] = payload
-                payload["online"] = True
+                payload['online'] = True
 
-                if payload.get("restart_required", None) is True:
-                    self.publish_z2m_topic("bridge", "request", "restart")
+                if payload.get('restart_required', None) is True:
+                    self.publish_z2m_topic('bridge', 'request', 'restart')
 
-            elif topic_3 == "response" and topic_4 in ("health_check", "permit_join", "networkmap"):
+            elif topic_3 == 'response' and topic_4 in ('health_check', 'permit_join', 'networkmap'):
                 # permit_join: {"data":{"value":true},"status":"ok"}
                 # topic_level1=zigbee2mqtt, topic_level2=bridge, topic_level3=None, topic_level4=networkmap, topic_level5=None, payload={'data': {'routes': False, 'type': 'raw', 'value': {'links': [{'depth': 1, 'linkquality': 5, 'lqi': 5, 'relationship': 1, 'routes': [], 'source': {'ieeeAddr': '0x588e81fffe28dec5', 'networkAddress': 39405}, 'sourceIeeeAddr': '0x588e81fffe28dec5', 'sourceNwkAddr': 39405, 'target': {'ieeeAddr': '0x00124b001cd4bbf0', 'networkAddress': 0}, 'targetIeeeAddr': '0x00124b001cd4bbf0'}, {'depth': 1, 'linkquality': 155, 'lqi': 155, 'relationship': 1, 'routes': [], 'source': {'ieeeAddr': '0x00124b00231e45b8', 'networkAddress': 18841}, 'sourceIeeeAddr': '0x00124b00231e45b8', 'sourceNwkAddr': 18841, 'target': {'ieeeAddr': '0x00124b001cd4bbf0', 'networkAddress': 0}, 'targetIeeeAddr': '0x00124b001cd4bbf0'}, {'depth': 1, 'linkquality': 1, 'lqi': 1, 'relationship': 1, 'routes': [], 'source': {'ieeeAddr': '0x00158d00067a0c2d', 'networkAddress': 60244}, 'sourceIeeeAddr': '0x00158d00067a0c2d', 'sourceNwkAddr': 60244, 'target': {'ieeeAddr': '0x00124b001cd4bbf0', 'networkAddress': 0}, 'targetIeeeAddr': '0x00124b001cd4bbf0'}], 'nodes': [{'definition': None, 'failed': [], 'friendlyName': 'Coordinator', 'ieeeAddr': '0x00124b001cd4bbf0', 'lastSeen': None, 'networkAddress': 0, 'type': 'Coordinator'}, {'definition': {'description': 'TRADFRI open/close remote', 'model': 'E1766', 'supports': 'battery, action, linkquality', 'vendor': 'IKEA'}, 'friendlyName': 'TRADFRI E1766_01', 'ieeeAddr': '0x588e81fffe28dec5', 'lastSeen': 1618408062253, 'manufacturerName': 'IKEA of Sweden', 'modelID': 'TRADFRI open/close remote', 'networkAddress': 39405, 'type': 'EndDevice'}, {'definition': {'description': 'Temperature and humidity sensor', 'model': 'SNZB-02', 'supports': 'battery, temperature, humidity, voltage, linkquality', 'vendor': 'SONOFF'}, 'friendlyName': 'SNZB02_01', 'ieeeAddr': '0x00124b00231e45b8', 'lastSeen': 1618407530272, 'manufacturerName': 'eWeLink', 'modelID': 'TH01', 'networkAddress': 18841, 'type': 'EndDevice'}, {'definition': {'description': 'Aqara vibration sensor', 'model': 'DJT11LM', 'supports': 'battery, action, strength, sensitivity, voltage, linkquality', 'vendor': 'Xiaomi'}, 'friendlyName': 'DJT11LM_01', 'ieeeAddr': '0x00158d00067a0c2d', 'lastSeen': 1618383303863, 'manufacturerName': 'LUMI', 'modelID': 'lumi.vibration.aq1', 'networkAddress': 60244, 'type': 'EndDevice'}]}}, 'status': 'ok', 'transaction': 'q15of-1'}
-                assert isinstance(payload, dict), "dict"
+                assert isinstance(payload, dict), 'dict'
                 _bridge[topic_4] = payload
-                payload["online"] = True
+                payload['online'] = True
 
-                if topic_4 == "health_check":
+                if topic_4 == 'health_check':
                     # topic_level1=zigbee2mqtt, topic_level2=bridge, topic_level3=response, topic_level4=health_check, topic_level5=, payload={'data': {'healthy': True}, 'status': 'ok'}
-                    payload["online"] = bool(payload["data"]["healthy"])
+                    payload['online'] = bool(payload['data']['healthy'])
 
-            elif topic_3 == "devices" or topic_3 == "groups":
+            elif topic_3 == 'devices' or topic_3 == 'groups':
                 # topic_level1=zigbee2mqtt, topic_level2=bridge, topic_level3=config, topic_level4=devices, topic_level5=, payload=[{'dateCode': '20201127', 'friendly_name': 'Coordinator', 'ieeeAddr': '0x00124b001cd4bbf0', 'lastSeen': 1618861562211, 'networkAddress': 0, 'softwareBuildID': 'zStack12', 'type': 'Coordinator'}, {'dateCode': '20190311', 'description': 'TRADFRI open/close remote', 'friendly_name': 'TRADFRI E1766_01', 'hardwareVersion': 1, 'ieeeAddr': '0x588e81fffe28dec5', 'lastSeen': 1618511300581, 'manufacturerID': 4476, 'manufacturerName': 'IKEA of Sweden', 'model': 'E1766', 'modelID': 'TRADFRI open/close remote', 'networkAddress': 39405, 'powerSource': 'Battery', 'softwareBuildID': '2.2.010', 'type': 'EndDevice', 'vendor': 'IKEA'}, {'dateCode': '20201026', 'description': 'Temperature and humidity sensor', 'friendly_name': 'SNZB02_01', 'hardwareVersion': 1, 'ieeeAddr': '0x00124b00231e45b8', 'lastSeen': 1618861025534, 'manufacturerID': 0, 'manufacturerName': 'eWeLink', 'model': 'SNZB-02', 'modelID': 'TH01', 'networkAddress': 18841, 'powerSource': 'Battery', 'type': 'EndDevice', 'vendor': 'SONOFF'}, {'description': 'Aqara vibration sensor', 'friendly_name': 'DJT11LM_01', 'ieeeAddr': '0x00158d00067a0c2d', 'lastSeen': 1618383303863, 'manufacturerID': 4151, 'manufacturerName': 'LUMI', 'model': 'DJT11LM', 'modelID': 'lumi.vibration.aq1', 'networkAddress': 60244, 'powerSource': 'Battery', 'type': 'EndDevice', 'vendor': 'Xiaomi'}]
-                assert isinstance(payload, list), "list"
-                self._get_device_data(payload, topic_4 == "groups")
+                assert isinstance(payload, list), 'list'
+                self._get_device_data(payload, topic_4 == 'groups')
 
                 for entry in payload:
-                    friendly_name = entry.get("friendly_name")
+                    friendly_name = entry.get('friendly_name')
                     if friendly_name in self._devices:
                         try:
-                            self._devices[friendly_name]["exposes"] = entry["definition"]["exposes"]
+                            self._devices[friendly_name]['exposes'] = entry['definition']['exposes']
                         except (KeyError, TypeError):
                             pass
 
                 return {topic_3: payload}
 
-            elif topic_3 == "log":
+            elif topic_3 == 'log':
                 # topic_level1=zigbee2mqtt, topic_level2=bridge, topic_level3=log, topic_level4=, topic_level5=, payload={"message":[{"dateCode":"20201127","friendly_name":"Coordinator","ieeeAddr":"0x00124b001cd4bbf0","lastSeen":1617961599543,"networkAddress":0,"softwareBuildID":"zStack12","type":"Coordinator"},{"dateCode":"20190311","description":"TRADFRI open/close remote","friendly_name":"TRADFRI E1766_01","hardwareVersion":1,"ieeeAddr":"0x588e81fffe28dec5","lastSeen":1617873345111,"manufacturerID":4476,"manufacturerName":"IKEA of Sweden","model":"E1766","modelID":"TRADFRI open/close remote","networkAddress":39405,"powerSource":"Battery","softwareBuildID":"2.2.010","type":"EndDevice","vendor":"IKEA"},{"dateCode":"20201026","description":"Temperature and humidity sensor","friendly_name":"SNZB02_01","hardwareVersion":1,"ieeeAddr":"0x00124b00231e45b8","lastSeen":1617961176234,"manufacturerID":0,"manufacturerName":"eWeLink","model":"SNZB-02","modelID":"TH01","networkAddress":18841,"powerSource":"Battery","type":"EndDevice","vendor":"SONOFF"}],"type":"devices"}'
                 # topic_level1=zigbee2mqtt, topic_level2=bridge, topic_level3=log, topic_level4=, topic_level5=, payload={'message': {'friendly_name': '0x00158d00067a0c2d'}, 'type': 'device_connected'}
                 # topic_level1=zigbee2mqtt, topic_level2=bridge, topic_level3=log, topic_level4=, topic_level5=, payload={'message': 'Publish \'set\' \'sensitivity\' to \'DJT11LM_01\' failed: \'Error: Write 0x00158d00067a0c2d/1 genBasic({"65293":{"value":21,"type":32}}, {"timeout":35000,"disableResponse":false,"disableRecovery":false,"disableDefaultResponse":true,"direction":0,"srcEndpoint":null,"reservedBits":0,"manufacturerCode":4447,"transactionSequenceNumber":null,"writeUndiv":false}) failed (Data request failed with error: \'MAC transaction expired\' (240))\'', 'meta': {'friendly_name': 'DJT11LM_01'}, 'type': 'zigbee_publish_error'}
                 # topic_level1=zigbee2mqtt, topic_level2=bridge, topic_level3=log, topic_level4=, topic_level5=, payload={'message': 'announce', 'meta': {'friendly_name': 'DJT11LM_01'}, 'type': 'device_announced'}
                 # topic_level1=zigbee2mqtt, topic_level2=bridge, topic_level3=log, topic_level4=, topic_level5=, payload={'message': {'cluster': 'genOnOff', 'from': 'TRADFRI E1766_01', 'to': 'default_bind_group'}, 'type': 'device_bind_failed'}
-                assert isinstance(payload, dict), "dict"
-                if "message" in payload and payload.get("type") == "devices":
-                    self._get_device_data(payload["message"])
+                assert isinstance(payload, dict), 'dict'
+                if 'message' in payload and payload.get('type') == 'devices':
+                    self._get_device_data(payload['message'])
 
             else:
-                self.logger.debug(f"Function type message bridge/{topic_3}/{topic_4} not implemented yet.")
+                self.logger.debug(f'Function type message bridge/{topic_3}/{topic_4} not implemented yet.')
         except AssertionError as e:
-            self.logger.debug(f"Response format not of type {e}, ignoring data")
+            self.logger.debug(f'Response format not of type {e}, ignoring data')
 
     def _handle_in_attr_color(self, device: str, attr: str, payload={}, item=None):
         """automatically sync rgb items"""
         if item is not None:
-            col = payload["color"]
-            if "x" in col and "y" in col and "brightness" in payload:
-                r, g, b = self._color_xy_to_rgb(color=col, brightness=payload["brightness"] / 254)
+            col = payload['color']
+            if 'x' in col and 'y' in col and 'brightness' in payload:
+                r, g, b = self._color_xy_to_rgb(color=col, brightness=payload['brightness'] / 254)
                 try:
                     items_default = True
                     item_r = item.r
@@ -670,9 +665,9 @@ class Zigbee2Mqtt(MqttPlugin):
                 try:
                     items_custom = True
                     # try to get user-specified items to override default
-                    item_r = self._devices[device]["color_r"]["item"]
-                    item_g = self._devices[device]["color_g"]["item"]
-                    item_b = self._devices[device]["color_b"]["item"]
+                    item_r = self._devices[device]['color_r']['item']
+                    item_g = self._devices[device]['color_g']['item']
+                    item_b = self._devices[device]['color_b']['item']
                 except (AttributeError, KeyError):
                     items_custom = False
 
@@ -685,14 +680,14 @@ class Zigbee2Mqtt(MqttPlugin):
                     item_b(b, self.get_fullname())
                 except Exception as e:
                     self.logger.warning(
-                        f"Trying to set rgb color values for color item {item}, but appropriate subitems ({item_r}, {item_g}, {item_b}) missing: {e}"
+                        f'Trying to set rgb color values for color item {item}, but appropriate subitems ({item_r}, {item_g}, {item_b}) missing: {e}'
                     )
 
                 try:
-                    target = self._devices[device]["color_rgb"]["item"]
+                    target = self._devices[device]['color_rgb']['item']
                 except (AttributeError, KeyError):
                     return
-                target(f"{r:x}{g:x}{b:x}", self.get_fullname())
+                target(f'{r:x}{g:x}{b:x}', self.get_fullname())
 
     def _handle_in_attr_brightness(self, device: str, attr: str, payload={}, item=None):
         """automatically set brightness percent"""
@@ -704,12 +699,12 @@ class Zigbee2Mqtt(MqttPlugin):
                 pass
 
             try:
-                target = self._devices[device]["brightness_percent"]["item"]
+                target = self._devices[device]['brightness_percent']['item']
             except (AttributeError, KeyError):
                 pass
 
             if target is not None:
-                target(payload["brightness"] / 2.54, self.get_fullname())
+                target(payload['brightness'] / 2.54, self.get_fullname())
 
     def _handle_in_attr_color_temp(self, device: str, attr: str, payload={}, item=None):
         """automatically set color temp in kelvin"""
@@ -721,12 +716,12 @@ class Zigbee2Mqtt(MqttPlugin):
                 pass
 
             try:
-                target = self._devices[device]["color_temp_kelvin"]["item"]
+                target = self._devices[device]['color_temp_kelvin']['item']
             except (AttributeError, KeyError):
                 pass
 
             if target is not None:
-                target(int(1000000 / payload["color_temp"]), self.get_fullname())
+                target(int(1000000 / payload['color_temp']), self.get_fullname())
 
     #
     # handlers out: activated when values are sent out from shng
@@ -739,34 +734,34 @@ class Zigbee2Mqtt(MqttPlugin):
         # statically defined cmds for interaction with z2m-gateway
         # independent from connected devices
         bridge_cmds = {
-            "permit_join": {"setval": "VAL", "attr": "value", "t5": ""},
-            "health_check": {"t5": ""},
-            "restart": {"setval": None, "t5": ""},
-            "networkmap": {"setval": "raw", "t5": "remove"},
-            "device_remove": {"setval": "STR", "t5": ""},
-            "device_configure": {"setval": "STR", "t5": ""},
-            "device_options": {"setval": "STR", "t5": ""},
-            "device_rename": {"setval": "STR", "t5": ""},
+            'permit_join': {'setval': 'VAL', 'attr': 'value', 't5': ''},
+            'health_check': {'t5': ''},
+            'restart': {'setval': None, 't5': ''},
+            'networkmap': {'setval': 'raw', 't5': 'remove'},
+            'device_remove': {'setval': 'STR', 't5': ''},
+            'device_configure': {'setval': 'STR', 't5': ''},
+            'device_options': {'setval': 'STR', 't5': ''},
+            'device_rename': {'setval': 'STR', 't5': ''},
         }
 
         if attr in bridge_cmds:
-            topic_3 = "request"
+            topic_3 = 'request'
             topic_4 = attr
-            topic_5 = bridge_cmds[attr]["t5"]
-            payload = ""
-            if attr.startswith("device_"):
-                topic_4, topic_5 = attr.split("_")
-            sv = bridge_cmds[attr].get("setval", "")
-            if sv == "VAL":
+            topic_5 = bridge_cmds[attr]['t5']
+            payload = ''
+            if attr.startswith('device_'):
+                topic_4, topic_5 = attr.split('_')
+            sv = bridge_cmds[attr].get('setval', '')
+            if sv == 'VAL':
                 payload = value
-            if sv == "STR":
+            if sv == 'STR':
                 payload = str(value)
-            elif sv == "PATH":
+            elif sv == 'PATH':
                 payload = item.property.path
             elif sv is None:
                 payload = None
-            if "attr" in bridge_cmds[attr]:
-                attr = bridge_cmds[attr]["attr"]
+            if 'attr' in bridge_cmds[attr]:
+                attr = bridge_cmds[attr]['attr']
 
             value = payload
 
@@ -774,29 +769,29 @@ class Zigbee2Mqtt(MqttPlugin):
 
     def _handle_out_attr_color_r(self, item, value, topic_3, topic_4, topic_5, device, attr):
         try:
-            self._color_sync_from_rgb(self._devices[device]["state"]["item"])
+            self._color_sync_from_rgb(self._devices[device]['state']['item'])
         except Exception as e:
-            self.logger.debug(f"problem calling color sync: {e}")
+            self.logger.debug(f'problem calling color sync: {e}')
         return attr, value, topic_3, topic_4, topic_5, True
 
     def _handle_out_attr_color_g(self, item, value, topic_3, topic_4, topic_5, device, attr):
         try:
-            self._color_sync_from_rgb(self._devices[device]["state"]["item"])
+            self._color_sync_from_rgb(self._devices[device]['state']['item'])
         except Exception as e:
-            self.logger.debug(f"problem calling color sync: {e}")
+            self.logger.debug(f'problem calling color sync: {e}')
         return attr, value, topic_3, topic_4, topic_5, True
 
     def _handle_out_attr_color_b(self, item, value, topic_3, topic_4, topic_5, device, attr):
         try:
-            self._color_sync_from_rgb(self._devices[device]["state"]["item"])
+            self._color_sync_from_rgb(self._devices[device]['state']['item'])
         except Exception as e:
-            self.logger.debug(f"problem calling color sync: {e}")
+            self.logger.debug(f'problem calling color sync: {e}')
         return attr, value, topic_3, topic_4, topic_5, True
 
     def _handle_out_attr_brightness_percent(self, item, value, topic_3, topic_4, topic_5, device, attr):
         brightness = value * 2.54
         try:
-            self._devices[device]["brightness"]["item"](brightness)
+            self._devices[device]['brightness']['item'](brightness)
         except (KeyError, AttributeError):
             pass
         return attr, value, topic_3, topic_4, topic_5, True
@@ -804,7 +799,7 @@ class Zigbee2Mqtt(MqttPlugin):
     def _handle_out_attr_color_temp_kelvin(self, item, value, topic_3, topic_4, topic_5, device, attr):
         kelvin = int(1000000 / value)
         try:
-            self._devices[device]["color_temp"]["item"](kelvin)
+            self._devices[device]['color_temp']['item'](kelvin)
         except (KeyError, AttributeError):
             pass
         return attr, value, topic_3, topic_4, topic_5, True
@@ -814,11 +809,11 @@ class Zigbee2Mqtt(MqttPlugin):
             try:
                 col = {}
                 rgb = item()
-                col["r"] = int(rgb[0:2], 16)
-                col["g"] = int(rgb[2:4], 16)
-                col["b"] = int(rgb[4:6], 16)
+                col['r'] = int(rgb[0:2], 16)
+                col['g'] = int(rgb[2:4], 16)
+                col['b'] = int(rgb[4:6], 16)
 
-                for color in ("r", "g", "b"):
+                for color in ('r', 'g', 'b'):
                     target = None
                     try:
                         target = getattr(item.return_parent(), color)
@@ -826,17 +821,17 @@ class Zigbee2Mqtt(MqttPlugin):
                         pass
 
                     try:
-                        target = self._devices[device]["color_" + color]["item"]
+                        target = self._devices[device]['color_' + color]['item']
                     except (AttributeError, KeyError):
                         pass
 
                     if target is not None:
                         target(col[color], self.get_fullname())
 
-                self._color_sync_from_rgb(self._devices[device]["state"]["item"])
+                self._color_sync_from_rgb(self._devices[device]['state']['item'])
 
             except Exception as e:
-                self.logger.debug(f"problem calling color sync: {e}")
+                self.logger.debug(f'problem calling color sync: {e}')
 
         return attr, value, topic_3, topic_4, topic_5, True
 
@@ -848,8 +843,8 @@ class Zigbee2Mqtt(MqttPlugin):
 
     def _color_xy_to_rgb(self, color={}, x=None, y=None, brightness=1):
         if color:
-            x = color.get("x")
-            y = color.get("y")
+            x = color.get('x')
+            y = color.get('y')
         c = Converter()
         return c.xy_to_rgb(x, y, brightness)
 
@@ -861,15 +856,15 @@ class Zigbee2Mqtt(MqttPlugin):
         """sync xy color to rgb, needs struct items"""
         self._item_color_xy_to_rgb(item.color, item.brightness, item.color.r, item.color.g, item.color.b, caller)
 
-    def _color_sync_from_rgb(self, item, caller=None, rgb=""):
+    def _color_sync_from_rgb(self, item, caller=None, rgb=''):
         """sync rgb color to xy, needs struct items"""
         self._item_color_rgb_to_xy(item.color.r, item.color.g, item.color.b, item.color, item.brightness, caller)
 
     def _item_color_xy_to_rgb(self, item_xy, item_brightness, item_r, item_g, item_b, caller=None):
         """convert xy and brightness item data to rgb and assign"""
         try:
-            x = item_xy()["x"]
-            y = item_xy()["y"]
+            x = item_xy()['x']
+            y = item_xy()['y']
         except (ValueError, TypeError, KeyError):
             self.logger.warning(
                 f"Item {item_xy} doesn't contain a valid {{'x': x, 'y': y}} color definition: {item_xy()}"
@@ -892,7 +887,7 @@ class Zigbee2Mqtt(MqttPlugin):
             item_g(g, caller)
             item_b(b, caller)
         except (ValueError, TypeError):
-            self.logger.warning(f"Error on assigning rgb values {r},{g},{b} to items {item_r}, {item_g}, {item_b}")
+            self.logger.warning(f'Error on assigning rgb values {r},{g},{b} to items {item_r}, {item_g}, {item_b}')
 
     def _item_color_rgb_to_xy(self, item_r, item_g, item_b, item_xy, item_brightness, caller=None):
         """convert r, g, b items data to xy and brightness and assign"""
@@ -901,15 +896,15 @@ class Zigbee2Mqtt(MqttPlugin):
             g = item_g()
             b = item_b()
         except (ValueError, TypeError):
-            self.logger.warning(f"Error on getting rgb values from items {item_r}, {item_g}, {item_b}")
+            self.logger.warning(f'Error on getting rgb values from items {item_r}, {item_g}, {item_b}')
             return
 
         x, y, bright = self._color_rgb_to_xy(r, g, b)
 
         try:
-            item_xy({"x": x, "y": y}, caller)
+            item_xy({'x': x, 'y': y}, caller)
             item_brightness(bright * 254, caller)
         except (ValueError, TypeError) as e:
             self.logger.warning(
-                f"Error on assigning values {x},{y}, {bright} to items {item_xy} and {item_brightness}: {e}"
+                f'Error on assigning values {x},{y}, {bright} to items {item_xy} and {item_brightness}: {e}'
             )

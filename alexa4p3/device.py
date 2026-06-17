@@ -27,19 +27,19 @@ class AlexaDevice(object):
         self.types = []
         self.alias = []
         # P3 - Properties - A.Kohler
-        self.thermo_config = "0:AUTO"  # default if nothing is in Config-File
+        self.thermo_config = '0:AUTO'  # default if nothing is in Config-File
         self.icon = []
         self.retrievable = False
         self.proactivelyReported = False
         self.camera_setting = {}
-        self.camera_uri = ""
-        self.camera_imageUri = ""
-        self.alexa_auth_cred = ""
-        self.alexa_color_value_type = ""
+        self.camera_uri = ''
+        self.camera_imageUri = ''
+        self.alexa_auth_cred = ''
+        self.alexa_color_value_type = ''
         self.proxied_Urls = {}
-        self.alexa_proxy_credentials = ""
-        self.alias_for = ""
-        self.alexa_cam_modifiers = ""
+        self.alexa_proxy_credentials = ''
+        self.alias_for = ''
+        self.alexa_cam_modifiers = ''
 
     @classmethod
     def create_id_from_name(cls, name):
@@ -47,9 +47,9 @@ class AlexaDevice(object):
         import re
 
         id = name.strip()
-        id = unicodedata.normalize("NFKD", id).encode("ascii", "ignore").decode("ascii")
+        id = unicodedata.normalize('NFKD', id).encode('ascii', 'ignore').decode('ascii')
         id = id.lower()
-        return re.sub("[^a-z0-9_-]", "-", id)
+        return re.sub('[^a-z0-9_-]', '-', id)
 
     def register(self, action_name, item):
         if action_name in self.action_items:
@@ -79,7 +79,7 @@ class AlexaDevice(object):
     def create_alias_devices(self):
         alias_devices = []
         for idx, alias_name in enumerate(self.alias):
-            alias_device_id = "{}-alias{}".format(self.id, idx + 1)
+            alias_device_id = '{}-alias{}'.format(self.id, idx + 1)
 
             alias_device = AlexaDevice(alias_device_id)
             alias_device.name = alias_name
@@ -105,25 +105,25 @@ class AlexaDevice(object):
 
     def validate(self, logger, proto):
         if not self.id:
-            msg = "Alexa-Device {}: empty identifier".format(self.id)
+            msg = 'Alexa-Device {}: empty identifier'.format(self.id)
             logger.warning(msg)
-            proto.addEntry("WARNING", msg)
+            proto.addEntry('WARNING', msg)
             return False
         elif len(self.id) > 128:
             msg = "Alexa-Device: {}: identifier '{}' too long >128".format(self.id, self.id)
             logger.warning(msg)
-            proto.addEntry("WARNING", msg)
+            proto.addEntry('WARNING', msg)
             return False
 
         if not self.name:
-            msg = "Alexa-Device {}: empty name".format(self.id)
+            msg = 'Alexa-Device {}: empty name'.format(self.id)
             logger.warning(msg)
-            proto.addEntry("WARNING", msg)
+            proto.addEntry('WARNING', msg)
             return False
         elif len(self.name) > 128:
             msg = "Alexa-Device: {}: name '{}' too long >128".format(self.id, self.name)
             logger.warning(msg)
-            proto.addEntry("WARNING", msg)
+            proto.addEntry('WARNING', msg)
             return False
 
         if not self.description:
@@ -131,17 +131,17 @@ class AlexaDevice(object):
                 self.id, self.name
             )
             logger.warning(msg)
-            proto.addEntry("WARNING", msg)
+            proto.addEntry('WARNING', msg)
             self.description = self.name
         elif len(self.description) > 128:
             msg = "Alexa-Device {}: description '{}' too long >128".format(self.id, self.description)
             logger.warning(msg)
-            proto.addEntry("WARNING", msg)
+            proto.addEntry('WARNING', msg)
             return False
 
         if not self.action_items:
-            msg = "Alexa-Device {}: no actions/items registered - please set `alexa_actions`".format(self.id)
+            msg = 'Alexa-Device {}: no actions/items registered - please set `alexa_actions`'.format(self.id)
             logger.warning(msg)
-            proto.addEntry("WARNING", msg)
+            proto.addEntry('WARNING', msg)
 
         return True

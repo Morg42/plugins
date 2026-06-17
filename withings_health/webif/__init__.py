@@ -84,18 +84,18 @@ class WebInterface(SmartPluginWebIf):
             )
 
         if not reload and code:
-            self.logger.debug("Got code as callback for plugin {}: {}".format(self.plugin.get_fullname(), code))
+            self.logger.debug('Got code as callback for plugin {}: {}'.format(self.plugin.get_fullname(), code))
             credentials = None
             try:
                 credentials = self._auth.get_credentials(code)
             except Exception as e:
                 self.logger.error(
-                    "An error occurred, perhaps code parameter is invalid or too old? Message: {}".format(str(e))
+                    'An error occurred, perhaps code parameter is invalid or too old? Message: {}'.format(str(e))
                 )
             if credentials is not None:
                 self._creds = credentials
                 self.logger.debug(
-                    "New credentials for plugin {} are: access_token {}, token_expiry {}, token_type {}, refresh_token {}".format(
+                    'New credentials for plugin {} are: access_token {}, token_expiry {}, token_type {}, refresh_token {}'.format(
                         self.plugin.get_fullname(),
                         self._creds.access_token,
                         self._creds.token_expiry,
@@ -103,20 +103,20 @@ class WebInterface(SmartPluginWebIf):
                         self._creds.refresh_token,
                     )
                 )
-                self.plugin.get_item("access_token")(self._creds.access_token)
-                self.plugin.get_item("token_expiry")(self._creds.token_expiry)
-                self.plugin.get_item("token_type")(self._creds.token_type)
-                self.plugin.get_item("refresh_token")(self._creds.refresh_token)
+                self.plugin.get_item('access_token')(self._creds.access_token)
+                self.plugin.get_item('token_expiry')(self._creds.token_expiry)
+                self.plugin.get_item('token_type')(self._creds.token_type)
+                self.plugin.get_item('refresh_token')(self._creds.refresh_token)
 
                 self.plugin._client = None
 
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         try:
             token_expiry_val = datetime.datetime.fromtimestamp(
-                self.plugin.get_item("token_expiry").property.value, tz=self.plugin.shtime.tzinfo()
+                self.plugin.get_item('token_expiry').property.value, tz=self.plugin.shtime.tzinfo()
             )
         except Exception:
-            self.logger.error("Please integrate the plugin struct to make the plugin work correctly.")
+            self.logger.error('Please integrate the plugin struct to make the plugin work correctly.')
             token_expiry_val = 0
         return tmpl.render(
             plugin_shortname=self.plugin.get_shortname(),
@@ -126,8 +126,8 @@ class WebInterface(SmartPluginWebIf):
             plugin_info=self.plugin.get_info(),
             tabcount=2,
             callback_url=self.plugin.get_callback_url(),
-            tab1title="Withings Health Items (%s)" % len(self.plugin.get_items()),
-            tab2title="OAuth2 Data",
+            tab1title='Withings Health Items (%s)' % len(self.plugin.get_items()),
+            tab2title='OAuth2 Data',
             authorize_url=self._auth.get_authorize_url(),
             p=self.plugin,
             token_expiry=token_expiry_val,

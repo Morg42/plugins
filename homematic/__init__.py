@@ -43,7 +43,7 @@ class Homematic(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = "1.5.2"
+    PLUGIN_VERSION = '1.5.2'
     #    ALLOW_MULTIINSTANCE = False
 
     connected = False
@@ -68,84 +68,84 @@ class Homematic(SmartPlugin):
         #   self.param1 = self.get_parameter_value('param1')
 
         # Initialization code goes here
-        self.username = self.get_parameter_value("username")
-        self.password = self.get_parameter_value("password")
-        self.host = self.get_parameter_value("host")
+        self.username = self.get_parameter_value('username')
+        self.password = self.get_parameter_value('password')
+        self.host = self.get_parameter_value('host')
         #        self.port = self.get_parameter_value('port')
         #        self.port_hmip = self.get_parameter_value('port_hmip')
-        self.proxyPort = self.get_parameter_value("proxyPort")
-        self.proxyPort_hmip = self.get_parameter_value("proxyPort_hmip")
-        self.customCallbackHost = self.get_parameter_value("customCallbackHost")
-        self.callbackHost = self.get_parameter_value("callbackHost")
-        self.callbackPort = self.get_parameter_value("callbackPort")
-        self.callbackPort_hmip = self.get_parameter_value("callbackPort_hmip")
+        self.proxyPort = self.get_parameter_value('proxyPort')
+        self.proxyPort_hmip = self.get_parameter_value('proxyPort_hmip')
+        self.customCallbackHost = self.get_parameter_value('customCallbackHost')
+        self.callbackHost = self.get_parameter_value('callbackHost')
+        self.callbackPort = self.get_parameter_value('callbackPort')
+        self.callbackPort_hmip = self.get_parameter_value('callbackPort_hmip')
 
         self.port = 2001
         self.port_hmip = 2010
 
         # build dict identifier for the homematic ccu of this plugin instance
-        self.hm_id = "rf"
-        if self.get_instance_name() != "":
-            self.hm_id += "_" + self.get_instance_name()
+        self.hm_id = 'rf'
+        if self.get_instance_name() != '':
+            self.hm_id += '_' + self.get_instance_name()
         # create HomeMatic object
         try:
-            remotes = {self.hm_id: {"ip": self.host, "port": self.port}}
+            remotes = {self.hm_id: {'ip': self.host, 'port': self.port}}
             if self.customCallbackHost:
                 remotes = {
                     self.hm_id: {
-                        "ip": self.host,
-                        "port": self.port,
-                        "callbackip": self.callbackHost,
-                        "callbackport": self.callbackPort,
+                        'ip': self.host,
+                        'port': self.port,
+                        'callbackip': self.callbackHost,
+                        'callbackport': self.callbackPort,
                     }
                 }
             self.hm = HMConnection(
-                interface_id="myserver",
+                interface_id='myserver',
                 autostart=False,
                 eventcallback=self.eventcallback,
                 systemcallback=self.systemcallback,
                 remotes=remotes,
                 localport=self.proxyPort,
-                local="0.0.0.0",
+                local='0.0.0.0',
             )
         except Exception:
-            self.logger.error("Unable to create HomeMatic object")
+            self.logger.error('Unable to create HomeMatic object')
             self._init_complete = False
             return
 
         # build dict identifier for the homematicIP ccu of this plugin instance
         if self.port_hmip != 0:
-            self.hmip_id = "ip"
-            if self.get_instance_name() != "":
-                self.hmip_id += "_" + self.get_instance_name()
+            self.hmip_id = 'ip'
+            if self.get_instance_name() != '':
+                self.hmip_id += '_' + self.get_instance_name()
             # create HomeMaticIP object
             try:
-                remotes = {self.hmip_id: {"ip": self.host, "port": self.port_hmip}}
+                remotes = {self.hmip_id: {'ip': self.host, 'port': self.port_hmip}}
                 if self.customCallbackHost:
                     remotes = {
                         self.hmip_id: {
-                            "ip": self.host,
-                            "port": self.port_hmip,
-                            "callbackip": self.callbackHost,
-                            "callbackport": self.callbackPort_hmip,
+                            'ip': self.host,
+                            'port': self.port_hmip,
+                            'callbackip': self.callbackHost,
+                            'callbackport': self.callbackPort_hmip,
                         }
                     }
                 self.hmip = HMConnection(
-                    interface_id="myserver_ip",
+                    interface_id='myserver_ip',
                     autostart=False,
                     eventcallback=self.eventcallback,
                     systemcallback=self.systemcallback,
                     remotes=remotes,
                     localport=self.proxyPort_hmip,
-                    local="0.0.0.0",
+                    local='0.0.0.0',
                 )
             except Exception:
-                self.logger.error("Unable to create HomeMaticIP object")
+                self.logger.error('Unable to create HomeMaticIP object')
         #                self._init_complete = False
         #                return
 
         # set the name of the thread that got created by pyhomematic to something meaningfull
-        self.hm._server.name = "plugins." + self.get_fullname() + ".server"
+        self.hm._server.name = 'plugins.' + self.get_fullname() + '.server'
 
         # start communication with HomeMatic ccu
         try:
@@ -153,7 +153,7 @@ class Homematic(SmartPlugin):
             self.connected = True
         except Exception:
             self.logger.error(
-                "Unable to start HomeMatic object - SmartHomeNG will be unable to terminate the thread vor this plugin (instance)"
+                'Unable to start HomeMatic object - SmartHomeNG will be unable to terminate the thread vor this plugin (instance)'
             )
             self.connected = False
         #            self._init_complete = False
@@ -165,16 +165,16 @@ class Homematic(SmartPlugin):
         try:
             self.hmip.start()
         except Exception:
-            self.logger.error("{}: Unable to start HomeMaticIP object".format(self.get_fullname()))
+            self.logger.error('{}: Unable to start HomeMaticIP object'.format(self.get_fullname()))
         # set the name of the thread that got created by pyhomematic to something meaningfull
-        self.hmip._server.name = "plugins." + self.get_fullname() + ".ip.server"
+        self.hmip._server.name = 'plugins.' + self.get_fullname() + '.ip.server'
 
         if self.connected:
             # TO DO: sleep besser lösen!
             sleep(20)
             #            self.logger.warning("Plugin '{}': self.hm.devices".format(self.hm.devices))
             if self.hm.devices.get(self.hm_id, {}) == {}:
-                self.logger.error("Connection to ccu failed")
+                self.logger.error('Connection to ccu failed')
         #                self._init_complete = False
         # stop the thread that got created by initializing pyhomematic
         #                self.hm.stop()
@@ -190,7 +190,7 @@ class Homematic(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
 
         self.alive = True
         # if you want to create child threads, do not make them daemon = True!
@@ -200,7 +200,7 @@ class Homematic(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.alive = False
 
         self.hm.stop()
@@ -219,26 +219,26 @@ class Homematic(SmartPlugin):
                         with the item, caller, source and dest as arguments and in case of the knx plugin the value
                         can be sent to the knx with a knx write function within the knx plugin.
         """
-        if self.has_iattr(item.conf, "hm_address"):
+        if self.has_iattr(item.conf, 'hm_address'):
             init_error = False
             #            self.logger.debug("parse_item: {}".format(item))
-            dev_id = self.get_iattr_value(item.conf, "hm_address")
+            dev_id = self.get_iattr_value(item.conf, 'hm_address')
 
-            dev_type = self.get_iattr_value(item.conf, "hm_type")
+            dev_type = self.get_iattr_value(item.conf, 'hm_type')
 
-            dev_type = "?"
+            dev_type = '?'
             dev = self.hm.devices[self.hm_id].get(dev_id)
             if dev is None:
                 dev = self.hmip.devices[self.hmip_id].get(dev_id)
                 if dev is not None:
-                    dev_type = "hmIP"
+                    dev_type = 'hmIP'
             else:
-                dev_type = "hm"
+                dev_type = 'hm'
 
-            hm_address = self.get_iattr_value(item.conf, "hm_address")
-            hm_channel = self.get_iattr_value(item.conf, "hm_channel")
-            hm_function = self.get_iattr_value(item.conf, "hm_function")
-            hm_node = ""
+            hm_address = self.get_iattr_value(item.conf, 'hm_address')
+            hm_channel = self.get_iattr_value(item.conf, 'hm_channel')
+            hm_function = self.get_iattr_value(item.conf, 'hm_function')
+            hm_node = ''
             if dev is None:
                 self.logger.error(
                     "No HomeMatic device found with address '{}' channel {} for {}".format(
@@ -254,27 +254,27 @@ class Homematic(SmartPlugin):
 
                 # Lookup hm_node and hm_channel for the configured hm_function
                 if hm_function is None:
-                    hm_function = "STATE"
-                hm_channel, hm_node = self.get_hmchannelforfunction(hm_function, hm_channel, dev.ACTIONNODE, "AC", item)
-                if hm_node == "":
+                    hm_function = 'STATE'
+                hm_channel, hm_node = self.get_hmchannelforfunction(hm_function, hm_channel, dev.ACTIONNODE, 'AC', item)
+                if hm_node == '':
                     hm_channel, hm_node = self.get_hmchannelforfunction(
-                        hm_function, hm_channel, dev.ATTRIBUTENODE, "AT", item
+                        hm_function, hm_channel, dev.ATTRIBUTENODE, 'AT', item
                     )
-                if hm_node == "":
+                if hm_node == '':
                     hm_channel, hm_node = self.get_hmchannelforfunction(
-                        hm_function, hm_channel, dev.BINARYNODE, "BI", item
+                        hm_function, hm_channel, dev.BINARYNODE, 'BI', item
                     )
-                if hm_node == "":
+                if hm_node == '':
                     hm_channel, hm_node = self.get_hmchannelforfunction(
-                        hm_function, hm_channel, dev.EVENTNODE, "EV", item
+                        hm_function, hm_channel, dev.EVENTNODE, 'EV', item
                     )
-                if hm_node == "":
+                if hm_node == '':
                     hm_channel, hm_node = self.get_hmchannelforfunction(
-                        hm_function, hm_channel, dev.SENSORNODE, "SE", item
+                        hm_function, hm_channel, dev.SENSORNODE, 'SE', item
                     )
-                if hm_node == "":
+                if hm_node == '':
                     hm_channel, hm_node = self.get_hmchannelforfunction(
-                        hm_function, hm_channel, dev.WRITENODE, "WR", item
+                        hm_function, hm_channel, dev.WRITENODE, 'WR', item
                     )
 
                 #                self.logger.warning("parse_item {}: dev.ELEMENT='{}'".format(item, dev.ELEMENT))
@@ -285,7 +285,7 @@ class Homematic(SmartPlugin):
                     )
                 )
 
-            if hm_node == "":
+            if hm_node == '':
                 hm_node = None
 
             # store item and device information for plugin instance
@@ -296,31 +296,31 @@ class Homematic(SmartPlugin):
             # Initialize item from HomeMatic
             if dev is not None:
                 value = None
-                if hm_node == "AC":
+                if hm_node == 'AC':
                     pass  # actionNodeData can not be read for initialization
                     init_error = True
-                elif hm_node == "AT":
+                elif hm_node == 'AT':
                     value = dev.getAttributeData(hm_function)
-                elif hm_node == "BI":
+                elif hm_node == 'BI':
                     value = dev.getBinaryData(hm_function)
-                elif hm_node == "EV":
+                elif hm_node == 'EV':
                     value = dev.event(hm_function)
-                elif hm_node == "SE":
+                elif hm_node == 'SE':
                     try:
                         # Do not read sensors during initialization (could result in a warning 'HMGeneric.getValue: ...'
                         # to logger 'pyhomematic.devicetypes.generic'
                         # value = dev.getSensorData(hm_function)
                         pass
                     except Exception as e:
-                        self.logger.warning(f"parse_item: Item {item._path} Exception {e}")
-                elif hm_node == "WR":
+                        self.logger.warning(f'parse_item: Item {item._path} Exception {e}')
+                elif hm_node == 'WR':
                     value = dev.getWriteData(hm_function)
                 else:
                     init_error = True
                     log_text = "Not initializing {}: Unknown hm_node='{}' for address={}:{}, function={}".format(
                         item, hm_node, hm_address, hm_channel, hm_function
                     )
-                    if hm_node is None and hm_function == "STATE":
+                    if hm_node is None and hm_function == 'STATE':
                         self.logger.info(log_text)
                     else:
                         self.logger.error(log_text)
@@ -331,16 +331,13 @@ class Homematic(SmartPlugin):
                             item, value, hm_address, hm_channel, hm_function
                         )
                     )
-                    item(value, "HomeMatic", "Init")
+                    item(value, 'HomeMatic', 'Init')
                 else:
-                    if (not init_error) and (hm_node != "SE"):
+                    if (not init_error) and (hm_node != 'SE'):
                         # Dont log an error for sensors, since sensor data is not read during initialization
                         self.logger.error(
                             "Not initializing {} from address={}:{}, function='{}'".format(
-                                item,
-                                hm_node,
-                                hm_address,
-                                hm_channel,
+                                item, hm_node, hm_address, hm_channel
                             )
                         )
 
@@ -350,7 +347,7 @@ class Homematic(SmartPlugin):
         """
         Default plugin parse_logic method
         """
-        if "xxx" in logic.conf:
+        if 'xxx' in logic.conf:
             # self.function(logic['name'])
             pass
 
@@ -362,8 +359,8 @@ class Homematic(SmartPlugin):
         :param source: if given it represents the source
         :param dest: if given it represents the dest
         """
-        if caller != "homematic":
-            if self.has_iattr(item.conf, "hm_address"):
+        if caller != 'homematic':
+            if self.has_iattr(item.conf, 'hm_address'):
                 #               self.hm_items[] = [str(item), item, hm_address, hm_channel, hm_function, hm_node]
                 myitem = None
                 for i in self.hm_items:
@@ -381,7 +378,7 @@ class Homematic(SmartPlugin):
                     )
                 )
 
-                dev_id = self.get_iattr_value(item.conf, "hm_address")
+                dev_id = self.get_iattr_value(item.conf, 'hm_address')
                 dev = self.hm.devices[self.hm_id].get(dev_id)
 
                 # Write item value to HomeMatic device
@@ -454,15 +451,15 @@ class Homematic(SmartPlugin):
         """
         dev = self.hm.devices[self.hm_id].get(dev_id)
         if dev is not None:
-            d_type = str(dev.__class__).replace("<class '" + dev.__module__ + ".", "").replace("'>", "")
+            d_type = str(dev.__class__).replace("<class '" + dev.__module__ + '.', '').replace("'>", '')
             return d_type
 
         dev = self.hmip.devices[self.hmip_id].get(dev_id)
         if dev is not None:
-            d_type = str(dev.__class__).replace("<class '" + dev.__module__ + ".", "").replace("'>", "")
+            d_type = str(dev.__class__).replace("<class '" + dev.__module__ + '.', '').replace("'>", '')
             return d_type
 
-        return ""
+        return ''
 
     def get_hmchannelforfunction(self, hm_function, hm_channel, node, hm_node, item):
         """
@@ -478,12 +475,12 @@ class Homematic(SmartPlugin):
                 hm_channel = node[hm_function][0]
             else:
                 if int(hm_channel) not in node[hm_function]:
-                    hm_node = ""
+                    hm_node = ''
                     self.logger.error(
                         "get_hmchannelforfunction: Invalid channel '{}' specified for {}".format(hm_channel, item)
                     )
         else:
-            hm_node = ""
+            hm_node = ''
         return hm_channel, hm_node
 
     def systemcallback(self, src, *args):
@@ -497,12 +494,12 @@ class Homematic(SmartPlugin):
         """
         defined = False
         for i in self.hm_items:
-            if address == i[2] + ":" + str(i[3]):
+            if address == i[2] + ':' + str(i[3]):
                 if value_key == i[4]:
                     self.logger.info("eventcallback: address={}, {}='{}' -> {}".format(address, value_key, value, i[0]))
                     src = self.get_instance_name()
-                    if src != "":
-                        src += ":"
+                    if src != '':
+                        src += ':'
                     src += address
                     i[1](value, self.get_shortname(), src)
                     #                    i[1](value, 'HomeMatic')

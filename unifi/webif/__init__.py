@@ -70,8 +70,8 @@ class WebInterface(SmartPluginWebIf):
         :return: contents of the template after beeing rendered
         """
 
-        tmpl = self.tplenv.get_template("index.html")
-        pagelength = self.plugin.get_parameter_value("webif_pagelength")
+        tmpl = self.tplenv.get_template('index.html')
+        pagelength = self.plugin.get_parameter_value('webif_pagelength')
         return tmpl.render(
             plugin_shortname=self.plugin.get_shortname(),
             webif_pagelength=pagelength,
@@ -91,20 +91,20 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         if dataSet is None:
-            data = {"items": {}, "requests": 0}
+            data = {'items': {}, 'requests': 0}
             for item in self.plugin._model.get_items():
-                data["items"].update(
+                data['items'].update(
                     {
                         item.property.path: {
-                            "value": str(item.property.value),
-                            "last_update": item.property.last_update.strftime("%d.%m.%Y %H:%M:%S"),
-                            "last_change": item.property.last_change.strftime("%d.%m.%Y %H:%M:%S"),
+                            'value': str(item.property.value),
+                            'last_update': item.property.last_update.strftime('%d.%m.%Y %H:%M:%S'),
+                            'last_change': item.property.last_change.strftime('%d.%m.%Y %H:%M:%S'),
                         }
                     }
                 )
-            data["requests"] = self.plugin._model.get_total_number_of_requests_to_controller()
+            data['requests'] = self.plugin._model.get_total_number_of_requests_to_controller()
             try:
                 return json.dumps(data)
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
         return {}

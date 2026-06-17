@@ -18,7 +18,7 @@ class MessageSinkModel:
         return self.__reader.has_relevant_messages()
 
     def introspect(self):
-        return f"MessageSinkModel, based on: {self.__reader.introspect()}"
+        return f'MessageSinkModel, based on: {self.__reader.introspect()}'
 
     def dump(self):
         return self.__reader.dump()

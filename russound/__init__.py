@@ -32,8 +32,8 @@ import logging
 import sys
 import cherrypy
 
-REQ_DELIMITER = b"\r"
-RESP_DELIMITER = b"\r\n"
+REQ_DELIMITER = b'\r'
+RESP_DELIMITER = b'\r\n'
 
 
 class Russound(SmartPlugin):
@@ -42,7 +42,7 @@ class Russound(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = "1.7.3"
+    PLUGIN_VERSION = '1.7.3'
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -50,13 +50,13 @@ class Russound(SmartPlugin):
         """
         from bin.smarthome import VERSION
 
-        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
+        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
             self.logger = logging.getLogger(__name__)
 
         super().__init__()
-        self.host = self.get_parameter_value("host")
-        self.port = self.get_parameter_value("port")
-        self._pause_item_path = self.get_parameter_value("pause_item")
+        self.host = self.get_parameter_value('host')
+        self.port = self.get_parameter_value('port')
+        self._pause_item_path = self.get_parameter_value('pause_item')
 
         # Initialization code goes here
         self.terminator = RESP_DELIMITER
@@ -71,9 +71,9 @@ class Russound(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
         if not self._client.connect():
-            self.logger.debug(f"Connection to {self.host}:{self.port} not possible. Plugin stopped.")
+            self.logger.debug(f'Connection to {self.host}:{self.port} not possible. Plugin stopped.')
             self.stop()
             return
 
@@ -82,14 +82,14 @@ class Russound(SmartPlugin):
             self._pause_item(False, self.get_fullname())
 
     def activate(self):
-        self.logger.debug("Activate method called, but is deprecated. Please move to run()")
+        self.logger.debug('Activate method called, but is deprecated. Please move to run()')
         self.run()
 
     def stop(self):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.alive = False
         if self._pause_item:
             self._pause_item(True, self.get_fullname())
@@ -125,14 +125,14 @@ class Russound(SmartPlugin):
 
         if item.property.path == self._pause_item_path:
             self._pause_item = item
-            self.logger.info(f"set pause_item to {item.property.path}")
+            self.logger.info(f'set pause_item to {item.property.path}')
             return self.update_item
 
-        if self.has_iattr(item.conf, "rus_path"):
-            self.logger.debug("parse item: {}".format(item))
+        if self.has_iattr(item.conf, 'rus_path'):
+            self.logger.debug('parse item: {}'.format(item))
 
-            path = self.get_iattr_value(item.conf, "rus_path")
-            parts = path.split(".", 2)
+            path = self.get_iattr_value(item.conf, 'rus_path')
+            parts = path.split('.', 2)
 
             if len(parts) != 3:
                 self.logger.warning(
@@ -147,37 +147,37 @@ class Russound(SmartPlugin):
             param = parts[2]
 
         else:
-            if self.has_iattr(item.conf, "rus_controller"):
-                c = self.get_iattr_value(item.conf, "rus_controller")
-                path = c + "."
+            if self.has_iattr(item.conf, 'rus_controller'):
+                c = self.get_iattr_value(item.conf, 'rus_controller')
+                path = c + '.'
             else:
                 return None
 
-            if self.has_iattr(item.conf, "rus_zone"):
-                z = self.get_iattr_value(item.conf, "rus_zone")
-                path += z + "."
+            if self.has_iattr(item.conf, 'rus_zone'):
+                z = self.get_iattr_value(item.conf, 'rus_zone')
+                path += z + '.'
             else:
-                self.logger.warning("No zone specified for controller {0} in config of item {1}".format(c, item))
+                self.logger.warning('No zone specified for controller {0} in config of item {1}'.format(c, item))
                 return None
 
-            if self.has_iattr(item.conf, "rus_parameter"):
-                param = self.get_iattr_value(item.conf, "rus_parameter")
+            if self.has_iattr(item.conf, 'rus_parameter'):
+                param = self.get_iattr_value(item.conf, 'rus_parameter')
                 path += param
             else:
                 self.logger.warning(
-                    "No parameter specified for zone {0} on controller {1} in config of item {2}".format(z, c, item)
+                    'No parameter specified for zone {0} on controller {1} in config of item {2}'.format(z, c, item)
                 )
                 return None
 
-            if param == "relativevolume":
+            if param == 'relativevolume':
                 # item._enforce_updates = True
                 item.property.enforce_updates = True
 
-            self.set_attr_value(item.conf, "rus_path", path)
+            self.set_attr_value(item.conf, 'rus_path', path)
 
         param = param.lower()
-        self.params[path] = {"c": int(c), "z": int(z), "param": param, "item": item}
-        self.logger.debug("Parameter {0} with path {1} added".format(item, path))
+        self.params[path] = {'c': int(c), 'z': int(z), 'param': param, 'item': item}
+        self.logger.debug('Parameter {0} with path {1} added'.format(item, path))
 
         return self.update_item
 
@@ -204,7 +204,7 @@ class Russound(SmartPlugin):
         # check for pause item
         if item is self._pause_item:
             if caller != self.get_shortname():
-                self.logger.debug(f"pause item changed to {item()}")
+                self.logger.debug(f'pause item changed to {item()}')
                 if item() and self.alive:
                     self.stop()
                 elif not item() and not self.alive:
@@ -215,41 +215,41 @@ class Russound(SmartPlugin):
             # code to execute if the plugin is not stopped
             # and only, if the item has not been changed by this this plugin:
             self.logger.info(
-                "Update item: {}, item has been changed outside this plugin (caller={}, source={}, dest={})".format(
+                'Update item: {}, item has been changed outside this plugin (caller={}, source={}, dest={})'.format(
                     item.property.path, caller, source, dest
                 )
             )
 
-            if self.has_iattr(item.conf, "rus_path"):
-                path = self.get_iattr_value(item.conf, "rus_path")
+            if self.has_iattr(item.conf, 'rus_path'):
+                path = self.get_iattr_value(item.conf, 'rus_path')
                 p = self.params[path]
-                cmd = p["param"]
-                c = p["c"]
-                z = p["z"]
+                cmd = p['param']
+                c = p['c']
+                z = p['z']
 
-                if cmd == "bass":
+                if cmd == 'bass':
                     self.send_set(c, z, cmd, self._restrict(item(), -10, 10))
-                elif cmd == "treble":
+                elif cmd == 'treble':
                     self.send_set(c, z, cmd, self._restrict(item(), -10, 10))
-                elif cmd == "balance":
+                elif cmd == 'balance':
                     self.send_set(c, z, cmd, self._restrict(item(), -10, 10))
-                elif cmd == "loudness":
-                    self.send_set(c, z, cmd, "ON" if item() else "OFF")
-                elif cmd == "turnonvolume":
+                elif cmd == 'loudness':
+                    self.send_set(c, z, cmd, 'ON' if item() else 'OFF')
+                elif cmd == 'turnonvolume':
                     self.send_set(c, z, cmd, self._restrict(item(), 0, 50))
-                elif cmd == "status":
-                    self.send_event(c, z, "ZoneOn" if item() else "ZoneOff")
-                elif cmd == "partymode":
+                elif cmd == 'status':
+                    self.send_event(c, z, 'ZoneOn' if item() else 'ZoneOff')
+                elif cmd == 'partymode':
                     self.send_event(c, z, cmd, item().lower())
-                elif cmd == "donotdisturb":
-                    self.send_event(c, z, cmd, "on" if item() else "off")
-                elif cmd == "volume":
-                    self.send_event(c, z, "KeyPress", "Volume", self._restrict(item(), 0, 50))
-                elif cmd == "currentsource":
-                    self.send_event(c, z, "SelectSource", item())
-                elif cmd == "relativevolume":
-                    self.send_event(c, z, "KeyPress", "VolumeUp" if item() else "VolumeDown")
-                elif cmd == "name":
+                elif cmd == 'donotdisturb':
+                    self.send_event(c, z, cmd, 'on' if item() else 'off')
+                elif cmd == 'volume':
+                    self.send_event(c, z, 'KeyPress', 'Volume', self._restrict(item(), 0, 50))
+                elif cmd == 'currentsource':
+                    self.send_event(c, z, 'SelectSource', item())
+                elif cmd == 'relativevolume':
+                    self.send_event(c, z, 'KeyPress', 'VolumeUp' if item() else 'VolumeDown')
+                elif cmd == 'name':
                     return
                 else:
                     self.key_release(c, z, cmd)
@@ -259,33 +259,33 @@ class Russound(SmartPlugin):
 
     def send_event(self, c, z, cmd, value1=None, value2=None):
         if value1 is None and value2 is None:
-            self._send_cmd("EVENT C[{0}].Z[{1}]!{2}\r".format(c, z, cmd))
+            self._send_cmd('EVENT C[{0}].Z[{1}]!{2}\r'.format(c, z, cmd))
         elif value2 is None:
-            self._send_cmd("EVENT C[{0}].Z[{1}]!{2} {3}\r".format(c, z, cmd, value1))
+            self._send_cmd('EVENT C[{0}].Z[{1}]!{2} {3}\r'.format(c, z, cmd, value1))
         else:
-            self._send_cmd("EVENT C[{0}].Z[{1}]!{2} {3} {4}\r".format(c, z, cmd, value1, value2))
+            self._send_cmd('EVENT C[{0}].Z[{1}]!{2} {3} {4}\r'.format(c, z, cmd, value1, value2))
 
     def key_release(self, c, z, key_code):
-        self.send_event(c, z, "KeyRelease", key_code)
+        self.send_event(c, z, 'KeyRelease', key_code)
 
     def key_hold(self, c, z, key_code, hold_time):
-        self.send_event(c, z, "KeyHold", key_code, hold_time)
+        self.send_event(c, z, 'KeyHold', key_code, hold_time)
 
     def _watch_zone(self, controller, zone):
-        self._send_cmd("WATCH C[{0}].Z[{1}] ON\r".format(controller, zone))
+        self._send_cmd('WATCH C[{0}].Z[{1}] ON\r'.format(controller, zone))
 
     def _watch_source(self, source):
-        self._send_cmd("WATCH S[{0}] ON\r".format(source))
+        self._send_cmd('WATCH S[{0}] ON\r'.format(source))
 
     def _watch_system(self):
-        self._send_cmd("WATCH System ON\r")
+        self._send_cmd('WATCH System ON\r')
 
     def _send_cmd(self, cmd):
         if not self.alive:
-            self.logger.error("Trying to send data but plugin is not running")
+            self.logger.error('Trying to send data but plugin is not running')
             return
 
-        self.logger.debug("Sending request: {0}".format(cmd))
+        self.logger.debug('Sending request: {0}'.format(cmd))
 
         # if connection is closed we don't wait for sh.con to reopen it
         # instead we reconnect immediatly
@@ -300,32 +300,32 @@ class Russound(SmartPlugin):
     def found_terminator(self, client, resp):  # client is the Tcp_Client ref
         """callback method for lib.network Tcp_Client, aka "data received" """
         try:
-            self.logger.debug("Parse response: {0}".format(resp))
-            if resp[0] == "S":
+            self.logger.debug('Parse response: {0}'.format(resp))
+            if resp[0] == 'S':
                 return
-            if resp[0] == "E":
-                self.logger.debug("Received response error: {0}".format(resp))
-            elif resp[0] == "N":
+            if resp[0] == 'E':
+                self.logger.debug('Received response error: {0}'.format(resp))
+            elif resp[0] == 'N':
                 resp = resp[2:]
 
-                if resp[0] == "C":
-                    resp = resp.split(".", 2)
+                if resp[0] == 'C':
+                    resp = resp.split('.', 2)
                     c = int(resp[0][2])
                     z = int(resp[1][2])
                     resp = resp[2]
-                    cmd = resp.split("=")[0].lower()
+                    cmd = resp.split('=')[0].lower()
                     value = resp.split('"')[1]
 
-                    path = "{0}.{1}.{2}".format(c, z, cmd)
+                    path = '{0}.{1}.{2}'.format(c, z, cmd)
                     if path in list(self.params.keys()):
-                        self.params[path]["item"](self._decode(cmd, value), self.get_shortname())
-                elif resp.startswith("System.status"):
+                        self.params[path]['item'](self._decode(cmd, value), self.get_shortname())
+                elif resp.startswith('System.status'):
                     return
-                elif resp[0] == "S":
-                    resp = resp.split(".", 1)
+                elif resp[0] == 'S':
+                    resp = resp.split('.', 1)
                     #                   s = int(resp[0][2])
                     resp = resp[1]
-                    cmd = resp.split("=")[0].lower()
+                    cmd = resp.split('=')[0].lower()
                     value = resp.split('"')[1]
 
                     #                    if s in self.sources.keys():
@@ -338,15 +338,15 @@ class Russound(SmartPlugin):
 
     def _decode(self, cmd, value):
         cmd = cmd.lower()
-        if cmd in ["bass", "treble", "balance", "turnonvolume", "volume"]:
+        if cmd in ['bass', 'treble', 'balance', 'turnonvolume', 'volume']:
             return int(value)
-        elif cmd in ["loudness", "status", "mute"]:
-            return value == "ON"
-        elif cmd in ["partymode", "donotdisturb"]:
+        elif cmd in ['loudness', 'status', 'mute']:
+            return value == 'ON'
+        elif cmd in ['partymode', 'donotdisturb']:
             return value.lower()
-        elif cmd == "currentsource":
+        elif cmd == 'currentsource':
             return value
-        elif cmd == "name":
+        elif cmd == 'name':
             return str(value)
 
     def handle_connect(self):
@@ -357,10 +357,10 @@ class Russound(SmartPlugin):
         zones = []
         for path in self.params:
             p = self.params[path]
-            key = "{0}.{1}".format(p["c"], p["z"])
+            key = '{0}.{1}'.format(p['c'], p['z'])
             if key not in zones:
                 zones.append(key)
-                self._watch_zone(p["c"], p["z"])
+                self._watch_zone(p['c'], p['z'])
 
         for s in self.sources:
             self._watch_source(s)
@@ -396,24 +396,22 @@ class Russound(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
-            self.logger.error("Not initializing the web interface")
+            self.logger.error('Not initializing the web interface')
             return False
 
-        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
-            self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
+        if 'SmartPluginWebIf' not in list(sys.modules['lib.model.smartplugin'].__dict__):
+            self.logger.warning('Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface')
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
+        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            "/": {
-                "tools.staticdir.root": webif_dir,
-            },
-            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
         # Register the web interface as a cherrypy app
@@ -423,7 +421,7 @@ class Russound(SmartPlugin):
             config,
             self.get_classname(),
             self.get_instance_name(),
-            description="",
+            description='',
         )
 
         return True
@@ -460,9 +458,9 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])))
+        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])))
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):

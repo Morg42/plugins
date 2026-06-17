@@ -47,7 +47,7 @@ class WebInterface(SmartPluginWebIf):
         self.plugin = plugin
         self.items = Items.get_instance()
         self.tplenv = self.init_template_environment()
-        self.logger.debug(f"Init WebIF of {self.plugin.get_shortname()}")
+        self.logger.debug(f'Init WebIF of {self.plugin.get_shortname()}')
 
     @cherrypy.expose
     def index(self, reload=None, action=None):
@@ -60,7 +60,7 @@ class WebInterface(SmartPluginWebIf):
 
         self.plugin.get_broker_info()
 
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
 
         try:
             pagelength = self.plugin.webif_pagelength
@@ -91,42 +91,42 @@ class WebInterface(SmartPluginWebIf):
             # get the new data
             self.plugin.get_broker_info()
             data = dict()
-            data["broker_info"] = self.plugin._broker
-            data["broker_uptime"] = self.plugin.broker_uptime()
+            data['broker_info'] = self.plugin._broker
+            data['broker_uptime'] = self.plugin.broker_uptime()
 
-            data["item_values"] = {}
+            data['item_values'] = {}
             for item in self.plugin.get_item_list():
-                data["item_values"][item.property.path] = {}
-                data["item_values"][item.property.path]["value"] = item.property.value
-                data["item_values"][item.property.path]["last_update"] = item.property.last_update.strftime(
-                    "%d.%m.%Y %H:%M:%S"
+                data['item_values'][item.property.path] = {}
+                data['item_values'][item.property.path]['value'] = item.property.value
+                data['item_values'][item.property.path]['last_update'] = item.property.last_update.strftime(
+                    '%d.%m.%Y %H:%M:%S'
                 )
-                data["item_values"][item.property.path]["last_change"] = item.property.last_change.strftime(
-                    "%d.%m.%Y %H:%M:%S"
+                data['item_values'][item.property.path]['last_change'] = item.property.last_change.strftime(
+                    '%d.%m.%Y %H:%M:%S'
                 )
 
-            data["device_values"] = {}
+            data['device_values'] = {}
             for device in self.plugin._devices:
-                if "data" in self.plugin._devices[device]:
-                    data["device_values"][device] = {
-                        "lqi": str(self.plugin._devices[device]["data"].get("linkquality", "-")),
-                        "data": ", ".join(list(self.plugin._devices[device]["data"].keys())),
+                if 'data' in self.plugin._devices[device]:
+                    data['device_values'][device] = {
+                        'lqi': str(self.plugin._devices[device]['data'].get('linkquality', '-')),
+                        'data': ', '.join(list(self.plugin._devices[device]['data'].keys())),
                     }
                 else:
-                    data["device_values"][device] = {"lqi": "-", "data": "-"}
+                    data['device_values'][device] = {'lqi': '-', 'data': '-'}
 
-                if "meta" in self.plugin._devices[device]:
-                    last_seen = self.plugin._devices[device]["meta"].get("lastSeen", None)
+                if 'meta' in self.plugin._devices[device]:
+                    last_seen = self.plugin._devices[device]['meta'].get('lastSeen', None)
                     if last_seen:
-                        data["device_values"][device]["last_seen"] = last_seen.strftime("%d.%m.%Y %H:%M:%S")
+                        data['device_values'][device]['last_seen'] = last_seen.strftime('%d.%m.%Y %H:%M:%S')
                     else:
-                        data["device_values"][device]["last_seen"] = "-"
+                        data['device_values'][device]['last_seen'] = '-'
                 else:
-                    data["device_values"][device]["last_seen"] = "-"
+                    data['device_values'][device]['last_seen'] = '-'
 
             # return it as json the web page
             try:
                 return json.dumps(data, default=str)
             except Exception as e:
-                self.logger.error("get_data_html exception: {}".format(e))
+                self.logger.error('get_data_html exception: {}'.format(e))
                 return {}

@@ -65,8 +65,8 @@ class WebInterface(SmartPluginWebIf):
         :return: contents of the template after being rendered
         """
 
-        pagelength = self.plugin.get_parameter_value("webif_pagelength")
-        tmpl = self.tplenv.get_template("index.html")
+        pagelength = self.plugin.get_parameter_value('webif_pagelength')
+        tmpl = self.tplenv.get_template('index.html')
 
         return tmpl.render(
             p=self.plugin,
@@ -91,34 +91,34 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
 
-        if dataSet == "overview":
+        if dataSet == 'overview':
             data = dict()
             try:
                 data = json.dumps(data)
                 return data
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
 
         if dataSet is None:
             data = dict()
 
-            data["items"] = {}
+            data['items'] = {}
             for item in self.plugin.get_item_list():
-                data["items"][item.property.path] = {}
-                data["items"][item.property.path]["value"] = item() if item() is not None else "-"
-                data["items"][item.property.path]["last_update"] = item.property.last_update.strftime(
-                    "%d.%m.%Y %H:%M:%S"
+                data['items'][item.property.path] = {}
+                data['items'][item.property.path]['value'] = item() if item() is not None else '-'
+                data['items'][item.property.path]['last_update'] = item.property.last_update.strftime(
+                    '%d.%m.%Y %H:%M:%S'
                 )
-                data["items"][item.property.path]["last_change"] = item.property.last_change.strftime(
-                    "%d.%m.%Y %H:%M:%S"
+                data['items'][item.property.path]['last_change'] = item.property.last_change.strftime(
+                    '%d.%m.%Y %H:%M:%S'
                 )
 
-            data["maintenance"] = True if self.plugin.log_level <= 20 else False
+            data['maintenance'] = True if self.plugin.log_level <= 20 else False
 
             try:
                 return json.dumps(data, default=str)
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
 
     @cherrypy.expose
     def discover(self):

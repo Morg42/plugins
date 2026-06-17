@@ -74,25 +74,25 @@ class WebInterface(SmartPluginWebIf):
         tokenRequestCompleted = None
 
         if action is not None:
-            if action == "generateURL":
-                self.logger.info("generate URL triggered via webinterface")
+            if action == 'generateURL':
+                self.logger.info('generate URL triggered via webinterface')
                 self.plugin.generate_code_verifier()
                 self.plugin.calculate_code_challenge(self.plugin.codeVerifier)
                 generateURLSuccessfull = self.plugin.generate_request_url()
-            elif action == "requestToken":
-                self.logger.info("Request token triggered via webinterface")
-                if (code is not None) and (not code == ""):
+            elif action == 'requestToken':
+                self.logger.info('Request token triggered via webinterface')
+                if (code is not None) and (not code == ''):
                     tokenRequestCompleted = self.plugin.retrieve_accessToken(code)
-                elif (code is None) or (code == ""):
-                    self.logger.error("Token request not possible: Code missing in field above.")
+                elif (code is None) or (code == ''):
+                    self.logger.error('Token request not possible: Code missing in field above.')
                     tokenRequestCompleted = False
                 else:
-                    self.logger.error("Token request not possible: Missing argument.")
+                    self.logger.error('Token request not possible: Missing argument.')
                     tokenRequestCompleted = False
             else:
-                self.logger.error("Unknown command received via webinterface")
+                self.logger.error('Unknown command received via webinterface')
 
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(
             p=self.plugin, generateURLSuccessfull=generateURLSuccessfull, tokenRequestCompleted=tokenRequestCompleted
@@ -109,14 +109,14 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         # if dataSets are used, define them here
-        if dataSet == "overview":
+        if dataSet == 'overview':
             # get the new data from the plugin variable called _webdata
             data = self.plugin._webdata
             try:
                 data = json.dumps(data)
                 return data
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
         if dataSet is None:
             # get the new data
             data = {}

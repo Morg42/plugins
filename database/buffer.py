@@ -142,7 +142,7 @@ class BufferManager:
             buf = self._buffer.get(item, [])
             return bool(buf) and buf[-1].duration is None
 
-    def last_entry(self, item) -> "BufferEntry | None":
+    def last_entry(self, item) -> 'BufferEntry | None':
         """Return the last buffered entry for *item*, or ``None``.
 
         :param item: SmartHomeNG item.

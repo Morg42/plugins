@@ -35,7 +35,7 @@ import warnings
 from cryptography.utils import CryptographyDeprecationWarning
 
 with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=CryptographyDeprecationWarning)
+    warnings.filterwarnings('ignore', category=CryptographyDeprecationWarning)
     import py_vapid
     from pywebpush import webpush, WebPushException
     from cryptography.hazmat.primitives import serialization
@@ -52,16 +52,16 @@ class WebPush(SmartPlugin):
     """
 
     PLUGIN_VERSION = (
-        "1.1.0"  # (must match the version specified in plugin.yaml), use '1.0.0' for your initial plugin Release
+        '1.1.0'  # (must match the version specified in plugin.yaml), use '1.0.0' for your initial plugin Release
     )
 
-    ITEM_COMMUNICATION = "webpush_communication"
-    ITEM_CONFIG = "webpush_config"
+    ITEM_COMMUNICATION = 'webpush_communication'
+    ITEM_CONFIG = 'webpush_config'
 
-    VALID_COMMUNICATIONS = ["fromclient"]
-    VALID_CONFIGS = ["grouplist", "publickey"]
+    VALID_COMMUNICATIONS = ['fromclient']
+    VALID_CONFIGS = ['grouplist', 'publickey']
 
-    VALID_CMDS = ["subscribe", "unsubscribe"]
+    VALID_CMDS = ['subscribe', 'unsubscribe']
 
     def __init__(self, sh):
         """
@@ -80,8 +80,8 @@ class WebPush(SmartPlugin):
         super().__init__()
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
-        self.groupList = self.get_parameter_value("grouplist")
-        self.varpath = self.get_parameter_value("varpath")
+        self.groupList = self.get_parameter_value('grouplist')
+        self.varpath = self.get_parameter_value('varpath')
 
         self.groupListItem = None
         self.publicKeyItem = None
@@ -89,9 +89,9 @@ class WebPush(SmartPlugin):
 
         self.alive = False
 
-        self.pluginVarPath = self.varpath + "/webpush/"
-        self.databasePath = self.pluginVarPath + "webpush_database.txt"
-        self.keyFilePath = self.pluginVarPath + "webpush_private_key.pem"
+        self.pluginVarPath = self.varpath + '/webpush/'
+        self.databasePath = self.pluginVarPath + 'webpush_database.txt'
+        self.keyFilePath = self.pluginVarPath + 'webpush_private_key.pem'
 
         if not os.path.exists(self.pluginVarPath):
             os.mkdir(self.pluginVarPath)
@@ -104,7 +104,7 @@ class WebPush(SmartPlugin):
         )
         self.publicKey = py_vapid.b64urlencode(raw_pub)
 
-        self.logger.info("Application Server Key: {0}".format(self.publicKey))
+        self.logger.info('Application Server Key: {0}'.format(self.publicKey))
 
         # On initialization error use:
         #   self._init_complete = False
@@ -124,18 +124,18 @@ class WebPush(SmartPlugin):
         """
         # if you need to create child threads, do not make them daemon = True!
         # They will not shut down properly. (It's a python bug)
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
 
         alive = True
 
         if self.groupListItem is None:
-            self.logger.warning("Item webpush_config: grouplist needed!")
+            self.logger.warning('Item webpush_config: grouplist needed!')
             alive = False
         if self.publicKeyItem is None:
-            self.logger.warning("Item webpush_config: publickey needed!")
+            self.logger.warning('Item webpush_config: publickey needed!')
             alive = False
         if self.fromClientItem is None:
-            self.logger.warning("Item webpush_communication: fromclient needed!")
+            self.logger.warning('Item webpush_communication: fromclient needed!')
             alive = False
 
         self.alive = alive
@@ -144,7 +144,7 @@ class WebPush(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called. Shutting down...")
+        self.logger.debug('Stop method called. Shutting down...')
         self.alive = False
 
     def parse_item(self, item):
@@ -162,12 +162,12 @@ class WebPush(SmartPlugin):
         """
 
         if self.has_iattr(item.conf, self.ITEM_COMMUNICATION):
-            self.logger.debug("parse COMMUNICATION item: {}".format(item))
+            self.logger.debug('parse COMMUNICATION item: {}'.format(item))
 
             value = self.get_iattr_value(item.conf, self.ITEM_COMMUNICATION).lower()
             if value in self.VALID_COMMUNICATIONS:
                 self.logger.debug(
-                    "adding valid info item {0} to wachlist {1}={2} ".format(
+                    'adding valid info item {0} to wachlist {1}={2} '.format(
                         item, self.ITEM_COMMUNICATION, item.conf[self.ITEM_COMMUNICATION]
                     )
                 )
@@ -185,12 +185,12 @@ class WebPush(SmartPlugin):
                 )
 
         if self.has_iattr(item.conf, self.ITEM_CONFIG):
-            self.logger.debug("parse CONFIG item: {}".format(item))
+            self.logger.debug('parse CONFIG item: {}'.format(item))
 
             value = self.get_iattr_value(item.conf, self.ITEM_CONFIG).lower()
             if value in self.VALID_CONFIGS:
                 self.logger.debug(
-                    "adding valid config item {0} to wachlist {1}={2} ".format(
+                    'adding valid config item {0} to wachlist {1}={2} '.format(
                         item, self.ITEM_CONFIG, item.conf[self.ITEM_CONFIG]
                     )
                 )
@@ -237,9 +237,9 @@ class WebPush(SmartPlugin):
         if self.alive and caller != self.get_shortname():
             # code to execute if the plugin is not stopped
             # and only, if the item has not been changed by this plugin:
-            item_value = "{0}".format(item())
+            item_value = '{0}'.format(item())
             self.logger.info(
-                "Update item: {0}, item has been changed outside this plugin to value={1}".format(
+                'Update item: {0}, item has been changed outside this plugin to value={1}'.format(
                     item.property.path, item_value
                 )
             )
@@ -252,7 +252,7 @@ class WebPush(SmartPlugin):
 
                 if item == self.fromClientItem:
                     # clear communication item
-                    item("", self.get_shortname())
+                    item('', self.get_shortname())
                     # process stored message
                     self.processMessageFromClient(item_value)
 
@@ -265,16 +265,16 @@ class WebPush(SmartPlugin):
         dbConn = sqlite3.connect(self.databasePath)
         c = dbConn.cursor()
         c.execute(
-            "CREATE TABLE IF NOT EXISTS subscriptions"
-            "([id] INTEGER PRIMARY KEY,"
-            "[sessionId] varchar(255) NOT NULL,"
-            "[subscription] varchar(512) NOT NULL,"
-            "[subscriptiongroup] varchar(255) NOT NULL)"
+            'CREATE TABLE IF NOT EXISTS subscriptions'
+            '([id] INTEGER PRIMARY KEY,'
+            '[sessionId] varchar(255) NOT NULL,'
+            '[subscription] varchar(512) NOT NULL,'
+            '[subscriptiongroup] varchar(255) NOT NULL)'
         )
         dbConn.commit()
 
         # delete all entries for groups wich are still in database but not in plugin conifg anymore
-        sql = "SELECT subscriptiongroup FROM subscriptions GROUP BY subscriptiongroup"
+        sql = 'SELECT subscriptiongroup FROM subscriptions GROUP BY subscriptiongroup'
         c.execute(sql)
         dbgrouptuplelist = c.fetchall()
 
@@ -299,16 +299,16 @@ class WebPush(SmartPlugin):
         #        }
         data = json.loads(msg)
         if data:
-            if data["cmd"] in self.VALID_CMDS:
-                self.logger.info("Executing cmd: {0} for sessionId: {1}".format(data["cmd"], data["sessionId"]))
-                self.unsubscribeEntireSessionId(data["sessionId"])
-                if data["cmd"] != "unsubscribe":
-                    self.subscribeEntireSessionId(data["sessionId"], data["groups"], data["subscription"])
+            if data['cmd'] in self.VALID_CMDS:
+                self.logger.info('Executing cmd: {0} for sessionId: {1}'.format(data['cmd'], data['sessionId']))
+                self.unsubscribeEntireSessionId(data['sessionId'])
+                if data['cmd'] != 'unsubscribe':
+                    self.subscribeEntireSessionId(data['sessionId'], data['groups'], data['subscription'])
             else:
-                self.logger.error("command '{0}' invalid, use one of {1}".format(data["cmd"], self.VALID_CMDS))
+                self.logger.error("command '{0}' invalid, use one of {1}".format(data['cmd'], self.VALID_CMDS))
 
     def subscribe(self, sessionId, group, subscription):
-        self.logger.info("Subscribing: {0} to {1}".format(sessionId, group))
+        self.logger.info('Subscribing: {0} to {1}'.format(sessionId, group))
         dbConn = sqlite3.connect(self.databasePath)
         c = dbConn.cursor()
         sql = 'INSERT INTO subscriptions (sessionId, subscription, subscriptiongroup) VALUES ("{0}", "{1}", "{2}")'.format(
@@ -322,7 +322,7 @@ class WebPush(SmartPlugin):
         dbConn = sqlite3.connect(self.databasePath)
         c = dbConn.cursor()
         for group in groups:
-            self.logger.info("Subscribing: {0} to {1}".format(sessionId, group))
+            self.logger.info('Subscribing: {0} to {1}'.format(sessionId, group))
             sql = 'INSERT INTO subscriptions (sessionId, subscription, subscriptiongroup) VALUES ("{0}", "{1}", "{2}")'.format(
                 sessionId, subscription, group
             )
@@ -331,7 +331,7 @@ class WebPush(SmartPlugin):
         dbConn.close()
 
     def unsubscribe(self, sessionId, group):
-        self.logger.info("Unsubscribing: {0} from {1}".format(sessionId, group))
+        self.logger.info('Unsubscribing: {0} from {1}'.format(sessionId, group))
         dbConn = sqlite3.connect(self.databasePath)
         c = dbConn.cursor()
         sql = "DELETE FROM subscriptions WHERE sessionId = '{0}' AND subscriptiongroup = '{1}'".format(sessionId, group)
@@ -340,7 +340,7 @@ class WebPush(SmartPlugin):
         dbConn.close()
 
     def unsubscribeEntireSessionId(self, sessionId):
-        self.logger.info("Unsubscribing: {0}".format(sessionId))
+        self.logger.info('Unsubscribing: {0}'.format(sessionId))
         dbConn = sqlite3.connect(self.databasePath)
         c = dbConn.cursor()
         sql = "DELETE FROM subscriptions WHERE sessionId = '{0}'".format(sessionId)
@@ -349,7 +349,7 @@ class WebPush(SmartPlugin):
         dbConn.close()
 
     def unsubscribeBySubscription(self, subscription):
-        self.logger.info("Unsubscribing by subscription: {0}".format(subscription))
+        self.logger.info('Unsubscribing by subscription: {0}'.format(subscription))
         dbConn = sqlite3.connect(self.databasePath)
         c = dbConn.cursor()
         sql = 'DELETE FROM subscriptions WHERE subscription = "{0}"'.format(subscription)
@@ -359,9 +359,9 @@ class WebPush(SmartPlugin):
 
     def unsubscribeAll(self):
         dbConn = sqlite3.connect(self.databasePath)
-        self.logger.info("Unsubscribing all")
+        self.logger.info('Unsubscribing all')
         c = dbConn.cursor()
-        sql = "DELETE FROM subscriptions"
+        sql = 'DELETE FROM subscriptions'
         c.execute(sql)
         dbConn.commit()
         dbConn.close()
@@ -374,12 +374,12 @@ class WebPush(SmartPlugin):
         self,
         msg,
         group,
-        title="",
-        url="",
+        title='',
+        url='',
         requireInteraction=True,
-        icon="",
-        badge="",
-        image="",
+        icon='',
+        badge='',
+        image='',
         silent=False,
         vibrate=[],
         ttl=604800,
@@ -390,25 +390,25 @@ class WebPush(SmartPlugin):
         # options from https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerRegistration/showNotification
 
         if timestamp:
-            dt_string = datetime.now().strftime("[%d.%m.%Y %H:%M:%S]\n")
+            dt_string = datetime.now().strftime('[%d.%m.%Y %H:%M:%S]\n')
             msg = dt_string + msg
 
         data = {
-            "body": msg,
-            "title": title,
-            "url": url,
-            "requireInteraction": requireInteraction,
-            "icon": icon,
-            "badge": badge,
-            "image": image,
-            "silent": silent,
-            "vibrate": vibrate,
+            'body': msg,
+            'title': title,
+            'url': url,
+            'requireInteraction': requireInteraction,
+            'icon': icon,
+            'badge': badge,
+            'image': image,
+            'silent': silent,
+            'vibrate': vibrate,
         }
 
-        urgency = "normal"
+        urgency = 'normal'
         if highpriority:
-            urgency = "high"
-        headers = {"Urgency": urgency}
+            urgency = 'high'
+        headers = {'Urgency': urgency}
 
         dbConn = sqlite3.connect(self.databasePath)
         c = dbConn.cursor()
@@ -419,32 +419,30 @@ class WebPush(SmartPlugin):
 
         counter = 0
         for subscription in subscriptionlist:
-            sub = subscription[0].replace("'", '"').replace("None", "null")
+            sub = subscription[0].replace("'", '"').replace('None', 'null')
             try:
                 webpush(
                     subscription_info=json.loads(sub),
                     data=json.dumps(data),
                     vapid_private_key=self.vapid,
-                    vapid_claims={
-                        "sub": "mailto:YourNameHere@example.org",
-                    },
+                    vapid_claims={'sub': 'mailto:YourNameHere@example.org'},
                     ttl=ttl,
                     headers=headers,
                 )
                 counter += 1
             except WebPushException as ex:
-                self.logger.info("Send to {0} unsuccessfully...\n{1}".format(subscription[0], ex.message))
+                self.logger.info('Send to {0} unsuccessfully...\n{1}'.format(subscription[0], ex.message))
                 # Mozilla returns additional information in the body of the response.
                 if ex.response and ex.response.json():
                     extra = ex.response.json()
                     self.logger.info(
-                        "Remote service replied with a {0}:{1}, {2}".format(extra.code, extra.errno, extra.message)
+                        'Remote service replied with a {0}:{1}, {2}'.format(extra.code, extra.errno, extra.message)
                     )
-                if "410" in ex.message:
+                if '410' in ex.message:
                     self.unsubscribeBySubscription(subscription[0])
 
         self.logger.info(
-            "To {0}/{1} subscribers of group {2} successfully send.".format(counter, len(subscriptionlist), group)
+            'To {0}/{1} subscribers of group {2} successfully send.'.format(counter, len(subscriptionlist), group)
         )
 
         return returnval
@@ -461,26 +459,24 @@ class WebPush(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
-            self.logger.error("Not initializing the web interface")
+            self.logger.error('Not initializing the web interface')
             return False
 
         import sys
 
-        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
-            self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
+        if 'SmartPluginWebIf' not in list(sys.modules['lib.model.smartplugin'].__dict__):
+            self.logger.warning('Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface')
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
+        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            "/": {
-                "tools.staticdir.root": webif_dir,
-            },
-            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
         # Register the web interface as a cherrypy app
@@ -490,7 +486,7 @@ class WebPush(SmartPlugin):
             config,
             self.get_classname(),
             self.get_instance_name(),
-            description="",
+            description='',
         )
 
         return True
@@ -504,7 +500,7 @@ class WebPush(SmartPlugin):
     def getSubscritionsPerGroup(self):
         dbConn = sqlite3.connect(self.databasePath)
         c = dbConn.cursor()
-        sql = "SELECT subscriptiongroup, COUNT(id) FROM subscriptions GROUP BY subscriptiongroup"
+        sql = 'SELECT subscriptiongroup, COUNT(id) FROM subscriptions GROUP BY subscriptiongroup'
         c.execute(sql)
         groupcounttuplelist = c.fetchall()
         dbConn.close()
@@ -567,7 +563,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
 
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(p=self.plugin)

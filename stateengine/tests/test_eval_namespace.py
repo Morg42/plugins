@@ -38,7 +38,7 @@ import sys
 import unittest
 
 # ── path bootstrap ────────────────────────────────────────────────────────
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 import tests.common as common
 
 common.register_shng_log_levels()
@@ -48,7 +48,7 @@ from plugins.stateengine import StateEngineDefaults
 
 
 def _setup():
-    StateEngineDefaults.logger = logging.getLogger("test.se")
+    StateEngineDefaults.logger = logging.getLogger('test.se')
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -67,7 +67,7 @@ class TestSeValueEvalNamespace(unittest.TestCase):
         self.SeValue = SeValue
 
     def _make_value(self):
-        return self.SeValue(self.abitem, "test_value")
+        return self.SeValue(self.abitem, 'test_value')
 
     def _eval_expr(self, expr):
         """Set a raw eval expression on a fresh SeValue and call get()."""
@@ -82,36 +82,36 @@ class TestSeValueEvalNamespace(unittest.TestCase):
 
     def test_sh_is_available(self):
         """``sh is not None`` must evaluate to True (sh in eval scope)."""
-        result = self._eval_expr("sh is not None")
+        result = self._eval_expr('sh is not None')
         self.assertIs(result, True)
 
     def test_sh_is_the_smarthome_instance(self):
         """``sh`` must be the MockSmartHome, not an arbitrary object."""
-        result = self._eval_expr("sh")
+        result = self._eval_expr('sh')
         self.assertIs(result, self.abitem._sh)
 
     # ── shtime ──────────────────────────────────────────────────────────
 
     def test_shtime_is_available(self):
         """``shtime is not None`` must evaluate to True."""
-        result = self._eval_expr("shtime is not None")
+        result = self._eval_expr('shtime is not None')
         self.assertIs(result, True)
 
     # ── stateengine_eval / se_eval ───────────────────────────────────────
 
     def test_stateengine_eval_is_available(self):
         """``stateengine_eval is not None`` must evaluate True."""
-        result = self._eval_expr("stateengine_eval is not None")
+        result = self._eval_expr('stateengine_eval is not None')
         self.assertIs(result, True)
 
     def test_se_eval_alias_available(self):
         """``se_eval`` is the same alias as ``stateengine_eval``."""
-        result = self._eval_expr("se_eval is not None")
+        result = self._eval_expr('se_eval is not None')
         self.assertIs(result, True)
 
     def test_stateengine_eval_and_se_eval_same_object(self):
         """Both names should point to the same SeEval instance."""
-        result = self._eval_expr("stateengine_eval is se_eval")
+        result = self._eval_expr('stateengine_eval is se_eval')
         self.assertIs(result, True)
 
     # ── NameError regression ─────────────────────────────────────────────
@@ -122,7 +122,7 @@ class TestSeValueEvalNamespace(unittest.TestCase):
         undefined name is used — confirming the regression would be caught.
         """
         v = self._make_value()
-        v._SeValue__eval = "undefined_name_xyz is not None"
+        v._SeValue__eval = 'undefined_name_xyz is not None'
         # get() swallows the exception into __get_issues, returning None
         result = v.get()
         # Result is None (exception path), NOT True
@@ -146,7 +146,7 @@ class TestSeConditionEvalNamespace(unittest.TestCase):
 
     def _make_condition(self, eval_expr):
         """Return a SeCondition with __eval set to eval_expr."""
-        cond = self.SeCondition(self.abitem, "test_cond")
+        cond = self.SeCondition(self.abitem, 'test_cond')
         cond._SeCondition__eval = eval_expr
         return cond
 
@@ -159,27 +159,27 @@ class TestSeConditionEvalNamespace(unittest.TestCase):
     # ── sh ──────────────────────────────────────────────────────────────
 
     def test_sh_is_available(self):
-        result = self._get_current("sh is not None")
+        result = self._get_current('sh is not None')
         self.assertIs(result, True)
 
     def test_sh_is_smarthome_instance(self):
-        result = self._get_current("sh")
+        result = self._get_current('sh')
         self.assertIs(result, self.abitem._sh)
 
     # ── shtime ──────────────────────────────────────────────────────────
 
     def test_shtime_is_available(self):
-        result = self._get_current("shtime is not None")
+        result = self._get_current('shtime is not None')
         self.assertIs(result, True)
 
     # ── stateengine_eval / se_eval ───────────────────────────────────────
 
     def test_stateengine_eval_available(self):
-        result = self._get_current("stateengine_eval is not None")
+        result = self._get_current('stateengine_eval is not None')
         self.assertIs(result, True)
 
     def test_se_eval_alias_available(self):
-        result = self._get_current("se_eval is not None")
+        result = self._get_current('se_eval is not None')
         self.assertIs(result, True)
 
     # ── NameError regression ─────────────────────────────────────────────
@@ -189,7 +189,7 @@ class TestSeConditionEvalNamespace(unittest.TestCase):
         check_eval wraps NameError into ValueError with a message; verify that
         using an unknown name raises rather than silently returning True.
         """
-        cond = self._make_condition("undefined_xyz_name is not None")
+        cond = self._make_condition('undefined_xyz_name is not None')
         with self.assertRaises((ValueError, NameError)):
             cond._SeCondition__get_current()
 
@@ -211,7 +211,7 @@ class TestSeActionRunEvalNamespace(unittest.TestCase):
 
     def _make_action(self, eval_expr):
         """Return a SeActionRun with __eval set to eval_expr."""
-        action = self.SeActionRun(self.abitem, "test_action")
+        action = self.SeActionRun(self.abitem, 'test_action')
         # SeActionRun stores the eval as _SeActionRun__eval
         action._SeActionRun__eval = eval_expr
         return action
@@ -222,38 +222,34 @@ class TestSeActionRunEvalNamespace(unittest.TestCase):
         directly without side-effecting any shng items.
         """
         action = self._make_action(eval_expr)
-        return action.real_execute(
-            state=None,
-            actionname="test_action",
-            returnvalue=returnvalue,
-        )
+        return action.real_execute(state=None, actionname='test_action', returnvalue=returnvalue)
 
     # ── sh ──────────────────────────────────────────────────────────────
 
     def test_sh_is_available(self):
-        result = self._call_execute("sh is not None")
+        result = self._call_execute('sh is not None')
         self.assertIs(result, True)
 
     def test_sh_is_smarthome_instance(self):
-        result = self._call_execute("sh")
+        result = self._call_execute('sh')
         self.assertIs(result, self.abitem._sh)
 
     # ── shtime ──────────────────────────────────────────────────────────
 
     def test_shtime_is_available(self):
-        result = self._call_execute("shtime is not None")
+        result = self._call_execute('shtime is not None')
         self.assertIs(result, True)
 
     # ── stateengine_eval / se_eval ───────────────────────────────────────
 
     def test_stateengine_eval_available(self):
-        result = self._call_execute("stateengine_eval is not None")
+        result = self._call_execute('stateengine_eval is not None')
         self.assertIs(result, True)
 
     def test_se_eval_alias_available(self):
-        result = self._call_execute("se_eval is not None")
+        result = self._call_execute('se_eval is not None')
         self.assertIs(result, True)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

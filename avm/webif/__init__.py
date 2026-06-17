@@ -48,7 +48,7 @@ class WebInterface(SmartPluginWebIf):
         self.items = Items.get_instance()
         self.tplenv = self.init_template_environment()
 
-        self.logger.debug(f"Init WebIF of {self.plugin.get_shortname()}")
+        self.logger.debug(f'Init WebIF of {self.plugin.get_shortname()}')
 
     @cherrypy.expose
     def index(self, reload=None, action=None):
@@ -85,8 +85,8 @@ class WebInterface(SmartPluginWebIf):
             call_monitor_items = None
             call_monitor_item_count = None
 
-        pagelength = self.plugin.get_parameter_value("webif_pagelength")
-        tmpl = self.tplenv.get_template("index.html")
+        pagelength = self.plugin.get_parameter_value('webif_pagelength')
+        tmpl = self.tplenv.get_template('index.html')
 
         return tmpl.render(
             plugin_shortname=self.plugin.get_shortname(),
@@ -118,49 +118,49 @@ class WebInterface(SmartPluginWebIf):
         if dataSet is None:
             data = dict()
             if self.plugin.monitoring_service:
-                data["call_monitor"] = {}
+                data['call_monitor'] = {}
                 for item in self.plugin.get_monitor_items():
-                    data["call_monitor"][item.property.path] = {}
-                    data["call_monitor"][item.property.path]["value"] = item()
-                    data["call_monitor"][item.property.path]["last_update"] = item.property.last_update.strftime(
-                        "%d.%m.%Y %H:%M:%S"
+                    data['call_monitor'][item.property.path] = {}
+                    data['call_monitor'][item.property.path]['value'] = item()
+                    data['call_monitor'][item.property.path]['last_update'] = item.property.last_update.strftime(
+                        '%d.%m.%Y %H:%M:%S'
                     )
-                    data["call_monitor"][item.property.path]["last_change"] = item.property.last_change.strftime(
-                        "%d.%m.%Y %H:%M:%S"
+                    data['call_monitor'][item.property.path]['last_change'] = item.property.last_change.strftime(
+                        '%d.%m.%Y %H:%M:%S'
                     )
 
             if self.plugin.fritz_device:
-                data["tr064_items"] = {}
+                data['tr064_items'] = {}
                 for item in self.plugin.get_tr064_items():
-                    data["tr064_items"][item.property.path] = {}
-                    data["tr064_items"][item.property.path]["value"] = item()
-                    data["tr064_items"][item.property.path]["last_update"] = item.property.last_update.strftime(
-                        "%d.%m.%Y %H:%M:%S"
+                    data['tr064_items'][item.property.path] = {}
+                    data['tr064_items'][item.property.path]['value'] = item()
+                    data['tr064_items'][item.property.path]['last_update'] = item.property.last_update.strftime(
+                        '%d.%m.%Y %H:%M:%S'
                     )
-                    data["tr064_items"][item.property.path]["last_change"] = item.property.last_change.strftime(
-                        "%d.%m.%Y %H:%M:%S"
+                    data['tr064_items'][item.property.path]['last_change'] = item.property.last_change.strftime(
+                        '%d.%m.%Y %H:%M:%S'
                     )
-                data["tr064_items_blacklistet"] = self.plugin.get_tr064_items_blacklisted()
+                data['tr064_items_blacklistet'] = self.plugin.get_tr064_items_blacklisted()
 
             if self.plugin.fritz_home:
-                data["aha_items"] = {}
+                data['aha_items'] = {}
                 for item in self.plugin.get_aha_items():
-                    data["aha_items"][item.property.path] = {}
-                    data["aha_items"][item.property.path]["value"] = item()
-                    data["aha_items"][item.property.path]["last_update"] = item.property.last_update.strftime(
-                        "%d.%m.%Y %H:%M:%S"
+                    data['aha_items'][item.property.path] = {}
+                    data['aha_items'][item.property.path]['value'] = item()
+                    data['aha_items'][item.property.path]['last_update'] = item.property.last_update.strftime(
+                        '%d.%m.%Y %H:%M:%S'
                     )
-                    data["aha_items"][item.property.path]["last_change"] = item.property.last_change.strftime(
-                        "%d.%m.%Y %H:%M:%S"
+                    data['aha_items'][item.property.path]['last_change'] = item.property.last_change.strftime(
+                        '%d.%m.%Y %H:%M:%S'
                     )
-                data["aha_last_request"] = self.plugin.fritz_home.last_request
+                data['aha_last_request'] = self.plugin.fritz_home.last_request
 
-            data["maintenance"] = True if self.plugin.log_level <= 20 else False
+            data['maintenance'] = True if self.plugin.log_level <= 20 else False
 
             try:
                 return json.dumps(data, default=str)
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
 
     @cherrypy.expose
     def reboot(self):

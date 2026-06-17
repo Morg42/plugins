@@ -23,22 +23,22 @@
 #########################################################################
 
 
-__license__ = "GPL"
-__version__ = "2.0"
-__revision__ = "0.1"
-__docformat__ = "reStructuredText"
+__license__ = 'GPL'
+__version__ = '2.0'
+__revision__ = '0.1'
+__docformat__ = 'reStructuredText'
 
 import datetime
 
 CONVERTERS = {
-    "int": "int",
-    "float": "float",
-    "ZST10": "datetime",
-    "ZST12": "datetime",
-    "D6": "date",
-    "Z6": "time",
-    "Z4": "time",
-    "num": "num",
+    'int': 'int',
+    'float': 'float',
+    'ZST10': 'datetime',
+    'ZST12': 'datetime',
+    'D6': 'date',
+    'Z6': 'time',
+    'Z4': 'time',
+    'num': 'num',
 }
 
 
@@ -50,7 +50,7 @@ class Conversion:
         :return: a datetime object upon success or None if error found by malformed string
         """
         if len(text) != 10:
-            raise ValueError("too few characters for date/time code from OBIS")
+            raise ValueError('too few characters for date/time code from OBIS')
 
         year = int(text[0:2]) + 2000
         month = int(text[2:4])
@@ -66,7 +66,7 @@ class Conversion:
         :return: a datetime object upon success or None if error found by malformed string
         """
         if len(text) != 12:
-            raise ValueError("too few characters for date/time code from OBIS")
+            raise ValueError('too few characters for date/time code from OBIS')
 
         year = int(text[0:2]) + 2000
         month = int(text[2:4])
@@ -83,7 +83,7 @@ class Conversion:
         :return: a datetime.date object upon success or None if error found by malformed string
         """
         if len(text) != 6:
-            raise ValueError("too few characters for date code from OBIS")
+            raise ValueError('too few characters for date code from OBIS')
 
         year = int(text[0:2]) + 2000
         month = int(text[2:4])
@@ -97,7 +97,7 @@ class Conversion:
         :return: a datetime.time object upon success or None if error found by malformed string
         """
         if len(text) != 4:
-            raise ValueError("too few characters for time code from OBIS")
+            raise ValueError('too few characters for time code from OBIS')
 
         hour = int(text[0:2])
         minute = int(text[2:4])
@@ -110,14 +110,14 @@ class Conversion:
         :return: a datetime.time object upon success or None if error found by malformed string
         """
         if len(text) != 6:
-            raise ValueError("too few characters for time code from OBIS")
+            raise ValueError('too few characters for time code from OBIS')
 
         hour = int(text[0:2])
         minute = int(text[2:4])
         second = int(text[4:6])
         return datetime.time(hour, minute, second)
 
-    def _convert_value(self, val, converter: str = ""):
+    def _convert_value(self, val, converter: str = ''):
         """
         This function converts the OBIS value to a user chosen valalue
         :param val: the value to convert given as string
@@ -128,33 +128,33 @@ class Conversion:
             return val
 
         try:
-            if converter in ("num", "float", "int"):
-                if converter in ("num", "int"):
+            if converter in ('num', 'float', 'int'):
+                if converter in ('num', 'int'):
                     try:
                         return int(val)
                     except (ValueError, AttributeError):
-                        if converter == "int":
+                        if converter == 'int':
                             raise ValueError
 
                 # try/except to catch floats like '1.0' and '1,0'
                 try:
                     return float(val)
                 except ValueError:
-                    if "," in val:
-                        val = val.replace(",", ".")
+                    if ',' in val:
+                        val = val.replace(',', '.')
                         return float(val)
                     else:
                         raise ValueError
 
             if not val.isdigit():
-                raise ValueError("only digits allowed for date/time code from OBIS")
+                raise ValueError('only digits allowed for date/time code from OBIS')
 
-            if converter == "int":
+            if converter == 'int':
                 return int(val)
 
             # try to find self._from_<converter> -> run it and return result
-            if hasattr(self, f"_from_{converter}"):
-                return getattr(self, f"_from_{converter}")(val)
+            if hasattr(self, f'_from_{converter}'):
+                return getattr(self, f'_from_{converter}')(val)
 
             # no suitable converter found
             raise ValueError

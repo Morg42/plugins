@@ -25,7 +25,7 @@ class ApiClient:
 
     def _get_groups(self):
         self._ensure_logged_in()
-        self._groups = self._auth.execute_get(self._get_group_url(), "get_groups", 200)
+        self._groups = self._auth.execute_get(self._get_group_url(), 'get_groups', 200)
         self._devices = None
 
     def get_devices(self):
@@ -35,26 +35,26 @@ class ApiClient:
 
             self._devices = []
 
-            for group in self._groups["groupList"]:
-                if "deviceList" in group:
-                    device_list = group.get("deviceList", [])
+            for group in self._groups['groupList']:
+                if 'deviceList' in group:
+                    device_list = group.get('deviceList', [])
                 else:
-                    device_list = group.get("deviceIdList", [])
+                    device_list = group.get('deviceIdList', [])
 
                 for device in device_list:
                     if device:
-                        if "deviceHashGuid" in device:
-                            device_id = device["deviceHashGuid"]
+                        if 'deviceHashGuid' in device:
+                            device_id = device['deviceHashGuid']
                         else:
-                            device_id = hashlib.md5(device["deviceGuid"].encode("utf-8")).hexdigest()
+                            device_id = hashlib.md5(device['deviceGuid'].encode('utf-8')).hexdigest()
 
-                        self._device_indexer[device_id] = device["deviceGuid"]
+                        self._device_indexer[device_id] = device['deviceGuid']
                         self._devices.append(
                             {
-                                "id": device_id,
-                                "name": device["deviceName"],
-                                "group": group["groupName"],
-                                "model": device["deviceModuleNumber"] if "deviceModuleNumber" in device else "",
+                                'id': device_id,
+                                'name': device['deviceName'],
+                                'group': group['groupName'],
+                                'model': device['deviceModuleNumber'] if 'deviceModuleNumber' in device else '',
                             }
                         )
         return self._devices
@@ -62,10 +62,10 @@ class ApiClient:
     def dump(self, device_id):
         device_guid = self._device_indexer.get(device_id)
         if device_guid:
-            return self._auth.execute_get(self._get_device_status_url(device_guid), "dump", 200)
+            return self._auth.execute_get(self._get_device_status_url(device_guid), 'dump', 200)
         return None
 
-    def history(self, device_id, mode, date, time_zone="+01:00"):
+    def history(self, device_id, mode, date, time_zone='+01:00'):
         self._ensure_logged_in()
 
         device_guid = self._device_indexer.get(device_id)
@@ -74,13 +74,13 @@ class ApiClient:
             try:
                 data_mode = constants.DataMode[mode].value
             except KeyError:
-                raise Exception("Wrong mode parameter")
+                raise Exception('Wrong mode parameter')
 
-            payload = {"deviceGuid": device_guid, "dataMode": data_mode, "date": date, "osTimezone": time_zone}
+            payload = {'deviceGuid': device_guid, 'dataMode': data_mode, 'date': date, 'osTimezone': time_zone}
 
-            json_response = self._auth.execute_post(self._get_device_history_url(), payload, "history", 200)
+            json_response = self._auth.execute_post(self._get_device_history_url(), payload, 'history', 200)
 
-            return {"id": device_id, "parameters": self._read_parameters(json_response)}
+            return {'id': device_id, 'parameters': self._read_parameters(json_response)}
         return None
 
     def get_device(self, device_id):
@@ -89,8 +89,8 @@ class ApiClient:
         device_guid = self._device_indexer.get(device_id)
 
         if device_guid:
-            json_response = self._auth.execute_get(self._get_device_status_url(device_guid), "get_device", 200)
-            return {"id": device_id, "parameters": self._read_parameters(json_response["parameters"])}
+            json_response = self._auth.execute_get(self._get_device_status_url(device_guid), 'get_device', 200)
+            return {'id': device_id, 'parameters': self._read_parameters(json_response['parameters'])}
         return None
 
     def set_device(self, device_id, **kwargs):
@@ -108,33 +108,33 @@ class ApiClient:
 
         if kwargs is not None:
             for key, value in kwargs.items():
-                if key == "power" and isinstance(value, constants.Power):
-                    parameters["operate"] = value.value
+                if key == 'power' and isinstance(value, constants.Power):
+                    parameters['operate'] = value.value
 
-                if key == "temperature":
-                    parameters["temperatureSet"] = value
+                if key == 'temperature':
+                    parameters['temperatureSet'] = value
 
-                if key == "mode" and isinstance(value, constants.OperationMode):
-                    parameters["operationMode"] = value.value
+                if key == 'mode' and isinstance(value, constants.OperationMode):
+                    parameters['operationMode'] = value.value
 
-                if key == "fanSpeed" and isinstance(value, constants.FanSpeed):
-                    parameters["fanSpeed"] = value.value
+                if key == 'fanSpeed' and isinstance(value, constants.FanSpeed):
+                    parameters['fanSpeed'] = value.value
 
-                if key == "airSwingHorizontal" and isinstance(value, constants.AirSwingLR):
+                if key == 'airSwingHorizontal' and isinstance(value, constants.AirSwingLR):
                     air_x = value
 
-                if key == "airSwingVertical" and isinstance(value, constants.AirSwingUD):
+                if key == 'airSwingVertical' and isinstance(value, constants.AirSwingUD):
                     air_y = value
 
-                if key == "eco" and isinstance(value, constants.EcoMode):
-                    parameters["ecoMode"] = value.value
+                if key == 'eco' and isinstance(value, constants.EcoMode):
+                    parameters['ecoMode'] = value.value
 
                 if (
-                    key == "nanoe"
+                    key == 'nanoe'
                     and isinstance(value, constants.NanoeMode)
                     and value != constants.NanoeMode.Unavailable
                 ):
-                    parameters["nanoe"] = value.value
+                    parameters['nanoe'] = value.value
 
         # routine to set the auto mode of fan
         # (either horizontal, vertical, both or disabled)
@@ -142,10 +142,10 @@ class ApiClient:
             fan_auto = 0
             device = self.get_device(device_id)
 
-            if device and device["parameters"]["airSwingHorizontal"].value == -1:
+            if device and device['parameters']['airSwingHorizontal'].value == -1:
                 fan_auto = fan_auto | 1
 
-            if device and device["parameters"]["airSwingVertical"].value == -1:
+            if device and device['parameters']['airSwingVertical'].value == -1:
                 fan_auto = fan_auto | 2
 
             if air_x is not None:
@@ -153,7 +153,7 @@ class ApiClient:
                     fan_auto = fan_auto | 1
                 else:
                     fan_auto = fan_auto & ~1
-                    parameters["airSwingLR"] = air_x.value
+                    parameters['airSwingLR'] = air_x.value
 
             if air_y is not None:
                 if air_y.value == -1:
@@ -161,21 +161,21 @@ class ApiClient:
                 else:
                     fan_auto = fan_auto & ~2
                     print(air_y.name)
-                    parameters["airSwingUD"] = air_y.value
+                    parameters['airSwingUD'] = air_y.value
 
             if fan_auto == 3:
-                parameters["fanAutoMode"] = constants.AirSwingAutoMode.Both.value
+                parameters['fanAutoMode'] = constants.AirSwingAutoMode.Both.value
             elif fan_auto == 1:
-                parameters["fanAutoMode"] = constants.AirSwingAutoMode.AirSwingLR.value
+                parameters['fanAutoMode'] = constants.AirSwingAutoMode.AirSwingLR.value
             elif fan_auto == 2:
-                parameters["fanAutoMode"] = constants.AirSwingAutoMode.AirSwingUD.value
+                parameters['fanAutoMode'] = constants.AirSwingAutoMode.AirSwingUD.value
             else:
-                parameters["fanAutoMode"] = constants.AirSwingAutoMode.Disabled.value
+                parameters['fanAutoMode'] = constants.AirSwingAutoMode.Disabled.value
 
         device_guid = self._device_indexer.get(device_id)
         if device_guid:
-            payload = {"deviceGuid": device_guid, "parameters": parameters}
-            _ = self._auth.execute_post(self._get_device_status_control_url(), payload, "set_device", 200)
+            payload = {'deviceGuid': device_guid, 'parameters': parameters}
+            _ = self._auth.execute_post(self._get_device_status_control_url(), payload, 'set_device', 200)
             return True
         return False
 
@@ -183,67 +183,65 @@ class ApiClient:
         value = dict()
 
         _convert = {
-            "insideTemperature": "temperatureInside",
-            "outTemperature": "temperatureOutside",
-            "temperatureSet": "temperature",
-            "currencyUnit": "currencyUnit",
-            "energyConsumption": "energyConsumption",
-            "estimatedCost": "estimatedCost",
-            "historyDataList": "historyDataList",
+            'insideTemperature': 'temperatureInside',
+            'outTemperature': 'temperatureOutside',
+            'temperatureSet': 'temperature',
+            'currencyUnit': 'currencyUnit',
+            'energyConsumption': 'energyConsumption',
+            'estimatedCost': 'estimatedCost',
+            'historyDataList': 'historyDataList',
         }
         for key in _convert:
             if key in parameters:
                 value[_convert[key]] = parameters[key]
 
-        if "operate" in parameters:
-            value["power"] = constants.Power(parameters["operate"])
+        if 'operate' in parameters:
+            value['power'] = constants.Power(parameters['operate'])
 
-        if "operationMode" in parameters:
-            value["mode"] = constants.OperationMode(parameters["operationMode"])
+        if 'operationMode' in parameters:
+            value['mode'] = constants.OperationMode(parameters['operationMode'])
 
-        if "fanSpeed" in parameters:
-            value["fanSpeed"] = constants.FanSpeed(parameters["fanSpeed"])
+        if 'fanSpeed' in parameters:
+            value['fanSpeed'] = constants.FanSpeed(parameters['fanSpeed'])
 
-        if "airSwingLR" in parameters:
-            value["airSwingHorizontal"] = constants.AirSwingLR(parameters["airSwingLR"])
+        if 'airSwingLR' in parameters:
+            value['airSwingHorizontal'] = constants.AirSwingLR(parameters['airSwingLR'])
 
-        if "airSwingUD" in parameters:
-            value["airSwingVertical"] = constants.AirSwingUD(parameters["airSwingUD"])
+        if 'airSwingUD' in parameters:
+            value['airSwingVertical'] = constants.AirSwingUD(parameters['airSwingUD'])
 
-        if "ecoMode" in parameters:
-            value["eco"] = constants.EcoMode(parameters["ecoMode"])
+        if 'ecoMode' in parameters:
+            value['eco'] = constants.EcoMode(parameters['ecoMode'])
 
-        if "nanoe" in parameters:
-            value["nanoe"] = constants.NanoeMode(parameters["nanoe"])
+        if 'nanoe' in parameters:
+            value['nanoe'] = constants.NanoeMode(parameters['nanoe'])
 
-        if "fanAutoMode" in parameters:
-            if parameters["fanAutoMode"] == constants.AirSwingAutoMode.Both.value:
-                value["airSwingHorizontal"] = constants.AirSwingLR.Auto
-                value["airSwingVertical"] = constants.AirSwingUD.Auto
-            elif parameters["fanAutoMode"] == constants.AirSwingAutoMode.AirSwingLR.value:
-                value["airSwingHorizontal"] = constants.AirSwingLR.Auto
-            elif parameters["fanAutoMode"] == constants.AirSwingAutoMode.AirSwingUD.value:
-                value["airSwingVertical"] = constants.AirSwingUD.Auto
+        if 'fanAutoMode' in parameters:
+            if parameters['fanAutoMode'] == constants.AirSwingAutoMode.Both.value:
+                value['airSwingHorizontal'] = constants.AirSwingLR.Auto
+                value['airSwingVertical'] = constants.AirSwingUD.Auto
+            elif parameters['fanAutoMode'] == constants.AirSwingAutoMode.AirSwingLR.value:
+                value['airSwingHorizontal'] = constants.AirSwingLR.Auto
+            elif parameters['fanAutoMode'] == constants.AirSwingAutoMode.AirSwingUD.value:
+                value['airSwingVertical'] = constants.AirSwingUD.Auto
 
         return value
 
     def _get_group_url(self):
-        return "{base_url}/device/group".format(base_url=constants.BASE_PATH_ACC)
+        return '{base_url}/device/group'.format(base_url=constants.BASE_PATH_ACC)
 
     def _get_device_status_url(self, guid):
-        return "{base_url}/deviceStatus/{guid}".format(
-            base_url=constants.BASE_PATH_ACC, guid=re.sub(r"(?i)\%2f", "f", quote_plus(guid))
+        return '{base_url}/deviceStatus/{guid}'.format(
+            base_url=constants.BASE_PATH_ACC, guid=re.sub(r'(?i)\%2f', 'f', quote_plus(guid))
         )
 
     def _get_device_status_now_url(self, guid):
-        return "{base_url}/deviceStatus/now/{guid}".format(
-            base_url=constants.BASE_PATH_ACC, guid=re.sub(r"(?i)\%2f", "f", quote_plus(guid))
+        return '{base_url}/deviceStatus/now/{guid}'.format(
+            base_url=constants.BASE_PATH_ACC, guid=re.sub(r'(?i)\%2f', 'f', quote_plus(guid))
         )
 
     def _get_device_status_control_url(self):
-        return "{base_url}/deviceStatus/control".format(base_url=constants.BASE_PATH_ACC)
+        return '{base_url}/deviceStatus/control'.format(base_url=constants.BASE_PATH_ACC)
 
     def _get_device_history_url(self):
-        return "{base_url}/deviceHistoryData".format(
-            base_url=constants.BASE_PATH_ACC,
-        )
+        return '{base_url}/deviceHistoryData'.format(base_url=constants.BASE_PATH_ACC)

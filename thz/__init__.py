@@ -51,7 +51,7 @@ except Exception:
     REQUIRED_PACKAGE_IMPORTED = False
 
 
-specialRequests = ["logFullScan", "logRegister", "setRegiter"]
+specialRequests = ['logFullScan', 'logRegister', 'setRegiter']
 CLIENT_TIMEOUT = 60
 POLL_INTERVAL = 10
 
@@ -61,7 +61,7 @@ class THZ(SmartPlugin):
     Class THZ implements main control instance
     """
 
-    PLUGIN_VERSION = "1.0.0"
+    PLUGIN_VERSION = '1.0.0'
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -69,10 +69,10 @@ class THZ(SmartPlugin):
         """
         from bin.smarthome import VERSION
 
-        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
+        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
             self.logger = logging.getLogger(__name__)
 
-        self.logger.debug("init {}".format(__name__))
+        self.logger.debug('init {}'.format(__name__))
         self._init_complete = False
 
         # Exit if the required package(s) could not be imported
@@ -81,19 +81,19 @@ class THZ(SmartPlugin):
             return
 
         # Get Parameters
-        self._poll_period = self.get_parameter_value("poll_period")
+        self._poll_period = self.get_parameter_value('poll_period')
 
-        min_update_period = self.get_parameter_value("min_update_period")
+        min_update_period = self.get_parameter_value('min_update_period')
         self._min_update_period = datetime.timedelta(seconds=int(min_update_period))
 
-        max_update_period = self.get_parameter_value("max_update_period")
+        max_update_period = self.get_parameter_value('max_update_period')
         self._max_update_period = datetime.timedelta(seconds=int(max_update_period))
 
-        self._serial_port = self.get_parameter_value("serial_port")
-        self._baudrate = self.get_parameter_value("baudrate")
+        self._serial_port = self.get_parameter_value('serial_port')
+        self._baudrate = self.get_parameter_value('baudrate')
 
-        self._server_host = self.get_parameter_value("server_host")
-        self._server_port = self.get_parameter_value("server_port")
+        self._server_host = self.get_parameter_value('server_host')
+        self._server_port = self.get_parameter_value('server_port')
 
         self._params = {}
 
@@ -109,7 +109,7 @@ class THZ(SmartPlugin):
 
         self.init_webinterface()
 
-        self.logger.debug("init done")
+        self.logger.debug('init done')
         self._init_complete = True
 
     def _update_values(self):
@@ -126,8 +126,8 @@ class THZ(SmartPlugin):
         for param in stats.keys():
             if param in self._params:
                 # notify smarthome.py
-                for item in self._params[param]["item"]:
-                    item(stats[param], source="thzRefresh")
+                for item in self._params[param]['item']:
+                    item(stats[param], source='thzRefresh')
 
         # parse new data and update items
         for param in newData:
@@ -136,44 +136,44 @@ class THZ(SmartPlugin):
                 update = False
 
                 # check for changes to reduce the update rate
-                if not self._params[param]["lastValue"] == newData[param]:
+                if not self._params[param]['lastValue'] == newData[param]:
                     # value changed
                     # update discrete values on every change
-                    if self._params[param]["lastValue"] in (0, 1, 2, 3) and newData[param] in (0, 1, 2, 3):
+                    if self._params[param]['lastValue'] in (0, 1, 2, 3) and newData[param] in (0, 1, 2, 3):
                         update = True
                         self.logger.debug(
-                            "Discrete value changed - {0}: {1} => {2}".format(
-                                param, self._params[param]["lastValue"], newData[param]
+                            'Discrete value changed - {0}: {1} => {2}'.format(
+                                param, self._params[param]['lastValue'], newData[param]
                             )
                         )
                     else:
                         # the value is not discrete, check the minimum period
-                        if self._params[param]["lastUpdate"] + self._min_update_period < now:
+                        if self._params[param]['lastUpdate'] + self._min_update_period < now:
                             update = True
                             self.logger.debug(
-                                "minimum period expired {0}: {1} => {2}".format(
-                                    param, self._params[param]["lastValue"], newData[param]
+                                'minimum period expired {0}: {1} => {2}'.format(
+                                    param, self._params[param]['lastValue'], newData[param]
                                 )
                             )
                 else:
                     # no change
                     # check the maximum update period
-                    if self._params[param]["lastUpdate"] + self._max_update_period < now:
+                    if self._params[param]['lastUpdate'] + self._max_update_period < now:
                         update = True
                         self.logger.debug(
-                            "maximum period expired {0}: {1} => {2}".format(
-                                param, self._params[param]["lastValue"], newData[param]
+                            'maximum period expired {0}: {1} => {2}'.format(
+                                param, self._params[param]['lastValue'], newData[param]
                             )
                         )
 
                 if update:
                     # update the history
-                    self._params[param]["lastUpdate"] = now
-                    self._params[param]["lastValue"] = newData[param]
+                    self._params[param]['lastUpdate'] = now
+                    self._params[param]['lastValue'] = newData[param]
 
                     # notify smarthome.py
-                    for item in self._params[param]["item"]:
-                        item(newData[param], source="thzRefresh")
+                    for item in self._params[param]['item']:
+                        item(newData[param], source='thzRefresh')
 
         # provide the new data to the server instance
         self._curData = newData.copy()
@@ -184,28 +184,28 @@ class THZ(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
         self.alive = True
         try:
-            self.scheduler_add("THZ", self._update_values, prio=5, cycle=self._poll_period)
+            self.scheduler_add('THZ', self._update_values, prio=5, cycle=self._poll_period)
             self._update_values()
             self._thzServer.start()
-            self.logger.info("plugin started")
+            self.logger.info('plugin started')
         except Exception:
-            self.logger.error("thz: plugin start failed - {}".format(sys.exc_info()))
+            self.logger.error('thz: plugin start failed - {}'.format(sys.exc_info()))
 
     def _logFullScan(self):
         """requests logging a full scan of the heat pump registers"""
         # self.logger.info('logFullScan started')
         self._thzProtocol.logFullScan()
-        self._params["logFullScan"]["item"][0]("done", source="thzRefresh")
+        self._params['logFullScan']['item'][0]('done', source='thzRefresh')
         # self.logger.info('logFullScan completed')
 
     def _logRegister(self):
         """requests logging the specified heat pump register"""
         # self.logger.info('logRegister started')
         self._thzProtocol.logRegister(self._logRegisterId)
-        self._params["logRegister"]["item"][0]("done", source="thzRefresh")
+        self._params['logRegister']['item'][0]('done', source='thzRefresh')
         # self.logger.info('logRegister completed')
 
         # def _setRegister(self):
@@ -219,18 +219,18 @@ class THZ(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.alive = False
         try:
-            self.scheduler_remove("THZ")
+            self.scheduler_remove('THZ')
         except Exception:
             self.logger.error("removing 'thz.update' from scheduler failed - {}".format(sys.exc_info()))
         try:
-            self.scheduler_remove("ThzRegister")
+            self.scheduler_remove('ThzRegister')
         except Exception:
             self.logger.error("removing 'ThzRegister' from scheduler failed - {}".format(sys.exc_info()))
         try:
-            self.scheduler_remove("ThzScan")
+            self.scheduler_remove('ThzScan')
         except Exception:
             self.logger.error("removing 'ThzScan' from scheduler failed - {}".format(sys.exc_info()))
         self._thzProtocol.stop()
@@ -240,90 +240,90 @@ class THZ(SmartPlugin):
         """forwards a new item value to the heat pump"""
         # self.logger.info('{}: caller={}, source={}'.format(item.conf['thz'], caller, source))
         # skip updates triggered by own refresh
-        if source == "thzRefresh":
+        if source == 'thzRefresh':
             return
 
         try:
-            if self._thzProtocol.getMsgFromParameter(item.conf["thz"]) is not None:
-                self._thzProtocol.sendSetRequest(item.conf["thz"], item())
-            elif item.conf["thz"] == "logFullScan":
+            if self._thzProtocol.getMsgFromParameter(item.conf['thz']) is not None:
+                self._thzProtocol.sendSetRequest(item.conf['thz'], item())
+            elif item.conf['thz'] == 'logFullScan':
                 # request logging a full register scan
                 # update the item status
-                item("processing", source="thzRefresh")
+                item('processing', source='thzRefresh')
                 try:
                     self.scheduler_add(
-                        "ThzScan", self._logFullScan, next=shtime.now() + datetime.timedelta(milliseconds=10)
+                        'ThzScan', self._logFullScan, next=shtime.now() + datetime.timedelta(milliseconds=10)
                     )
                     # self.logger.info('logFullScan requested')
                 except Exception:
-                    self.logger.error("thz: scheduling logFullScan failed - {}".format(sys.exc_info()))
-            elif item.conf["thz"] == "logRegister":
+                    self.logger.error('thz: scheduling logFullScan failed - {}'.format(sys.exc_info()))
+            elif item.conf['thz'] == 'logRegister':
                 # request logging a register
                 self._logRegisterId = item()
                 # update the item status
-                item("processing", source="thzRefresh")
+                item('processing', source='thzRefresh')
                 try:
                     self.scheduler_add(
-                        "ThzRegister", self._logRegister, next=shtime.now() + datetime.timedelta(milliseconds=10)
+                        'ThzRegister', self._logRegister, next=shtime.now() + datetime.timedelta(milliseconds=10)
                     )
                     # self.logger.info('logRegister requested')
                 except Exception:
-                    self.logger.error("thz: scheduling logRegister failed - {}".format(sys.exc_info()))
+                    self.logger.error('thz: scheduling logRegister failed - {}'.format(sys.exc_info()))
             else:
-                self.logger.warning("thz: Invalid parameter name - {}".format(item.conf["thz"]))
+                self.logger.warning('thz: Invalid parameter name - {}'.format(item.conf['thz']))
         except Exception:
-            self.logger.warning("thz: Setting parameter failed - {}".format(sys.exc_info()))
+            self.logger.warning('thz: Setting parameter failed - {}'.format(sys.exc_info()))
 
     def parse_item(self, item):
         """implements parsing the items associated with plugin parameters"""
-        if "thz" in item.conf:
+        if 'thz' in item.conf:
             # validate the parameter name
 
             try:
-                msgName = self._thzProtocol.getMsgFromParameter(item.conf["thz"])
+                msgName = self._thzProtocol.getMsgFromParameter(item.conf['thz'])
             except Exception:
-                self.logger.error("thz: ### parse_item - {}".format(sys.exc_info()))
+                self.logger.error('thz: ### parse_item - {}'.format(sys.exc_info()))
             try:
                 if msgName:
                     # a message parameter
                     # add the message name to the list
                     self._msgList[msgName] = 1
 
-                    if item.conf["thz"] not in self._params:
+                    if item.conf['thz'] not in self._params:
                         # new parameter
-                        self._params[item.conf["thz"]] = {
-                            "lastValue": 0,
-                            "lastUpdate": datetime.datetime.min,
-                            "item": [item],
+                        self._params[item.conf['thz']] = {
+                            'lastValue': 0,
+                            'lastUpdate': datetime.datetime.min,
+                            'item': [item],
                         }
                     else:
                         # parameter exists, associate the new item with it
-                        self._params[item.conf["thz"]]["item"].append(item)
+                        self._params[item.conf['thz']]['item'].append(item)
 
-                    if self._thzProtocol.isParameterWritable(item.conf["thz"]):
+                    if self._thzProtocol.isParameterWritable(item.conf['thz']):
                         return self.update_item
                     else:
                         return None
-                elif item.conf["thz"] in self._thzProtocol.getStats() or item.conf["thz"] in specialRequests:
+                elif item.conf['thz'] in self._thzProtocol.getStats() or item.conf['thz'] in specialRequests:
                     # a plugin parameter
-                    if item.conf["thz"] not in self._params:
+                    if item.conf['thz'] not in self._params:
                         # new parameter
-                        self._params[item.conf["thz"]] = {
-                            "lastValue": 0,
-                            "lastUpdate": datetime.datetime.min,
-                            "item": [item],
+                        self._params[item.conf['thz']] = {
+                            'lastValue': 0,
+                            'lastUpdate': datetime.datetime.min,
+                            'item': [item],
                         }
                     else:
                         # parameter exists, associate the new item with it
-                        self._params[item.conf["thz"]]["item"].append(item)
+                        self._params[item.conf['thz']]['item'].append(item)
 
                     # provide the update function for special requests
-                    if item.conf["thz"] in specialRequests:
+                    if item.conf['thz'] in specialRequests:
                         return self.update_item
                 else:
-                    self.logger.warning("thz: No such parameter - {}".format(item.conf["thz"]))
+                    self.logger.warning('thz: No such parameter - {}'.format(item.conf['thz']))
             except Exception:
-                self.logger.error("thz: ### parse_item - {}".format(sys.exc_info()))
+                self.logger.error('thz: ### parse_item - {}'.format(sys.exc_info()))
 
         return None
 
@@ -331,7 +331,7 @@ class THZ(SmartPlugin):
         """implements a subscription mechanism for the ThzServer"""
         self._extMsgList = {}
         for item in itemList:
-            self.logger.debug("subscribing to {0}".format(item))
+            self.logger.debug('subscribing to {0}'.format(item))
             msgName = None
             try:
                 msgName = self._thzProtocol.getMsgFromParameter(item)
@@ -340,7 +340,7 @@ class THZ(SmartPlugin):
                     # add the message name to the list
                     self._extMsgList[msgName] = 1
             except Exception:
-                self.logger.error("thz: ### parse_item - {}".format(sys.exc_info()))
+                self.logger.error('thz: ### parse_item - {}'.format(sys.exc_info()))
 
         return self._curData
 
@@ -351,26 +351,24 @@ class THZ(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
-            self.logger.error("Not initializing the web interface")
+            self.logger.error('Not initializing the web interface')
             return False
 
         import sys
 
-        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
-            self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
+        if 'SmartPluginWebIf' not in list(sys.modules['lib.model.smartplugin'].__dict__):
+            self.logger.warning('Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface')
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
+        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            "/": {
-                "tools.staticdir.root": webif_dir,
-            },
-            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
         # Register the web interface as a cherrypy app
@@ -380,7 +378,7 @@ class THZ(SmartPlugin):
             config,
             self.get_classname(),
             self.get_instance_name(),
-            description="",
+            description='',
         )
 
         return True
@@ -393,13 +391,13 @@ Class ThzServer implements a UDP server.
 
 class ThzServer(threading.Thread):
     def __init__(self, thzDispatcher, host, port, logger):
-        threading.Thread.__init__(self, name="THZ Server")
+        threading.Thread.__init__(self, name='THZ Server')
 
         self.alive = True
         self._thzDispatcher = thzDispatcher
         self._clients = {}
         self.logger = logger
-        self.logger.info("Thz Server initialized")
+        self.logger.info('Thz Server initialized')
 
         self._server = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         self._server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
@@ -408,18 +406,18 @@ class ThzServer(threading.Thread):
 
     def updateClient(self, client, data):
         try:
-            msg = ""
+            msg = ''
             # self.logger.info("Updating client {0}".format(client))
-            for item in self._clients[client]["itemList"]:
+            for item in self._clients[client]['itemList']:
                 if item in data:
                     # append to the list
-                    msg = msg + "{0}:{1};".format(item, data[item])
+                    msg = msg + '{0}:{1};'.format(item, data[item])
             if len(msg) > 0:
                 # self.logger.info("Notify '{0}' sent to {1}".format(msg, client))
-                msg = "notify " + msg
-                self._server.sendto(msg.encode("ascii"), self._clients[client]["addr"])
+                msg = 'notify ' + msg
+                self._server.sendto(msg.encode('ascii'), self._clients[client]['addr'])
         except Exception:
-            self.logger.error("Exception: {0}".format(sys.exc_info()))
+            self.logger.error('Exception: {0}'.format(sys.exc_info()))
             pass
 
     def updateData(self, data):
@@ -427,18 +425,18 @@ class ThzServer(threading.Thread):
             self.updateClient(client, data)
 
     def run(self):
-        self.logger.debug("Thz Server entered run() method")
+        self.logger.debug('Thz Server entered run() method')
         while self.alive:
             try:
                 now = datetime.datetime.now()
                 # print now
                 purgeList = []
                 for addr, client in self._clients.items():
-                    if client["lastContact"] + datetime.timedelta(seconds=CLIENT_TIMEOUT) < now:
+                    if client['lastContact'] + datetime.timedelta(seconds=CLIENT_TIMEOUT) < now:
                         # client connection timed out
                         purgeList.append(addr)
                 for addr in purgeList:
-                    self.logger.debug("Removing client {0}".format(addr))
+                    self.logger.debug('Removing client {0}'.format(addr))
                     del self._clients[addr]
 
                 inputs = [self._server]
@@ -448,43 +446,43 @@ class ThzServer(threading.Thread):
                     continue
 
                 buf, remoteAddr = self._server.recvfrom(10000)
-                self.logger.debug("Received *{0}* from {1}:{2}".format(buf, remoteAddr[0], remoteAddr[1]))
+                self.logger.debug('Received *{0}* from {1}:{2}'.format(buf, remoteAddr[0], remoteAddr[1]))
 
-                addr = "{0}:{1}".format(remoteAddr[0], remoteAddr[1])
+                addr = '{0}:{1}'.format(remoteAddr[0], remoteAddr[1])
             except Exception:
-                self.logger.error("Exception: {0}".format(sys.exc_info()))
+                self.logger.error('Exception: {0}'.format(sys.exc_info()))
                 continue
 
             # parse the request
             try:
                 try:
-                    buf = buf.decode("ascii")
-                    cmd, params = buf.split(" ")
+                    buf = buf.decode('ascii')
+                    cmd, params = buf.split(' ')
                 except Exception:
                     cmd = buf
 
-                if cmd == "subscribe":
+                if cmd == 'subscribe':
                     # update subscription
-                    self._clients[addr] = {"addr": remoteAddr, "itemList": params.split(";")}
+                    self._clients[addr] = {'addr': remoteAddr, 'itemList': params.split(';')}
 
                     # self.logger.info("item list {0}".format(self._clients[addr]['itemList']))
-                    data = self._thzDispatcher.subscribe(self._clients[addr]["itemList"])
+                    data = self._thzDispatcher.subscribe(self._clients[addr]['itemList'])
                     self.updateClient(addr, data)
-                    self._clients[addr]["lastContact"] = datetime.datetime.now()
+                    self._clients[addr]['lastContact'] = datetime.datetime.now()
 
-                elif cmd == "set":
+                elif cmd == 'set':
                     # set the parameters to the provided values
                     pass
 
-                elif cmd == "alive":
+                elif cmd == 'alive':
                     # update the timestamp
                     # self.logger.info("alive from {0}".format(addr))
-                    self._clients[addr]["lastContact"] = datetime.datetime.now()
+                    self._clients[addr]['lastContact'] = datetime.datetime.now()
 
             except Exception:
-                self.logger.error("Exception: {0}".format(sys.exc_info()))
+                self.logger.error('Exception: {0}'.format(sys.exc_info()))
 
-        self.logger.debug("Thz Server ends run() method")
+        self.logger.debug('Thz Server ends run() method')
 
     def stop(self):
         self.alive = False
@@ -522,6 +520,6 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(p=self.plugin)

@@ -30,15 +30,15 @@ from lib.model.smartplugin import SmartPlugin
 
 
 class Pushbullet(SmartPlugin):
-    _apiurl = "https://api.pushbullet.com/v2/pushes"
-    _upload_apiurl = "https://api.pushbullet.com/v2/upload-request"
+    _apiurl = 'https://api.pushbullet.com/v2/pushes'
+    _upload_apiurl = 'https://api.pushbullet.com/v2/upload-request'
     ALLOW_MULTIINSTANCE = False
-    PLUGIN_VERSION = "1.5.2"
+    PLUGIN_VERSION = '1.5.2'
 
     def __init__(self, sh, *args, **kwargs):
-        logging.getLogger("requests").setLevel(logging.WARNING)
-        self._apikey = self.get_parameter_value("apikey")
-        self._deviceid = self.get_parameter_value("deviceid")
+        logging.getLogger('requests').setLevel(logging.WARNING)
+        self._apikey = self.get_parameter_value('apikey')
+        self._deviceid = self.get_parameter_value('deviceid')
         self.logger = logging.getLogger(__name__)
 
     def run(self):
@@ -53,9 +53,9 @@ class Pushbullet(SmartPlugin):
 
         try:
             response = requests.delete(
-                self._apiurl + "/" + pushid,
-                headers={"User-Agent": "SmartHomeNG", "Content-Type": "application/json"},
-                auth=(apikey, ""),
+                self._apiurl + '/' + pushid,
+                headers={'User-Agent': 'SmartHomeNG', 'Content-Type': 'application/json'},
+                auth=(apikey, ''),
             )
             if self._is_response_ok(response):
                 return response.json()
@@ -75,18 +75,18 @@ class Pushbullet(SmartPlugin):
         return False
 
     def note(self, title, body, deviceid=None, apikey=None):
-        return self._push(data={"type": "note", "title": title, "body": body}, deviceid=deviceid, apikey=apikey)
+        return self._push(data={'type': 'note', 'title': title, 'body': body}, deviceid=deviceid, apikey=apikey)
 
     def link(self, title, url, deviceid=None, apikey=None, body=None):
         return self._push(
-            data={"type": "link", "title": title, "url": url, "body": body}, deviceid=deviceid, apikey=apikey
+            data={'type': 'link', 'title': title, 'url': url, 'body': body}, deviceid=deviceid, apikey=apikey
         )
 
     def address(self, name, address, deviceid=None, apikey=None):
-        return self._push(data={"type": "address", "name": name, "address": address}, deviceid=deviceid, apikey=apikey)
+        return self._push(data={'type': 'address', 'name': name, 'address': address}, deviceid=deviceid, apikey=apikey)
 
     def list(self, title, items, deviceid=None, apikey=None):
-        return self._push(data={"type": "list", "title": title, "items": items}, deviceid=deviceid, apikey=apikey)
+        return self._push(data={'type': 'list', 'title': title, 'items': items}, deviceid=deviceid, apikey=apikey)
 
     def file(self, filepath, deviceid=None, apikey=None, body=None):
         if not os.path.exists(filepath):
@@ -97,7 +97,7 @@ class Pushbullet(SmartPlugin):
 
     def _upload_and_push_file(self, filepath, body=None, deviceid=None, apikey=None):
         try:
-            headers = {"User-Agent": "SmartHomeNG", "Content-Type": "application/json"}
+            headers = {'User-Agent': 'SmartHomeNG', 'Content-Type': 'application/json'}
 
             if apikey is None:
                 apikey = self._apikey
@@ -107,43 +107,43 @@ class Pushbullet(SmartPlugin):
                     self._upload_apiurl,
                     data=json.dumps(
                         {
-                            "file_name": os.path.basename(filepath),
-                            "file_type": magic.from_file(filepath, mime=True).decode("UTF-8"),
+                            'file_name': os.path.basename(filepath),
+                            'file_type': magic.from_file(filepath, mime=True).decode('UTF-8'),
                         }
                     ),
                     headers=headers,
-                    auth=(apikey, ""),
+                    auth=(apikey, ''),
                 )
             else:
                 upload_request_response = requests.post(
                     self._upload_apiurl,
                     data=json.dumps(
-                        {"file_name": os.path.basename(filepath), "file_type": magic.from_file(filepath, mime=True)}
+                        {'file_name': os.path.basename(filepath), 'file_type': magic.from_file(filepath, mime=True)}
                     ),
                     headers=headers,
-                    auth=(apikey, ""),
+                    auth=(apikey, ''),
                 )
 
             if self._is_response_ok(upload_request_response):
                 data = upload_request_response.json()
                 upload_response = requests.post(
-                    data["upload_url"],
-                    data=data["data"],
-                    headers={"User-Agent": "SmartHomeNG"},
-                    files={"file": open(filepath, "rb")},
+                    data['upload_url'],
+                    data=data['data'],
+                    headers={'User-Agent': 'SmartHomeNG'},
+                    files={'file': open(filepath, 'rb')},
                 )
 
                 if self._is_response_ok(upload_response):
                     if body is None:
-                        body = ""
+                        body = ''
 
                     return self._push(
                         data={
-                            "type": "file",
-                            "file_name": data["file_name"],
-                            "file_type": data["file_type"],
-                            "file_url": data["file_url"],
-                            "body": body,
+                            'type': 'file',
+                            'file_name': data['file_name'],
+                            'file_type': data['file_type'],
+                            'file_url': data['file_url'],
+                            'body': body,
                         },
                         deviceid=deviceid,
                         apikey=apikey,
@@ -174,17 +174,17 @@ class Pushbullet(SmartPlugin):
         if deviceid is None:
             deviceid = self._deviceid
 
-        if re.match(r"^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$", deviceid):
-            data["email"] = deviceid
+        if re.match(r'^[_a-z0-9-]+(\.[_a-z0-9-]+)*@[a-z0-9-]+(\.[a-z0-9-]+)*(\.[a-z]{2,4})$', deviceid):
+            data['email'] = deviceid
         else:
-            data["device_iden"] = deviceid
+            data['device_iden'] = deviceid
 
         try:
             response = requests.post(
                 self._apiurl,
                 data=json.dumps(data),
-                headers={"User-Agent": "SmartHomeNG", "Content-Type": "application/json"},
-                auth=(apikey, ""),
+                headers={'User-Agent': 'SmartHomeNG', 'Content-Type': 'application/json'},
+                auth=(apikey, ''),
             )
             if self._is_response_ok(response):
                 return response.json()

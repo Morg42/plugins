@@ -11,7 +11,7 @@ except ImportError:
 
 def is_valid_port(port):
     valid_port = re.compile(
-        "^(102[4-9]|10[3-9]\d|1[1-9]\d{2}|[2-9]\d{3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$"
+        '^(102[4-9]|10[3-9]\d|1[1-9]\d{2}|[2-9]\d{3}|[1-5]\d{4}|6[0-4]\d{3}|65[0-4]\d{2}|655[0-2]\d|6553[0-5])$'
     )
     if valid_port.match(port):
         return True
@@ -42,7 +42,7 @@ def unique_list(seq, idfun=None):
 def is_open_port(port):
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        s.bind(("127.0.0.1", port))
+        s.bind(('127.0.0.1', port))
     except socket.error:
         return False
     return True
@@ -51,14 +51,14 @@ def is_open_port(port):
 def get_local_ip_address():
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     try:
-        s.connect(("10.10.10.10", 80))
+        s.connect(('10.10.10.10', 80))
     except socket.error:
-        return "0.0.0.0"
+        return '0.0.0.0'
     return s.getsockname()[0]
 
 
 def file_size(size):
-    _suffixes = ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"]
+    _suffixes = ['bytes', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB', 'ZiB', 'YiB']
     # determine binary order in steps of size 10
     # (coerce to int, // still returns a float)
     from math import log2
@@ -67,7 +67,7 @@ def file_size(size):
     # format file size
     # (.4g results in rounded numbers for exact matches and max 3 decimals,
     # should never resort to exponent values)
-    return "{:.4g} {}".format(size / (1 << (order * 10)), _suffixes[order])
+    return '{:.4g} {}'.format(size / (1 << (order * 10)), _suffixes[order])
 
 
 def get_free_diskspace(folder):
@@ -86,6 +86,6 @@ def get_folder_size(folder):
 
 def get_tts_local_file_path(local_directory, tts_string, tts_language):
     m = hashlib.md5()
-    m.update("{}_{}".format(tts_language, tts_string).encode("utf-8"))
-    file_name = "{}.mp3".format(m.hexdigest())
+    m.update('{}_{}'.format(tts_language, tts_string).encode('utf-8'))
+    file_name = '{}.mp3'.format(m.hexdigest())
     return os.path.join(local_directory, file_name)

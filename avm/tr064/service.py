@@ -25,7 +25,7 @@ class Service:
         control_url,
         event_sub_url,
         verify: bool = False,
-        description_file="tr64desc.xml",
+        description_file='tr64desc.xml',
     ):
         self.auth = auth
         self.base_url = base_url
@@ -37,10 +37,10 @@ class Service:
         self.actions = {}
         self.verify = verify
         self.description_file = description_file
-        self.namespaces = IGD_SERVICE_NAMESPACE if "igd" in description_file else TR064_SERVICE_NAMESPACE
+        self.namespaces = IGD_SERVICE_NAMESPACE if 'igd' in description_file else TR064_SERVICE_NAMESPACE
 
         # added parser with resolve_entities option in response to CVE-2026-41066
-        self._xmlparser = ET.XMLParser(resolve_entities="internal")
+        self._xmlparser = ET.XMLParser(resolve_entities='internal')
 
     def __getattr__(self, name):
         if name not in self.actions:
@@ -49,18 +49,18 @@ class Service:
         if name in self.actions:
             return self.actions[name]
 
-        raise TR064UnknownActionException(f"Requested Action Name {name!r} not available.")
+        raise TR064UnknownActionException(f'Requested Action Name {name!r} not available.')
 
     def _fetch_actions(self, scpdurl):
         """Fetch action description."""
-        request = requests.get("{0}{1}".format(self.base_url, scpdurl), verify=self.verify)
+        request = requests.get('{0}{1}'.format(self.base_url, scpdurl), verify=self.verify)
         if request.status_code == 200:
             # added parser option in response to CVE-2026-41066
             xml = ET.parse(BytesIO(request.content), parser=self._xmlparser)
 
-            for action in xml.findall("./actionList/action", namespaces=self.namespaces):
-                name = action.findtext("name", namespaces=self.namespaces)
-                canonical_name = name.replace("-", "_")
+            for action in xml.findall('./actionList/action', namespaces=self.namespaces):
+                name = action.findtext('name', namespaces=self.namespaces)
+                canonical_name = name.replace('-', '_')
                 self.actions[canonical_name] = Action(
                     action,
                     self.auth,

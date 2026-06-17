@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 
-print(f"sys.path={sys.path}")
+print(f'sys.path={sys.path}')
 
 from tests import common
 import cherrypy
@@ -100,24 +100,24 @@ class MockBackendServer:
     import os
 
     cwd = os.getcwd()
-    print(f"blockly cwd={cwd}")
-    os.chdir("..")
+    print(f'blockly cwd={cwd}')
+    os.chdir('..')
     cwd = os.getcwd()
-    print(f"blockly new cwd={cwd}")
+    print(f'blockly new cwd={cwd}')
 
     _sh = MockSmartHome()
-    print(f"blockly etc_dir = {_sh.get_etcdir()}")
+    print(f'blockly etc_dir = {_sh.get_etcdir()}')
 
     def __init__(self):
-        self._sh.with_items_from(common.BASE + "/tests/resources/blockly_items.conf")
+        self._sh.with_items_from(common.BASE + '/tests/resources/blockly_items.conf')
 
         # HACK: Make tests work! Backend accesses private field _logic_dir
         # directly instead of using a method (the field was remove in the
         # meantime). Setting this just to make it work again.
-        self._sh._logic_dir = common.BASE + "/tests/resources/"
+        self._sh._logic_dir = common.BASE + '/tests/resources/'
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     import unittest
 
     unittest.main()

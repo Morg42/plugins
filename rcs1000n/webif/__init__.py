@@ -64,7 +64,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # Setting pagelength (max. number of table entries per page) for web interface
         try:
             pagelength = self.plugin.webif_pagelength
@@ -73,13 +73,13 @@ class WebInterface(SmartPluginWebIf):
 
         # get list of items with the attribute rc_SystemCode
         plgin_items = []
-        for item in self.items.find_items("rcs_SystemCode"):
+        for item in self.items.find_items('rcs_SystemCode'):
             myitem = self.items.return_item(item.property.path)
             i = {}
-            i["path"] = item.property.path
-            i["SystemCode"] = myitem.property.rcs_SystemCode
-            i["ButtonCode"] = myitem.property.rcs_ButtonCode
-            i["value"] = item()
+            i['path'] = item.property.path
+            i['SystemCode'] = myitem.property.rcs_SystemCode
+            i['ButtonCode'] = myitem.property.rcs_ButtonCode
+            i['value'] = item()
             plgin_items.append(i)
         # self.logger.info("{}".format(plgin_items))
 
@@ -87,7 +87,7 @@ class WebInterface(SmartPluginWebIf):
         return tmpl.render(
             p=self.plugin,
             webif_pagelength=pagelength,
-            items=sorted(plgin_items, key=lambda cat: str.lower(cat["path"]), reverse=False),
+            items=sorted(plgin_items, key=lambda cat: str.lower(cat['path']), reverse=False),
             item_count=len(plgin_items),
         )
 

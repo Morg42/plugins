@@ -29,18 +29,18 @@ from uuid import getnode as getmac
 
 class SmartTV(SmartPlugin):
     ALLOW_MULTIINSTANCE = True
-    PLUGIN_VERSION = "1.3.3"
+    PLUGIN_VERSION = '1.3.3'
 
     def __init__(self, sh, **kwargs):
-        self._tv_version = self.get_parameter_value("tv_version")
-        self._host = self.get_parameter_value("host")
-        self._port = self.get_parameter_value("port")
-        self._delay = self.get_parameter_value("delay")
-        if self._tv_version not in ["samsung_m_series", "classic"]:
-            self.logger.error("No valid tv_version attribute specified to plugin")
+        self._tv_version = self.get_parameter_value('tv_version')
+        self._host = self.get_parameter_value('host')
+        self._port = self.get_parameter_value('port')
+        self._delay = self.get_parameter_value('delay')
+        if self._tv_version not in ['samsung_m_series', 'classic']:
+            self.logger.error('No valid tv_version attribute specified to plugin')
             self._init_complete = False
         else:
-            self.logger.debug("Smart TV plugin for {0} SmartTV device initalized".format(self._tv_version))
+            self.logger.debug('Smart TV plugin for {0} SmartTV device initalized'.format(self._tv_version))
 
     def push_samsung_m_series(self, key):
         """
@@ -49,10 +49,10 @@ class SmartTV(SmartPlugin):
         :param key: key as string representation
         """
         try:
-            ws = create_connection("ws://%s:%d/api/v2/channels/samsung.remote.control" % (self._host, self._port))
+            ws = create_connection('ws://%s:%d/api/v2/channels/samsung.remote.control' % (self._host, self._port))
         except Exception as e:
             self.logger.error(
-                "Could not connect to ws://%s:%d/api/v2/channels/samsung.remote.control, to send key: %s. Exception: %s"
+                'Could not connect to ws://%s:%d/api/v2/channels/samsung.remote.control, to send key: %s. Exception: %s'
                 % (self._host, self._port, key, str(e))
             )
             return
@@ -61,8 +61,8 @@ class SmartTV(SmartPlugin):
             % key
         )
         self.logger.debug(
-            "Sending %s via websocket connection to %s"
-            % (cmd, "ws://%s:%d/api/v2/channels/samsung.remote.control" % (self._host, self._port))
+            'Sending %s via websocket connection to %s'
+            % (cmd, 'ws://%s:%d/api/v2/channels/samsung.remote.control' % (self._host, self._port))
         )
         ws.send(cmd)
         ws.close()
@@ -72,20 +72,20 @@ class SmartTV(SmartPlugin):
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((self._host, int(self._port)))
-            self.logger.debug("Connected to {0}:{1}".format(self._host, self._port))
+            self.logger.debug('Connected to {0}:{1}'.format(self._host, self._port))
         except Exception:
-            self.logger.warning("Could not connect to %s:%s, to send key: %s." % (self._host, self._port, key))
+            self.logger.warning('Could not connect to %s:%s, to send key: %s.' % (self._host, self._port, key))
             return
 
         src = s.getsockname()[0]  # ip of remote
         mac = self._int_to_str(getmac())  # mac of remote
-        remote = "sh.py remote"  # remote name
+        remote = 'sh.py remote'  # remote name
         dst = self._host  # ip of tv
-        app = b"python"  # iphone..iapp.samsung
-        tv = b"UE32ES6300"  # iphone.UE32ES6300.iapp.samsung
+        app = b'python'  # iphone..iapp.samsung
+        tv = b'UE32ES6300'  # iphone.UE32ES6300.iapp.samsung
 
         self.logger.debug(
-            "src = {0}, mac = {1}, remote = {2}, dst = {3}, app = {4}, tv = {5}".format(src, mac, remote, dst, app, tv)
+            'src = {0}, mac = {1}, remote = {2}, dst = {3}, app = {4}, tv = {5}'.format(src, mac, remote, dst, app, tv)
         )
 
         src = base64.b64encode(src.encode())
@@ -135,14 +135,14 @@ class SmartTV(SmartPlugin):
                 s.close()
             except Exception:
                 pass
-        self.logger.debug("Send {0} to Smart TV".format(key))
+        self.logger.debug('Send {0} to Smart TV'.format(key))
         time.sleep(0.1)
 
     def parse_item(self, item):
-        if self.has_iattr(item.conf, "smarttv"):
+        if self.has_iattr(item.conf, 'smarttv'):
             self.logger.debug(
-                "Smart TV Item {0} with value {1} for plugin instance {2} found!".format(
-                    item, self.get_iattr_value(item.conf, "smarttv"), self.get_instance_name()
+                'Smart TV Item {0} with value {1} for plugin instance {2} found!'.format(
+                    item, self.get_iattr_value(item.conf, 'smarttv'), self.get_instance_name()
                 )
             )
             return self.update_item
@@ -154,25 +154,25 @@ class SmartTV(SmartPlugin):
             return
         val = item()
         if isinstance(val, str):
-            if val.startswith("KEY_"):
-                if self._tv_version == "classic":
+            if val.startswith('KEY_'):
+                if self._tv_version == 'classic':
                     self.push_classic(val)
-                elif self._tv_version == "samsung_m_series":
+                elif self._tv_version == 'samsung_m_series':
                     self.push_samsung_m_series(val)
             return
         if val:
-            keys = self.get_iattr_value(item.conf, "smarttv")
+            keys = self.get_iattr_value(item.conf, 'smarttv')
             if isinstance(keys, str):
                 keys = [keys]
             i = 0
             for key in keys:
                 i = i + 1
-                if isinstance(key, str) and key.startswith("KEY_"):
+                if isinstance(key, str) and key.startswith('KEY_'):
                     if i != len(keys):
                         time.sleep(self._delay)
-                    if self._tv_version == "classic":
+                    if self._tv_version == 'classic':
                         self.push_classic(key)
-                    elif self._tv_version == "samsung_m_series":
+                    elif self._tv_version == 'samsung_m_series':
                         self.push_samsung_m_series(key)
 
     def parse_logic(self, logic):
@@ -188,7 +188,7 @@ class SmartTV(SmartPlugin):
         max_int = 2 ** (num_words * word_size) - 1
 
         if not 0 <= int_val <= max_int:
-            raise IndexError("integer out of bounds: %r!" % hex(int_val))
+            raise IndexError('integer out of bounds: %r!' % hex(int_val))
 
         max_word = 2**word_size - 1
 
@@ -202,7 +202,7 @@ class SmartTV(SmartPlugin):
 
     def _int_to_str(self, int_val):
         words = self._int_to_words(int_val, 8, 6)
-        tokens = ["%.2X" % i for i in words]
-        addr = "-".join(tokens)
+        tokens = ['%.2X' % i for i in words]
+        addr = '-'.join(tokens)
 
         return addr

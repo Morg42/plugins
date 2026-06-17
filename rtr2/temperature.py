@@ -94,7 +94,7 @@ class Temperature:
                 self.night = value
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     @property
@@ -122,7 +122,7 @@ class Temperature:
             self._temp_comfort = value
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     @property
@@ -152,7 +152,7 @@ class Temperature:
                 )
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     @property
@@ -182,7 +182,7 @@ class Temperature:
                 )
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     @property
@@ -207,7 +207,7 @@ class Temperature:
             self._night_reduction = value
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     @property
@@ -232,7 +232,7 @@ class Temperature:
             self._standby_reduction = value
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     @property
@@ -255,7 +255,7 @@ class Temperature:
             self._fixed_reduction = value
             return
         else:
-            self._type_error("non-boolean")
+            self._type_error('non-boolean')
             return
 
     @property
@@ -280,11 +280,11 @@ class Temperature:
             self._temp_frost = value
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     def __repr__(self):
-        return f"set-temp={self.set_temp} ({self.mode}) \n- comfort={self.comfort}, standby={self.standby}, night={self.night}, frost={self.frost} \n- standby reduction={self.standby_reduction}, night reduction={self.night_reduction} - fixed reduction={self.fixed_reduction}"
+        return f'set-temp={self.set_temp} ({self.mode}) \n- comfort={self.comfort}, standby={self.standby}, night={self.night}, frost={self.frost} \n- standby reduction={self.standby_reduction}, night reduction={self.night_reduction} - fixed reduction={self.fixed_reduction}'
 
     def _type_error(self, err):
         prop = inspect.stack()[1][3]

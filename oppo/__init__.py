@@ -25,7 +25,7 @@ import builtins
 import os
 import sys
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     builtins.SDP_standalone = True
 
     class SmartPlugin:
@@ -51,7 +51,7 @@ from lib.model.sdp.globals import (
 from lib.model.smartdeviceplugin import SmartDevicePlugin, Standalone
 from lib.model.sdp.command import SDPCommandParseStr
 
-CUSTOM_INPUT_NAME_COMMAND = "custom_inputnames"
+CUSTOM_INPUT_NAME_COMMAND = 'custom_inputnames'
 
 
 class oppo(SmartDevicePlugin):
@@ -64,7 +64,7 @@ class oppo(SmartDevicePlugin):
     The know-how is in the commands.py (and some DT_ classes...)
     """
 
-    PLUGIN_VERSION = "1.0.1"
+    PLUGIN_VERSION = '1.0.1'
 
     def _set_device_defaults(self):
 
@@ -77,59 +77,59 @@ class oppo(SmartDevicePlugin):
         self._parameters[PLUGIN_ATTR_CMD_CLASS] = SDPCommandParseStr
 
         b = self._parameters[PLUGIN_ATTR_CONN_TERMINATOR].encode()
-        b = b.decode("unicode-escape").encode()
+        b = b.decode('unicode-escape').encode()
         self._parameters[PLUGIN_ATTR_CONN_TERMINATOR] = b
         self._use_callbacks = True
-        self._last_command = ""
+        self._last_command = ''
 
     def on_connect(self, by=None):
-        verbose = self.get_items_for_mapping("general.verbose")[0].property.value
-        self.logger.debug(f"Activating verbose mode {verbose} after connection.")
-        self.send_command("general.verbose", verbose)
+        verbose = self.get_items_for_mapping('general.verbose')[0].property.value
+        self.logger.debug(f'Activating verbose mode {verbose} after connection.')
+        self.send_command('general.verbose', verbose)
 
     def _transform_send_data(self, data=None, **kwargs):
         if isinstance(data, dict):
-            data["limit_response"] = self._parameters[PLUGIN_ATTR_CONN_TERMINATOR]
-            data["payload"] = f"{data.get('payload', '')}\r"
+            data['limit_response'] = self._parameters[PLUGIN_ATTR_CONN_TERMINATOR]
+            data['payload'] = f'{data.get("payload", "")}\r'
         return data
 
     def _process_additional_data(self, command, data, value, custom, by):
 
-        if value == "ER INVALID":
-            self.logger.warning(f"Command {command} did not work, got error response {value}. Querying current value.")
+        if value == 'ER INVALID':
+            self.logger.warning(f'Command {command} did not work, got error response {value}. Querying current value.')
             self.send_command(command)
 
-        if command == "info.status":
-            self.logger.debug(f"Got status {command} data {data} value {value} custom {custom} by {by}")
-            if value == "PLAY":
-                self._dispatch_callback("control.playpause", True)
-                self._dispatch_callback("control.stop", False)
-            elif value.startswith("PAUS"):
-                self._dispatch_callback("control.playpause", False)
-                self._dispatch_callback("control.stop", False)
-            elif value == "STOP":
-                self._dispatch_callback("control.playpause", False)
-                self._dispatch_callback("control.stop", True)
-        if command == "info.trackinfo":
-            self.logger.debug(f"Got trackinfo {command} data {data} value {value} custom {custom} by {by}")
+        if command == 'info.status':
+            self.logger.debug(f'Got status {command} data {data} value {value} custom {custom} by {by}')
+            if value == 'PLAY':
+                self._dispatch_callback('control.playpause', True)
+                self._dispatch_callback('control.stop', False)
+            elif value.startswith('PAUS'):
+                self._dispatch_callback('control.playpause', False)
+                self._dispatch_callback('control.stop', False)
+            elif value == 'STOP':
+                self._dispatch_callback('control.playpause', False)
+                self._dispatch_callback('control.stop', True)
+        if command == 'info.trackinfo':
+            self.logger.debug(f'Got trackinfo {command} data {data} value {value} custom {custom} by {by}')
             try:
-                ct, cc, id, it = value.split(" ")
+                ct, cc, id, it = value.split(' ')
             except ValueError:
                 pass
             else:
-                self._dispatch_callback("control.title", ct)
-                self._dispatch_callback("control.chapter", cc)
-                self._dispatch_callback("info.displaytype", id)
+                self._dispatch_callback('control.title', ct)
+                self._dispatch_callback('control.chapter', cc)
+                self._dispatch_callback('info.displaytype', id)
                 time_type = {
-                    "E": "info.time.totalelapsed",
-                    "R": "info.time.totalremaining",
-                    "T": "info.time.titleelapsed",
-                    "C": "info.time.titleelapsed",
-                    "K": "info.time.titleremaining",
+                    'E': 'info.time.totalelapsed',
+                    'R': 'info.time.totalremaining',
+                    'T': 'info.time.titleelapsed',
+                    'C': 'info.time.titleelapsed',
+                    'K': 'info.time.titleremaining',
                 }
                 if id in time_type:
                     self._dispatch_callback(time_type[id], it)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     s = Standalone(oppo, sys.argv[0])

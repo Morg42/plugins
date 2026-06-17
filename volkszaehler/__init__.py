@@ -40,7 +40,7 @@ class Volkszaehler(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = "1.6.1"
+    PLUGIN_VERSION = '1.6.1'
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -58,14 +58,14 @@ class Volkszaehler(SmartPlugin):
         """
         from bin.smarthome import VERSION
 
-        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
+        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
             self.logger = logging.getLogger(__name__)
 
-        self.logger.info("Init Volkszaehler Plugin")
+        self.logger.info('Init Volkszaehler Plugin')
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
-        self._host = self.get_parameter_value("host")
-        self._url = self.get_parameter_value("url")
+        self._host = self.get_parameter_value('host')
+        self._url = self.get_parameter_value('url')
 
         # none of the parameters may be left out
         if not self._host or not self._url:
@@ -77,7 +77,7 @@ class Volkszaehler(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
 
         self.alive = True
 
@@ -85,7 +85,7 @@ class Volkszaehler(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.alive = False
 
     def parse_item(self, item):
@@ -98,8 +98,8 @@ class Volkszaehler(SmartPlugin):
                         like the function update_item down below.
         """
 
-        if self.has_iattr(item.conf, "vz_uuid"):
-            self.logger.debug("parse item: {}".format(item))
+        if self.has_iattr(item.conf, 'vz_uuid'):
+            self.logger.debug('parse item: {}'.format(item))
             return self.update_item
         else:
             return None
@@ -120,16 +120,16 @@ class Volkszaehler(SmartPlugin):
 
         if caller != self.get_shortname():
             # code to execute, only if the item has not been changed by this plugin:
-            self.logger.info("Update item: {}, item has been changed outside this plugin".format(item.property.path))
+            self.logger.info('Update item: {}, item has been changed outside this plugin'.format(item.property.path))
 
-            if self.has_iattr(item.conf, "vz_uuid"):
+            if self.has_iattr(item.conf, 'vz_uuid'):
                 self.logger.debug(
                     "update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(
                         item, caller, source, dest
                     )
                 )
 
-                vz_uuid = self.get_iattr_value(item.conf, "vz_uuid")
+                vz_uuid = self.get_iattr_value(item.conf, 'vz_uuid')
                 value = item()
 
                 # check if the value is float (i.e. temperature, humidity...)
@@ -137,7 +137,7 @@ class Volkszaehler(SmartPlugin):
                 if isinstance(value, float):
                     vz_value = value
                 else:
-                    vz_value = "1"
+                    vz_value = '1'
 
                 url = self._url.format(vz_uuid)
 
@@ -146,16 +146,16 @@ class Volkszaehler(SmartPlugin):
                 )
 
                 data = {}
-                headers = {"User-Agent": "SmartHomeNG", "Content-Type": "application/x-www-form-urlencoded"}
-                data["operation"] = "add"
-                data["value"] = vz_value
+                headers = {'User-Agent': 'SmartHomeNG', 'Content-Type': 'application/x-www-form-urlencoded'}
+                data['operation'] = 'add'
+                data['value'] = vz_value
 
                 try:
                     conn = http.client.HTTPConnection(self._host, timeout=4)
-                    conn.request("POST", url, urllib.parse.urlencode(data), headers)
+                    conn.request('POST', url, urllib.parse.urlencode(data), headers)
                     resp = conn.getresponse()
                     if resp.status != 200:
-                        raise Exception("{} {}".format(resp.status, resp.reason))
+                        raise Exception('{} {}'.format(resp.status, resp.reason))
                 except Exception as e:
                     self.logger.warning("Using url '{0}' at '{1}' resulted in Error: {2}".format(url, self._host, e))
                 finally:

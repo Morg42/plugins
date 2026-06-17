@@ -44,14 +44,14 @@ import sys
 from ruamel.yaml import YAML
 from io import BytesIO
 
-install_openpyxl = "python3 -m pip install --user openpyxl"
+install_openpyxl = 'python3 -m pip install --user openpyxl'
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     logger = logging.getLogger(__name__)
-    logger.debug(f"init standalone {__name__}")
+    logger.debug(f'init standalone {__name__}')
 else:
     logger = logging.getLogger()
-    logger.debug(f"init plugin component {__name__}")
+    logger.debug(f'init plugin component {__name__}')
 
 try:
     import openpyxl
@@ -70,24 +70,24 @@ def get_manufacturer(from_url, to_yaml, verbose=False):
     logger.debug(f"Read manufacturer IDs from URL: '{url}'")
     logger.debug(f"Using openpyxl version '{openpyxl.__version__}'")
 
-    headers = {"User-agent": "Mozilla/5.0"}
+    headers = {'User-agent': 'Mozilla/5.0'}
 
     try:
         reque = requests.get(url, headers=headers)
     except ConnectionError as e:
-        logger.debug(f"An error {e} occurred fetching {url}\n")
+        logger.debug(f'An error {e} occurred fetching {url}\n')
         raise
 
     try:
         wb = openpyxl.load_workbook(filename=BytesIO(reque.content), data_only=True)
         # wb = openpyxl.load_workbook(xlfilename, data_only=True)
 
-        logger.debug("sheetnames {}".format(wb.sheetnames))
+        logger.debug('sheetnames {}'.format(wb.sheetnames))
 
         sheet = wb.active
-        logger.debug(f"sheet {sheet}")
-        logger.debug(f"rows [{sheet.min_row} .. {sheet.max_row}]")
-        logger.debug(f"columns [{sheet.min_column} .. {sheet.max_column}]")
+        logger.debug(f'sheet {sheet}')
+        logger.debug(f'rows [{sheet.min_row} .. {sheet.max_row}]')
+        logger.debug(f'columns [{sheet.min_column} .. {sheet.max_column}]')
 
         if sheet.min_row + 1 <= sheet.max_row and sheet.min_column == 1 and sheet.max_column == 4:
             # Get data from rows """
@@ -99,21 +99,21 @@ def get_manufacturer(from_url, to_yaml, verbose=False):
                     man = man.strip("'").strip()
                     r[id] = man
                     if verbose:
-                        logger.debug(f"{id}->{man}")
+                        logger.debug(f'{id}->{man}')
                 else:
                     logger.debug(f">id< is '{id}' has more than 3 characters and will not be considered")
-            with open(exportfile, "w") as f:
+            with open(exportfile, 'w') as f:
                 y.dump(r, f)
 
-        logger.debug(f"{len(r)} distinct manufacturers were found and written to {exportfile}")
+        logger.debug(f'{len(r)} distinct manufacturers were found and written to {exportfile}')
 
     except Exception as e:
-        logger.debug(f"Error {e} occurred")
+        logger.debug(f'Error {e} occurred')
 
     return r
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     verbose = True
 
     logging.getLogger().setLevel(logging.DEBUG)
@@ -121,14 +121,14 @@ if __name__ == "__main__":
     ch.setLevel(logging.DEBUG)
     # create formatter and add it to the handlers
     if verbose:
-        formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s  @ %(lineno)d")
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s  @ %(lineno)d')
     else:
-        formatter = logging.Formatter("%(message)s")
+        formatter = logging.Formatter('%(message)s')
     ch.setFormatter(formatter)
     # add the handlers to the logger
     logging.getLogger().addHandler(ch)
     logger = logging.getLogger(__name__)
 
-    exportfile = "manufacturer.yaml"
-    url = "https://www.dlms.com/srv/lib/Export_Flagids.php"
+    exportfile = 'manufacturer.yaml'
+    url = 'https://www.dlms.com/srv/lib/Export_Flagids.php'
     get_manufacturer(url, exportfile, verbose)

@@ -124,7 +124,7 @@ class Crc(object):
         """
         # If the input data is a string, convert to bytes.
         if isinstance(in_data, str):
-            in_data = bytearray(in_data, "utf-8")
+            in_data = bytearray(in_data, 'utf-8')
 
         reg = self.nondirect_init
         for octet in in_data:
@@ -154,7 +154,7 @@ class Crc(object):
         """
         # If the input data is a string, convert to bytes.
         if isinstance(in_data, str):
-            in_data = bytearray(in_data, "utf-8")
+            in_data = bytearray(in_data, 'utf-8')
 
         reg = self.direct_init
         for octet in in_data:
@@ -208,7 +208,7 @@ class Crc(object):
 
         # If the input data is a string, convert to bytes.
         if isinstance(in_data, str):
-            in_data = bytearray(in_data, "utf-8")
+            in_data = bytearray(in_data, 'utf-8')
 
         tbl = self.gen_table()
 

@@ -20,7 +20,7 @@
 #  along with SmartHomeNG. If not, see <http://www.gnu.org/licenses/>.
 #########################################################################
 
-__docformat__ = "reStructuredText"
+__docformat__ = 'reStructuredText'
 
 import socket
 import logging
@@ -71,7 +71,7 @@ DEV_chain = 0b0010000000000000  # supports CHAIN command
 
 
 class OwBase(object):
-    def __init__(self, host="127.0.0.1", port=4304):
+    def __init__(self, host='127.0.0.1', port=4304):
         self.logger = logging.getLogger(__name__)
 
         self.address = (host, int(port))
@@ -98,13 +98,13 @@ class OwBase(object):
             except Exception as e:
                 self._connection_attempts -= 1
                 if self._connection_attempts <= 0:
-                    self.logger.error("1-Wire: could not connect to {0}:{1}: {2}".format(*self.address, e))
+                    self.logger.error('1-Wire: could not connect to {0}:{1}: {2}'.format(*self.address, e))
                     self._connection_attempts = self._connection_errorlog
                 return
             else:
                 self.connected = True
                 if self.logger.isEnabledFor(logging.DEBUG):
-                    self.logger.debug("1-Wire: connected to {0}:{1}".format(*self.address))
+                    self.logger.debug('1-Wire: connected to {0}:{1}'.format(*self.address))
                 self._connection_attempts = 0
             finally:
                 self._lock.release()
@@ -123,45 +123,45 @@ class OwBase(object):
         """
         return self._request(path, cmd=OWMSG_WRITE, value=value)
 
-    def dir(self, path="/"):
+    def dir(self, path='/'):
         """
         Reads the directory starting with given path.
         As default the root path is assumed
         """
-        return self._request(path, cmd=OWMSG_DIRALLSLASH).decode().strip("\x00").split(",")
+        return self._request(path, cmd=OWMSG_DIRALLSLASH).decode().strip('\x00').split(',')
 
-    def tree(self, path="/", max_depth=None, with_values=False):
+    def tree(self, path='/', max_depth=None, with_values=False):
         """
         Calls itself recursively to create a tree of all mounted sensors, devices, settings, etc.
         Warnung: This can result in a couple of thousand lines and might take a long time
         """
-        result = ""
+        result = ''
         try:
             items = self.dir(path)
         except Exception as e:
             if self.logger.isEnabledFor(logging.DEBUG):
-                self.logger.debug(f"dir({path}) raised an exception {e}, giving up")
+                self.logger.debug(f'dir({path}) raised an exception {e}, giving up')
         else:
             for item in items:
-                if item.endswith("/"):
-                    result = result + item + "\n"
+                if item.endswith('/'):
+                    result = result + item + '\n'
                     if max_depth is not None and max_depth > 0:
                         subresult = self.tree(item, max_depth=max_depth - 1, with_values=with_values)
                         if subresult is not None:
                             result += subresult
                 else:
-                    vstr = ""
+                    vstr = ''
                     if with_values:
                         try:
                             value = self.read(item)
                         except Exception:
-                            value = ">>> value could not be read <<<"
+                            value = '>>> value could not be read <<<'
                         else:
                             if value is not None:
-                                vstr = f" --> {value}"
+                                vstr = f' --> {value}'
                             else:
-                                vstr = "(None)"
-                    result = result + item + vstr + "\n"
+                                vstr = '(None)'
+                    result = result + item + vstr + '\n'
         return result
 
     def _request(self, path, cmd=OWMSG_GETSLASH, value=None):
@@ -199,29 +199,29 @@ class OwBase(object):
             #    self.logger.debug("no connection while request() was called. Retrying ...")
             self.connect()
         if not self.connected:
-            raise ConnectionError("No connection to owserver.")
+            raise ConnectionError('No connection to owserver.')
         islocked = self._lock.acquire()
         if islocked:
             try:
                 if value is not None:
-                    payload = path + "\x00" + str(value) + "\x00"
+                    payload = path + '\x00' + str(value) + '\x00'
                     data = len(str(value)) + 1
                 else:
-                    payload = path + "\x00"
+                    payload = path + '\x00'
                     data = 65536
                 header = bytearray(24)
                 # header[0:3]                                                # version, currently defined as 0
-                header[4:8] = len(payload).to_bytes(4, byteorder="big")  # payload
-                header[8:12] = cmd.to_bytes(4, byteorder="big")  # type
-                header[12:16] = self._flag.to_bytes(4, byteorder="big")  # control flags
-                header[16:20] = data.to_bytes(4, byteorder="big")  # size
+                header[4:8] = len(payload).to_bytes(4, byteorder='big')  # payload
+                header[8:12] = cmd.to_bytes(4, byteorder='big')  # type
+                header[12:16] = self._flag.to_bytes(4, byteorder='big')  # control flags
+                header[16:20] = data.to_bytes(4, byteorder='big')  # size
                 # header[20:23]                                              # offset
                 try:
                     data = header + payload.encode()
                     self._sock.sendall(data)
                 except Exception as e:
                     self.close()
-                    raise owex(f"error sending request: {e}")
+                    raise owex(f'error sending request: {e}')
 
                 while True:
                     header = bytearray()
@@ -229,21 +229,21 @@ class OwBase(object):
                         header = self._sock.recv(24)
                     except socket.timeout:
                         self.close()
-                        raise owex("error receiving header: timeout")
+                        raise owex('error receiving header: timeout')
                     except Exception as e:
                         self.close()
-                        raise owex(f"error receiving header: {e}")
+                        raise owex(f'error receiving header: {e}')
 
                     if len(header) != 24:
                         self.close()
-                        raise owex(f"error receiving header: no or not enough data {len(header)} bytes")
+                        raise owex(f'error receiving header: no or not enough data {len(header)} bytes')
 
-                    self.version = int.from_bytes(data[0:4], byteorder="big")
-                    length = int.from_bytes(header[4:8], byteorder="big")
-                    ret = int.from_bytes(header[8:12], byteorder="big")
-                    self.owserver_flags = int.from_bytes(data[12:16], byteorder="big")
-                    self.owserver_size = int.from_bytes(data[16:20], byteorder="big")
-                    self.owserver_offset = int.from_bytes(data[20:24], byteorder="big")
+                    self.version = int.from_bytes(data[0:4], byteorder='big')
+                    length = int.from_bytes(header[4:8], byteorder='big')
+                    ret = int.from_bytes(header[8:12], byteorder='big')
+                    self.owserver_flags = int.from_bytes(data[12:16], byteorder='big')
+                    self.owserver_size = int.from_bytes(data[16:20], byteorder='big')
+                    self.owserver_offset = int.from_bytes(data[20:24], byteorder='big')
                     if not length == OW_ERROR:
                         break
 
@@ -252,20 +252,20 @@ class OwBase(object):
 
                 if length == 0:
                     if cmd != 3:
-                        raise owex(f"no payload for {path}")
+                        raise owex(f'no payload for {path}')
                     return
                 try:
                     payload = self._sock.recv(length)
                 except socket.timeout:
                     self.close()
-                    raise owex("error receiving payload: timeout")
+                    raise owex('error receiving payload: timeout')
                 except Exception as e:
                     self.close()
-                    raise owex(f"error receiving payload: {e}")
+                    raise owex(f'error receiving payload: {e}')
             finally:
                 self._lock.release()
         else:
-            raise owex("error acquiring lock")
+            raise owex('error acquiring lock')
 
         # if self.logger.isEnabledFor(logging.DEBUG):
         #    self.logger.debug("request successfully finished, return '{}'".format(payload))
@@ -293,48 +293,48 @@ class OwBase(object):
         Details for most sensor types can be found at http://owfs.sourceforge.net/family.html
         """
         try:
-            typ = self.read(path + "type").decode()
+            typ = self.read(path + 'type').decode()
         except Exception:
             # if self.logger.isEnabledFor(logging.DEBUG):
             #    self.logger.debug("path '{0}' not found.".format(path+'type'))
-            return None, "unknown"
-        addr = path.split("/")[-2]  # sensor device id like 28.16971B03000059 or an alias like MultiTemp
+            return None, 'unknown'
+        addr = path.split('/')[-2]  # sensor device id like 28.16971B03000059 or an alias like MultiTemp
         # return possible types
-        if typ == "DS18B20":  # Temperature
+        if typ == 'DS18B20':  # Temperature
             return {
-                "T": "temperature",
-                "T9": "temperature9",
-                "T10": "temperature10",
-                "T11": "temperature11",
-                "T12": "temperature12",
+                'T': 'temperature',
+                'T9': 'temperature9',
+                'T10': 'temperature10',
+                'T11': 'temperature11',
+                'T12': 'temperature12',
             }, typ
-        elif typ == "DS18S20":  # Temperature
-            return {"T": "temperature"}, typ
-        elif typ == "DS2438":  # Multisensor (see at https://www.owfs.org/index_php_page_ds2438.html)
+        elif typ == 'DS18S20':  # Temperature
+            return {'T': 'temperature'}, typ
+        elif typ == 'DS2438':  # Multisensor (see at https://www.owfs.org/index_php_page_ds2438.html)
             # sensor subtype needs to be further identified by page3 of its memory
             try:
-                page3 = self.read(path + "pages/page.3")  # .encode('hex').upper()
+                page3 = self.read(path + 'pages/page.3')  # .encode('hex').upper()
             except Exception as e:
-                self.logger.warning(f"1-Wire: sensor {addr} problem reading page.3: {e}")
+                self.logger.warning(f'1-Wire: sensor {addr} problem reading page.3: {e}')
                 return None, typ
             # check if a light sensor could be available, if so then path 'vis' is present
             try:
-                vis = float(self.read(path + "vis").decode())
+                vis = float(self.read(path + 'vis').decode())
             except Exception:
                 vis = 0
             if vis > 0:
-                keys = {"T": "temperature", "H": "HIH4000/humidity", "L": "vis"}
+                keys = {'T': 'temperature', 'H': 'HIH4000/humidity', 'L': 'vis'}
             else:
-                keys = {"T": "temperature", "H": "HIH4000/humidity"}
+                keys = {'T': 'temperature', 'H': 'HIH4000/humidity'}
             # check if a voltage from 1-wire bus can be measured
             try:
-                vdd = float(self.read(path + "VDD").decode())
+                vdd = float(self.read(path + 'VDD').decode())
             except Exception:
                 vdd = None
             if vdd is not None:
                 if self.logger.isEnabledFor(logging.DEBUG):
-                    self.logger.debug("1-Wire: sensor {0} voltage: {1}".format(addr, vdd))
-                keys["VDD"] = "VDD"
+                    self.logger.debug('1-Wire: sensor {0} voltage: {1}'.format(addr, vdd))
+                keys['VDD'] = 'VDD'
             # certain multisensors have also other infos to pass.
             if page3[0] == 0x19:
                 return keys, typ
@@ -343,7 +343,7 @@ class OwBase(object):
             elif page3[0] == 0xF3:  # AMSv2 TH
                 return keys, typ
             elif page3[0] == 0xF4:  # AMSv2 V
-                return {"V": "VAD"}, typ
+                return {'V': 'VAD'}, typ
             elif page3[0] == 0xF7:
                 # ToDo: check if this data here is valid
                 return keys, typ
@@ -352,54 +352,54 @@ class OwBase(object):
                 #    self.logger.warning("1-Wire: unsupported multisensor {0} {1} page3: {2}".format(addr, typ, page3))
                 #    self._unsupported_sensor_already_warned.append(addr)
                 #    return
-            elif page3 == b"HUMIDIT3":  # DataNab
-                keys["H"] = "humidity"
+            elif page3 == b'HUMIDIT3':  # DataNab
+                keys['H'] = 'humidity'
                 return keys, typ
             else:
-                self.logger.warning(f"1-Wire: unknown sensor {addr} {typ} page3: {page3}")
-                keys.update({"V": "VAD", "VDD": "VDD"})
+                self.logger.warning(f'1-Wire: unknown sensor {addr} {typ} page3: {page3}')
+                keys.update({'V': 'VAD', 'VDD': 'VDD'})
                 return keys, typ
-        elif typ == "DS2401":  # iButton
-            return {"B": "iButton"}, typ
-        elif typ in ["DS2413", "DS2406"]:  # I/O
-            return {"IA": "sensed.A", "IB": "sensed.B", "OA": "PIO.A", "OB": "PIO.B"}, typ
-        elif typ == "DS1420":  # Busmaster
-            return {"BM": "Busmaster"}, typ
-        elif typ == "DS2423":  # Counter
-            return {"CA": "counter.A", "CB": "counter.B"}, typ
-        elif typ == "DS2408":  # I/O
+        elif typ == 'DS2401':  # iButton
+            return {'B': 'iButton'}, typ
+        elif typ in ['DS2413', 'DS2406']:  # I/O
+            return {'IA': 'sensed.A', 'IB': 'sensed.B', 'OA': 'PIO.A', 'OB': 'PIO.B'}, typ
+        elif typ == 'DS1420':  # Busmaster
+            return {'BM': 'Busmaster'}, typ
+        elif typ == 'DS2423':  # Counter
+            return {'CA': 'counter.A', 'CB': 'counter.B'}, typ
+        elif typ == 'DS2408':  # I/O
             return {
-                "I0": "sensed.0",
-                "I1": "sensed.1",
-                "I2": "sensed.2",
-                "I3": "sensed.3",
-                "I4": "sensed.4",
-                "I5": "sensed.5",
-                "I6": "sensed.6",
-                "I7": "sensed.7",
-                "O0": "PIO.0",
-                "O1": "PIO.1",
-                "O2": "PIO.2",
-                "O3": "PIO.3",
-                "O4": "PIO.4",
-                "O5": "PIO.5",
-                "O6": "PIO.6",
-                "O7": "PIO.7",
+                'I0': 'sensed.0',
+                'I1': 'sensed.1',
+                'I2': 'sensed.2',
+                'I3': 'sensed.3',
+                'I4': 'sensed.4',
+                'I5': 'sensed.5',
+                'I6': 'sensed.6',
+                'I7': 'sensed.7',
+                'O0': 'PIO.0',
+                'O1': 'PIO.1',
+                'O2': 'PIO.2',
+                'O3': 'PIO.3',
+                'O4': 'PIO.4',
+                'O5': 'PIO.5',
+                'O6': 'PIO.6',
+                'O7': 'PIO.7',
             }, typ
-        elif typ == "DS2431":  # 1K EEprom
+        elif typ == 'DS2431':  # 1K EEprom
             if addr not in self._unsupported_sensor_already_warned:
                 self._unsupported_sensor_already_warned.append(addr)
-                self.logger.warning(f"1-Wire: unsupported device {addr} {typ} (EEprom)")
+                self.logger.warning(f'1-Wire: unsupported device {addr} {typ} (EEprom)')
             return None, typ
-        elif typ == "DS2433":  # 4K EEprom
+        elif typ == 'DS2433':  # 4K EEprom
             if addr not in self._unsupported_sensor_already_warned:
                 self._unsupported_sensor_already_warned.append(addr)
-                self.logger.warning(f"1-Wire: unsupported device {addr} {typ} (EEprom)")
+                self.logger.warning(f'1-Wire: unsupported device {addr} {typ} (EEprom)')
             return None, typ
         else:
             # unknown sensor type found, warn but only once
             if addr not in self._unknown_sensor_already_warned:
                 self._unknown_sensor_already_warned.append(addr)
-                self.logger.warning(f"1-Wire: unknown sensor {addr} {typ}")
+                self.logger.warning(f'1-Wire: unknown sensor {addr} {typ}')
             return None, typ
         return None, typ

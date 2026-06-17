@@ -32,12 +32,12 @@ from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 
 
-mapping_delimiter = "|"
+mapping_delimiter = '|'
 
 # optionally import package 'pcomfcloud' from local plugin folder
 LOCAL_PACKAGE_IMPORTED = False
-EXCEPTION_TEXT = ""
-if os.path.isfile(os.path.join("plugins", "panasonic_ac", "packages", "pcomfortcloud", "__init__.py")):
+EXCEPTION_TEXT = ''
+if os.path.isfile(os.path.join('plugins', 'panasonic_ac', 'packages', 'pcomfortcloud', '__init__.py')):
     try:
         import plugins.panasonic_ac.packages.pcomfortcloud as pcomfortcloud
 
@@ -65,7 +65,7 @@ class PanComfortCloud(SmartPlugin):
     """
 
     PLUGIN_VERSION = (
-        "0.3.1"  # (must match the version specified in plugin.yaml), use '1.0.0' for your initial plugin Release
+        '0.3.1'  # (must match the version specified in plugin.yaml), use '1.0.0' for your initial plugin Release
     )
 
     def __init__(self, sh):
@@ -87,7 +87,7 @@ class PanComfortCloud(SmartPlugin):
         # cycle time in seconds, only needed, if hardware/interface needs to be
         # polled for value changes by adding a scheduler entry in the run method of this plugin
         # (maybe you want to make it a plugin parameter?)
-        self._cycle = self.get_parameter_value("cycle")
+        self._cycle = self.get_parameter_value('cycle')
 
         # if you want to use an item to toggle plugin execution, enable the
         # definition in plugin.yaml and uncomment the following line
@@ -101,18 +101,18 @@ class PanComfortCloud(SmartPlugin):
             pass
 
         # Initialization code goes here
-        self._username = self.get_parameter_value("username")
-        self._password = self.get_parameter_value("password")
+        self._username = self.get_parameter_value('username')
+        self._password = self.get_parameter_value('password')
 
         self._raw = False
-        self._token = os.path.join(var_plugin_dir, "token.json")
+        self._token = os.path.join(var_plugin_dir, 'token.json')
         self._skipVerify = False
         self.session = None
 
         if LOCAL_PACKAGE_IMPORTED:
             self.logger.notice("Using local installation of 'pcomfortcloud' package")
-        if EXCEPTION_TEXT != "":
-            self.logger.error(f"Exception while importing LOCAL package: {EXCEPTION_TEXT}")
+        if EXCEPTION_TEXT != '':
+            self.logger.error(f'Exception while importing LOCAL package: {EXCEPTION_TEXT}')
             self._init_complete = False
             return
 
@@ -142,11 +142,11 @@ class PanComfortCloud(SmartPlugin):
     def pcc_getdevicestatus(self, index):
         # index: 1, ...
         if int(index) <= 0 or int(index) > len(self._devices):
-            self.logger.error(f"Device with index={index} not found in device list")
+            self.logger.error(f'Device with index={index} not found in device list')
 
-        id = self._devices[str(index)]["id"]
+        id = self._devices[str(index)]['id']
         try:
-            device_status = self.session.get_device(id)["parameters"]
+            device_status = self.session.get_device(id)['parameters']
         except Exception as ex:
             device_status = {}
 
@@ -155,9 +155,9 @@ class PanComfortCloud(SmartPlugin):
             ex_type, ex_value, ex_traceback = sys.exc_info()
 
             self.logger.dbghigh(
-                f"- Status of device (index={index}) cannot be read - Exception {ex} ({type(ex)}), {dir(ex)=}"
+                f'- Status of device (index={index}) cannot be read - Exception {ex} ({type(ex)}), {dir(ex)=}'
             )
-            self.logger.dbghigh(f"   - {ex_value=}")
+            self.logger.dbghigh(f'   - {ex_value=}')
         return device_status
 
     def pcc_readdevicelist(self):
@@ -168,7 +168,7 @@ class PanComfortCloud(SmartPlugin):
     def pcc_login(self):
 
         if os.path.isfile(self._token):
-            with open(self._token, "r") as token_file:
+            with open(self._token, 'r') as token_file:
                 json_token = json.load(token_file)
         else:
             json_token = None
@@ -183,15 +183,15 @@ class PanComfortCloud(SmartPlugin):
         try:
             auth.login()
         except Exception as ex:
-            self.logger.notice(f"Exception on auth.login: {ex}")
-            self.logger.notice("Retrying login without old token")
+            self.logger.notice(f'Exception on auth.login: {ex}')
+            self.logger.notice('Retrying login without old token')
             json_token = None
             auth = pcomfortcloud.Authentication(self._username, self._password, json_token, self._raw)
             auth.login()
 
         json_token = auth.get_token()
         self.session = pcomfortcloud.ApiClient(auth, self._raw)
-        with open(self._token, "w") as token_file:
+        with open(self._token, 'w') as token_file:
             json.dump(json_token, token_file, indent=4)
         return True
 
@@ -199,7 +199,7 @@ class PanComfortCloud(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.dbghigh(self.translate("Methode '{method}' aufgerufen", {"method": "run()"}))
+        self.logger.dbghigh(self.translate("Methode '{method}' aufgerufen", {'method': 'run()'}))
 
         # connect to network / web / serial device
         # (enable the following lines if you want to open a connection
@@ -209,7 +209,7 @@ class PanComfortCloud(SmartPlugin):
         # setup scheduler for device poll loop
         # (enable the following line, if you need to poll the device.
         #  Rember to un-comment the self._cycle statement in __init__ as well)
-        self.scheduler_add(self.get_fullname() + "_poll", self.poll_device, cycle=self._cycle)
+        self.scheduler_add(self.get_fullname() + '_poll', self.poll_device, cycle=self._cycle)
 
         # Start the asyncio eventloop in it's own thread
         # and set self.alive to True when the eventloop is running
@@ -232,7 +232,7 @@ class PanComfortCloud(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.dbghigh(self.translate("Methode '{method}' aufgerufen", {"method": "stop()"}))
+        self.logger.dbghigh(self.translate("Methode '{method}' aufgerufen", {'method': 'stop()'}))
         self.alive = False  # if using asyncio, do not set self.alive here. Set it in the session coroutine
 
         # let the plugin change the state of pause_item
@@ -269,19 +269,19 @@ class PanComfortCloud(SmartPlugin):
         """
         # check for pause item
         if item.property.path == self._pause_item_path:
-            self.logger.debug(f"pause item {item.property.path} registered")
+            self.logger.debug(f'pause item {item.property.path} registered')
             self._pause_item = item
             self.add_item(item, updating=True)
             return self.update_item
 
-        if self.has_iattr(item.conf, "pcc_index") and self.has_iattr(item.conf, "pcc_parameter"):
-            index = str(self.get_iattr_value(item.conf, "pcc_index"))
-            parameter = self.get_iattr_value(item.conf, "pcc_parameter")
+        if self.has_iattr(item.conf, 'pcc_index') and self.has_iattr(item.conf, 'pcc_parameter'):
+            index = str(self.get_iattr_value(item.conf, 'pcc_index'))
+            parameter = self.get_iattr_value(item.conf, 'pcc_parameter')
             config_data = {}
-            config_data["index"] = index
-            config_data["parameter"] = parameter
-            config_data["item"] = item
-            mapping = config_data["index"] + mapping_delimiter + config_data["parameter"]
+            config_data['index'] = index
+            config_data['parameter'] = parameter
+            config_data['item'] = item
+            mapping = config_data['index'] + mapping_delimiter + config_data['parameter']
             self.add_item(item, mapping=mapping, config_data_dict=config_data, updating=True)
             return self.update_item
 
@@ -289,7 +289,7 @@ class PanComfortCloud(SmartPlugin):
         """
         Default plugin parse_logic method
         """
-        if "xxx" in logic.conf:
+        if 'xxx' in logic.conf:
             # self.function(logic['name'])
             pass
 
@@ -313,7 +313,7 @@ class PanComfortCloud(SmartPlugin):
         # check for pause item
         if item is self._pause_item:
             if caller != self.get_shortname():
-                self.logger.debug(f"pause item changed to {item()}")
+                self.logger.debug(f'pause item changed to {item()}')
                 if item() and self.alive:
                     self.stop()
                 elif not item() and not self.alive:
@@ -339,36 +339,36 @@ class PanComfortCloud(SmartPlugin):
         # self.logger.notice(f"update_pcc_from_item: config_data = {config_data}")
 
         try:
-            index = config_data["index"]
+            index = config_data['index']
             kwargs = {}
-            if config_data["parameter"] == "temperature":
-                kwargs["temperature"] = float(value)
+            if config_data['parameter'] == 'temperature':
+                kwargs['temperature'] = float(value)
                 self.logger.info(f" -> Device {index}: Setting '{config_data['parameter']}' to {value}°C")
             else:
-                if config_data["parameter"] == "power":
-                    kwargs["power"] = pcomfortcloud.constants.Power(int(value))
-                elif config_data["parameter"] == "mode":
-                    kwargs["mode"] = pcomfortcloud.constants.OperationMode(int(value))
-                elif config_data["parameter"] == "fanSpeed":
-                    kwargs["fanSpeed"] = pcomfortcloud.constants.FanSpeed(int(value))
-                elif config_data["parameter"] == "airSwingHorizontal":
-                    kwargs["airSwingHorizontal"] = pcomfortcloud.constants.AirSwingLR(int(value))
-                elif config_data["parameter"] == "airSwingVertical":
-                    kwargs["airSwingVertical"] = pcomfortcloud.constants.AirSwingUD(int(value))
-                elif config_data["parameter"] == "eco":
-                    kwargs["eco"] = pcomfortcloud.constants.EcoMode(int(value))
-                elif config_data["parameter"] == "nanoe":
-                    kwargs["nanoe"] = pcomfortcloud.constants.NanoeMode(int(value))
+                if config_data['parameter'] == 'power':
+                    kwargs['power'] = pcomfortcloud.constants.Power(int(value))
+                elif config_data['parameter'] == 'mode':
+                    kwargs['mode'] = pcomfortcloud.constants.OperationMode(int(value))
+                elif config_data['parameter'] == 'fanSpeed':
+                    kwargs['fanSpeed'] = pcomfortcloud.constants.FanSpeed(int(value))
+                elif config_data['parameter'] == 'airSwingHorizontal':
+                    kwargs['airSwingHorizontal'] = pcomfortcloud.constants.AirSwingLR(int(value))
+                elif config_data['parameter'] == 'airSwingVertical':
+                    kwargs['airSwingVertical'] = pcomfortcloud.constants.AirSwingUD(int(value))
+                elif config_data['parameter'] == 'eco':
+                    kwargs['eco'] = pcomfortcloud.constants.EcoMode(int(value))
+                elif config_data['parameter'] == 'nanoe':
+                    kwargs['nanoe'] = pcomfortcloud.constants.NanoeMode(int(value))
                 else:
                     self.logger.notice(
-                        f"update_pcc_from_item: Updating the parameter {config_data['parameter']} is not supported/implemented"
+                        f'update_pcc_from_item: Updating the parameter {config_data["parameter"]} is not supported/implemented'
                     )
                 if kwargs != {}:
                     self.logger.info(
                         f" -> Device {index=}: Setting '{config_data['parameter']}' to {value} ({kwargs[config_data['parameter']].name})"
                     )
             if kwargs != {}:
-                self.session.set_device(self._devices[config_data["index"]]["id"], **kwargs)
+                self.session.set_device(self._devices[config_data['index']]['id'], **kwargs)
         except Exception as ex:
             self.logger.warning(
                 f"Cannot set parameter '{config_data['parameter']}' of device index={config_data['index']} - Exception: {ex}"
@@ -386,7 +386,7 @@ class PanComfortCloud(SmartPlugin):
             val_num = int(value_enum.value)
             val_str = value_enum.name
             for item in update_items:
-                if item.property.type == "num":
+                if item.property.type == 'num':
                     item(val_num, self.get_fullname())
                 else:
                     item(val_str, self.get_fullname())
@@ -401,27 +401,27 @@ class PanComfortCloud(SmartPlugin):
         """
         for idx, device in enumerate(self._devices):
             index = idx + 1
-            self._devices[str(index)]["parameters"] = self.pcc_getdevicestatus(index)
+            self._devices[str(index)]['parameters'] = self.pcc_getdevicestatus(index)
             self.logger.dbghigh(
                 f"poll_device: Polling Panasonic Comfort Cloud for device '{self._devices[str(index)]['name']}' - Got parameters={self._devices[str(index)]['parameters']}"
             )
 
             # Items updaten
             mapping_root = str(index) + mapping_delimiter
-            self.update_items_with_mapping(mapping_root, "name", self._devices[str(index)]["name"])
-            if self._devices[str(index)]["parameters"] != {}:
-                self.update_items_with_mapping(mapping_root, "connected", True)
-                for key in self._devices[str(index)]["parameters"].keys():
+            self.update_items_with_mapping(mapping_root, 'name', self._devices[str(index)]['name'])
+            if self._devices[str(index)]['parameters'] != {}:
+                self.update_items_with_mapping(mapping_root, 'connected', True)
+                for key in self._devices[str(index)]['parameters'].keys():
                     try:
-                        value = int(self._devices[str(index)]["parameters"][key].value)
+                        value = int(self._devices[str(index)]['parameters'][key].value)
                         self.update_items_with_mapping(
-                            mapping_root, key, value_enum=self._devices[str(index)]["parameters"][key]
+                            mapping_root, key, value_enum=self._devices[str(index)]['parameters'][key]
                         )
                     except Exception:
-                        value = self._devices[str(index)]["parameters"][key]
+                        value = self._devices[str(index)]['parameters'][key]
                         self.update_items_with_mapping(mapping_root, key, value)
             else:
-                self.update_items_with_mapping(mapping_root, "connected", False)
+                self.update_items_with_mapping(mapping_root, 'connected', False)
 
     async def plugin_coro(self):
         """
@@ -430,7 +430,7 @@ class PanComfortCloud(SmartPlugin):
         This coroutine is run as the PluginTask and should
         only terminate, when the plugin is stopped
         """
-        self.logger.notice("plugin_coro started")
+        self.logger.notice('plugin_coro started')
 
         self.alive = True
 
@@ -438,5 +438,5 @@ class PanComfortCloud(SmartPlugin):
 
         self.alive = False
 
-        self.logger.notice("plugin_coro finished")
+        self.logger.notice('plugin_coro finished')
         return

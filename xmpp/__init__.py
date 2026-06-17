@@ -33,35 +33,35 @@ from lib.model.smartplugin import SmartPlugin
 
 
 class XMPP(SmartPlugin):
-    PLUGIN_VERSION = "1.4.1"
+    PLUGIN_VERSION = '1.4.1'
     ALLOW_MULTIINSTANCE = False
 
-    def __init__(self, smarthome, jid, password, logic="XMPP"):
+    def __init__(self, smarthome, jid, password, logic='XMPP'):
         self.logger = logging.getLogger(__name__)
-        server = self.get_parameter_value("server")
-        plugins = self.get_parameter_value("plugins")
-        joins = self.get_parameter_value("join")
+        server = self.get_parameter_value('server')
+        plugins = self.get_parameter_value('plugins')
+        joins = self.get_parameter_value('join')
 
         # Check server parameter and default to port 5222
         if server is None:
             self._server = None
-        elif ":" in server:
-            parts = server.split(":")
+        elif ':' in server:
+            parts = server.split(':')
             self._server = (parts[0].strip(), parts[1].strip())
         else:
             self._server = (server, 5222)
 
         # Enable MUC in case account should join channels
-        if len(joins) and "xep_0045" not in plugins:
-            plugins.append("xep_0045")
+        if len(joins) and 'xep_0045' not in plugins:
+            plugins.append('xep_0045')
 
         self.xmpp = slixmpp.ClientXMPP(jid, password)
         for plugin in plugins:
             self.xmpp.register_plugin(plugin)
-        self.xmpp.use_ipv6 = self.get_parameter_value("use_ipv6")
-        self.xmpp.add_event_handler("session_start", self.handleXMPPConnected)
-        self.xmpp.add_event_handler("session_end", self.handleXMPPDisconnected)
-        self.xmpp.add_event_handler("message", self.handleIncomingMessage)
+        self.xmpp.use_ipv6 = self.get_parameter_value('use_ipv6')
+        self.xmpp.add_event_handler('session_start', self.handleXMPPConnected)
+        self.xmpp.add_event_handler('session_end', self.handleXMPPDisconnected)
+        self.xmpp.add_event_handler('message', self.handleIncomingMessage)
         self._logic = logic
         self._sh = smarthome
         self._join = joins
@@ -84,8 +84,8 @@ class XMPP(SmartPlugin):
         self.alive = False
         self._connected = 0
         for chat in self._join:
-            self.xmpp.plugin["xep_0045"].leave_muc(chat, self.xmpp.boundjid.bare)
-        self.logger.info("Shutting Down XMPP Client")
+            self.xmpp.plugin['xep_0045'].leave_muc(chat, self.xmpp.boundjid.bare)
+        self.logger.info('Shutting Down XMPP Client')
         self.xmpp.disconnect(wait=True)
 
     def parse_item(self, item):
@@ -96,9 +96,9 @@ class XMPP(SmartPlugin):
 
     def __call__(self, to, msgsend):
         try:
-            self.send(to, msgsend, mt="chat")
+            self.send(to, msgsend, mt='chat')
         except Exception as e:
-            self.logger.error("XMPP: Could not send message {} to {}: {}".format(msgsend, to, e))
+            self.logger.error('XMPP: Could not send message {} to {}: {}'.format(msgsend, to, e))
         finally:
             try:
                 pass
@@ -111,12 +111,12 @@ class XMPP(SmartPlugin):
     def handleXMPPConnected(self, event):
         self._connected = 2
         try:
-            self.xmpp.send_presence(pstatus="Send me a message")
+            self.xmpp.send_presence(pstatus='Send me a message')
             self.xmpp.get_roster()
             for chat in self._join:
-                self.xmpp.plugin["xep_0045"].join_muc(chat, self.xmpp.boundjid.bare, wait=True)
+                self.xmpp.plugin['xep_0045'].join_muc(chat, self.xmpp.boundjid.bare, wait=True)
         except Exception as e:
-            self.logger.error("XMPP: Reconnecting, because can not set/get presence/roster: {}".format(e))
+            self.logger.error('XMPP: Reconnecting, because can not set/get presence/roster: {}'.format(e))
             self.xmpp.reconnect()
 
     def handleXMPPDisconnected(self, event):
@@ -142,7 +142,7 @@ class XMPP(SmartPlugin):
     def update_item(self, item, caller=None, source=None, dest=None):
         pass
 
-    def send(self, to, msgsend, mt="chat"):
+    def send(self, to, msgsend, mt='chat'):
         """
         Send a message via xmpp
         Requires:
@@ -150,14 +150,14 @@ class XMPP(SmartPlugin):
                  msgsend->mbody = body of the message eg 'Hello world'
                  mt->mtype = message type, could be 'chat' or 'groupchat'
         """
-        self.logger.info("Sending message via XMPP. To: {0}\t Message: {1}".format(to, msgsend))
+        self.logger.info('Sending message via XMPP. To: {0}\t Message: {1}'.format(to, msgsend))
         self.xmpp.send_message(mto=to, mbody=str(msgsend), mtype=mt)
 
 
 class XMPPLogHandler(logging.Handler):
     _errors = {}
 
-    def __init__(self, xmpp_plugin, xmpp_receiver, xmpp_receiver_type="chat"):
+    def __init__(self, xmpp_plugin, xmpp_receiver, xmpp_receiver_type='chat'):
         logging.Handler.__init__(self)
         self._plugin = None
         self._xmpp_plugin = xmpp_plugin
@@ -173,9 +173,9 @@ class XMPPLogHandler(logging.Handler):
 
 
 def main():
-    bot = XMPP("skender@haxhimolla.im", "mypassword")
+    bot = XMPP('skender@haxhimolla.im', 'mypassword')
     bot.run()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

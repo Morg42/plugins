@@ -24,8 +24,8 @@ class Client:
         self,
         username,
         password,
-        base_url="https://192.168.178.1:49443",
-        description_file="tr64desc.xml",
+        base_url='https://192.168.178.1:49443',
+        description_file='tr64desc.xml',
         verify: bool = False,
     ):
         self.base_url = base_url
@@ -35,7 +35,7 @@ class Client:
         self.verify = verify
         self.devices = {}
 
-        self.namespaces = IGD_DEVICE_NAMESPACE if "igd" in description_file else TR064_DEVICE_NAMESPACE
+        self.namespaces = IGD_DEVICE_NAMESPACE if 'igd' in description_file else TR064_DEVICE_NAMESPACE
 
     def __getattr__(self, name):
         if name not in self.devices:
@@ -44,20 +44,20 @@ class Client:
         if name in self.devices:
             return self.devices[name]
 
-        raise TR064UnknownDeviceException(f"Requested Device Name {name!r} not available.")
+        raise TR064UnknownDeviceException(f'Requested Device Name {name!r} not available.')
 
-    def _fetch_devices(self, description_file="tr64desc.xml"):
+    def _fetch_devices(self, description_file='tr64desc.xml'):
         """Fetch device description."""
-        request = requests.get("{0}/{1}".format(self.base_url, description_file), verify=self.verify)
+        request = requests.get('{0}/{1}'.format(self.base_url, description_file), verify=self.verify)
         # request = requests.get(f'{self.base_url}/{description_file}', verify=self.verify)
 
         if request.status_code == 200:
             # added parser with resolve_entities option in response to CVE-2026-41066
-            xmlparser = ET.XMLParser(resolve_entities="internal")
+            xmlparser = ET.XMLParser(resolve_entities='internal')
             xml = ET.parse(BytesIO(request.content), parser=xmlparser)
 
-            for device in xml.findall(".//device", namespaces=self.namespaces):
-                name = device.findtext("deviceType", namespaces=self.namespaces).split(":")[-2]
+            for device in xml.findall('.//device', namespaces=self.namespaces):
+                name = device.findtext('deviceType', namespaces=self.namespaces).split(':')[-2]
 
                 if name not in self.devices:
                     self.devices[name] = Device(device, self.auth, self.base_url, self.verify, self.description_file)

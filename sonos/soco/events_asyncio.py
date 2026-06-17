@@ -24,7 +24,7 @@ Example:
             try:
                 pprint(event.variables)
             except Exception as e:
-                print("There was an error in print_event:", e)
+                print('There was an error in print_event:', e)
 
 
         def _get_device():
@@ -49,14 +49,14 @@ Example:
                 await events_asyncio.event_listener.async_stop()
 
             await asyncio.sleep(1)
-            print("Renewing subscription..")
+            print('Renewing subscription..')
             await sub.renew()
 
             await asyncio.sleep(100)
             await before_shutdown()
 
 
-        if __name__ == "__main__":
+        if __name__ == '__main__':
             asyncio.run(main())
 
 """
@@ -115,8 +115,8 @@ class EventNotifyHandler(EventNotifyHandlerBase):
         with the headers and content.
         """
         content = await request.text()
-        seq = request.headers["seq"]  # Event sequence number
-        sid = request.headers["sid"]  # Event Subscription Identifier
+        seq = request.headers['seq']  # Event sequence number
+        sid = request.headers['sid']  # Event Subscription Identifier
         # find the relevant service from the sid
         # pylint: disable=no-member
         subscription = self.subscriptions_map.get_subscription(sid)
@@ -125,21 +125,19 @@ class EventNotifyHandler(EventNotifyHandlerBase):
             timestamp = time.time()
             service = subscription.service
             self.log_event(seq, service.service_id, timestamp)
-            log.debug("Event content: %s", content)
-            if "x-sonos-http" in content:
+            log.debug('Event content: %s', content)
+            if 'x-sonos-http' in content:
                 # parse_event_xml will generate I/O if
                 # x-sonos-http is in the content
                 variables = await asyncio.get_event_loop().run_in_executor(None, parse_event_xml, content)
             else:
                 variables = parse_event_xml(content)
 
-            if "zone_group_state" in variables:
+            if 'zone_group_state' in variables:
                 # Pass ZGS payload to associated SoCo instance to update
                 # attributes. Keeps cache warm and avoids network calls.
                 service.soco.zone_group_state.process_payload(
-                    payload=variables["zone_group_state"],
-                    source="event",
-                    source_ip=service.soco.ip_address,
+                    payload=variables['zone_group_state'], source='event', source_ip=service.soco.ip_address
                 )
 
             # Build the Event object
@@ -151,13 +149,13 @@ class EventNotifyHandler(EventNotifyHandlerBase):
             # Pass the event on for handling
             subscription.send_event(event)
         else:
-            log.debug("No service registered for %s", sid)
+            log.debug('No service registered for %s', sid)
 
-        return web.Response(text="OK", status=200)
+        return web.Response(text='OK', status=200)
 
     # pylint: disable=no-self-use, missing-docstring
     def log_event(self, seq, service_id, timestamp):
-        log.debug("Event %s received for %s service at %s", seq, service_id, timestamp)
+        log.debug('Event %s received for %s service at %s', seq, service_id, timestamp)
 
 
 class EventListener(EventListenerBase):
@@ -204,7 +202,7 @@ class EventListener(EventListenerBase):
             # automatically.
             ip_address = get_listen_ip(any_zone.ip_address)
             if not ip_address:
-                log.exception("Could not start Event Listener: check network.")
+                log.exception('Could not start Event Listener: check network.')
                 # Otherwise, no point trying to start server
                 return
             port = await self.async_listen(ip_address)
@@ -214,7 +212,7 @@ class EventListener(EventListenerBase):
             client_timeout = ClientTimeout(total=10)
             self.session = ClientSession(raise_for_status=True, timeout=client_timeout)
             self.is_running = True
-            log.debug("Event Listener started")
+            log.debug('Event Listener started')
 
     async def async_listen(self, ip_address):
         """Start the event listener listening on the local machine at
@@ -242,7 +240,7 @@ class EventListener(EventListenerBase):
         for port_number in range(self.requested_port_number, self.requested_port_number + 100):
             try:
                 if port_number > self.requested_port_number:
-                    log.debug("Trying next port (%d)", port_number)
+                    log.debug('Trying next port (%d)', port_number)
                 # pylint: disable=no-member
                 sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 sock.bind((ip_address, port_number))
@@ -252,7 +250,7 @@ class EventListener(EventListenerBase):
                 break
             # pylint: disable=invalid-name
             except socket.error as e:
-                log.warning("Could not bind to %s:%s: %s", ip_address, port_number, e)
+                log.warning('Could not bind to %s:%s: %s', ip_address, port_number, e)
                 continue
 
         if not self.port:
@@ -266,12 +264,12 @@ class EventListener(EventListenerBase):
         """Start the site."""
         handler = EventNotifyHandler()
         app = web.Application()
-        app.add_routes([web.route("notify", "", handler.notify)])
+        app.add_routes([web.route('notify', '', handler.notify)])
         self.runner = web.AppRunner(app)
         await self.runner.setup()
         self.site = web.SockSite(self.runner, self.sock)
         await self.site.start()
-        log.debug("Event listener running on %s", (self.ip_address, self.port))
+        log.debug('Event listener running on %s', (self.ip_address, self.port))
 
     async def async_stop(self):
         """Stop the listener."""
@@ -385,9 +383,9 @@ class Subscription(SubscriptionBase):
     def _log_exception(self, exc):
         """Log an exception during subscription."""
         msg = (
-            "An Exception occurred: {}.".format(exc)
-            + " Subscription to {},".format(self.service.base_url + self.service.event_subscription_url)
-            + " sid: {} has been cancelled".format(self.sid)
+            'An Exception occurred: {}.'.format(exc)
+            + ' Subscription to {},'.format(self.service.base_url + self.service.event_subscription_url)
+            + ' sid: {} has been cancelled'.format(self.sid)
         )
         log.exception(msg)
 
@@ -418,7 +416,7 @@ class Subscription(SubscriptionBase):
             return await super().renew(requested_timeout, is_autorenew)
         except Exception as exc:  # pylint: disable=broad-except
             self._cancel_subscription(exc)
-            if self.auto_renew_fail is not None and hasattr(self.auto_renew_fail, "__call__"):
+            if self.auto_renew_fail is not None and hasattr(self.auto_renew_fail, '__call__'):
                 # pylint: disable=not-callable
                 self.auto_renew_fail(exc)
             else:

@@ -30,7 +30,7 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 import tests.common as common
 
 common.register_shng_log_levels()
@@ -40,10 +40,10 @@ from plugins.stateengine import StateEngineDefaults
 
 
 def _setup():
-    StateEngineDefaults.logger = logging.getLogger("test.se")
+    StateEngineDefaults.logger = logging.getLogger('test.se')
 
 
-def _make_value(abitem, name="test", allow_list=False, value_type=None):
+def _make_value(abitem, name='test', allow_list=False, value_type=None):
     from plugins.stateengine.StateEngineValue import SeValue
 
     return SeValue(abitem, name, allow_list, value_type)
@@ -65,13 +65,13 @@ class TestSeValueIsEmpty(unittest.TestCase):
 
     def test_after_set_bool_not_empty(self):
         v = _make_value(self.abitem)
-        v.set(True, "test")
+        v.set(True, 'test')
         self.assertFalse(v.is_empty())
 
     def test_after_reset_is_empty_again(self):
         v = _make_value(self.abitem)
-        v.set(True, "test")
-        v.set(None, "test", reset=True)  # None + reset → clears everything
+        v.set(True, 'test')
+        v.set(None, 'test', reset=True)  # None + reset → clears everything
         self.assertTrue(v.is_empty())
 
 
@@ -87,7 +87,7 @@ class TestSeValueSetPlainPython(unittest.TestCase):
         _setup()
         self.abitem = MockAbItem()
 
-    def _roundtrip(self, value, name="test"):
+    def _roundtrip(self, value, name='test'):
         v = _make_value(self.abitem)
         v.set(value, name)
         return v.get()
@@ -123,51 +123,51 @@ class TestSeValueSetStringLiteral(unittest.TestCase):
         _setup()
         self.abitem = MockAbItem()
 
-    def _roundtrip(self, raw, name="test"):
+    def _roundtrip(self, raw, name='test'):
         v = _make_value(self.abitem)
         v.set(raw, name)
         return v.get()
 
     def test_bare_integer_string(self):
         """'42' (no prefix) → auto-parsed to int 42."""
-        result = self._roundtrip("42")
+        result = self._roundtrip('42')
         self.assertEqual(result, 42)
 
     def test_bare_negative_integer_string(self):
-        result = self._roundtrip("-5")
+        result = self._roundtrip('-5')
         self.assertEqual(result, -5)
 
     def test_bare_float_string(self):
-        result = self._roundtrip("1.5")
+        result = self._roundtrip('1.5')
         self.assertAlmostEqual(result, 1.5)
 
     def test_bare_true_string(self):
         """'true' (bare) → parsed to Python True."""
-        result = self._roundtrip("true")
+        result = self._roundtrip('true')
         self.assertIs(result, True)
 
     def test_bare_false_string(self):
-        result = self._roundtrip("false")
+        result = self._roundtrip('false')
         self.assertIs(result, False)
 
     def test_bare_True_string(self):
-        result = self._roundtrip("True")
+        result = self._roundtrip('True')
         self.assertIs(result, True)
 
     def test_value_prefixed_integer(self):
         """'value:99' → 99."""
-        result = self._roundtrip("value:99")
+        result = self._roundtrip('value:99')
         self.assertEqual(result, 99)
 
     def test_value_prefixed_bool_true(self):
         """'value:True' → True."""
-        result = self._roundtrip("value:True")
+        result = self._roundtrip('value:True')
         self.assertIs(result, True)
 
     def test_bare_string_word(self):
         """'auto' (no colon, no known type) → stored as string 'auto'."""
-        result = self._roundtrip("auto")
-        self.assertEqual(result, "auto")
+        result = self._roundtrip('auto')
+        self.assertEqual(result, 'auto')
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -184,31 +184,31 @@ class TestSeValueSetEval(unittest.TestCase):
 
     def _eval_roundtrip(self, expr):
         v = _make_value(self.abitem)
-        v.set("eval:" + expr, "test")
+        v.set('eval:' + expr, 'test')
         return v.get()
 
     def test_eval_literal_true(self):
-        self.assertIs(self._eval_roundtrip("True"), True)
+        self.assertIs(self._eval_roundtrip('True'), True)
 
     def test_eval_literal_false(self):
-        self.assertIs(self._eval_roundtrip("False"), False)
+        self.assertIs(self._eval_roundtrip('False'), False)
 
     def test_eval_arithmetic(self):
-        self.assertEqual(self._eval_roundtrip("2 + 3"), 5)
+        self.assertEqual(self._eval_roundtrip('2 + 3'), 5)
 
     def test_eval_sh_in_scope(self):
         """eval expression can reference 'sh' from the eval namespace."""
-        result = self._eval_roundtrip("sh is not None")
+        result = self._eval_roundtrip('sh is not None')
         self.assertIs(result, True)
 
     def test_eval_shtime_in_scope(self):
-        result = self._eval_roundtrip("shtime is not None")
+        result = self._eval_roundtrip('shtime is not None')
         self.assertIs(result, True)
 
     def test_eval_not_empty(self):
         """After set('eval:…'), is_empty() must be False."""
         v = _make_value(self.abitem)
-        v.set("eval:True", "test")
+        v.set('eval:True', 'test')
         self.assertFalse(v.is_empty())
 
 
@@ -225,21 +225,21 @@ class TestSeValueSetVar(unittest.TestCase):
         self.abitem = MockAbItem()
 
     def test_var_reads_from_abitem(self):
-        self.abitem.set_variable("my.var", "hello")
+        self.abitem.set_variable('my.var', 'hello')
         v = _make_value(self.abitem)
-        v.set("var:my.var", "test")
-        self.assertEqual(v.get(), "hello")
+        v.set('var:my.var', 'test')
+        self.assertEqual(v.get(), 'hello')
 
     def test_var_missing_returns_none(self):
         """Variable not set → get_variable returns None → get() returns None."""
         v = _make_value(self.abitem)
-        v.set("var:no.such.var", "test")
+        v.set('var:no.such.var', 'test')
         result = v.get()
         self.assertIsNone(result)
 
     def test_var_not_empty_after_set(self):
         v = _make_value(self.abitem)
-        v.set("var:some.var", "test")
+        v.set('var:some.var', 'test')
         self.assertFalse(v.is_empty())
 
 
@@ -258,7 +258,7 @@ class TestSeValueSetList(unittest.TestCase):
     def test_list_of_raw_bools(self):
         """set([True, False]) → get() returns [True, False]."""
         v = _make_value(self.abitem, allow_list=True)
-        v.set([True, False], "test")
+        v.set([True, False], 'test')
         result = v.get()
         result_list = result if isinstance(result, list) else [result]
         self.assertIn(True, result_list)
@@ -273,26 +273,26 @@ class TestSeValueSetList(unittest.TestCase):
         a multi-value list receive strings and must cast themselves.
         """
         v = _make_value(self.abitem, allow_list=True)
-        v.set(["value:True", "value:False"], "test")
+        v.set(['value:True', 'value:False'], 'test')
         result = v.get()
         result_list = result if isinstance(result, list) else [result]
         self.assertEqual(len(result_list), 2)
         # Both canonical strings are present
-        self.assertIn("True", result_list)
-        self.assertIn("False", result_list)
+        self.assertIn('True', result_list)
+        self.assertIn('False', result_list)
 
     def test_list_of_plain_ints(self):
         v = _make_value(self.abitem, allow_list=True)
-        v.set([1, 2, 3], "test")
+        v.set([1, 2, 3], 'test')
         result = v.get()
         result_list = result if isinstance(result, list) else [result]
         self.assertIn(1, result_list)
 
     def test_list_not_empty(self):
         v = _make_value(self.abitem, allow_list=True)
-        v.set([True, False], "test")
+        v.set([True, False], 'test')
         self.assertFalse(v.is_empty())
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

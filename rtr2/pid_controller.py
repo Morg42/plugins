@@ -145,7 +145,7 @@ class PID:
             self._Kp = value
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     @property
@@ -172,7 +172,7 @@ class PID:
             self._Ki = value
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     @property
@@ -199,11 +199,11 @@ class PID:
             self._Kd = value
             return
         else:
-            self._type_error("non-float")
+            self._type_error('non-float')
             return
 
     def __repr__(self):
-        return "PID controller"
+        return 'PID controller'
 
     def _type_error(self, err):
         import inspect

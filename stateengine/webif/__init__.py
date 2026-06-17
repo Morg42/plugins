@@ -54,7 +54,7 @@ class WebInterface(SmartPluginWebIf):
         self.vis_enabled = plugin.vis_enabled
 
     @cherrypy.expose
-    def index(self, action=None, item_id=None, item_path=None, reload=None, abitem=None, page="index"):
+    def index(self, action=None, item_id=None, item_path=None, reload=None, abitem=None, page='index'):
         """
         Build index.html for cherrypy
 
@@ -62,18 +62,18 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("{}.html".format(page))
-        pagelength = self.plugin.get_parameter_value("webif_pagelength")
-        if action == "get_graph" and abitem is not None:
+        tmpl = self.tplenv.get_template('{}.html'.format(page))
+        pagelength = self.plugin.get_parameter_value('webif_pagelength')
+        if action == 'get_graph' and abitem is not None:
             if isinstance(abitem, str):
                 try:
                     abitem = self.plugin.abitems[abitem]
                 except Exception as e:
-                    self.logger.warning("Item {} not initialized yet. Try again later. Error: {}".format(abitem, e))
+                    self.logger.warning('Item {} not initialized yet. Try again later. Error: {}'.format(abitem, e))
                     return None
             if self.vis_enabled:
-                self.plugin.get_graph(abitem, "graph")
-            tmpl = self.tplenv.get_template("visu.html")
+                self.plugin.get_graph(abitem, 'graph')
+            tmpl = self.tplenv.get_template('visu.html')
             return tmpl.render(
                 p=self.plugin,
                 item=abitem,
@@ -106,37 +106,37 @@ class WebInterface(SmartPluginWebIf):
             data = {}
             for item in self.plugin.get_items():
                 laststate = item.laststate_name
-                laststate = "-" if laststate in ["", None] else laststate
+                laststate = '-' if laststate in ['', None] else laststate
                 conditionset = item.lastconditionset_name
-                conditionset = "-" if conditionset in ["", None] else conditionset
+                conditionset = '-' if conditionset in ['', None] else conditionset
                 ll = item.logger.log_level_as_num
                 if item.laststate_releasedby in [None, []]:
-                    lsr = "-"
+                    lsr = '-'
                 else:
-                    lsr = [entry.split(".")[-1] for entry in item.laststate_releasedby]
+                    lsr = [entry.split('.')[-1] for entry in item.laststate_releasedby]
                 data.update(
                     {
                         item.id: {
-                            "laststate": laststate,
-                            "lastconditionset": conditionset,
-                            "log_level": ll,
-                            "laststate_releasedby": lsr,
+                            'laststate': laststate,
+                            'lastconditionset': conditionset,
+                            'log_level': ll,
+                            'laststate_releasedby': lsr,
                         }
                     }
                 )
             try:
                 return json.dumps(data)
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
         elif dataSet and isinstance(dataSet, str):
             try:
                 dataSet = self.plugin.abitems[dataSet]
             except Exception as e:
-                self.logger.warning("Item {} not initialized yet. Try again later. Error: {}".format(dataSet, e))
-                return json.dumps({"success": "error"})
+                self.logger.warning('Item {} not initialized yet. Try again later. Error: {}'.format(dataSet, e))
+                return json.dumps({'success': 'error'})
             if self.vis_enabled and dataSet.firstrun is None:
-                self.plugin.get_graph(dataSet, "graph")
-                return json.dumps({"success": "true"})
-            return json.dumps({"success": "false"})
+                self.plugin.get_graph(dataSet, 'graph')
+                return json.dumps({'success': 'true'})
+            return json.dumps({'success': 'false'})
         else:
             return {}

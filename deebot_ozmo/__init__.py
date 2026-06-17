@@ -44,7 +44,7 @@ class DeebotOzmo(SmartPlugin):
     """
 
     # (must match the version specified in plugin.yaml)
-    PLUGIN_VERSION = "1.7.2"
+    PLUGIN_VERSION = '1.7.2'
 
     # ----------------------------------------------------
     #    SmartHomeNG plugin methods
@@ -57,62 +57,62 @@ class DeebotOzmo(SmartPlugin):
         # Call init code of parent class (SmartPlugin)
         super().__init__()
 
-        self.logger.debug("Init method called")
+        self.logger.debug('Init method called')
         self._items = []
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
-        self._account = self.get_parameter_value("account")
-        self._password = EcoVacsAPI.md5(self.get_parameter_value("password"))
-        self._wanted_device = self.get_parameter_value("device")
+        self._account = self.get_parameter_value('account')
+        self._password = EcoVacsAPI.md5(self.get_parameter_value('password'))
+        self._wanted_device = self.get_parameter_value('device')
 
         self.mybot = {
-            "nick": None,
-            "did": None,
-            "country": self.get_parameter_value("country").lower(),
-            "continent": self.get_parameter_value("continent").lower(),
-            "model": None,
-            "iconURL": None,
-            "live_map": None,
-            "last_clean_logs": [],
-            "last_clean_map": None,
-            "available": False,
-            "battery_level": 0,
-            "state": None,
-            "state_text": None,
-            "fan_speed": None,
-            "water_level": None,
-            "components": [],
-            "rooms": [],
+            'nick': None,
+            'did': None,
+            'country': self.get_parameter_value('country').lower(),
+            'continent': self.get_parameter_value('continent').lower(),
+            'model': None,
+            'iconURL': None,
+            'live_map': None,
+            'last_clean_logs': [],
+            'last_clean_map': None,
+            'available': False,
+            'battery_level': 0,
+            'state': None,
+            'state_text': None,
+            'fan_speed': None,
+            'water_level': None,
+            'components': [],
+            'rooms': [],
         }
 
         # Check if country and continent defined, if not try to autolocate
         http = Http()
-        if not self.mybot["country"] or not self.mybot["continent"]:
-            _locate = http.get_json("http://ip-api.com/json?fields=continentCode,countryCode")
-        if not self.mybot["country"]:
-            if _locate and _locate["countryCode"]:
-                self.logger.info(f"Autodetected country: {_locate['countryCode']}")
-                self._update_items("country", _locate["countryCode"].lower())
+        if not self.mybot['country'] or not self.mybot['continent']:
+            _locate = http.get_json('http://ip-api.com/json?fields=continentCode,countryCode')
+        if not self.mybot['country']:
+            if _locate and _locate['countryCode']:
+                self.logger.info(f'Autodetected country: {_locate["countryCode"]}')
+                self._update_items('country', _locate['countryCode'].lower())
             else:
                 self.logger.error(
-                    "No country defined and autolocate not possible, please specify country in plugin configuration !"
+                    'No country defined and autolocate not possible, please specify country in plugin configuration !'
                 )
                 self._init_complete = False
                 return
 
-        if not self.mybot["continent"]:
-            if _locate and _locate["continentCode"]:
-                self.logger.info(f"Autodetected continent: {_locate['continentCode']}")
-                self._update_items("continent", _locate["continentCode"].lower())
+        if not self.mybot['continent']:
+            if _locate and _locate['continentCode']:
+                self.logger.info(f'Autodetected continent: {_locate["continentCode"]}')
+                self._update_items('continent', _locate['continentCode'].lower())
             else:
                 self.logger.error(
-                    "No continent defined and autolocate not possible, please specify continent in plugin configuration !"
+                    'No continent defined and autolocate not possible, please specify continent in plugin configuration !'
                 )
                 self._init_complete = False
                 return
 
         self.device = None
-        self._device_id = "".join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
-        self._cycle = self.get_parameter_value("interval")
+        self._device_id = ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(16))
+        self._cycle = self.get_parameter_value('interval')
         self._items = {}
 
         if not self.init_webinterface():
@@ -124,43 +124,43 @@ class DeebotOzmo(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
         self.alive = True
-        self.scheduler_add("poll_device", self.poll_device, cycle=5)
+        self.scheduler_add('poll_device', self.poll_device, cycle=5)
 
         # Connect to API
         self.api = EcoVacsAPI(
-            self._device_id, self._account, self._password, self.mybot["country"], self.mybot["continent"]
+            self._device_id, self._account, self._password, self.mybot['country'], self.mybot['continent']
         )
 
         # Find wanted device, use first device if none specified
         self.devices = self.api.devices()
         for device in self.devices:
-            if not device["nick"]:
-                device["nick"] = device["did"]
-            self.logger.info(f"Found device {device['nick']} with ID {device['did']}")
-            if device["nick"].lower() == self._wanted_device.lower():
-                self.logger.info(f"Using wanted device {device['nick']} for this instance !")
+            if not device['nick']:
+                device['nick'] = device['did']
+            self.logger.info(f'Found device {device["nick"]} with ID {device["did"]}')
+            if device['nick'].lower() == self._wanted_device.lower():
+                self.logger.info(f'Using wanted device {device["nick"]} for this instance !')
                 self.device = device
                 break
 
         if not self.device:
             self.device = self.devices[0]
-            if not self.device["nick"]:
-                self.device["nick"] = self.device["did"]
-            self.logger.info(f"Using device {device['nick']} for this instance !")
+            if not self.device['nick']:
+                self.device['nick'] = self.device['did']
+            self.logger.info(f'Using device {device["nick"]} for this instance !')
         self.logger.debug(self.device)
 
-        self._update_items("nick", self.device["nick"])
-        self._update_items("did", self.device["did"])
+        self._update_items('nick', self.device['nick'])
+        self._update_items('did', self.device['did'])
 
         self.vacbot = VacBot(
             self.api.uid,
             self.api.resource,
             self.api.user_access_token,
             self.device,
-            self.mybot["country"],
-            self.mybot["continent"],
+            self.mybot['country'],
+            self.mybot['continent'],
             live_map_enabled=True,
             show_rooms_color=True,
             verify_ssl=True,
@@ -175,7 +175,7 @@ class DeebotOzmo(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.alive = False
 
     def parse_item(self, item):
@@ -183,9 +183,9 @@ class DeebotOzmo(SmartPlugin):
         Parse items into internal array on plugin startup
         """
 
-        if self.has_iattr(item.conf, "deebot_ozmo"):
+        if self.has_iattr(item.conf, 'deebot_ozmo'):
             # self.logger.debug(f"parse item: {item.property.path}")
-            _item = self.get_iattr_value(item.conf, "deebot_ozmo")
+            _item = self.get_iattr_value(item.conf, 'deebot_ozmo')
             # Add items to internal array
             if _item not in self._items:
                 self._items[_item] = []
@@ -196,7 +196,7 @@ class DeebotOzmo(SmartPlugin):
         """
         Default plugin parse_logic method
         """
-        if "xxx" in logic.conf:
+        if 'xxx' in logic.conf:
             # self.function(logic['name'])
             pass
 
@@ -210,27 +210,27 @@ class DeebotOzmo(SmartPlugin):
         :param dest: if given it represents the dest
         """
         if self.alive and caller != self.get_shortname():
-            if self.has_iattr(item.conf, "deebot_ozmo") and item():
-                _cmd = self.get_iattr_value(item.conf, "deebot_ozmo")
-                self.logger.debug(f"Command: {_cmd}")
+            if self.has_iattr(item.conf, 'deebot_ozmo') and item():
+                _cmd = self.get_iattr_value(item.conf, 'deebot_ozmo')
+                self.logger.debug(f'Command: {_cmd}')
                 item(False, self.get_shortname())
-                if _cmd == "cmd_clean":
-                    self.logger.info("Start cleaning")
+                if _cmd == 'cmd_clean':
+                    self.logger.info('Start cleaning')
                     self.clean()
-                elif _cmd == "cmd_pause":
-                    self.logger.info("Pause cleaning")
+                elif _cmd == 'cmd_pause':
+                    self.logger.info('Pause cleaning')
                     self.pause()
-                elif _cmd == "cmd_stop":
-                    self.logger.info("Stop cleaning")
+                elif _cmd == 'cmd_stop':
+                    self.logger.info('Stop cleaning')
                     self.stop()
-                elif _cmd == "cmd_charge":
-                    self.logger.info("Returning to charging station")
+                elif _cmd == 'cmd_charge':
+                    self.logger.info('Returning to charging station')
                     self.charge()
-                elif _cmd == "cmd_locate":
-                    self.logger.info("Locating device")
+                elif _cmd == 'cmd_locate':
+                    self.logger.info('Locating device')
                     self.locate()
                 else:
-                    self.logger.warning(f"Unknown command {_cmd}")
+                    self.logger.warning(f'Unknown command {_cmd}')
 
     def init_webinterface(self):
         """ "
@@ -239,26 +239,24 @@ class DeebotOzmo(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
-            self.logger.error("Not initializing the web interface")
+            self.logger.error('Not initializing the web interface')
             return False
 
         import sys
 
-        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
-            self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
+        if 'SmartPluginWebIf' not in list(sys.modules['lib.model.smartplugin'].__dict__):
+            self.logger.warning('Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface')
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
+        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            "/": {
-                "tools.staticdir.root": webif_dir,
-            },
-            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
         # Register the web interface as a cherrypy app
@@ -268,7 +266,7 @@ class DeebotOzmo(SmartPlugin):
             config,
             self.get_classname(),
             self.get_instance_name(),
-            description="",
+            description='',
         )
 
         return True
@@ -325,10 +323,10 @@ class DeebotOzmo(SmartPlugin):
         """
         try:
             _speed = FAN_SPEED_TO_ECOVACS[speed]
-            self.logger.debug(f"Changing fan speed to {speed} - {_speed}")
+            self.logger.debug(f'Changing fan speed to {speed} - {_speed}')
             self.vacbot.SetFanSpeed(speed)
         except KeyError:
-            self.logger.warning(f"Unknown speed {speed}")
+            self.logger.warning(f'Unknown speed {speed}')
             return False
         return True
 
@@ -338,10 +336,10 @@ class DeebotOzmo(SmartPlugin):
         """
         try:
             _level = WATER_LEVEL_TO_ECOVACS[level]
-            self.logger.debug(f"Changing water level to {level} - {_level}")
+            self.logger.debug(f'Changing water level to {level} - {_level}')
             self.vacbot.SetWaterLevel(level)
         except KeyError:
-            self.logger.warning(f"Unknown water level {level}")
+            self.logger.warning(f'Unknown water level {level}')
             return False
         return True
 
@@ -359,11 +357,11 @@ class DeebotOzmo(SmartPlugin):
     def getIotProduct(self):
         iotproducts = self.api.getiotProducts()
         for iotProduct in iotproducts:
-            if self.device["class"] in iotProduct["classid"]:
-                if "product" in iotProduct and "name" in iotProduct["product"]:
-                    self._update_items("model", iotProduct["product"]["name"])
-                if "product" in iotProduct and "iconUrl" in iotProduct["product"]:
-                    self._update_items("iconURL", iotProduct["product"]["iconUrl"])
+            if self.device['class'] in iotProduct['classid']:
+                if 'product' in iotProduct and 'name' in iotProduct['product']:
+                    self._update_items('model', iotProduct['product']['name'])
+                if 'product' in iotProduct and 'iconUrl' in iotProduct['product']:
+                    self._update_items('iconURL', iotProduct['product']['iconUrl'])
                 return iotProduct
         return None
 
@@ -371,26 +369,26 @@ class DeebotOzmo(SmartPlugin):
         """
         Polls for updates of the device
         """
-        self._update_items("available", self.vacbot.is_available)
-        self._update_items("state", self.vacbot.vacuum_status)
-        self._update_items("state_text", self.translate(self.vacbot.vacuum_status))
-        self._update_items("battery_level", self.vacbot.battery_status)
-        self._update_items("fan_speed", self.vacbot.fan_speed)
-        self._update_items("fan_speed_text", self.translate(self.vacbot.fan_speed))
-        self._update_items("water_level", self.vacbot.water_level)
-        self._update_items("water_level_text", self.translate(self.vacbot.water_level))
-        self._update_items("rooms", self.vacbot.getSavedRooms())
-        self._update_items("last_clean_logs", self.vacbot.lastCleanLogs)
-        self._update_items("last_clean_map", self.vacbot.last_clean_image)
+        self._update_items('available', self.vacbot.is_available)
+        self._update_items('state', self.vacbot.vacuum_status)
+        self._update_items('state_text', self.translate(self.vacbot.vacuum_status))
+        self._update_items('battery_level', self.vacbot.battery_status)
+        self._update_items('fan_speed', self.vacbot.fan_speed)
+        self._update_items('fan_speed_text', self.translate(self.vacbot.fan_speed))
+        self._update_items('water_level', self.vacbot.water_level)
+        self._update_items('water_level_text', self.translate(self.vacbot.water_level))
+        self._update_items('rooms', self.vacbot.getSavedRooms())
+        self._update_items('last_clean_logs', self.vacbot.lastCleanLogs)
+        self._update_items('last_clean_map', self.vacbot.last_clean_image)
 
         if self.vacbot.live_map:
-            self._update_items("live_map", self.vacbot.live_map.decode("utf-8"))
+            self._update_items('live_map', self.vacbot.live_map.decode('utf-8'))
 
         # Update components lifespan if available
         try:
-            self._update_items("components", self.vacbot.components)
-            self._update_items("brush", round(self.vacbot.components["brush"]))
-            self._update_items("sideBrush", round(self.vacbot.components["sideBrush"]))
-            self._update_items("filter", round(self.vacbot.components["heap"]))
+            self._update_items('components', self.vacbot.components)
+            self._update_items('brush', round(self.vacbot.components['brush']))
+            self._update_items('sideBrush', round(self.vacbot.components['sideBrush']))
+            self._update_items('filter', round(self.vacbot.components['heap']))
         except KeyError:
             pass

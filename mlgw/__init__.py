@@ -46,7 +46,7 @@ loglevel_senttelegrams = logging.INFO  # INFO
 def _hexbyte(byte):
     resultstr = hex(byte)
     if byte < 16:
-        resultstr = resultstr[:2] + "0" + resultstr[2]
+        resultstr = resultstr[:2] + '0' + resultstr[2]
     return resultstr
 
 
@@ -81,25 +81,25 @@ reverse_mlndict = {}
 
 payloadtypedict = dict(
     [
-        (0x01, "Beo4 Command"),
-        (0x02, "Source Status"),
-        (0x03, "Pict&Snd Status"),
-        (0x04, "Light and Control command"),
-        (0x05, "All standby notification"),
-        (0x06, "BeoRemote One control command"),
-        (0x07, "BeoRemote One source selection"),
-        (0x20, "MLGW virtual button event"),
-        (0x30, "Login request"),
-        (0x31, "Login status"),
-        (0x32, "Change password request"),
-        (0x33, "Change password response"),
-        (0x34, "Secure login request"),
-        (0x36, "Ping"),
-        (0x37, "Pong"),
-        (0x38, "Configuration change notification"),
-        (0x39, "Request Serial Number"),
-        (0x3A, "Serial Number"),
-        (0x40, "Location based event"),
+        (0x01, 'Beo4 Command'),
+        (0x02, 'Source Status'),
+        (0x03, 'Pict&Snd Status'),
+        (0x04, 'Light and Control command'),
+        (0x05, 'All standby notification'),
+        (0x06, 'BeoRemote One control command'),
+        (0x07, 'BeoRemote One source selection'),
+        (0x20, 'MLGW virtual button event'),
+        (0x30, 'Login request'),
+        (0x31, 'Login status'),
+        (0x32, 'Change password request'),
+        (0x33, 'Change password response'),
+        (0x34, 'Secure login request'),
+        (0x36, 'Ping'),
+        (0x37, 'Pong'),
+        (0x38, 'Configuration change notification'),
+        (0x39, 'Request Serial Number'),
+        (0x3A, 'Serial Number'),
+        (0x40, 'Location based event'),
     ]
 )
 
@@ -117,74 +117,74 @@ payloadtypedict = dict(
 beo4commanddict = dict(
     [
         # Source selection:
-        (0x0C, "Standby"),
-        (0x47, "Sleep"),
-        (0x80, "TV"),
-        (0x81, "Radio"),
-        (0x82, "DTV2"),
-        (0x83, "Aux_A"),
-        (0x85, "V.Mem"),
-        (0x86, "DVD"),
-        (0x87, "Camera"),
-        (0x88, "Text"),
-        (0x8A, "DTV"),
-        (0x8B, "PC"),
-        (0x0D, "Doorcam"),
-        (0x91, "A.Mem"),
-        (0x92, "CD"),
-        (0x93, "N.Radio"),
-        (0x94, "N.Music"),
-        (0x97, "CD2"),
+        (0x0C, 'Standby'),
+        (0x47, 'Sleep'),
+        (0x80, 'TV'),
+        (0x81, 'Radio'),
+        (0x82, 'DTV2'),
+        (0x83, 'Aux_A'),
+        (0x85, 'V.Mem'),
+        (0x86, 'DVD'),
+        (0x87, 'Camera'),
+        (0x88, 'Text'),
+        (0x8A, 'DTV'),
+        (0x8B, 'PC'),
+        (0x0D, 'Doorcam'),
+        (0x91, 'A.Mem'),
+        (0x92, 'CD'),
+        (0x93, 'N.Radio'),
+        (0x94, 'N.Music'),
+        (0x97, 'CD2'),
         # Digits:
-        (0x00, "Digit-0"),
-        (0x01, "Digit-1"),
-        (0x02, "Digit-2"),
-        (0x03, "Digit-3"),
-        (0x04, "Digit-4"),
-        (0x05, "Digit-5"),
-        (0x06, "Digit-6"),
-        (0x07, "Digit-7"),
-        (0x08, "Digit-8"),
-        (0x09, "Digit-9"),
+        (0x00, 'Digit-0'),
+        (0x01, 'Digit-1'),
+        (0x02, 'Digit-2'),
+        (0x03, 'Digit-3'),
+        (0x04, 'Digit-4'),
+        (0x05, 'Digit-5'),
+        (0x06, 'Digit-6'),
+        (0x07, 'Digit-7'),
+        (0x08, 'Digit-8'),
+        (0x09, 'Digit-9'),
         # Source control:
-        (0x1E, "STEP_UP"),
-        (0x1F, "STEP_DW"),
-        (0x32, "REWIND"),
-        (0x33, "RETURN"),
-        (0x34, "WIND"),
-        (0x35, "Go / Play"),
-        (0x36, "Stop"),
-        (0xD4, "Yellow"),
-        (0xD5, "Green"),
-        (0xD8, "Blue"),
-        (0xD9, "Red"),
+        (0x1E, 'STEP_UP'),
+        (0x1F, 'STEP_DW'),
+        (0x32, 'REWIND'),
+        (0x33, 'RETURN'),
+        (0x34, 'WIND'),
+        (0x35, 'Go / Play'),
+        (0x36, 'Stop'),
+        (0xD4, 'Yellow'),
+        (0xD5, 'Green'),
+        (0xD8, 'Blue'),
+        (0xD9, 'Red'),
         # Sound and picture control:
-        (0x0D, "Mute"),
-        (0x1C, "P.Mute"),
-        (0x2A, "Format"),
-        (0x44, "Sound / Speaker"),
-        (0x5C, "Menu"),
-        (0x60, "Volume UP"),
-        (0x64, "Volume DOWN"),
-        (0xDA, "Cinema_On"),
-        (0xDB, "Cinema_Off"),
+        (0x0D, 'Mute'),
+        (0x1C, 'P.Mute'),
+        (0x2A, 'Format'),
+        (0x44, 'Sound / Speaker'),
+        (0x5C, 'Menu'),
+        (0x60, 'Volume UP'),
+        (0x64, 'Volume DOWN'),
+        (0xDA, 'Cinema_On'),
+        (0xDB, 'Cinema_Off'),
         # Other controls:
-        (0x14, "BACK"),
-        (0x7F, "Exit"),
+        (0x14, 'BACK'),
+        (0x7F, 'Exit'),
         # Continue functionality:
-        (0x7E, "Key Release"),
+        (0x7E, 'Key Release'),
         # Functions:
         # Cursor functions:
-        (0x13, "SELECT"),
-        (0xCA, "Cursor_Up"),
-        (0xCB, "Cursor_Down"),
-        (0xCC, "Cursor_Left"),
-        (0xCD, "Cursor_Right"),
+        (0x13, 'SELECT'),
+        (0xCA, 'Cursor_Up'),
+        (0xCB, 'Cursor_Down'),
+        (0xCC, 'Cursor_Left'),
+        (0xCD, 'Cursor_Right'),
         #
-        (0x9B, "Light"),
-        (0x9C, "Command"),
+        (0x9B, 'Light'),
+        (0x9C, 'Command'),
         #  Dummy for 'Listen for all commands'
-        (0xFF, "<all>"),
+        (0xFF, '<all>'),
     ]
 )
 
@@ -194,15 +194,15 @@ reverse_beo4commanddict = {}
 
 selectedsourcedict = dict(
     [
-        (0x0B, "TV"),
-        (0x15, "V.Mem"),
-        (0x1F, "DTV"),
-        (0x29, "DVD"),
-        (0x6F, "Radio"),
-        (0x79, "A.Mem"),
-        (0x8D, "CD"),
+        (0x0B, 'TV'),
+        (0x15, 'V.Mem'),
+        (0x1F, 'DTV'),
+        (0x29, 'DVD'),
+        (0x6F, 'Radio'),
+        (0x79, 'A.Mem'),
+        (0x8D, 'CD'),
         #  Dummy for 'Listen for all sources'
-        (0xFE, "<all>"),
+        (0xFE, '<all>'),
     ]
 )
 
@@ -210,67 +210,67 @@ reverse_selectedsourcedict = {}
 
 sourceactivitydict = dict(
     [
-        (0x00, "Unknown"),
-        (0x01, "Stop"),
-        (0x02, "Playing"),
-        (0x03, "Wind"),
-        (0x04, "Rewind"),
-        (0x05, "Record lock"),
-        (0x06, "Standby"),
+        (0x00, 'Unknown'),
+        (0x01, 'Stop'),
+        (0x02, 'Playing'),
+        (0x03, 'Wind'),
+        (0x04, 'Rewind'),
+        (0x05, 'Record lock'),
+        (0x06, 'Standby'),
     ]
 )
 
 pictureformatdict = dict(
     [
-        (0x00, "Not known"),
-        (0x01, "Known by decoder"),
-        (0x02, "4:3"),
-        (0x03, "16:9"),
-        (0x04, "4:3 Letterbox middle"),
-        (0x05, "4:3 Letterbox top"),
-        (0x06, "4:3 Letterbox bottom"),
-        (0xFF, "Blank picture"),
+        (0x00, 'Not known'),
+        (0x01, 'Known by decoder'),
+        (0x02, '4:3'),
+        (0x03, '16:9'),
+        (0x04, '4:3 Letterbox middle'),
+        (0x05, '4:3 Letterbox top'),
+        (0x06, '4:3 Letterbox bottom'),
+        (0xFF, 'Blank picture'),
     ]
 )
 
 
 ### for '0x03: Picture and Sound Status'
 
-soundstatusdict = dict([(0x00, "Not muted"), (0x01, "Muted")])
+soundstatusdict = dict([(0x00, 'Not muted'), (0x01, 'Muted')])
 
 speakermodedict = dict(
     [
-        (0x01, "Center channel"),
-        (0x02, "2ch stereo"),
-        (0x03, "Front surround"),
-        (0x04, "4ch stereo"),
-        (0x05, "Full surround"),
+        (0x01, 'Center channel'),
+        (0x02, '2ch stereo'),
+        (0x03, 'Front surround'),
+        (0x04, '4ch stereo'),
+        (0x05, 'Full surround'),
         #  Dummy for 'Listen for all modes'
-        (0xFD, "<all>"),
+        (0xFD, '<all>'),
     ]
 )
 
 reverse_speakermodedict = {}
 
-screenmutedict = dict([(0x00, "not muted"), (0x01, "muted")])
+screenmutedict = dict([(0x00, 'not muted'), (0x01, 'muted')])
 
 # screenactivedict = dict( [
 #    (0x00, "not active"), (0x01, "active")
 #    ] )
 
-cinemamodedict = dict([(0x00, "Cinemamode=off"), (0x01, "Cinemamode=on")])
+cinemamodedict = dict([(0x00, 'Cinemamode=off'), (0x01, 'Cinemamode=on')])
 
-stereoindicatordict = dict([(0x00, "Mono"), (0x01, "Stereo")])
+stereoindicatordict = dict([(0x00, 'Mono'), (0x01, 'Stereo')])
 
 
 ### for '0x04: Light and Control command'
 
-lctypedict = dict([(0x01, "LIGHT"), (0x02, "CONTROL")])
+lctypedict = dict([(0x01, 'LIGHT'), (0x02, 'CONTROL')])
 
 
 ### for '0x31: Login Status
 
-loginstatusdict = dict([(0x00, "OK"), (0x01, "FAIL")])
+loginstatusdict = dict([(0x00, 'OK'), (0x01, 'FAIL')])
 
 
 # ########################################################################################
@@ -282,42 +282,42 @@ loginstatusdict = dict([(0x00, "OK"), (0x01, "FAIL")])
 def _getpayloadtypestr(payloadtype):
     result = payloadtypedict.get(payloadtype)
     if result is None:
-        result = "UNKNOWN (type=" + _hexbyte(payloadtype) + ")"
+        result = 'UNKNOWN (type=' + _hexbyte(payloadtype) + ')'
     return result
 
 
 def _getraumstr(raum):
     result = roomdict.get(raum)
     if result is None:
-        result = "Room=" + str(raum)
+        result = 'Room=' + str(raum)
     return result
 
 
 def _getmlnstr(mln):
     result = mlndict.get(mln)
     if result is None:
-        result = "MLN=" + str(mln)
+        result = 'MLN=' + str(mln)
     return result
 
 
 def _getbeo4commandstr(command):
     result = beo4commanddict.get(command)
     if result is None:
-        result = "Cmd=" + _hexbyte(command)
+        result = 'Cmd=' + _hexbyte(command)
     return result
 
 
 def _getselectedsourcestr(source):
     result = selectedsourcedict.get(source)
     if result is None:
-        result = "Src=" + _hexbyte(source)
+        result = 'Src=' + _hexbyte(source)
     return result
 
 
 def _getspeakermodestr(source):
     result = speakermodedict.get(source)
     if result is None:
-        result = "mode=" + _hexbyte(source)
+        result = 'mode=' + _hexbyte(source)
     return result
 
 
@@ -339,38 +339,38 @@ def _getdictstr(mydict, mykey):
 #
 def _getpayloadstr(message):
     if message[2] == 0:  # payload length is 0
-        resultstr = "[No payload]"
+        resultstr = '[No payload]'
     elif message[1] == 0x01:  # Beo4 Command
         resultstr = _getmlnstr(message[4])
-        resultstr = resultstr + " " + _hexbyte(message[5])
-        resultstr = resultstr + " " + _getbeo4commandstr(message[6])
+        resultstr = resultstr + ' ' + _hexbyte(message[5])
+        resultstr = resultstr + ' ' + _getbeo4commandstr(message[6])
 
     elif message[1] == 0x02:  # Source Status
         resultstr = _getmlnstr(message[4])
-        resultstr = resultstr + " " + _getselectedsourcestr(message[5])
-        resultstr = resultstr + " " + _hexword(message[6], message[7])
-        resultstr = resultstr + " " + _hexword(message[8], message[9])
-        resultstr = resultstr + " " + _getdictstr(sourceactivitydict, message[10])
-        resultstr = resultstr + " " + _getdictstr(pictureformatdict, message[11])
+        resultstr = resultstr + ' ' + _getselectedsourcestr(message[5])
+        resultstr = resultstr + ' ' + _hexword(message[6], message[7])
+        resultstr = resultstr + ' ' + _hexword(message[8], message[9])
+        resultstr = resultstr + ' ' + _getdictstr(sourceactivitydict, message[10])
+        resultstr = resultstr + ' ' + _getdictstr(pictureformatdict, message[11])
 
     elif message[1] == 0x03:  # Picture and Sound Status
         resultstr = _getmlnstr(message[4])
         if message[5] != 0x00:
-            resultstr = resultstr + " " + _getdictstr(soundstatusdict, message[5])
-        resultstr = resultstr + " " + _getdictstr(speakermodedict, message[6])
-        resultstr = resultstr + " Vol=" + str(message[7])
+            resultstr = resultstr + ' ' + _getdictstr(soundstatusdict, message[5])
+        resultstr = resultstr + ' ' + _getdictstr(speakermodedict, message[6])
+        resultstr = resultstr + ' Vol=' + str(message[7])
         if message[9] != 0x00:
-            resultstr = resultstr + " Scrn:" + _getdictstr(screenmutedict, message[8])
+            resultstr = resultstr + ' Scrn:' + _getdictstr(screenmutedict, message[8])
         if message[11] != 0x00:
-            resultstr = resultstr + " Scrn2:" + _getdictstr(screenmutedict, message[10])
+            resultstr = resultstr + ' Scrn2:' + _getdictstr(screenmutedict, message[10])
         if message[12] != 0x00:
-            resultstr = resultstr + " " + _getdictstr(cinemamodedict, message[12])
+            resultstr = resultstr + ' ' + _getdictstr(cinemamodedict, message[12])
         if message[13] != 0x01:
-            resultstr = resultstr + " " + _getdictstr(stereoindicatordict, message[13])
+            resultstr = resultstr + ' ' + _getdictstr(stereoindicatordict, message[13])
 
     elif message[1] == 0x04:  # Light and Control command
         resultstr = (
-            _getraumstr(message[4]) + " " + _getdictstr(lctypedict, message[5]) + " " + _getbeo4commandstr(message[6])
+            _getraumstr(message[4]) + ' ' + _getdictstr(lctypedict, message[5]) + ' ' + _getbeo4commandstr(message[6])
         )
 
     elif message[1] == 0x30:  # Login request
@@ -378,20 +378,20 @@ def _getpayloadstr(message):
         for i in range(0, message[2]):
             if wrk[i] == 0:
                 wrk[i] = 0x7F
-        wrk = wrk.decode("utf-8")
-        resultstr = wrk.split(chr(0x7F))[0] + " / " + wrk.split(chr(0x7F))[1]
+        wrk = wrk.decode('utf-8')
+        resultstr = wrk.split(chr(0x7F))[0] + ' / ' + wrk.split(chr(0x7F))[1]
 
     elif message[1] == 0x31:  # Login status
         resultstr = _getdictstr(loginstatusdict, message[4])
 
     elif message[1] == 0x3A:  # Serial Number
-        resultstr = message[4 : 4 + message[2]].decode("utf-8")
+        resultstr = message[4 : 4 + message[2]].decode('utf-8')
 
     else:  # Display raw payload
-        resultstr = ""
+        resultstr = ''
         for i in range(0, message[2]):
             if i > 0:
-                resultstr = resultstr + " "
+                resultstr = resultstr + ' '
             resultstr = resultstr + _hexbyte(message[4 + i])
     return resultstr
 
@@ -412,7 +412,7 @@ class mlgwBase:
         global reverse_selectedsourcedict
         global reverse_speakermodedict
 
-        self._host = ""
+        self._host = ''
         self._tcpip = None
         self._port = None
         self.buffersize = 1024
@@ -422,12 +422,12 @@ class mlgwBase:
         reverse_beo4commanddict = {v.upper(): k for k, v in beo4commanddict.items()}
         reverse_selectedsourcedict = {v.upper(): k for k, v in selectedsourcedict.items()}
         reverse_speakermodedict = {v.upper(): k for k, v in speakermodedict.items()}
-        self.logger.info("beo4commanddict=" + str(beo4commanddict))
-        self.logger.info("reverse_beo4commanddict=" + str(reverse_beo4commanddict))
-        self.logger.info("selectedsourcedict=" + str(selectedsourcedict))
-        self.logger.info("reverse_selectedsourcedict=" + str(reverse_selectedsourcedict))
-        self.logger.info("speakermodedict=" + str(speakermodedict))
-        self.logger.info("reverse_speakermodedict=" + str(reverse_speakermodedict))
+        self.logger.info('beo4commanddict=' + str(beo4commanddict))
+        self.logger.info('reverse_beo4commanddict=' + str(reverse_beo4commanddict))
+        self.logger.info('selectedsourcedict=' + str(selectedsourcedict))
+        self.logger.info('reverse_selectedsourcedict=' + str(reverse_selectedsourcedict))
+        self.logger.info('speakermodedict=' + str(speakermodedict))
+        self.logger.info('reverse_speakermodedict=' + str(reverse_speakermodedict))
 
     ## Open tcp connection to mlgw
     #  @param self      The object pointer.
@@ -451,14 +451,14 @@ class mlgwBase:
         try:
             self._mysocket.connect((self._tcpip, self._port))
         except Exception as e:
-            self.logger.error("Error opening connection to %s: %s" % (self._tcpip, e))
+            self.logger.error('Error opening connection to %s: %s' % (self._tcpip, e))
             return
         if self._tcpip != host:
             self.logger.info(
-                "Opened connection to ML Gateway '" + host + "' on IP " + self._tcpip + ":" + str(self._port)
+                "Opened connection to ML Gateway '" + host + "' on IP " + self._tcpip + ':' + str(self._port)
             )
         else:
-            self.logger.info("Opened connection to ML Gateway on IP " + self._tcpip + ":" + str(self._port))
+            self.logger.info('Opened connection to ML Gateway on IP ' + self._tcpip + ':' + str(self._port))
         self.connected = 1
         return
 
@@ -470,7 +470,7 @@ class mlgwBase:
             return
         self.connected = 0
         self._mysocket.close()
-        self.logger.info("Closed connection to ML Gateway")
+        self.logger.info('Closed connection to ML Gateway')
         return
 
     ## Send command to mlgw
@@ -496,7 +496,7 @@ class mlgwBase:
             else:
                 loglevel = loglevel_senttelegrams
             self.logger.log(
-                loglevel, ">SENT: " + _getpayloadtypestr(type) + ": " + _getpayloadstr(self._telegram)
+                loglevel, '>SENT: ' + _getpayloadtypestr(type) + ': ' + _getpayloadstr(self._telegram)
             )  # debug
         return
 
@@ -525,15 +525,15 @@ class mlgwBase:
         try:
             self._mlgwdata = self._mysocket.recv(self.buffersize)
         except KeyboardInterrupt:
-            self.logger.error("KeyboardInterrupt, terminating...")
+            self.logger.error('KeyboardInterrupt, terminating...')
             self.CloseConnection()
             sys.exit(1)
 
         self._payloadstr = _getpayloadstr(self._mlgwdata)
         if self._mlgwdata[0] != 0x01:
-            self.logger.error("Received telegram with SOH byte <> 0x01")
+            self.logger.error('Received telegram with SOH byte <> 0x01')
         if self._mlgwdata[3] != 0x00:
-            self.logger.error("Received telegram with spare byte <> 0x00")
+            self.logger.error('Received telegram with spare byte <> 0x00')
         if self.telegramlogging:
             loglevel = loglevel_receivedtelegrams
             if self._mlgwdata[1] == 0x37:
@@ -550,9 +550,9 @@ class mlgwBase:
         if self.connected == 0:
             return
         # Request serial number
-        self.SendCommand(0x39, "")
+        self.SendCommand(0x39, '')
         (result, self._serial) = self.ReceiveCommand()
-        self.logger.warning("Serial number of ML Gateway is " + self._serial)  # info
+        self.logger.warning('Serial number of ML Gateway is ' + self._serial)  # info
         return
 
     ## Test and login if nessary
@@ -564,23 +564,23 @@ class mlgwBase:
         if self.connected == 0:
             return
         # send Ping
-        self.SendCommand(0x36, "")
+        self.SendCommand(0x36, '')
         (result, self.wrkstr) = self.ReceiveCommand()
         if result == 0x31:
-            self.logger.info("Login required for this ML Gateway")
+            self.logger.info('Login required for this ML Gateway')
             self._wrkstr = username + chr(0x00) + password
             self._payload = bytearray()
             for i in range(0, len(self._wrkstr)):
                 self._payload.append(ord(self._wrkstr[i]))
             self.SendCommand(0x30, self._payload)  # Login Request
             (result, self._wrkstr) = self.ReceiveCommand()
-            if self._wrkstr == "FAIL":
-                self.logger.error("Login not successful, user / password combination is not valid!")
+            if self._wrkstr == 'FAIL':
+                self.logger.error('Login not successful, user / password combination is not valid!')
                 self.CloseConnection()
             else:
-                self.logger.info("Login successful, connection established")
+                self.logger.info('Login successful, connection established')
         else:
-            self.logger.info("Connection established")
+            self.logger.info('Connection established')
         return
 
 
@@ -602,7 +602,7 @@ class mlgwlistener(threading.Thread):
     def __init__(self, mymlgwbase):
         self.logger = logging.getLogger(__name__)
         self._mythread = threading.Thread.__init__(self)
-        self.name = "mlgwListener"
+        self.name = 'mlgwListener'
         self._mlgwbase = mymlgwbase
         self._mlgwbase._mysocket.settimeout(5)
 
@@ -613,7 +613,7 @@ class mlgwlistener(threading.Thread):
         if self._mlgwbase.connected == 0:
             return
 
-        self.logger.debug("Listener Started")
+        self.logger.debug('Listener Started')
         timeoutcount = 0
         while self._mlgwbase.connected:
             try:
@@ -626,9 +626,9 @@ class mlgwlistener(threading.Thread):
                 timeoutcount = 0
                 self._payloadstr = _getpayloadstr(self._mlgwdata)
                 if self._mlgwdata[0] != 0x01:
-                    self.logger.error("Received telegram with SOH byte <> 0x01")
+                    self.logger.error('Received telegram with SOH byte <> 0x01')
                 if self._mlgwdata[3] != 0x00:
-                    self.logger.error("Received telegram with spare byte <> 0x00")
+                    self.logger.error('Received telegram with spare byte <> 0x00')
                 if self._mlgwbase.telegramlogging:
                     if self._mlgwdata[1] == 0x37:
                         loglevel = loglevel_keepalivetelegrams
@@ -639,7 +639,7 @@ class mlgwlistener(threading.Thread):
                     #                    self.logger.log(logging.WARNING, "loglevel="+str(loglevel)+", log_telegrams="+str(log_telegrams))
                     if log_telegrams > 1:
                         self.logger.log(
-                            loglevel, "<RCVD: " + _getpayloadtypestr(self._mlgwdata[1]) + ": " + str(self._payloadstr)
+                            loglevel, '<RCVD: ' + _getpayloadtypestr(self._mlgwdata[1]) + ': ' + str(self._payloadstr)
                         )  # info
                 if (self._mlgwdata[0] == 0x01) and (self._mlgwdata[3] == 0x00) and (self._mlgwdata[1] != 0x37):
                     # process telegram
@@ -647,15 +647,15 @@ class mlgwlistener(threading.Thread):
                     if (not telegram_handled) and (log_telegrams >= 1):
                         self.logger.log(
                             loglevel,
-                            "UNHANDLED: " + _getpayloadtypestr(self._mlgwdata[1]) + ": " + str(self._payloadstr),
+                            'UNHANDLED: ' + _getpayloadtypestr(self._mlgwdata[1]) + ': ' + str(self._payloadstr),
                         )  # info
             if timeoutcount > 12:
-                self.logger.error("No answer received to mlgw-ping")
+                self.logger.error('No answer received to mlgw-ping')
             if timeoutcount > 11:
                 # send Ping (after 60 seconds of inactivity)
-                self._mlgwbase.SendCommand(0x36, "")
+                self._mlgwbase.SendCommand(0x36, '')
 
-        self.logger.debug("Listener Stopped")
+        self.logger.debug('Listener Stopped')
 
     ## Process incomming telegram
     #  @param self The object pointer.
@@ -675,13 +675,13 @@ class mlgwlistener(threading.Thread):
                 item = listenerlightdict.get(_hexword(self._mlgwdata[4], 255))
                 if item is not None:
                     #                    self.logger.warning('processtelegram: L&C telegram: room='+str(self._mlgwdata[4])+', LC=LIGHT, command='+cmd+', item='+str(item))
-                    item(cmd, "mlgw", "LIGHT <ALL>")
+                    item(cmd, 'mlgw', 'LIGHT <ALL>')
                     ishandled = True
                 # update item (return 1)
                 item = listenerlightdict.get(_hexword(self._mlgwdata[4], self._mlgwdata[6]))
                 if item is not None:
                     #                    self.logger.warning('processtelegram: L&C telegram: room='+str(self._mlgwdata[4])+', LC=LIGHT, command='+cmd+', item='+str(item))
-                    item(1, "mlgw", "LIGHT " + cmd)
+                    item(1, 'mlgw', 'LIGHT ' + cmd)
                     ishandled = True
 
             # CONTROL telegram
@@ -693,13 +693,13 @@ class mlgwlistener(threading.Thread):
                 item = listenercontroldict.get(_hexword(self._mlgwdata[4], 255))  # room
                 if item is not None:
                     #                    self.logger.warning('processtelegram: L&C telegram: room='+str(self._mlgwdata[4])+', LC=CONTROL, command='+cmd+', item='+str(item))
-                    item(cmd, "mlgw", "CONTROL <ALL>")
+                    item(cmd, 'mlgw', 'CONTROL <ALL>')
                     ishandled = True
                 # update item (return 1)
                 item = listenercontroldict.get(_hexword(self._mlgwdata[4], self._mlgwdata[6]))
                 if item is not None:
                     #                    self.logger.warning('processtelegram: L&C telegram: room='+str(self._mlgwdata[4])+', LC=CONTROL, command='+cmd+', item='+str(item))
-                    item(1, "mlgw", "CONTROL " + cmd)
+                    item(1, 'mlgw', 'CONTROL ' + cmd)
                     ishandled = True
 
         ##### SOURCE STATUS telegrams
@@ -709,13 +709,13 @@ class mlgwlistener(threading.Thread):
             item = listenersourcestatusdict.get(_hexword(self._mlgwdata[4], 254))  # mln
             if item is not None:
                 #                self.logger.warning('processtelegram: Source Status telegram: mln='+str(self._mlgwdata[4])+', source='+source+', item='+str(item))
-                item(source, "mlgw", "SOURCE STATUS <ALL>")
+                item(source, 'mlgw', 'SOURCE STATUS <ALL>')
                 ishandled = True
             # update item (return 1)
             item = listenersourcestatusdict.get(_hexword(self._mlgwdata[4], self._mlgwdata[5]))  # mln, source
             if item is not None:
                 #                self.logger.warning('processtelegram: Source Status telegram: mln='+str(self._mlgwdata[4])+', source='+source+', item='+str(item))
-                item(1, "mlgw", "SOURCE STATUS " + source)
+                item(1, 'mlgw', 'SOURCE STATUS ' + source)
                 ishandled = True
 
         ##### PICT&SND STATUS telegrams
@@ -725,13 +725,13 @@ class mlgwlistener(threading.Thread):
             item = listenerspeakermodedict.get(_hexword(self._mlgwdata[4], 253))  # mln
             if item is not None:
                 #                self.logger.warning('processtelegram: Source Status telegram: mln='+str(self._mlgwdata[4])+', speakermode='+speakermode+', item='+str(item))
-                item(speakermode, "mlgw", "PICT&SND STATUS <ALL>")
+                item(speakermode, 'mlgw', 'PICT&SND STATUS <ALL>')
                 ishandled = True
             # update item (return 1)
             item = listenerspeakermodedict.get(_hexword(self._mlgwdata[4], self._mlgwdata[6]))  # mln, speakermode
             if item is not None:
                 #                self.logger.warning('processtelegram: Source Status telegram: mln='+str(self._mlgwdata[4])+', speakermode='+speakermode+', item='+str(item))
-                item(1, "mlgw", "PICT&SND STATUS " + speakermode)
+                item(1, 'mlgw', 'PICT&SND STATUS ' + speakermode)
                 ishandled = True
 
         return ishandled
@@ -751,7 +751,7 @@ class mlgwlistener(threading.Thread):
 #
 class Mlgw(SmartPlugin):
     ALLOW_MULTIINSTANCE = False
-    PLUGIN_VERSION = "1.1.2"
+    PLUGIN_VERSION = '1.1.2'
 
     ## The constructor: Initialize plugin
     #
@@ -777,13 +777,13 @@ class Mlgw(SmartPlugin):
         global loglevel_receivedtelegrams, loglevel_unhandledtelegrams
         global log_telegrams
 
-        self.host = self.get_parameter_value("host")
-        self.port = self.get_parameter_value("port")
-        self.username = self.get_parameter_value("username")
-        self.password = self.get_parameter_value("password")
-        self.rooms = self.get_parameter_value("rooms")
-        self.mlns = self.get_parameter_value("mlns")
-        self.log_mlgwtelegrams = self.get_parameter_value("log_mlgwtelegrams")
+        self.host = self.get_parameter_value('host')
+        self.port = self.get_parameter_value('port')
+        self.username = self.get_parameter_value('username')
+        self.password = self.get_parameter_value('password')
+        self.rooms = self.get_parameter_value('rooms')
+        self.mlns = self.get_parameter_value('mlns')
+        self.log_mlgwtelegrams = self.get_parameter_value('log_mlgwtelegrams')
 
         log_telegrams = self.log_mlgwtelegrams
         if log_telegrams < 0:
@@ -799,7 +799,7 @@ class Mlgw(SmartPlugin):
         if log_telegrams >= 1:
             loglevel_unhandledtelegrams = logging.WARNING
 
-        self.logger.debug("mlgw.__init__()")
+        self.logger.debug('mlgw.__init__()')
         self._mlgwbase = mlgwBase()
         self._mlgwbase.OpenConnection(self.host, self.port)
         if self._mlgwbase.connected:
@@ -810,25 +810,25 @@ class Mlgw(SmartPlugin):
         self._sh = smarthome
 
         if self.rooms == []:
-            self.logger.warning("No rooms defined")
+            self.logger.warning('No rooms defined')
         else:
             try:
                 roomdict = ast.literal_eval(self.rooms)
-                self.logger.info("Rooms defined: " + str(roomdict))
+                self.logger.info('Rooms defined: ' + str(roomdict))
                 reverse_roomdict = {v.upper(): k for k, v in roomdict.items()}
-                self.logger.info("reverse_roomdict=" + str(reverse_roomdict))
+                self.logger.info('reverse_roomdict=' + str(reverse_roomdict))
             except Exception:
                 roomdict = {}
                 self.logger.warning("Room definition '{}' is not valid -> No rooms defined".format(self.rooms))
 
         if self.mlns == []:
-            self.logger.warning("No MLNs defined")
+            self.logger.warning('No MLNs defined')
         else:
             try:
                 mlndict = ast.literal_eval(self.mlns)
-                self.logger.info("MLNs defined: " + str(mlndict))
+                self.logger.info('MLNs defined: ' + str(mlndict))
                 reverse_mlndict = {v.upper(): k for k, v in mlndict.items()}
-                self.logger.info("reverse_mlndict=" + str(reverse_mlndict))
+                self.logger.info('reverse_mlndict=' + str(reverse_mlndict))
             except Exception:
                 mlndict = {}
                 self.logger.warning("MLN definition '{}' is not valid -> No MLNs defined".format(self.mlns))
@@ -842,12 +842,12 @@ class Mlgw(SmartPlugin):
         if self._mlgwbase.connected == 0:
             return
 
-        self.logger.info("listenerlightdict: " + str(listenerlightdict))
-        self.logger.info("listenercontroldict: " + str(listenercontroldict))
-        self.logger.info("listenersourcestatusdict: " + str(listenersourcestatusdict))
-        self.logger.info("listenerspeakermodedict: " + str(listenerspeakermodedict))
+        self.logger.info('listenerlightdict: ' + str(listenerlightdict))
+        self.logger.info('listenercontroldict: ' + str(listenercontroldict))
+        self.logger.info('listenersourcestatusdict: ' + str(listenersourcestatusdict))
+        self.logger.info('listenerspeakermodedict: ' + str(listenerspeakermodedict))
 
-        self.logger.debug("mlgw.run()")
+        self.logger.debug('mlgw.run()')
         self.alive = True
 
         # if you want to create child threads, do not make them daemon = True!
@@ -861,7 +861,7 @@ class Mlgw(SmartPlugin):
                 time.sleep(3)
             except KeyboardInterrupt:
                 loop = 0
-                self.logger.info("KeyboardInterrupt, terminating...")
+                self.logger.info('KeyboardInterrupt, terminating...')
         self._mlgwbase.CloseConnection()
 
     ## Stop plugin
@@ -869,12 +869,12 @@ class Mlgw(SmartPlugin):
     # @param self      The object pointer.
     #
     def stop(self):
-        self.logger.debug("mlgw.stop()")
+        self.logger.debug('mlgw.stop()')
         self._mlgwbase.CloseConnection()
         if self.alive:
-            self.logger.info("Waiting for listener-thread to stop")
+            self.logger.info('Waiting for listener-thread to stop')
             self.listener.join()
-            self.logger.info("Listener-threads stopped")
+            self.logger.info('Listener-threads stopped')
         self.alive = False
 
     ## Parse item configuration (not yet implemented)
@@ -888,123 +888,123 @@ class Mlgw(SmartPlugin):
         global listenersourcestatusdict
         global listenerspeakermodedict
 
-        if "mlgw_send" in item.conf:
-            mln = reverse_mlndict.get(item.conf["mlgw_mln"].upper())
+        if 'mlgw_send' in item.conf:
+            mln = reverse_mlndict.get(item.conf['mlgw_mln'].upper())
             if mln is None:
                 try:
-                    mln = int(item.conf["mlgw_mln"])
+                    mln = int(item.conf['mlgw_mln'])
                 except Exception:
-                    self.logger.error("Parse item: {0}".format(item) + " - mlgw_mln is not numeric")
+                    self.logger.error('Parse item: {0}'.format(item) + ' - mlgw_mln is not numeric')
                     return None
 
-            if item.conf["mlgw_send"].upper() == "CMD":
+            if item.conf['mlgw_send'].upper() == 'CMD':
                 wrk = None
-                if item._type == "bool":
-                    wrk = reverse_beo4commanddict.get(item.conf["mlgw_cmd"].upper())
+                if item._type == 'bool':
+                    wrk = reverse_beo4commanddict.get(item.conf['mlgw_cmd'].upper())
                     if wrk is None:
                         try:
-                            wrk = int(item.conf["mlgw_cmd"], 16)
+                            wrk = int(item.conf['mlgw_cmd'], 16)
                         except Exception:
                             pass
-                item.conf["_mlgw_cmd"] = wrk
+                item.conf['_mlgw_cmd'] = wrk
                 self.logger.info(
-                    "parse item: {0}".format(item) + ", type=" + item._type + ", item.conf=" + str(item.conf)
+                    'parse item: {0}'.format(item) + ', type=' + item._type + ', item.conf=' + str(item.conf)
                 )
                 return self.update_item
-            elif item.conf["mlgw_send"].upper() == "CH":
-                if item._type == "num":
+            elif item.conf['mlgw_send'].upper() == 'CH':
+                if item._type == 'num':
                     self.logger.info(
-                        "parse item: {0}".format(item) + ", type=" + item._type + ", item.conf=" + str(item.conf)
+                        'parse item: {0}'.format(item) + ', type=' + item._type + ', item.conf=' + str(item.conf)
                     )
                     return self.update_channel
                 else:
-                    self.logger.error("parse item: {0}".format(item) + " - 'mlgw_send' is 'ch' but 'type' is not 'num'")
+                    self.logger.error('parse item: {0}'.format(item) + " - 'mlgw_send' is 'ch' but 'type' is not 'num'")
                     return None
 
-        if "mlgw_listen" in item.conf:
-            room = reverse_roomdict.get(item.conf["mlgw_room"].upper())
+        if 'mlgw_listen' in item.conf:
+            room = reverse_roomdict.get(item.conf['mlgw_room'].upper())
             if room is None:
                 try:
-                    room = int(item.conf["mlgw_room"])
+                    room = int(item.conf['mlgw_room'])
                 except Exception:
-                    self.logger.error("parse item: {0}".format(item) + " - mlgw_room is not numeric")
+                    self.logger.error('parse item: {0}'.format(item) + ' - mlgw_room is not numeric')
                     return None
 
-            if item.conf["mlgw_listen"].upper() == "LIGHT":
-                if item._type == "bool":
-                    cmd = reverse_beo4commanddict.get(item.conf["mlgw_cmd"].upper())
+            if item.conf['mlgw_listen'].upper() == 'LIGHT':
+                if item._type == 'bool':
+                    cmd = reverse_beo4commanddict.get(item.conf['mlgw_cmd'].upper())
                     if cmd is None:
                         try:
-                            cmd = int(item.conf["mlgw_cmd"], 16)
+                            cmd = int(item.conf['mlgw_cmd'], 16)
                         except Exception:
                             pass
-                elif item._type == "str":
-                    cmd = reverse_beo4commanddict.get("<ALL>")
-                item.conf["_mlgw_cmd"] = cmd
+                elif item._type == 'str':
+                    cmd = reverse_beo4commanddict.get('<ALL>')
+                item.conf['_mlgw_cmd'] = cmd
                 self.logger.info(
-                    "parse item: {0}".format(item) + ", type=" + item._type + ", item.conf=" + str(item.conf)
+                    'parse item: {0}'.format(item) + ', type=' + item._type + ', item.conf=' + str(item.conf)
                 )
                 # Dict aufbauen für Listener !!!
                 listenerlightdict[_hexword(room, cmd)] = item
                 return None  # Keine update routine an sh.py zurueckmelden, item kann nicht gesetzt (gesendet) werden
 
-            if item.conf["mlgw_listen"].upper() == "CONTROL":
-                if item._type == "bool":
-                    cmd = reverse_beo4commanddict.get(item.conf["mlgw_cmd"].upper())
+            if item.conf['mlgw_listen'].upper() == 'CONTROL':
+                if item._type == 'bool':
+                    cmd = reverse_beo4commanddict.get(item.conf['mlgw_cmd'].upper())
                     if cmd is None:
                         try:
-                            cmd = int(item.conf["mlgw_cmd"], 16)
+                            cmd = int(item.conf['mlgw_cmd'], 16)
                         except Exception:
                             pass
-                elif item._type == "str":
-                    cmd = reverse_beo4commanddict.get("<ALL>")
-                item.conf["_mlgw_cmd"] = cmd
+                elif item._type == 'str':
+                    cmd = reverse_beo4commanddict.get('<ALL>')
+                item.conf['_mlgw_cmd'] = cmd
                 self.logger.info(
-                    "parse item: {0}".format(item) + ", type=" + item._type + ", item.conf=" + str(item.conf)
+                    'parse item: {0}'.format(item) + ', type=' + item._type + ', item.conf=' + str(item.conf)
                 )
                 # Dict aufbauen für Listener !!!
                 listenercontroldict[_hexword(room, cmd)] = item
                 return None  # Keine update routine an sh.py zurueckmelden (item kann nicht gesetzt werden)
 
-            mln = reverse_mlndict.get(item.conf["mlgw_mln"].upper())
+            mln = reverse_mlndict.get(item.conf['mlgw_mln'].upper())
             if mln is None:
                 try:
-                    mln = int(item.conf["mlgw_mln"])
+                    mln = int(item.conf['mlgw_mln'])
                 except Exception:
-                    self.logger.error("parse item: {0}".format(item) + " - mlgw_mln is not numeric")
+                    self.logger.error('parse item: {0}'.format(item) + ' - mlgw_mln is not numeric')
                     return None
 
-            if item.conf["mlgw_listen"].upper() == "SOURCE STATUS":
-                if item._type == "bool":
-                    source = reverse_selectedsourcedict.get(item.conf["mlgw_cmd"].upper())
+            if item.conf['mlgw_listen'].upper() == 'SOURCE STATUS':
+                if item._type == 'bool':
+                    source = reverse_selectedsourcedict.get(item.conf['mlgw_cmd'].upper())
                     if source is None:
                         try:
-                            source = int(item.conf["mlgw_cmd"], 16)
+                            source = int(item.conf['mlgw_cmd'], 16)
                         except Exception:
                             pass
-                elif item._type == "str":
-                    source = reverse_selectedsourcedict.get("<ALL>")
-                item.conf["_mlgw_cmd"] = source
+                elif item._type == 'str':
+                    source = reverse_selectedsourcedict.get('<ALL>')
+                item.conf['_mlgw_cmd'] = source
                 self.logger.info(
-                    "parse item: {0}".format(item) + ", type=" + item._type + ", item.conf=" + str(item.conf)
+                    'parse item: {0}'.format(item) + ', type=' + item._type + ', item.conf=' + str(item.conf)
                 )
                 # Dict aufbauen für Listener !!!
                 listenersourcestatusdict[_hexword(mln, source)] = item
                 return None  # Keine update routine an sh.py zurueckmelden (item kann nicht gesetzt werden)
 
-            if item.conf["mlgw_listen"].upper() == "PICT&SND STATUS":
-                if item._type == "bool":
-                    source = reverse_speakermodedict.get(item.conf["mlgw_cmd"].upper())
+            if item.conf['mlgw_listen'].upper() == 'PICT&SND STATUS':
+                if item._type == 'bool':
+                    source = reverse_speakermodedict.get(item.conf['mlgw_cmd'].upper())
                     if source is None:
                         try:
-                            source = int(item.conf["mlgw_cmd"], 16)
+                            source = int(item.conf['mlgw_cmd'], 16)
                         except Exception:
                             pass
-                elif item._type == "str":
-                    source = reverse_speakermodedict.get("<ALL>")
-                item.conf["_mlgw_cmd"] = source
+                elif item._type == 'str':
+                    source = reverse_speakermodedict.get('<ALL>')
+                item.conf['_mlgw_cmd'] = source
                 self.logger.info(
-                    "parse item: {0}".format(item) + ", type=" + item._type + ", item.conf=" + str(item.conf)
+                    'parse item: {0}'.format(item) + ', type=' + item._type + ', item.conf=' + str(item.conf)
                 )
                 # Dict aufbauen für Listener !!!
                 listenerspeakermodedict[_hexword(mln, source)] = item
@@ -1019,7 +1019,7 @@ class Mlgw(SmartPlugin):
     # @param logic     Pointer to logic configuration.
     #
     def parse_logic(self, logic):
-        if "xxx" in logic.conf:
+        if 'xxx' in logic.conf:
             # self.function(logic['name'])
             pass
 
@@ -1032,17 +1032,17 @@ class Mlgw(SmartPlugin):
     # @param dest      ???.
     #
     def update_channel(self, item, caller=None, source=None, dest=None):
-        if caller != "mlgw":
+        if caller != 'mlgw':
             #            mln = int(item.conf['mlgw_mln'])
-            mln = reverse_mlndict.get(item.conf["mlgw_mln"].upper())
+            mln = reverse_mlndict.get(item.conf['mlgw_mln'].upper())
             if mln is None:
                 try:
-                    mln = int(item.conf["mlgw_mln"])
+                    mln = int(item.conf['mlgw_mln'])
                 except Exception:
-                    self.logger.error("update_channel: {0}".format(item) + " - mlgw_mln is not numeric")
+                    self.logger.error('update_channel: {0}'.format(item) + ' - mlgw_mln is not numeric')
                     return None
             self.logger.warning(
-                "update channel: {0}".format(item.property.path) + ", value=" + str(item()) + ", (MLN=" + str(mln) + ")"
+                'update channel: {0}'.format(item.property.path) + ', value=' + str(item()) + ', (MLN=' + str(mln) + ')'
             )  # info
             channel = item()
             wrk = channel
@@ -1067,35 +1067,35 @@ class Mlgw(SmartPlugin):
     # @param dest      ???.
     #
     def update_item(self, item, caller=None, source=None, dest=None):
-        if caller != "mlgw":
+        if caller != 'mlgw':
             #            mln = int(item.conf['mlgw_mln'])
-            mln = reverse_mlndict.get(item.conf["mlgw_mln"].upper())
+            mln = reverse_mlndict.get(item.conf['mlgw_mln'].upper())
             if mln is None:
                 try:
-                    mln = int(item.conf["mlgw_mln"])
+                    mln = int(item.conf['mlgw_mln'])
                 except Exception:
-                    self.logger.error("update_item: {0}".format(item) + " - mlgw_mln is not numeric")
+                    self.logger.error('update_item: {0}'.format(item) + ' - mlgw_mln is not numeric')
                     return None
-            if item._type == "str":
+            if item._type == 'str':
                 cmd = reverse_beo4commanddict.get(item().upper())
                 if cmd is None:
                     try:
                         cmd = int(item(), 16)
                     except Exception:
                         pass
-            elif item._type == "bool":
-                cmd = item.conf["_mlgw_cmd"]
-            elif item._type == "num":
+            elif item._type == 'bool':
+                cmd = item.conf['_mlgw_cmd']
+            elif item._type == 'num':
                 cmd = item()
             self.logger.warning(
-                "update item: {0}".format(item.property.path)
-                + ", value="
+                'update item: {0}'.format(item.property.path)
+                + ', value='
                 + str(item())
-                + ", (MLN="
+                + ', (MLN='
                 + str(mln)
-                + ", cmd="
+                + ', cmd='
                 + str(cmd)
-                + ")"
+                + ')'
             )  # info
 
             if cmd is not None:
@@ -1111,33 +1111,33 @@ class Mlgw(SmartPlugin):
 #                self._mlgwbase.SendCommand(0x01, self._payload)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     rooms = [
-        (0x01, "KO"),
-        (0x02, "WZ"),
-        (0x03, "EZ"),
-        (0x04, "FL"),
-        (0x05, "GZ"),
-        (0x06, "AZ"),
-        (0x07, "DU"),
-        (0x08, "HW"),
-        (0x09, "BD"),
-        (0x0A, "SZ"),
-        (0x0B, "TR"),
-        (0x0C, "TE"),
+        (0x01, 'KO'),
+        (0x02, 'WZ'),
+        (0x03, 'EZ'),
+        (0x04, 'FL'),
+        (0x05, 'GZ'),
+        (0x06, 'AZ'),
+        (0x07, 'DU'),
+        (0x08, 'HW'),
+        (0x09, 'BD'),
+        (0x0A, 'SZ'),
+        (0x0B, 'TR'),
+        (0x0C, 'TE'),
     ]
     mlns = [
-        (0x01, "BV9-WZ"),
-        (0x02, "BV10-SZ"),
-        (0x03, "BLActive-KO"),
-        (0x04, "BLActive-GZ"),
-        (0x05, "BLActive-BD"),
-        (0x06, "BLActive-DU"),
-        (0x07, "BLActive-AZ"),
-        (0x08, "BLC"),
-        (0x09, "BeoPlayV1-AZ"),
+        (0x01, 'BV9-WZ'),
+        (0x02, 'BV10-SZ'),
+        (0x03, 'BLActive-KO'),
+        (0x04, 'BLActive-GZ'),
+        (0x05, 'BLActive-BD'),
+        (0x06, 'BLActive-DU'),
+        (0x07, 'BLActive-AZ'),
+        (0x08, 'BLC'),
+        (0x09, 'BeoPlayV1-AZ'),
     ]
-    myplugin = Mlgw("mlgw", "mlgw.local", 9000, "mlgw", "mlgw", str(dict(rooms)), str(dict(mlns)), 3)
+    myplugin = Mlgw('mlgw', 'mlgw.local', 9000, 'mlgw', 'mlgw', str(dict(rooms)), str(dict(mlns)), 3)
     myplugin.run()
     myplugin.stop()

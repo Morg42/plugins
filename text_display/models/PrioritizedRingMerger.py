@@ -40,6 +40,6 @@ class PrioritizedRingMerger:
         self.__slots_cache = None
 
     def introspect(self):
-        content = ", ".join(map(lambda s: str(s), self.get_slots()))
-        rings = ", ".join(map(lambda rm: rm.introspect(), self.__rings))
-        return f"PrioritizedRingMerger, ({content}), based on rings ({rings})"
+        content = ', '.join(map(lambda s: str(s), self.get_slots()))
+        rings = ', '.join(map(lambda rm: rm.introspect(), self.__rings))
+        return f'PrioritizedRingMerger, ({content}), based on rings ({rings})'

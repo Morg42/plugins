@@ -68,13 +68,13 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after being rendered
         """
-        pagelength = self.plugin.get_parameter_value("webif_pagelength")
-        tmpl = self.tplenv.get_template("index.html")
+        pagelength = self.plugin.get_parameter_value('webif_pagelength')
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(
             p=self.plugin,
             webif_pagelength=pagelength,
-            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])),
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
             item_count=0,
         )
 
@@ -89,18 +89,18 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         # if dataSets are used, define them here
-        if dataSet == "overview":
+        if dataSet == 'overview':
             # get the new data from the plugin variable called _webdata
             data = self.plugin._webdata
             try:
-                data = json.dumps(data, cls=JSONEncoder, separators=(",", ":"))
+                data = json.dumps(data, cls=JSONEncoder, separators=(',', ':'))
                 return data
             except Exception as e:
-                self.logger.error(f"get_data_html exception*: {e}")
+                self.logger.error(f'get_data_html exception*: {e}')
         if dataSet is None:
             # get the new data
             data = {}
-            data["discovered_devices"] = self.plugin.discovered_devices
+            data['discovered_devices'] = self.plugin.discovered_devices
 
             # data['item'] = {}
             # for i in self.plugin.items:
@@ -112,19 +112,19 @@ class WebInterface(SmartPluginWebIf):
             # except Exception as e:
             #     self.logger.error("get_data_html exception: {}".format(e))
 
-        result = {"discovered_devices": self.plugin.discovered_devices}
+        result = {'discovered_devices': self.plugin.discovered_devices}
 
         # send result to wen interface
         try:
             # data = json.dumps(result)
-            data = json.dumps(result, cls=JSONEncoder, separators=(",", ":"))
+            data = json.dumps(result, cls=JSONEncoder, separators=(',', ':'))
             if data:
                 return data
             else:
                 return None
         except Exception as e:
-            self.logger.error(f"get_data_html exception: {e}")
-            self.logger.error(f"- {data}")
+            self.logger.error(f'get_data_html exception: {e}')
+            self.logger.error(f'- {data}')
 
         return {}
 
@@ -142,7 +142,7 @@ class JSONEncoder(json.JSONEncoder):
         # elif isinstance(obj, decimal.Decimal):
         #     return float(obj)
         elif isinstance(obj, bytes):
-            return obj.decode("utf-8")
+            return obj.decode('utf-8')
             # import base64
             # return base64.b64encode(obj).decode("ascii")
         return json.JSONEncoder.default(self, obj)

@@ -310,118 +310,118 @@ FCSTAB = [
 ]
 
 attribute_to_text = {
-    35: "Fault",
-    51: "Closed",
-    295: "MPP",
-    302: "No derating",
-    303: "Off",
-    307: "OK",
-    308: "On",
-    311: "Open",
-    336: "Contact manufacturer",
-    337: "Contact electrically qualified person",
-    338: "Invalid",
-    381: "Stop",
-    443: "Constant voltage",
-    455: "Warning",
-    557: "Temperature derating",
-    884: "Not active",
-    887: "None",
-    1129: "Yes",
-    1130: "No",
-    0xFFFFFD: "NaN",
+    35: 'Fault',
+    51: 'Closed',
+    295: 'MPP',
+    302: 'No derating',
+    303: 'Off',
+    307: 'OK',
+    308: 'On',
+    311: 'Open',
+    336: 'Contact manufacturer',
+    337: 'Contact electrically qualified person',
+    338: 'Invalid',
+    381: 'Stop',
+    443: 'Constant voltage',
+    455: 'Warning',
+    557: 'Temperature derating',
+    884: 'Not active',
+    887: 'None',
+    1129: 'Yes',
+    1130: 'No',
+    0xFFFFFD: 'NaN',
 }
 
 # eval-id: eval-expression
 lri_evals = {
-    "num32bit_scaleby1": '(lambda x: x if x not in [0x80000000, 0xFFFFFFFF] else 0)(int.from_bytes(msg[i + 8:i + 12], byteorder="little"))',
-    "num32bit_scaleby100.0": '(lambda x: x / 100.0 if x not in [0x80000000, 0xFFFFFFFF] else 0)(int.from_bytes(msg[i + 8:i + 12], byteorder="little"))',
-    "num32bit_scaleby1000.0": '(lambda x: x / 1000.0 if x not in [0x80000000, 0xFFFFFFFF] else 0)(int.from_bytes(msg[i + 8:i + 12], byteorder="little"))',
-    "num64bit_scaleby1": '(lambda x: x if x not in [0x8000000000000000, 0xFFFFFFFFFFFFFFFF] else 0)(int.from_bytes(msg[i + 8:i + 16], byteorder="little"))',
-    "sw_version_decode": '"{}{}.{}{}.{:02d}.{}".format(msg[i + 27] >> 4, msg[i + 27] & 0xf, msg[i + 26] >> 4, msg[i + 26] & 0xf, msg[i + 25], msg[i + 24] if msg[i + 24] > 5 else "NEABRS"[msg[i + 24]])',
-    "attribute_decode": '(lambda x: attribute_to_text[x[0]] if x[0] in attribute_to_text else "?")(list(__import__("itertools").dropwhile(lambda attr_tpl: (attr_tpl[1] != 1) or (attr_tpl[0] == 0xFFFFFE), [(int.from_bytes(msg[o:o + 3], byteorder="little"), msg[o + 3]) for o in range(i+8,i+40,4)]))[0])',
+    'num32bit_scaleby1': '(lambda x: x if x not in [0x80000000, 0xFFFFFFFF] else 0)(int.from_bytes(msg[i + 8:i + 12], byteorder="little"))',
+    'num32bit_scaleby100.0': '(lambda x: x / 100.0 if x not in [0x80000000, 0xFFFFFFFF] else 0)(int.from_bytes(msg[i + 8:i + 12], byteorder="little"))',
+    'num32bit_scaleby1000.0': '(lambda x: x / 1000.0 if x not in [0x80000000, 0xFFFFFFFF] else 0)(int.from_bytes(msg[i + 8:i + 12], byteorder="little"))',
+    'num64bit_scaleby1': '(lambda x: x if x not in [0x8000000000000000, 0xFFFFFFFFFFFFFFFF] else 0)(int.from_bytes(msg[i + 8:i + 16], byteorder="little"))',
+    'sw_version_decode': '"{}{}.{}{}.{:02d}.{}".format(msg[i + 27] >> 4, msg[i + 27] & 0xf, msg[i + 26] >> 4, msg[i + 26] & 0xf, msg[i + 25], msg[i + 24] if msg[i + 24] > 5 else "NEABRS"[msg[i + 24]])',
+    'attribute_decode': '(lambda x: attribute_to_text[x[0]] if x[0] in attribute_to_text else "?")(list(__import__("itertools").dropwhile(lambda attr_tpl: (attr_tpl[1] != 1) or (attr_tpl[0] == 0xFFFFFE), [(int.from_bytes(msg[o:o + 3], byteorder="little"), msg[o + 3]) for o in range(i+8,i+40,4)]))[0])',
 }
 
 TYPE_LABEL = (0x821E00, 0x8220FF, 0x58000200)
 
 # logical ressource identifier: [eval, recordsize, [request-cmd, -start, -end]]
 lris = {
-    0x214800: ["attribute_decode", 40, (0x51800200, 0x214800, 0x2148FF)],
-    0x251E00: ["num32bit_scaleby1", 28, (0x53800200, 0x251E00, 0x251EFF)],
-    0x260100: ["num64bit_scaleby1", 16, (0x54000200, 0x260100, 0x2622FF)],
-    0x262200: ["num64bit_scaleby1", 16, (0x54000200, 0x260100, 0x2622FF)],
-    0x263F00: ["num32bit_scaleby1", 28, (0x51000200, 0x263F00, 0x263FFF)],
-    0x411E00: ["num32bit_scaleby1", 28, (0x51000200, 0x411E00, 0x4120FF)],
-    0x411F00: ["num32bit_scaleby1", 28, (0x51000200, 0x411E00, 0x4120FF)],
-    0x412000: ["num32bit_scaleby1", 28, (0x51000200, 0x411E00, 0x4120FF)],
-    0x416400: ["attribute_decode", 40, (0x51800200, 0x416400, 0x4164FF)],
-    0x451F00: ["num32bit_scaleby100.0", 28, (0x53800200, 0x451F00, 0x4521FF)],
-    0x452100: ["num32bit_scaleby1000.0", 28, (0x53800200, 0x451F00, 0x4521FF)],
-    0x462E00: ["num64bit_scaleby1", 16, (0x54000200, 0x462E00, 0x462FFF)],
-    0x462F00: ["num64bit_scaleby1", 16, (0x54000200, 0x462E00, 0x462FFF)],
-    0x464000: ["num32bit_scaleby1", 28, (0x51000200, 0x464000, 0x4642FF)],
-    0x464100: ["num32bit_scaleby1", 28, (0x51000200, 0x464000, 0x4642FF)],
-    0x464200: ["num32bit_scaleby1", 28, (0x51000200, 0x464000, 0x4642FF)],
-    0x464800: ["num32bit_scaleby100.0", 28, (0x51000200, 0x464800, 0x4652FF)],
-    0x464900: ["num32bit_scaleby100.0", 28, (0x51000200, 0x464800, 0x4652FF)],
-    0x464A00: ["num32bit_scaleby100.0", 28, (0x51000200, 0x464800, 0x4652FF)],
-    0x465000: ["num32bit_scaleby1000.0", 28, (0x51000200, 0x464800, 0x4652FF)],
-    0x465100: ["num32bit_scaleby1000.0", 28, (0x51000200, 0x464800, 0x4652FF)],
-    0x465200: ["num32bit_scaleby1000.0", 28, (0x51000200, 0x464800, 0x4652FF)],
-    0x465300: ["num32bit_scaleby1000.0", 28, (0x51000200, 0x465300, 0x4655FF)],
-    0x465400: ["num32bit_scaleby1000.0", 28, (0x51000200, 0x465300, 0x4655FF)],
-    0x465500: ["num32bit_scaleby1000.0", 28, (0x51000200, 0x465300, 0x4655FF)],
-    0x465700: ["num32bit_scaleby100.0", 28, (0x51000200, 0x465700, 0x4657FF)],
-    0x823400: ["sw_version_decode", 40, (0x58000200, 0x823400, 0x8234FF)],
+    0x214800: ['attribute_decode', 40, (0x51800200, 0x214800, 0x2148FF)],
+    0x251E00: ['num32bit_scaleby1', 28, (0x53800200, 0x251E00, 0x251EFF)],
+    0x260100: ['num64bit_scaleby1', 16, (0x54000200, 0x260100, 0x2622FF)],
+    0x262200: ['num64bit_scaleby1', 16, (0x54000200, 0x260100, 0x2622FF)],
+    0x263F00: ['num32bit_scaleby1', 28, (0x51000200, 0x263F00, 0x263FFF)],
+    0x411E00: ['num32bit_scaleby1', 28, (0x51000200, 0x411E00, 0x4120FF)],
+    0x411F00: ['num32bit_scaleby1', 28, (0x51000200, 0x411E00, 0x4120FF)],
+    0x412000: ['num32bit_scaleby1', 28, (0x51000200, 0x411E00, 0x4120FF)],
+    0x416400: ['attribute_decode', 40, (0x51800200, 0x416400, 0x4164FF)],
+    0x451F00: ['num32bit_scaleby100.0', 28, (0x53800200, 0x451F00, 0x4521FF)],
+    0x452100: ['num32bit_scaleby1000.0', 28, (0x53800200, 0x451F00, 0x4521FF)],
+    0x462E00: ['num64bit_scaleby1', 16, (0x54000200, 0x462E00, 0x462FFF)],
+    0x462F00: ['num64bit_scaleby1', 16, (0x54000200, 0x462E00, 0x462FFF)],
+    0x464000: ['num32bit_scaleby1', 28, (0x51000200, 0x464000, 0x4642FF)],
+    0x464100: ['num32bit_scaleby1', 28, (0x51000200, 0x464000, 0x4642FF)],
+    0x464200: ['num32bit_scaleby1', 28, (0x51000200, 0x464000, 0x4642FF)],
+    0x464800: ['num32bit_scaleby100.0', 28, (0x51000200, 0x464800, 0x4652FF)],
+    0x464900: ['num32bit_scaleby100.0', 28, (0x51000200, 0x464800, 0x4652FF)],
+    0x464A00: ['num32bit_scaleby100.0', 28, (0x51000200, 0x464800, 0x4652FF)],
+    0x465000: ['num32bit_scaleby1000.0', 28, (0x51000200, 0x464800, 0x4652FF)],
+    0x465100: ['num32bit_scaleby1000.0', 28, (0x51000200, 0x464800, 0x4652FF)],
+    0x465200: ['num32bit_scaleby1000.0', 28, (0x51000200, 0x464800, 0x4652FF)],
+    0x465300: ['num32bit_scaleby1000.0', 28, (0x51000200, 0x465300, 0x4655FF)],
+    0x465400: ['num32bit_scaleby1000.0', 28, (0x51000200, 0x465300, 0x4655FF)],
+    0x465500: ['num32bit_scaleby1000.0', 28, (0x51000200, 0x465300, 0x4655FF)],
+    0x465700: ['num32bit_scaleby100.0', 28, (0x51000200, 0x465700, 0x4657FF)],
+    0x823400: ['sw_version_decode', 40, (0x58000200, 0x823400, 0x8234FF)],
 }
 
 # sh.py-Name: field-id
 name_to_id = {
-    "STATUS": 0x214801,
-    "DC_STRING1_P": 0x251E01,
-    "DC_STRING2_P": 0x251E02,
-    "E_TOTAL": 0x260101,
-    "E_DAY": 0x262201,
-    "AC_P_TOTAL": 0x263F01,
-    "AC_P_MAX_NORM": 0x411E01,
-    "AC_P_MAX_WARN": 0x411F01,
-    "AC_P_MAX_ALRM": 0x412001,
-    "GRID_RELAY": 0x416401,
-    "DC_STRING1_U": 0x451F01,
-    "DC_STRING2_U": 0x451F02,
-    "DC_STRING1_I": 0x452101,
-    "DC_STRING2_I": 0x452102,
-    "OPERATING_TIME": 0x462E01,
-    "FEEDING_TIME": 0x462F01,
-    "AC_PHASE1_P": 0x464001,
-    "AC_PHASE2_P": 0x464101,
-    "AC_PHASE3_P": 0x464201,
-    "AC_PHASE1_U": 0x464801,
-    "AC_PHASE2_U": 0x464901,
-    "AC_PHASE3_U": 0x464A01,
-    "AC_PHASE1_I": 0x465001,
-    "AC_PHASE2_I": 0x465101,
-    "AC_PHASE3_I": 0x465201,
-    "AC_PHASE1_I2": 0x465301,
-    "AC_PHASE2_I2": 0x465401,
-    "AC_PHASE3_I2": 0x465501,
-    "GRID_FREQUENCY": 0x465701,
-    "SW_VERSION": 0x823401,
+    'STATUS': 0x214801,
+    'DC_STRING1_P': 0x251E01,
+    'DC_STRING2_P': 0x251E02,
+    'E_TOTAL': 0x260101,
+    'E_DAY': 0x262201,
+    'AC_P_TOTAL': 0x263F01,
+    'AC_P_MAX_NORM': 0x411E01,
+    'AC_P_MAX_WARN': 0x411F01,
+    'AC_P_MAX_ALRM': 0x412001,
+    'GRID_RELAY': 0x416401,
+    'DC_STRING1_U': 0x451F01,
+    'DC_STRING2_U': 0x451F02,
+    'DC_STRING1_I': 0x452101,
+    'DC_STRING2_I': 0x452102,
+    'OPERATING_TIME': 0x462E01,
+    'FEEDING_TIME': 0x462F01,
+    'AC_PHASE1_P': 0x464001,
+    'AC_PHASE2_P': 0x464101,
+    'AC_PHASE3_P': 0x464201,
+    'AC_PHASE1_U': 0x464801,
+    'AC_PHASE2_U': 0x464901,
+    'AC_PHASE3_U': 0x464A01,
+    'AC_PHASE1_I': 0x465001,
+    'AC_PHASE2_I': 0x465101,
+    'AC_PHASE3_I': 0x465201,
+    'AC_PHASE1_I2': 0x465301,
+    'AC_PHASE2_I2': 0x465401,
+    'AC_PHASE3_I2': 0x465501,
+    'GRID_FREQUENCY': 0x465701,
+    'SW_VERSION': 0x823401,
 }
 
 
 class SMA(SmartPlugin):
     ALLOW_MULTIINSTANCE = False
-    PLUGIN_VERSION = "1.3.2"
+    PLUGIN_VERSION = '1.3.2'
 
     def __init__(self, sh, **kwargs):
         self.shtime = Shtime.get_instance()
 
         # TODO: self._own_bt_addr setzen
-        self._inv_bt_addr = self.get_parameter_value("bt_addr")
-        self._inv_password = self.get_parameter_value("password")
-        self._update_cycle = self.get_parameter_value("update_cycle")
-        self._allowed_timedelta = self.get_parameter_value("allowed_timedelta")
+        self._inv_bt_addr = self.get_parameter_value('bt_addr')
+        self._inv_password = self.get_parameter_value('password')
+        self._update_cycle = self.get_parameter_value('update_cycle')
+        self._allowed_timedelta = self.get_parameter_value('allowed_timedelta')
         self._fields = {}
         self._requests = []
         self._cmd_lock = threading.Lock()
@@ -429,12 +429,12 @@ class SMA(SmartPlugin):
         self._inv_last_read_timestamp_utc = 0
         self._inv_serial = 0
         self._own_bt_addr_le = bytearray(BCAST_ADDR)
-        self._inv_bt_addr_le = bytearray.fromhex(self._inv_bt_addr.replace(":", " "))
+        self._inv_bt_addr_le = bytearray.fromhex(self._inv_bt_addr.replace(':', ' '))
         self._inv_bt_addr_le.reverse()
         self._plugin_active_item = None
 
-        if not hasattr(socket, "AF_BLUETOOTH"):
-            raise Exception("Python socket module does not support Bluetooth - see README.md how to install")
+        if not hasattr(socket, 'AF_BLUETOOTH'):
+            raise Exception('Python socket module does not support Bluetooth - see README.md how to install')
 
     def _update_values(self):
         # logger.warning("sma: signal strength = {}%%".format(self._inv_get_bt_signal_strength()))
@@ -450,14 +450,14 @@ class SMA(SmartPlugin):
                 # wait 5sec for reply
                 self._reply_lock.wait(5)
                 self._reply_lock.release()
-            if ("LAST_UPDATE" in self._fields) and not (self._inv_last_read_timestamp_utc == 0):
+            if ('LAST_UPDATE' in self._fields) and not (self._inv_last_read_timestamp_utc == 0):
                 self._inv_last_read_datetime = datetime.fromtimestamp(self._inv_last_read_timestamp_utc, tz.tzlocal())
                 # self._inv_last_read_str = self._inv_last_read_datetime.strftime("%d.%m.%Y %H:%M:%S")
-                self._inv_last_read_str = self._inv_last_read_datetime.strftime("%d.%m. %H:%M  ")
-                for item in self._fields["LAST_UPDATE"]["items"]:
-                    item(self._inv_last_read_str, "SMA", self._inv_serial)
+                self._inv_last_read_str = self._inv_last_read_datetime.strftime('%d.%m. %H:%M  ')
+                for item in self._fields['LAST_UPDATE']['items']:
+                    item(self._inv_last_read_str, 'SMA', self._inv_serial)
         except Exception as e:
-            self.logger.error("sma: error while updating values - {}".format(e))
+            self.logger.error('sma: error while updating values - {}'.format(e))
         self._cmd_lock.release()
 
     def run(self):
@@ -477,22 +477,22 @@ class SMA(SmartPlugin):
                 try:
                     self._btsocket = socket.socket(socket.AF_BLUETOOTH, socket.SOCK_STREAM, socket.BTPROTO_RFCOMM)
                     self._btsocket.connect((self._inv_bt_addr, 1))
-                    self.logger.info("sma: via bluetooth connected to {}".format(self._inv_bt_addr))
+                    self.logger.info('sma: via bluetooth connected to {}'.format(self._inv_bt_addr))
                     self._send_count = 0
                     self._inv_connect()
                     self._inv_login()
-                    if "OWN_ADDRESS" in self._fields:
-                        for item in self._fields["OWN_ADDRESS"]["items"]:
-                            item(self._own_bt_addr, "SMA", self._inv_serial)
-                    if "INV_ADDRESS" in self._fields:
-                        for item in self._fields["INV_ADDRESS"]["items"]:
-                            item(self._inv_bt_addr, "SMA", self._inv_serial)
-                    if "INV_SERIAL" in self._fields:
-                        for item in self._fields["INV_SERIAL"]["items"]:
-                            item(self._inv_serial, "SMA", self._inv_serial)
+                    if 'OWN_ADDRESS' in self._fields:
+                        for item in self._fields['OWN_ADDRESS']['items']:
+                            item(self._own_bt_addr, 'SMA', self._inv_serial)
+                    if 'INV_ADDRESS' in self._fields:
+                        for item in self._fields['INV_ADDRESS']['items']:
+                            item(self._inv_bt_addr, 'SMA', self._inv_serial)
+                    if 'INV_SERIAL' in self._fields:
+                        for item in self._fields['INV_SERIAL']['items']:
+                            item(self._inv_serial, 'SMA', self._inv_serial)
                     self._is_connected = True
                 except Exception as e:
-                    self.logger.error("sma: establishing connection to inverter failed - {}".format(e))
+                    self.logger.error('sma: establishing connection to inverter failed - {}'.format(e))
                     # wait for 30sec and try to reconnect
                     time.sleep(30)
                     continue
@@ -501,14 +501,14 @@ class SMA(SmartPlugin):
                 # set time if diff is to big
                 try:
                     if self._allowed_timedelta >= 0:
-                        self._inv_send_request(lris[name_to_id["STATUS"] & 0xFFFF00][2])
+                        self._inv_send_request(lris[name_to_id['STATUS'] & 0xFFFF00][2])
                         msg = self._recv_smanet2_msg()
                         if msg is not None:
                             host_localtime = int(time.time())
-                            inv_localtime = int.from_bytes(msg[45:49], byteorder="little")
+                            inv_localtime = int.from_bytes(msg[45:49], byteorder='little')
                             diff = inv_localtime - host_localtime
                             self.logger.info(
-                                "sma: inverter timestamp = {}s / host timestamp = {}s / diff = {}s".format(
+                                'sma: inverter timestamp = {}s / host timestamp = {}s / diff = {}s'.format(
                                     inv_localtime, host_localtime, diff
                                 )
                             )
@@ -516,33 +516,33 @@ class SMA(SmartPlugin):
                                 self._inv_set_time()
                                 msg = self._recv_smanet2_msg()
                                 if msg is None:
-                                    self.logger.debug("sma: could not get reply while setting inverter time\n")
+                                    self.logger.debug('sma: could not get reply while setting inverter time\n')
                                 else:
                                     self.logger.debug(
-                                        "sma: reply while setting inverter time - len={} data=[{}]\n".format(
-                                            len(msg), ", ".join(["0x%02x" % b for b in msg[41:]])
+                                        'sma: reply while setting inverter time - len={} data=[{}]\n'.format(
+                                            len(msg), ', '.join(['0x%02x' % b for b in msg[41:]])
                                         )
                                     )
                 except Exception as e:
-                    self.logger.error("sma: adjusting inverter time failed - {}".format(e))
+                    self.logger.error('sma: adjusting inverter time failed - {}'.format(e))
                     return
-                self.scheduler_add("SMA", self._update_values, prio=5, cycle=self._update_cycle)
+                self.scheduler_add('SMA', self._update_values, prio=5, cycle=self._update_cycle)
 
             # disconnect from inverter and stop updates if not active or if not alive
             if self._is_connected and not (self._plugin_active and self.alive):
                 self._cmd_lock.acquire()
                 try:
-                    self.scheduler_remove("SMA")
+                    self.scheduler_remove('SMA')
                 except Exception as e:
-                    self.logger.error("sma: removing sma.update from scheduler failed - {}".format(e))
+                    self.logger.error('sma: removing sma.update from scheduler failed - {}'.format(e))
                 else:
-                    self.logger.debug("sma: sma.update removed from scheduler")
+                    self.logger.debug('sma: sma.update removed from scheduler')
                 try:
                     self._btsocket.close()
                 except Exception as e:
-                    self.logger.error("sma: closing connection to inverter failed - {}".format(e))
+                    self.logger.error('sma: closing connection to inverter failed - {}'.format(e))
                 else:
-                    self.logger.info("sma: connection to inverter closed")
+                    self.logger.info('sma: connection to inverter closed')
                 # set to False under all circumstances to force shutdown
                 self._is_connected = False
                 self._cmd_lock.release()
@@ -560,13 +560,13 @@ class SMA(SmartPlugin):
                     i = 41
                     try:
                         while i < (len(msg) - 11):
-                            full_id = int.from_bytes(msg[i : i + 3], byteorder="little")
+                            full_id = int.from_bytes(msg[i : i + 3], byteorder='little')
                             lri = full_id & 0xFFFF00
                             cls = full_id & 0x0000FF
                             dataType = msg[i + 3]
                             if lri not in lris:
                                 self.logger.info(
-                                    "sma: unknown lri={:#06x} / cls={:#02x} / dataType={:#02x} - trying to continue".format(
+                                    'sma: unknown lri={:#06x} / cls={:#02x} / dataType={:#02x} - trying to continue'.format(
                                         lri, cls, dataType
                                     )
                                 )
@@ -575,51 +575,51 @@ class SMA(SmartPlugin):
                                 elif (dataType == 0x08) or (dataType == 0x10):
                                     i += 40
                                 else:
-                                    self.logger.error("sma: rx - unknown datatype {:#02x}".format(dataType))
+                                    self.logger.error('sma: rx - unknown datatype {:#02x}'.format(dataType))
                                     raise
                                 continue
                             else:
-                                timestamp_utc = int.from_bytes(msg[i + 4 : i + 8], byteorder="little")
+                                timestamp_utc = int.from_bytes(msg[i + 4 : i + 8], byteorder='little')
                                 value = eval(
                                     lri_evals[lris[lri][0]], dict(msg=msg, i=i, attribute_to_text=attribute_to_text)
                                 )
                                 i += lris[lri][1]
                                 self.logger.debug(
-                                    "sma: lri={:#06x} / cls={:#02x} / timestamp={} / value={}".format(
+                                    'sma: lri={:#06x} / cls={:#02x} / timestamp={} / value={}'.format(
                                         lri, cls, timestamp_utc, value
                                     )
                                 )
                                 if full_id in self._fields:
-                                    for item in self._fields[full_id]["items"]:
-                                        item(value, "SMA", self._inv_serial, "{:#06x}".format(full_id))
+                                    for item in self._fields[full_id]['items']:
+                                        item(value, 'SMA', self._inv_serial, '{:#06x}'.format(full_id))
                                 # update timestamp
                                 if timestamp_utc > self._inv_last_read_timestamp_utc:
                                     self._inv_last_read_timestamp_utc = timestamp_utc
                     except Exception as e:
-                        self.logger.error("sma: rx: exception - {}".format(e))
+                        self.logger.error('sma: rx: exception - {}'.format(e))
                         self.logger.error(
-                            "sma: rx - exception when parsing msg - len={} data=[{}]\n".format(
-                                len(msg), ", ".join(["0x%02x" % b for b in msg])
+                            'sma: rx - exception when parsing msg - len={} data=[{}]\n'.format(
+                                len(msg), ', '.join(['0x%02x' % b for b in msg])
                             )
                         )
                         continue
                 elif len(msg) == 44:
-                    start_id = int.from_bytes(msg[33:36], byteorder="little")
-                    end_id = int.from_bytes(msg[37:40], byteorder="little")
+                    start_id = int.from_bytes(msg[33:36], byteorder='little')
+                    end_id = int.from_bytes(msg[37:40], byteorder='little')
                     self.logger.info(
                         'sma: inverters returns "no new data" in id range from {:#06x} to {:#06x}'.format(
                             start_id, end_id
                         )
                     )
                 else:
-                    self.logger.warning("sma: rx - unknown/malformed response!")
+                    self.logger.warning('sma: rx - unknown/malformed response!')
                     self.logger.warning(
-                        "sma: rx - len={} data=[{}]\n".format(len(msg), ", ".join(["0x%02x" % b for b in msg]))
+                        'sma: rx - len={} data=[{}]\n'.format(len(msg), ', '.join(['0x%02x' % b for b in msg]))
                     )
-                    seq_num = int.from_bytes(msg[27:29], byteorder="little")
+                    seq_num = int.from_bytes(msg[27:29], byteorder='little')
                     self.logger.warning(
-                        "sma: sma2-seq={} / sma2-data=[{}]\n".format(
-                            seq_num, " ".join(["0x%02x" % b for b in msg[29:]])
+                        'sma: sma2-seq={} / sma2-data=[{}]\n'.format(
+                            seq_num, ' '.join(['0x%02x' % b for b in msg[29:]])
                         )
                     )
                 self._reply_lock.acquire()
@@ -634,37 +634,37 @@ class SMA(SmartPlugin):
 
     def _update_plugin_active(self, item, caller=None, source=None, dest=None):
         self._plugin_active = item()
-        self.logger.debug("sma: {} set plugin_active to {}".format(item, self._plugin_active))
+        self.logger.debug('sma: {} set plugin_active to {}'.format(item, self._plugin_active))
 
     def parse_item(self, item):
-        if self.has_iattr(item.conf, "sma"):
-            field_name = self.get_iattr_value(item.conf, "sma")
+        if self.has_iattr(item.conf, 'sma'):
+            field_name = self.get_iattr_value(item.conf, 'sma')
             if field_name in name_to_id:
                 field_id = name_to_id[field_name]
                 lri = field_id & 0xFFFF00
                 if lri not in lris:
                     self.logger.error(
-                        "sma: {} connected to field {} requires unsupported lri {:#06x}".format(item, field_name, lri)
+                        'sma: {} connected to field {} requires unsupported lri {:#06x}'.format(item, field_name, lri)
                     )
                     return None
-                self.logger.debug("sma: {} connected to field {} ({:#06x})".format(item, field_name, field_id))
+                self.logger.debug('sma: {} connected to field {} ({:#06x})'.format(item, field_name, field_id))
                 if field_id not in self._fields:
-                    self._fields[field_id] = {"items": [item], "logics": []}
+                    self._fields[field_id] = {'items': [item], 'logics': []}
                 else:
-                    self._fields[field_id]["items"].append(item)
+                    self._fields[field_id]['items'].append(item)
                 field_request = lris[lri][2]
                 if field_request not in self._requests:
                     self._requests.append(field_request)
-            elif field_name == "PLUGIN_ACTIVE":
+            elif field_name == 'PLUGIN_ACTIVE':
                 self._plugin_active_item = item
                 return self._update_plugin_active
             else:
-                self.logger.debug("sma: {0} connected to field {1})".format(item, field_name))
+                self.logger.debug('sma: {0} connected to field {1})'.format(item, field_name))
                 if field_name not in self._fields:
-                    self._fields[field_name] = {"items": [item], "logics": []}
+                    self._fields[field_name] = {'items': [item], 'logics': []}
                 else:
-                    if item not in self._fields[field_name]["items"]:
-                        self._fields[field_name]["items"].append(item)
+                    if item not in self._fields[field_name]['items']:
+                        self._fields[field_name]['items'].append(item)
         # return None to indicate "read-only"
         return None
 
@@ -680,11 +680,11 @@ class SMA(SmartPlugin):
                     msg.pop(0)
             # get level 1 length and validate
             if (msg[1] ^ msg[2] ^ msg[3]) != 0x7E:
-                self.logger.warning("sma: rx: length fields invalid")
+                self.logger.warning('sma: rx: length fields invalid')
                 return None
-            length = int.from_bytes(msg[1:3], byteorder="little")
+            length = int.from_bytes(msg[1:3], byteorder='little')
             if length < 18:
-                self.logger.warning("sma: rx: length to small: {}".format(length))
+                self.logger.warning('sma: rx: length to small: {}'.format(length))
                 return None
             # get remaining bytes
             while len(msg) < length:
@@ -693,18 +693,18 @@ class SMA(SmartPlugin):
                 msg += self._btsocket.recv(length - len(msg))
             # check src and dst addr and check
             if msg[4:10] != self._inv_bt_addr_le:
-                self.logger.warning("sma: rx: unknown src addr")
+                self.logger.warning('sma: rx: unknown src addr')
                 return None
             if (msg[10:16] != self._own_bt_addr_le) and (msg[10:16] != ZERO_ADDR) and (msg[10:16] != BCAST_ADDR):
-                self.logger.warning("sma: rx: wrong dst addr")
+                self.logger.warning('sma: rx: wrong dst addr')
                 return None
 
         except socket.timeout:
             if not no_timeout_warning:
-                self.logger.warning("sma: rx: timeout exception - could not receive msg within {}s".format(timeout))
+                self.logger.warning('sma: rx: timeout exception - could not receive msg within {}s'.format(timeout))
             msg = None
         except Exception as e:
-            self.logger.error("sma: rx: exception - {}".format(e))
+            self.logger.error('sma: rx: exception - {}'.format(e))
             msg = None
         return msg
 
@@ -716,7 +716,7 @@ class SMA(SmartPlugin):
         while self.alive:
             retries -= 1
             if retries == 0:
-                self.logger.warning("sma: recv smanet2 msg - retries used up!")
+                self.logger.warning('sma: recv smanet2 msg - retries used up!')
                 return []
             smanet1_msg = self._recv_smanet1_msg(no_timeout_warning=no_timeout_warning)
             if smanet1_msg is None:
@@ -724,17 +724,17 @@ class SMA(SmartPlugin):
 
             # get cmdcode - check for last message code (0x0001)
             smanet2_msg += smanet1_msg[18::]
-            cmdcode_recv = int.from_bytes(smanet1_msg[16:18], byteorder="little")
+            cmdcode_recv = int.from_bytes(smanet1_msg[16:18], byteorder='little')
             if cmdcode_recv == 0x0001:
                 break
 
-        if (smanet2_msg == b"") and no_timeout_warning:
+        if (smanet2_msg == b'') and no_timeout_warning:
             return None
 
         if smanet2_msg[0:5] != SMANET2_HDR:
-            self.logger.warning("sma: no SMANET2 msg")
+            self.logger.warning('sma: no SMANET2 msg')
             self.logger.warning(
-                "sma: recv: len={} / data=[{}]".format(len(smanet2_msg), " ".join(["0x%02x" % b for b in smanet2_msg]))
+                'sma: recv: len={} / data=[{}]'.format(len(smanet2_msg), ' '.join(['0x%02x' % b for b in smanet2_msg]))
             )
             return None
 
@@ -750,10 +750,10 @@ class SMA(SmartPlugin):
                 break
 
         crc = self._calc_crc16(smanet2_msg[1:-3])
-        if crc != int.from_bytes(smanet2_msg[-3:-1], byteorder="little"):
-            self.logger.warning("sma: crc: crc16 error - {:04x}".format(crc))
+        if crc != int.from_bytes(smanet2_msg[-3:-1], byteorder='little'):
+            self.logger.warning('sma: crc: crc16 error - {:04x}'.format(crc))
             self.logger.warning(
-                "sma: crc: len={} / data=[{}]".format(len(smanet2_msg), " ".join(["0x%02x" % b for b in smanet2_msg]))
+                'sma: crc: len={} / data=[{}]'.format(len(smanet2_msg), ' '.join(['0x%02x' % b for b in smanet2_msg]))
             )
             return None
         return smanet2_msg
@@ -764,18 +764,18 @@ class SMA(SmartPlugin):
         while self.alive:
             retries -= 1
             if retries == 0:
-                self.logger.warning("sma: recv msg with cmdcode - retries used up!")
+                self.logger.warning('sma: recv msg with cmdcode - retries used up!')
                 return None
             msg = self._recv_smanet1_msg()
             # get cmdcode
-            if (msg != []) and (int.from_bytes(msg[16:18], byteorder="little") in cmdcodes_expected):
+            if (msg != []) and (int.from_bytes(msg[16:18], byteorder='little') in cmdcodes_expected):
                 break
         return msg
 
     def _send_msg(self, msg):
         if len(msg) >= 0x3A:
             # calculate crc starting with byte 19 and append with LE byte-oder
-            msg += self._calc_crc16(msg[19::]).to_bytes(2, byteorder="little")
+            msg += self._calc_crc16(msg[19::]).to_bytes(2, byteorder='little')
             # add escape sequences starting with byte 19
             i = 19
             while True:
@@ -788,7 +788,7 @@ class SMA(SmartPlugin):
             # add msg delimiter
             msg += bytes([0x7E])
         # set length fields
-        msg[1:3] = len(msg).to_bytes(2, byteorder="little")
+        msg[1:3] = len(msg).to_bytes(2, byteorder='little')
         msg[3] = msg[1] ^ msg[2] ^ 0x7E
         # print("tx: len={} / data=[{}]".format(len(msg), ' '.join(['0x%02x' % b for b in msg])))
         self._btsocket.send(msg)
@@ -826,7 +826,7 @@ class SMA(SmartPlugin):
         # extract own bluetooth addr
         self._own_bt_addr_le = msg[26:32]
         self.logger.info(
-            "sma: own bluetooth address: {}".format(":".join(["%02x" % b for b in self._own_bt_addr_le[::-1]]))
+            'sma: own bluetooth address: {}'.format(':'.join(['%02x' % b for b in self._own_bt_addr_le[::-1]]))
         )
 
         # first SMA net2 msg
@@ -836,18 +836,18 @@ class SMA(SmartPlugin):
             # level1
             cmdcode = 0x0001
             msg = bytearray([0x7E, 0, 0, 0])
-            msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder="little")
+            msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder='little')
             # sma-net2 level
             ctrl = 0xA009
             self._send_count = (self._send_count + 1) & 0x7FFF
             msg += (
                 SMANET2_HDR
-                + ctrl.to_bytes(2, byteorder="little")
+                + ctrl.to_bytes(2, byteorder='little')
                 + BCAST_ADDR
                 + bytes([0x00, 0x00])
                 + self._inv_bt_addr_le
                 + bytes([0x00] + [0x00] + [0, 0, 0, 0])
-                + (self._send_count | 0x8000).to_bytes(2, byteorder="little")
+                + (self._send_count | 0x8000).to_bytes(2, byteorder='little')
             )
             msg += bytes([0x00, 0x02, 0x00] + [0x00] + [0x00, 0x00, 0x00, 0x00] + [0x00, 0x00, 0x00, 0x00])
             # send msg to inverter
@@ -858,24 +858,24 @@ class SMA(SmartPlugin):
                 break
 
         if retries == 0:
-            self.logger.warning("sma: connect - retries used up!")
+            self.logger.warning('sma: connect - retries used up!')
             return
 
         # second SMA net2 msg
         cmdcode = 0x0001
         msg = bytearray([0x7E, 0, 0, 0])
-        msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder="little")
+        msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder='little')
         # sma-net2 level
         ctrl = 0xA008
         self._send_count = (self._send_count + 1) & 0x7FFF
         msg += (
             SMANET2_HDR
-            + ctrl.to_bytes(2, byteorder="little")
+            + ctrl.to_bytes(2, byteorder='little')
             + BCAST_ADDR
             + bytes([0x00, 0x03])
             + self._inv_bt_addr_le
             + bytes([0x00] + [0x03] + [0, 0, 0, 0])
-            + (self._send_count | 0x8000).to_bytes(2, byteorder="little")
+            + (self._send_count | 0x8000).to_bytes(2, byteorder='little')
         )
         msg += bytes([0x0E, 0x01, 0xFD, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF])
         # send msg
@@ -892,21 +892,21 @@ class SMA(SmartPlugin):
             # level1
             cmdcode = 0x0001
             msg = bytearray([0x7E, 0, 0, 0])
-            msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder="little")
+            msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder='little')
             # sma-net2 level
             ctrl = 0xA00E
             self._send_count = (self._send_count + 1) & 0x7FFF
             msg += (
                 SMANET2_HDR
-                + ctrl.to_bytes(2, byteorder="little")
+                + ctrl.to_bytes(2, byteorder='little')
                 + BCAST_ADDR
                 + bytes([0x00, 0x01])
                 + self._inv_bt_addr_le
                 + bytes([0x00] + [0x01] + [0, 0, 0, 0])
-                + (self._send_count | 0x8000).to_bytes(2, byteorder="little")
+                + (self._send_count | 0x8000).to_bytes(2, byteorder='little')
             )
             msg += bytes([0x0C, 0x04, 0xFD, 0xFF, 0x07, 0x00, 0x00, 0x00, 0x84, 0x03, 0x00, 0x00])
-            msg += timestamp_utc.to_bytes(4, byteorder="little")
+            msg += timestamp_utc.to_bytes(4, byteorder='little')
             msg += bytes([0x00, 0x00, 0x00, 0x00] + password_pattern)
             # send msg to inverter
             self._send_msg(msg)
@@ -918,17 +918,17 @@ class SMA(SmartPlugin):
                 break
 
         if retries == 0:
-            self.logger.warning("sma: login - retries used up!")
+            self.logger.warning('sma: login - retries used up!')
             return
 
         # extract serial
-        self._inv_serial = int.from_bytes(msg[17:21], byteorder="little")
-        self.logger.info("sma: inverter serial = {}".format(self._inv_serial))
+        self._inv_serial = int.from_bytes(msg[17:21], byteorder='little')
+        self.logger.info('sma: inverter serial = {}'.format(self._inv_serial))
 
     def _inv_get_bt_signal_strength(self):
         cmdcode = 0x0003
         msg = bytearray([0x7E, 0, 0, 0])
-        msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder="little")
+        msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder='little')
         msg += bytes([0x05, 0x00])
         self._send_msg(msg)
         msg = self._recv_smanet1_msg_with_cmdcode([0x0004])
@@ -940,7 +940,7 @@ class SMA(SmartPlugin):
         # level1
         cmdcode = 0x0001
         msg = bytearray([0x7E, 0, 0, 0])
-        msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder="little")
+        msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder='little')
         # sma-net2 level
         self._send_count = (self._send_count + 1) & 0x7FFF
         msg += (
@@ -950,12 +950,12 @@ class SMA(SmartPlugin):
             + bytes([0x00, 0x00])
             + self._inv_bt_addr_le
             + bytes([0x00] + [0x00] + [0, 0, 0, 0])
-            + (self._send_count | 0x8000).to_bytes(2, byteorder="little")
+            + (self._send_count | 0x8000).to_bytes(2, byteorder='little')
         )
         msg += (
-            request_set[0].to_bytes(4, byteorder="little")
-            + request_set[1].to_bytes(4, byteorder="little")
-            + request_set[2].to_bytes(4, byteorder="little")
+            request_set[0].to_bytes(4, byteorder='little')
+            + request_set[1].to_bytes(4, byteorder='little')
+            + request_set[2].to_bytes(4, byteorder='little')
         )
         # send msg to inverter
         # self.logger.debug("sma: requesting {:#06x}-{:#06x}...".format(request_set[1], request_set[2]))
@@ -965,7 +965,7 @@ class SMA(SmartPlugin):
         # level1
         cmdcode = 0x0001
         msg = bytearray([0x7E, 0, 0, 0])
-        msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder="little")
+        msg += self._own_bt_addr_le + self._inv_bt_addr_le + cmdcode.to_bytes(2, byteorder='little')
         # sma-net2 level
         self._send_count = (self._send_count + 1) & 0x7FFF
         msg += (
@@ -975,20 +975,20 @@ class SMA(SmartPlugin):
             + bytes([0x00, 0x00])
             + self._inv_bt_addr_le
             + bytes([0x00] + [0x00] + [0, 0, 0, 0])
-            + (self._send_count | 0x8000).to_bytes(2, byteorder="little")
+            + (self._send_count | 0x8000).to_bytes(2, byteorder='little')
         )
         msg += (
-            int(0xF000020A).to_bytes(4, byteorder="little")
-            + int(0x00236D00).to_bytes(4, byteorder="little")
-            + int(0x00236D00).to_bytes(4, byteorder="little")
-            + int(0x00236D00).to_bytes(4, byteorder="little")
+            int(0xF000020A).to_bytes(4, byteorder='little')
+            + int(0x00236D00).to_bytes(4, byteorder='little')
+            + int(0x00236D00).to_bytes(4, byteorder='little')
+            + int(0x00236D00).to_bytes(4, byteorder='little')
         )
-        local_time = int(time.time()).to_bytes(4, byteorder="little")
+        local_time = int(time.time()).to_bytes(4, byteorder='little')
         msg += (
             local_time
             + local_time
             + local_time
-            + round((datetime.now() - self.shtime.utcnow()).total_seconds()).to_bytes(4, byteorder="little")
+            + round((datetime.now() - self.shtime.utcnow()).total_seconds()).to_bytes(4, byteorder='little')
             + local_time
             + bytes([0x01, 0x00, 0x00, 0x00])
         )

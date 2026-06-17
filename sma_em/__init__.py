@@ -32,71 +32,71 @@ from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 from lib.module import Modules
 
 sma_units = {
-    "W": 10,
-    "VA": 10,
-    "VAr": 10,
-    "kWh": 3600000,
-    "kVAh": 3600000,
-    "kVArh": 3600000,
-    "A": 1000,
-    "V": 1000,
-    "°": 1000,
-    "Hz": 1000,
+    'W': 10,
+    'VA': 10,
+    'VAr': 10,
+    'kWh': 3600000,
+    'kVAh': 3600000,
+    'kVArh': 3600000,
+    'A': 1000,
+    'V': 1000,
+    '°': 1000,
+    'Hz': 1000,
 }
 
 sma_channels = {
     # totals
-    1: ("pconsume", "W", "kWh"),
-    2: ("psupply", "W", "kWh"),
-    3: ("qconsume", "VAr", "kVArh"),
-    4: ("qsupply", "VAr", "kVArh"),
-    9: ("sconsume", "VA", "kVAh"),
-    10: ("ssupply", "VA", "kVAh"),
-    13: ("cosphi", "°"),
-    14: ("frequency", "Hz"),
+    1: ('pconsume', 'W', 'kWh'),
+    2: ('psupply', 'W', 'kWh'),
+    3: ('qconsume', 'VAr', 'kVArh'),
+    4: ('qsupply', 'VAr', 'kVArh'),
+    9: ('sconsume', 'VA', 'kVAh'),
+    10: ('ssupply', 'VA', 'kVAh'),
+    13: ('cosphi', '°'),
+    14: ('frequency', 'Hz'),
     # phase 1
-    21: ("p1consume", "W", "kWh"),
-    22: ("p1supply", "W", "kWh"),
-    23: ("q1consume", "VAr", "kVArh"),
-    24: ("q1supply", "VAr", "kVArh"),
-    29: ("s1consume", "VA", "kVAh"),
-    30: ("s1supply", "VA", "kVAh"),
-    31: ("i1", "A"),
-    32: ("u1", "V"),
-    33: ("cosphi1", "°"),
+    21: ('p1consume', 'W', 'kWh'),
+    22: ('p1supply', 'W', 'kWh'),
+    23: ('q1consume', 'VAr', 'kVArh'),
+    24: ('q1supply', 'VAr', 'kVArh'),
+    29: ('s1consume', 'VA', 'kVAh'),
+    30: ('s1supply', 'VA', 'kVAh'),
+    31: ('i1', 'A'),
+    32: ('u1', 'V'),
+    33: ('cosphi1', '°'),
     # phase 2
-    41: ("p2consume", "W", "kWh"),
-    42: ("p2supply", "W", "kWh"),
-    43: ("q2consume", "VAr", "kVArh"),
-    44: ("q2supply", "VAr", "kVArh"),
-    49: ("s2consume", "VA", "kVAh"),
-    50: ("s2supply", "VA", "kVAh"),
-    51: ("i2", "A"),
-    52: ("u2", "V"),
-    53: ("cosphi2", "°"),
+    41: ('p2consume', 'W', 'kWh'),
+    42: ('p2supply', 'W', 'kWh'),
+    43: ('q2consume', 'VAr', 'kVArh'),
+    44: ('q2supply', 'VAr', 'kVArh'),
+    49: ('s2consume', 'VA', 'kVAh'),
+    50: ('s2supply', 'VA', 'kVAh'),
+    51: ('i2', 'A'),
+    52: ('u2', 'V'),
+    53: ('cosphi2', '°'),
     # phase 3
-    61: ("p3consume", "W", "kWh"),
-    62: ("p3supply", "W", "kWh"),
-    63: ("q3consume", "VAr", "kVArh"),
-    64: ("q3supply", "VAr", "kVArh"),
-    69: ("s3consume", "VA", "kVAh"),
-    70: ("s3supply", "VA", "kVAh"),
-    71: ("i3", "A"),
-    72: ("u3", "V"),
-    73: ("cosphi3", "°"),
+    61: ('p3consume', 'W', 'kWh'),
+    62: ('p3supply', 'W', 'kWh'),
+    63: ('q3consume', 'VAr', 'kVArh'),
+    64: ('q3supply', 'VAr', 'kVArh'),
+    69: ('s3consume', 'VA', 'kVAh'),
+    70: ('s3supply', 'VA', 'kVAh'),
+    71: ('i3', 'A'),
+    72: ('u3', 'V'),
+    73: ('cosphi3', '°'),
     # common
-    36864: ("speedwire-version", ""),
+    36864: ('speedwire-version', ''),
 }
 
 
 class SMA_EM(SmartPlugin):
     ALLOW_MULTIINSTANCE = False
-    PLUGIN_VERSION = "1.6.1"
+    PLUGIN_VERSION = '1.6.1'
 
     # listen to the Multicast; SMA-Energymeter sends its measurements to 239.12.255.254:9522
-    MCAST_GRP = "239.12.255.254"
+    MCAST_GRP = '239.12.255.254'
     MCAST_PORT = 9522
-    ipbind = "0.0.0.0"
+    ipbind = '0.0.0.0'
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -107,19 +107,19 @@ class SMA_EM(SmartPlugin):
 
         self.logger = logging.getLogger(__name__)
         self._items = {}
-        self._cycle = self.get_parameter_value("cycle")
-        self._serial = self.get_parameter_value("serial")
+        self._cycle = self.get_parameter_value('cycle')
+        self._serial = self.get_parameter_value('serial')
 
         # prepare listen to socket-Multicast
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-        self.sock.bind(("", self.MCAST_PORT))
+        self.sock.bind(('', self.MCAST_PORT))
 
         try:
-            mreq = struct.pack("4s4s", socket.inet_aton(self.MCAST_GRP), socket.inet_aton(self.ipbind))
+            mreq = struct.pack('4s4s', socket.inet_aton(self.MCAST_GRP), socket.inet_aton(self.ipbind))
             self.sock.setsockopt(socket.IPPROTO_IP, socket.IP_ADD_MEMBERSHIP, mreq)
         except BaseException as e:
-            self.logger.error("Could not connect to multicast group or bind to given interface: %s" % e)
+            self.logger.error('Could not connect to multicast group or bind to given interface: %s' % e)
             return
 
         self.init_webinterface()
@@ -136,7 +136,7 @@ class SMA_EM(SmartPlugin):
         """
         self.alive = True
         self.scheduler_add(
-            "update_sma_em",
+            'update_sma_em',
             self._update_sma_em,
             prio=3,
             cron=None,
@@ -150,7 +150,7 @@ class SMA_EM(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.scheduler_remove("update_sma_em")
+        self.scheduler_remove('update_sma_em')
         self.alive = False
 
     def parse_item(self, item):
@@ -160,270 +160,270 @@ class SMA_EM(SmartPlugin):
 
         :param item: The item to process.
         """
-        if self.has_iattr(item.conf, "sma_em_data_type"):
-            self._items[self.get_iattr_value(item.conf, "sma_em_data_type")] = item
+        if self.has_iattr(item.conf, 'sma_em_data_type'):
+            self._items[self.get_iattr_value(item.conf, 'sma_em_data_type')] = item
             return self.update_item
 
     def parse_logic(self, logic):
         pass
 
     def update_item(self, item, caller=None, source=None, dest=None):
-        if caller != "plugin":
+        if caller != 'plugin':
             pass
 
     def _update_sma_em(self):
         emparts = self.readem()
-        if self._serial == format(emparts["serial"]):
-            if "pconsume" in self._items:
-                self._items["pconsume"](emparts["pconsume"], __name__)
-            if "pconsumeunit" in self._items:
-                self._items["pconsumeunit"](emparts["pconsumeunit"], __name__)
-            if "pconsumecounter" in self._items:
-                self._items["pconsumecounter"](emparts["pconsumecounter"], __name__)
-            if "pconsumecounterunit" in self._items:
-                self._items["pconsumecounterunit"](emparts["pconsumecounterunit"], __name__)
-            if "psupply" in self._items:
-                self._items["psupply"](emparts["psupply"], __name__)
-            if "psupplyunit" in self._items:
-                self._items["psupplyunit"](emparts["psupplyunit"], __name__)
-            if "psupplycounter" in self._items:
-                self._items["psupplycounter"](emparts["psupplycounter"], __name__)
-            if "psupplycounterunit" in self._items:
-                self._items["psupplycounterunit"](emparts["psupplycounterunit"], __name__)
+        if self._serial == format(emparts['serial']):
+            if 'pconsume' in self._items:
+                self._items['pconsume'](emparts['pconsume'], __name__)
+            if 'pconsumeunit' in self._items:
+                self._items['pconsumeunit'](emparts['pconsumeunit'], __name__)
+            if 'pconsumecounter' in self._items:
+                self._items['pconsumecounter'](emparts['pconsumecounter'], __name__)
+            if 'pconsumecounterunit' in self._items:
+                self._items['pconsumecounterunit'](emparts['pconsumecounterunit'], __name__)
+            if 'psupply' in self._items:
+                self._items['psupply'](emparts['psupply'], __name__)
+            if 'psupplyunit' in self._items:
+                self._items['psupplyunit'](emparts['psupplyunit'], __name__)
+            if 'psupplycounter' in self._items:
+                self._items['psupplycounter'](emparts['psupplycounter'], __name__)
+            if 'psupplycounterunit' in self._items:
+                self._items['psupplycounterunit'](emparts['psupplycounterunit'], __name__)
 
-            if "sconsume" in self._items:
-                self._items["sconsume"](emparts["sconsume"], __name__)
-            if "sconsumeunit" in self._items:
-                self._items["sconsumeunit"](emparts["sconsumeunit"], __name__)
-            if "sconsumecounter" in self._items:
-                self._items["sconsumecounter"](emparts["sconsumecounter"], __name__)
-            if "sconsumecounterunit" in self._items:
-                self._items["sconsumecounterunit"](emparts["sconsumecounterunit"], __name__)
-            if "ssupply" in self._items:
-                self._items["ssupply"](emparts["ssupply"], __name__)
-            if "ssupplyunit" in self._items:
-                self._items["ssupplyunit"](emparts["ssupplyunit"], __name__)
-            if "ssupplycounter" in self._items:
-                self._items["ssupplycounter"](emparts["ssupplycounter"], __name__)
-            if "ssupplycounterunit" in self._items:
-                self._items["ssupplycounterunit"](emparts["ssupplycounterunit"], __name__)
+            if 'sconsume' in self._items:
+                self._items['sconsume'](emparts['sconsume'], __name__)
+            if 'sconsumeunit' in self._items:
+                self._items['sconsumeunit'](emparts['sconsumeunit'], __name__)
+            if 'sconsumecounter' in self._items:
+                self._items['sconsumecounter'](emparts['sconsumecounter'], __name__)
+            if 'sconsumecounterunit' in self._items:
+                self._items['sconsumecounterunit'](emparts['sconsumecounterunit'], __name__)
+            if 'ssupply' in self._items:
+                self._items['ssupply'](emparts['ssupply'], __name__)
+            if 'ssupplyunit' in self._items:
+                self._items['ssupplyunit'](emparts['ssupplyunit'], __name__)
+            if 'ssupplycounter' in self._items:
+                self._items['ssupplycounter'](emparts['ssupplycounter'], __name__)
+            if 'ssupplycounterunit' in self._items:
+                self._items['ssupplycounterunit'](emparts['ssupplycounterunit'], __name__)
 
-            if "qconsume" in self._items:
-                self._items["qconsume"](emparts["qconsume"], __name__)
-            if "qconsumeunit" in self._items:
-                self._items["qconsumeunit"](emparts["qconsumeunit"], __name__)
-            if "qconsumecounter" in self._items:
-                self._items["qconsumecounter"](emparts["qconsumecounter"], __name__)
-            if "qconsumecounterunit" in self._items:
-                self._items["qconsumecounterunit"](emparts["qconsumecounterunit"], __name__)
-            if "qsupply" in self._items:
-                self._items["qsupply"](emparts["qsupply"], __name__)
-            if "qsupplyunit" in self._items:
-                self._items["qsupplyunit"](emparts["qsupplyunit"], __name__)
-            if "qsupplycounter" in self._items:
-                self._items["qsupplycounter"](emparts["qsupplycounter"], __name__)
-            if "qsupplycounterunit" in self._items:
-                self._items["qsupplycounterunit"](emparts["qsupplycounterunit"], __name__)
+            if 'qconsume' in self._items:
+                self._items['qconsume'](emparts['qconsume'], __name__)
+            if 'qconsumeunit' in self._items:
+                self._items['qconsumeunit'](emparts['qconsumeunit'], __name__)
+            if 'qconsumecounter' in self._items:
+                self._items['qconsumecounter'](emparts['qconsumecounter'], __name__)
+            if 'qconsumecounterunit' in self._items:
+                self._items['qconsumecounterunit'](emparts['qconsumecounterunit'], __name__)
+            if 'qsupply' in self._items:
+                self._items['qsupply'](emparts['qsupply'], __name__)
+            if 'qsupplyunit' in self._items:
+                self._items['qsupplyunit'](emparts['qsupplyunit'], __name__)
+            if 'qsupplycounter' in self._items:
+                self._items['qsupplycounter'](emparts['qsupplycounter'], __name__)
+            if 'qsupplycounterunit' in self._items:
+                self._items['qsupplycounterunit'](emparts['qsupplycounterunit'], __name__)
 
-            if "cosphi" in self._items:
-                self._items["cosphi"](emparts["cosphi"], __name__)
-            if "cosphiunit" in self._items:
-                self._items["cosphiunit"](emparts["cosphiunit"], __name__)
+            if 'cosphi' in self._items:
+                self._items['cosphi'](emparts['cosphi'], __name__)
+            if 'cosphiunit' in self._items:
+                self._items['cosphiunit'](emparts['cosphiunit'], __name__)
 
-            if "p1consume" in self._items:
-                self._items["p1consume"](emparts["p1consume"], __name__)
-            if "p1consumeunit" in self._items:
-                self._items["p1consumeunit"](emparts["p1consumeunit"], __name__)
-            if "p1consumecounter" in self._items:
-                self._items["p1consumecounter"](emparts["p1consumecounter"], __name__)
-            if "p1consumecounterunit" in self._items:
-                self._items["p1consumecounterunit"](emparts["p1consumecounterunit"], __name__)
-            if "p1supply" in self._items:
-                self._items["p1supply"](emparts["p1supply"], __name__)
-            if "p1supplyunit" in self._items:
-                self._items["p1supplyunit"](emparts["p1supplyunit"], __name__)
-            if "p1supplycounter" in self._items:
-                self._items["p1supplycounter"](emparts["p1supplycounter"], __name__)
-            if "p1supplycounterunit" in self._items:
-                self._items["p1supplycounterunit"](emparts["p1supplycounterunit"], __name__)
+            if 'p1consume' in self._items:
+                self._items['p1consume'](emparts['p1consume'], __name__)
+            if 'p1consumeunit' in self._items:
+                self._items['p1consumeunit'](emparts['p1consumeunit'], __name__)
+            if 'p1consumecounter' in self._items:
+                self._items['p1consumecounter'](emparts['p1consumecounter'], __name__)
+            if 'p1consumecounterunit' in self._items:
+                self._items['p1consumecounterunit'](emparts['p1consumecounterunit'], __name__)
+            if 'p1supply' in self._items:
+                self._items['p1supply'](emparts['p1supply'], __name__)
+            if 'p1supplyunit' in self._items:
+                self._items['p1supplyunit'](emparts['p1supplyunit'], __name__)
+            if 'p1supplycounter' in self._items:
+                self._items['p1supplycounter'](emparts['p1supplycounter'], __name__)
+            if 'p1supplycounterunit' in self._items:
+                self._items['p1supplycounterunit'](emparts['p1supplycounterunit'], __name__)
 
-            if "s1consume" in self._items:
-                self._items["s1consume"](emparts["s1consume"], __name__)
-            if "s1consumeunit" in self._items:
-                self._items["s1consumeunit"](emparts["s1consumeunit"], __name__)
-            if "s1consumecounter" in self._items:
-                self._items["s1consumecounter"](emparts["s1consumecounter"], __name__)
-            if "s1consumecounterunit" in self._items:
-                self._items["s1consumecounterunit"](emparts["s1consumecounterunit"], __name__)
-            if "s1supply" in self._items:
-                self._items["s1supply"](emparts["s1supply"], __name__)
-            if "s1supplyunit" in self._items:
-                self._items["s1supplyunit"](emparts["s1supplyunit"], __name__)
-            if "s1supplycounter" in self._items:
-                self._items["s1supplycounter"](emparts["s1supplycounter"], __name__)
-            if "s1supplycounterunit" in self._items:
-                self._items["s1supplycounterunit"](emparts["s1supplycounterunit"], __name__)
+            if 's1consume' in self._items:
+                self._items['s1consume'](emparts['s1consume'], __name__)
+            if 's1consumeunit' in self._items:
+                self._items['s1consumeunit'](emparts['s1consumeunit'], __name__)
+            if 's1consumecounter' in self._items:
+                self._items['s1consumecounter'](emparts['s1consumecounter'], __name__)
+            if 's1consumecounterunit' in self._items:
+                self._items['s1consumecounterunit'](emparts['s1consumecounterunit'], __name__)
+            if 's1supply' in self._items:
+                self._items['s1supply'](emparts['s1supply'], __name__)
+            if 's1supplyunit' in self._items:
+                self._items['s1supplyunit'](emparts['s1supplyunit'], __name__)
+            if 's1supplycounter' in self._items:
+                self._items['s1supplycounter'](emparts['s1supplycounter'], __name__)
+            if 's1supplycounterunit' in self._items:
+                self._items['s1supplycounterunit'](emparts['s1supplycounterunit'], __name__)
 
-            if "q1consume" in self._items:
-                self._items["q1consume"](emparts["q1consume"], __name__)
-            if "q1consumeunit" in self._items:
-                self._items["q1consumeunit"](emparts["q1consumeunit"], __name__)
-            if "q1consumecounter" in self._items:
-                self._items["q1consumecounter"](emparts["q1consumecounter"], __name__)
-            if "q1consumecounterunit" in self._items:
-                self._items["q1consumecounterunit"](emparts["q1consumecounterunit"], __name__)
-            if "q1supply" in self._items:
-                self._items["q1supply"](emparts["q1supply"], __name__)
-            if "q1supplyunit" in self._items:
-                self._items["q1supplyunit"](emparts["q1supplyunit"], __name__)
-            if "q1supplycounter" in self._items:
-                self._items["q1supplycounter"](emparts["q1supplycounter"], __name__)
-            if "q1supplycounterunit" in self._items:
-                self._items["q1supplycounterunit"](emparts["q1supplycounterunit"], __name__)
+            if 'q1consume' in self._items:
+                self._items['q1consume'](emparts['q1consume'], __name__)
+            if 'q1consumeunit' in self._items:
+                self._items['q1consumeunit'](emparts['q1consumeunit'], __name__)
+            if 'q1consumecounter' in self._items:
+                self._items['q1consumecounter'](emparts['q1consumecounter'], __name__)
+            if 'q1consumecounterunit' in self._items:
+                self._items['q1consumecounterunit'](emparts['q1consumecounterunit'], __name__)
+            if 'q1supply' in self._items:
+                self._items['q1supply'](emparts['q1supply'], __name__)
+            if 'q1supplyunit' in self._items:
+                self._items['q1supplyunit'](emparts['q1supplyunit'], __name__)
+            if 'q1supplycounter' in self._items:
+                self._items['q1supplycounter'](emparts['q1supplycounter'], __name__)
+            if 'q1supplycounterunit' in self._items:
+                self._items['q1supplycounterunit'](emparts['q1supplycounterunit'], __name__)
 
-            if "i1" in self._items:
-                self._items["i1"](emparts["i1"], __name__)
-            if "i1unit" in self._items:
-                self._items["i1unit"](emparts["i1unit"], __name__)
-            if "u1" in self._items:
-                self._items["u1"](emparts["u1"], __name__)
-            if "u1unit" in self._items:
-                self._items["u1unit"](emparts["u1unit"], __name__)
-            if "cosphi1" in self._items:
-                self._items["cosphi1"](emparts["cosphi1"], __name__)
-            if "cosphi1unit" in self._items:
-                self._items["cosphi1unit"](emparts["cosphi1unit"], __name__)
+            if 'i1' in self._items:
+                self._items['i1'](emparts['i1'], __name__)
+            if 'i1unit' in self._items:
+                self._items['i1unit'](emparts['i1unit'], __name__)
+            if 'u1' in self._items:
+                self._items['u1'](emparts['u1'], __name__)
+            if 'u1unit' in self._items:
+                self._items['u1unit'](emparts['u1unit'], __name__)
+            if 'cosphi1' in self._items:
+                self._items['cosphi1'](emparts['cosphi1'], __name__)
+            if 'cosphi1unit' in self._items:
+                self._items['cosphi1unit'](emparts['cosphi1unit'], __name__)
 
-            if "p2consume" in self._items:
-                self._items["p2consume"](emparts["p2consume"], __name__)
-            if "p2consumeunit" in self._items:
-                self._items["p2consumeunit"](emparts["p2consumeunit"], __name__)
-            if "p2consumecounter" in self._items:
-                self._items["p2consumecounter"](emparts["p2consumecounter"], __name__)
-            if "p2consumecounterunit" in self._items:
-                self._items["p2consumecounterunit"](emparts["p2consumecounterunit"], __name__)
-            if "p2supply" in self._items:
-                self._items["p2supply"](emparts["p2supply"], __name__)
-            if "p2supplyunit" in self._items:
-                self._items["p2supplyunit"](emparts["p2supplyunit"], __name__)
-            if "p2supplycounter" in self._items:
-                self._items["p2supplycounter"](emparts["p2supplycounter"], __name__)
-            if "p2supplycounterunit" in self._items:
-                self._items["p2supplycounterunit"](emparts["p2supplycounterunit"], __name__)
+            if 'p2consume' in self._items:
+                self._items['p2consume'](emparts['p2consume'], __name__)
+            if 'p2consumeunit' in self._items:
+                self._items['p2consumeunit'](emparts['p2consumeunit'], __name__)
+            if 'p2consumecounter' in self._items:
+                self._items['p2consumecounter'](emparts['p2consumecounter'], __name__)
+            if 'p2consumecounterunit' in self._items:
+                self._items['p2consumecounterunit'](emparts['p2consumecounterunit'], __name__)
+            if 'p2supply' in self._items:
+                self._items['p2supply'](emparts['p2supply'], __name__)
+            if 'p2supplyunit' in self._items:
+                self._items['p2supplyunit'](emparts['p2supplyunit'], __name__)
+            if 'p2supplycounter' in self._items:
+                self._items['p2supplycounter'](emparts['p2supplycounter'], __name__)
+            if 'p2supplycounterunit' in self._items:
+                self._items['p2supplycounterunit'](emparts['p2supplycounterunit'], __name__)
 
-            if "s2consume" in self._items:
-                self._items["s2consume"](emparts["s2consume"], __name__)
-            if "s2consumeunit" in self._items:
-                self._items["s2consumeunit"](emparts["s2consumeunit"], __name__)
-            if "s2consumecounter" in self._items:
-                self._items["s2consumecounter"](emparts["s2consumecounter"], __name__)
-            if "s2consumecounterunit" in self._items:
-                self._items["s2consumecounterunit"](emparts["s2consumecounterunit"], __name__)
-            if "s2supply" in self._items:
-                self._items["s2supply"](emparts["s2supply"], __name__)
-            if "s2supplyunit" in self._items:
-                self._items["s2supplyunit"](emparts["s2supplyunit"], __name__)
-            if "s2supplycounter" in self._items:
-                self._items["s2supplycounter"](emparts["s2supplycounter"], __name__)
-            if "s2supplycounterunit" in self._items:
-                self._items["s2supplycounterunit"](emparts["s2supplycounterunit"], __name__)
+            if 's2consume' in self._items:
+                self._items['s2consume'](emparts['s2consume'], __name__)
+            if 's2consumeunit' in self._items:
+                self._items['s2consumeunit'](emparts['s2consumeunit'], __name__)
+            if 's2consumecounter' in self._items:
+                self._items['s2consumecounter'](emparts['s2consumecounter'], __name__)
+            if 's2consumecounterunit' in self._items:
+                self._items['s2consumecounterunit'](emparts['s2consumecounterunit'], __name__)
+            if 's2supply' in self._items:
+                self._items['s2supply'](emparts['s2supply'], __name__)
+            if 's2supplyunit' in self._items:
+                self._items['s2supplyunit'](emparts['s2supplyunit'], __name__)
+            if 's2supplycounter' in self._items:
+                self._items['s2supplycounter'](emparts['s2supplycounter'], __name__)
+            if 's2supplycounterunit' in self._items:
+                self._items['s2supplycounterunit'](emparts['s2supplycounterunit'], __name__)
 
-            if "q2consume" in self._items:
-                self._items["q2consume"](emparts["q2consume"], __name__)
-            if "q2consumeunit" in self._items:
-                self._items["q2consumeunit"](emparts["q2consumeunit"], __name__)
-            if "q2consumecounter" in self._items:
-                self._items["q2consumecounter"](emparts["q2consumecounter"], __name__)
-            if "q2consumecounterunit" in self._items:
-                self._items["q2consumecounterunit"](emparts["q2consumecounterunit"], __name__)
-            if "q2supply" in self._items:
-                self._items["q2supply"](emparts["q2supply"], __name__)
-            if "q2supplyunit" in self._items:
-                self._items["q2supplyunit"](emparts["q2supplyunit"], __name__)
-            if "q2supplycounter" in self._items:
-                self._items["q2supplycounter"](emparts["q2supplycounter"], __name__)
-            if "q2supplycounterunit" in self._items:
-                self._items["q2supplycounterunit"](emparts["q2supplycounterunit"], __name__)
+            if 'q2consume' in self._items:
+                self._items['q2consume'](emparts['q2consume'], __name__)
+            if 'q2consumeunit' in self._items:
+                self._items['q2consumeunit'](emparts['q2consumeunit'], __name__)
+            if 'q2consumecounter' in self._items:
+                self._items['q2consumecounter'](emparts['q2consumecounter'], __name__)
+            if 'q2consumecounterunit' in self._items:
+                self._items['q2consumecounterunit'](emparts['q2consumecounterunit'], __name__)
+            if 'q2supply' in self._items:
+                self._items['q2supply'](emparts['q2supply'], __name__)
+            if 'q2supplyunit' in self._items:
+                self._items['q2supplyunit'](emparts['q2supplyunit'], __name__)
+            if 'q2supplycounter' in self._items:
+                self._items['q2supplycounter'](emparts['q2supplycounter'], __name__)
+            if 'q2supplycounterunit' in self._items:
+                self._items['q2supplycounterunit'](emparts['q2supplycounterunit'], __name__)
 
-            if "i2" in self._items:
-                self._items["i2"](emparts["i2"], __name__)
-            if "i2unit" in self._items:
-                self._items["i2unit"](emparts["i2unit"], __name__)
-            if "u2" in self._items:
-                self._items["u2"](emparts["u2"], __name__)
-            if "u2unit" in self._items:
-                self._items["u2unit"](emparts["u2unit"], __name__)
-            if "cosphi2" in self._items:
-                self._items["cosphi2"](emparts["cosphi2"], __name__)
-            if "cosphi2unit" in self._items:
-                self._items["cosphi2unit"](emparts["cosphi2unit"], __name__)
+            if 'i2' in self._items:
+                self._items['i2'](emparts['i2'], __name__)
+            if 'i2unit' in self._items:
+                self._items['i2unit'](emparts['i2unit'], __name__)
+            if 'u2' in self._items:
+                self._items['u2'](emparts['u2'], __name__)
+            if 'u2unit' in self._items:
+                self._items['u2unit'](emparts['u2unit'], __name__)
+            if 'cosphi2' in self._items:
+                self._items['cosphi2'](emparts['cosphi2'], __name__)
+            if 'cosphi2unit' in self._items:
+                self._items['cosphi2unit'](emparts['cosphi2unit'], __name__)
 
-            if "p3consume" in self._items:
-                self._items["p3consume"](emparts["p3consume"], __name__)
-            if "p3consumeunit" in self._items:
-                self._items["p3consumeunit"](emparts["p3consumeunit"], __name__)
-            if "p3consumecounter" in self._items:
-                self._items["p3consumecounter"](emparts["p3consumecounter"], __name__)
-            if "p3consumecounterunit" in self._items:
-                self._items["p3consumecounterunit"](emparts["p3consumecounterunit"], __name__)
-            if "p3supply" in self._items:
-                self._items["p3supply"](emparts["p3supply"], __name__)
-            if "p3supplyunit" in self._items:
-                self._items["p3supplyunit"](emparts["p3supplyunit"], __name__)
-            if "p3supplycounter" in self._items:
-                self._items["p3supplycounter"](emparts["p3supplycounter"], __name__)
-            if "p3supplycounterunit" in self._items:
-                self._items["p3supplycounterunit"](emparts["p3supplycounterunit"], __name__)
+            if 'p3consume' in self._items:
+                self._items['p3consume'](emparts['p3consume'], __name__)
+            if 'p3consumeunit' in self._items:
+                self._items['p3consumeunit'](emparts['p3consumeunit'], __name__)
+            if 'p3consumecounter' in self._items:
+                self._items['p3consumecounter'](emparts['p3consumecounter'], __name__)
+            if 'p3consumecounterunit' in self._items:
+                self._items['p3consumecounterunit'](emparts['p3consumecounterunit'], __name__)
+            if 'p3supply' in self._items:
+                self._items['p3supply'](emparts['p3supply'], __name__)
+            if 'p3supplyunit' in self._items:
+                self._items['p3supplyunit'](emparts['p3supplyunit'], __name__)
+            if 'p3supplycounter' in self._items:
+                self._items['p3supplycounter'](emparts['p3supplycounter'], __name__)
+            if 'p3supplycounterunit' in self._items:
+                self._items['p3supplycounterunit'](emparts['p3supplycounterunit'], __name__)
 
-            if "s3consume" in self._items:
-                self._items["s3consume"](emparts["s3consume"], __name__)
-            if "s3consumeunit" in self._items:
-                self._items["s3consumeunit"](emparts["s3consumeunit"], __name__)
-            if "s3consumecounter" in self._items:
-                self._items["s3consumecounter"](emparts["s3consumecounter"], __name__)
-            if "s3consumecounterunit" in self._items:
-                self._items["s3consumecounterunit"](emparts["s3consumecounterunit"], __name__)
-            if "s3supply" in self._items:
-                self._items["s3supply"](emparts["s3supply"], __name__)
-            if "s3supplyunit" in self._items:
-                self._items["s3supplyunit"](emparts["s3supplyunit"], __name__)
-            if "s3supplycounter" in self._items:
-                self._items["s3supplycounter"](emparts["s3supplycounter"], __name__)
-            if "s3supplycounterunit" in self._items:
-                self._items["s3supplycounterunit"](emparts["s3supplycounterunit"], __name__)
+            if 's3consume' in self._items:
+                self._items['s3consume'](emparts['s3consume'], __name__)
+            if 's3consumeunit' in self._items:
+                self._items['s3consumeunit'](emparts['s3consumeunit'], __name__)
+            if 's3consumecounter' in self._items:
+                self._items['s3consumecounter'](emparts['s3consumecounter'], __name__)
+            if 's3consumecounterunit' in self._items:
+                self._items['s3consumecounterunit'](emparts['s3consumecounterunit'], __name__)
+            if 's3supply' in self._items:
+                self._items['s3supply'](emparts['s3supply'], __name__)
+            if 's3supplyunit' in self._items:
+                self._items['s3supplyunit'](emparts['s3supplyunit'], __name__)
+            if 's3supplycounter' in self._items:
+                self._items['s3supplycounter'](emparts['s3supplycounter'], __name__)
+            if 's3supplycounterunit' in self._items:
+                self._items['s3supplycounterunit'](emparts['s3supplycounterunit'], __name__)
 
-            if "q3consume" in self._items:
-                self._items["q3consume"](emparts["q3consume"], __name__)
-            if "q3consumeunit" in self._items:
-                self._items["q3consumeunit"](emparts["q3consumeunit"], __name__)
-            if "q3consumecounter" in self._items:
-                self._items["q3consumecounter"](emparts["q3consumecounter"], __name__)
-            if "q3consumecounterunit" in self._items:
-                self._items["q3consumecounterunit"](emparts["q3consumecounterunit"], __name__)
-            if "q3supply" in self._items:
-                self._items["q3supply"](emparts["q3supply"], __name__)
-            if "q3supplyunit" in self._items:
-                self._items["q3supplyunit"](emparts["q3supplyunit"], __name__)
-            if "q3supplycounter" in self._items:
-                self._items["q3supplycounter"](emparts["q3supplycounter"], __name__)
-            if "q3supplycounterunit" in self._items:
-                self._items["q3supplycounterunit"](emparts["q3supplycounterunit"], __name__)
+            if 'q3consume' in self._items:
+                self._items['q3consume'](emparts['q3consume'], __name__)
+            if 'q3consumeunit' in self._items:
+                self._items['q3consumeunit'](emparts['q3consumeunit'], __name__)
+            if 'q3consumecounter' in self._items:
+                self._items['q3consumecounter'](emparts['q3consumecounter'], __name__)
+            if 'q3consumecounterunit' in self._items:
+                self._items['q3consumecounterunit'](emparts['q3consumecounterunit'], __name__)
+            if 'q3supply' in self._items:
+                self._items['q3supply'](emparts['q3supply'], __name__)
+            if 'q3supplyunit' in self._items:
+                self._items['q3supplyunit'](emparts['q3supplyunit'], __name__)
+            if 'q3supplycounter' in self._items:
+                self._items['q3supplycounter'](emparts['q3supplycounter'], __name__)
+            if 'q3supplycounterunit' in self._items:
+                self._items['q3supplycounterunit'](emparts['q3supplycounterunit'], __name__)
 
-            if "i3" in self._items:
-                self._items["i3"](emparts["i3"], __name__)
-            if "i3unit" in self._items:
-                self._items["i3unit"](emparts["i3unit"], __name__)
-            if "u3" in self._items:
-                self._items["u3"](emparts["u3"], __name__)
-            if "u3unit" in self._items:
-                self._items["u3unit"](emparts["u3unit"], __name__)
-            if "cosphi3" in self._items:
-                self._items["cosphi3"](emparts["cosphi3"], __name__)
-            if "cosphi3unit" in self._items:
-                self._items["cosphi3unit"](emparts["cosphi3unit"], __name__)
+            if 'i3' in self._items:
+                self._items['i3'](emparts['i3'], __name__)
+            if 'i3unit' in self._items:
+                self._items['i3unit'](emparts['i3unit'], __name__)
+            if 'u3' in self._items:
+                self._items['u3'](emparts['u3'], __name__)
+            if 'u3unit' in self._items:
+                self._items['u3unit'](emparts['u3unit'], __name__)
+            if 'cosphi3' in self._items:
+                self._items['cosphi3'](emparts['cosphi3'], __name__)
+            if 'cosphi3unit' in self._items:
+                self._items['cosphi3unit'](emparts['cosphi3unit'], __name__)
 
-            if "speedwire-version" in self._items:
-                self._items["speedwire-version"](emparts["speedwire-version"], __name__)
+            if 'speedwire-version' in self._items:
+                self._items['speedwire-version'](emparts['speedwire-version'], __name__)
 
     def hex2dec(self, s):
         """
@@ -435,32 +435,32 @@ class SMA_EM(SmartPlugin):
         return int(s, 16)
 
     def decode_OBIS(self, obis):
-        measurement = int.from_bytes(obis[0:2], byteorder="big")
-        raw_type = int.from_bytes(obis[2:3], byteorder="big")
+        measurement = int.from_bytes(obis[0:2], byteorder='big')
+        raw_type = int.from_bytes(obis[2:3], byteorder='big')
         if raw_type == 4:
-            datatype = "actual"
+            datatype = 'actual'
         elif raw_type == 8:
-            datatype = "counter"
+            datatype = 'counter'
         elif raw_type == 0 and measurement == 36864:
-            datatype = "version"
+            datatype = 'version'
         else:
-            datatype = "unknown"
+            datatype = 'unknown'
             self.logger.error(
-                "unknown datatype: measurement {} datatype {} raw_type {}".format(measurement, datatype, raw_type)
+                'unknown datatype: measurement {} datatype {} raw_type {}'.format(measurement, datatype, raw_type)
             )
         return measurement, datatype
 
     def decode_speedwire(self, datagram):
         emparts = {}
         # process data only of SMA header is present
-        if datagram[0:3] == b"SMA":
+        if datagram[0:3] == b'SMA':
             # datagram length
-            datalength = int.from_bytes(datagram[12:14], byteorder="big") + 16
+            datalength = int.from_bytes(datagram[12:14], byteorder='big') + 16
             # self.logger.debug('data lenght: {}'.format(datalength))
             # serial number
-            emID = int.from_bytes(datagram[20:24], byteorder="big")
+            emID = int.from_bytes(datagram[20:24], byteorder='big')
             # self.logger.debug('seral: {}'.format(emID))
-            emparts["serial"] = emID
+            emparts['serial'] = emID
             # timestamp
             # self.logger.debug('timestamp: {}'.format(timestamp))
             # decode OBIS data blocks
@@ -473,54 +473,54 @@ class SMA_EM(SmartPlugin):
                 # self.logger.debug('measurement {} datatype: {}'.format(measurement,datatype))
                 # decode values
                 # actual values
-                if datatype == "actual":
-                    value = int.from_bytes(datagram[position + 4 : position + 8], byteorder="big")
+                if datatype == 'actual':
+                    value = int.from_bytes(datagram[position + 4 : position + 8], byteorder='big')
                     position += 8
                     if measurement in sma_channels.keys():
                         emparts[sma_channels[measurement][0]] = value / sma_units[sma_channels[measurement][1]]
-                        emparts[sma_channels[measurement][0] + "unit"] = sma_channels[measurement][1]
+                        emparts[sma_channels[measurement][0] + 'unit'] = sma_channels[measurement][1]
                 # counter values
-                elif datatype == "counter":
-                    value = int.from_bytes(datagram[position + 4 : position + 12], byteorder="big")
+                elif datatype == 'counter':
+                    value = int.from_bytes(datagram[position + 4 : position + 12], byteorder='big')
                     position += 12
                     if measurement in sma_channels.keys():
-                        emparts[sma_channels[measurement][0] + "counter"] = (
+                        emparts[sma_channels[measurement][0] + 'counter'] = (
                             value / sma_units[sma_channels[measurement][2]]
                         )
-                        emparts[sma_channels[measurement][0] + "counterunit"] = sma_channels[measurement][2]
-                elif datatype == "version":
+                        emparts[sma_channels[measurement][0] + 'counterunit'] = sma_channels[measurement][2]
+                elif datatype == 'version':
                     value = datagram[position + 4 : position + 8]
                     if measurement in sma_channels.keys():
-                        bversion = binascii.b2a_hex(value).decode("utf-8")
+                        bversion = binascii.b2a_hex(value).decode('utf-8')
                         version = (
                             str(int(bversion[0:2], 16))
-                            + "."
+                            + '.'
                             + str(int(bversion[2:4], 16))
-                            + "."
+                            + '.'
                             + str(int(bversion[4:6], 16))
                         )
                         revision = str(chr(int(bversion[6:8])))
                         # revision definitions
-                        if revision == "1":
+                        if revision == '1':
                             # S – Spezial Version
-                            version = version + ".S"
-                        elif revision == "2":
+                            version = version + '.S'
+                        elif revision == '2':
                             # A – Alpha (noch kein Feature Complete, Version für Verifizierung und Validierung)
-                            version = version + ".A"
-                        elif revision == "3":
+                            version = version + '.A'
+                        elif revision == '3':
                             # B – Beta (Feature Complete, Version für Verifizierung und Validierung)
-                            version = version + ".B"
-                        elif revision == "4":
+                            version = version + '.B'
+                        elif revision == '4':
                             # R – Release Candidate / Release (Version für Verifizierung, Validierung und Feldtest / öffentliche Version)
-                            version = version + ".R"
-                        elif revision == "5":
+                            version = version + '.R'
+                        elif revision == '5':
                             # E – Experimental Version (dient zur lokalen Verifizierung)
-                            version = version + ".E"
-                        elif revision == "6":
+                            version = version + '.E'
+                        elif revision == '6':
                             # N – Keine Revision
-                            version = version + ".N"
+                            version = version + '.N'
                         # adding versionnumber to compare versions
-                        version = version + "|" + str(bversion[0:2]) + str(bversion[2:4]) + str(bversion[4:6])
+                        version = version + '|' + str(bversion[0:2]) + str(bversion[2:4]) + str(bversion[4:6])
                         emparts[sma_channels[measurement][0]] = version
                     position += 8
                 else:
@@ -560,7 +560,7 @@ class SMA_EM(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
@@ -568,12 +568,10 @@ class SMA_EM(SmartPlugin):
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
+        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            "/": {
-                "tools.staticdir.root": webif_dir,
-            },
-            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
         # Register the web interface as a cherrypy app
@@ -583,7 +581,7 @@ class SMA_EM(SmartPlugin):
             config,
             self.get_classname(),
             self.get_instance_name(),
-            description="",
+            description='',
         )
 
         return True
@@ -623,7 +621,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         return tmpl.render(
             plugin_shortname=self.plugin.get_shortname(),
             plugin_version=self.plugin.get_version(),
@@ -631,7 +629,7 @@ class WebInterface(SmartPluginWebIf):
             item_count=len(self.plugin.get_items()),
             plugin_info=self.plugin.get_info(),
             tabcount=1,
-            tab1title="SMA EM Items (%s)" % len(self.plugin.get_items()),
+            tab1title='SMA EM Items (%s)' % len(self.plugin.get_items()),
             p=self.plugin,
         )
 
@@ -649,9 +647,9 @@ class WebInterface(SmartPluginWebIf):
             # get the new data
             data = {}
             for key, item in self.plugin.get_items().items():
-                data[item.property.path + "_value"] = item()
-                data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
-                data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
+                data[item.property.path + '_value'] = item()
+                data[item.property.path + '_last_update'] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
+                data[item.property.path + '_last_change'] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
 
             # return it as json the the web page
             return json.dumps(data)

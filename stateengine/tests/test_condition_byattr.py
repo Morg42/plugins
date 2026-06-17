@@ -35,7 +35,7 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 import tests.common as common
 
 common.register_shng_log_levels()
@@ -45,11 +45,11 @@ from plugins.stateengine import StateEngineDefaults
 
 
 def _setup():
-    StateEngineDefaults.logger = logging.getLogger("test.se")
+    StateEngineDefaults.logger = logging.getLogger('test.se')
 
 
 class _MockState:
-    id = "mock.state"
+    id = 'mock.state'
 
 
 def _make_byattr_cond(SeCondition, abitem, name, item, by_type, by_value, negate=None):
@@ -63,21 +63,21 @@ def _make_byattr_cond(SeCondition, abitem, name, item, by_type, by_value, negate
     cond._SeCondition__item = item
     cond._SeCondition__state = _MockState()
 
-    if by_type == "changedby":
+    if by_type == 'changedby':
         cond._SeCondition__changedby._SeValue__value = by_value
-    elif by_type == "updatedby":
+    elif by_type == 'updatedby':
         cond._SeCondition__updatedby._SeValue__value = by_value
-    elif by_type == "triggeredby":
+    elif by_type == 'triggeredby':
         cond._SeCondition__triggeredby._SeValue__value = by_value
     else:
-        raise ValueError(f"unknown by_type: {by_type!r}")
+        raise ValueError(f'unknown by_type: {by_type!r}')
 
     if negate is not None:
-        if by_type == "changedby":
+        if by_type == 'changedby':
             cond._SeCondition__changedbynegate = negate
-        elif by_type == "updatedby":
+        elif by_type == 'updatedby':
             cond._SeCondition__updatedbynegate = negate
-        elif by_type == "triggeredby":
+        elif by_type == 'triggeredby':
             cond._SeCondition__triggeredbynegate = negate
 
     return cond
@@ -99,38 +99,38 @@ class TestConditionChangedBy(unittest.TestCase):
         self.abitem = MockAbItem()
 
     def _item(self, last_change_by):
-        item = MockItem("test.changedby", value=True)
+        item = MockItem('test.changedby', value=True)
         item.property.last_change_by = last_change_by
         return item
 
     def test_exact_match_returns_true(self):
         """last_change_by='knx', changedby='knx' → True."""
-        item = self._item("knx")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "light", item, "changedby", "knx")
+        item = self._item('knx')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'light', item, 'changedby', 'knx')
         self.assertTrue(cond.check(None))
 
     def test_mismatch_returns_false(self):
         """last_change_by='mqtt', changedby='knx' → False."""
-        item = self._item("mqtt")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "light", item, "changedby", "knx")
+        item = self._item('mqtt')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'light', item, 'changedby', 'knx')
         self.assertFalse(cond.check(None))
 
     def test_negate_with_match_returns_false(self):
         """negate=True + match → False."""
-        item = self._item("knx")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "light", item, "changedby", "knx", negate=True)
+        item = self._item('knx')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'light', item, 'changedby', 'knx', negate=True)
         self.assertFalse(cond.check(None))
 
     def test_negate_without_match_returns_true(self):
         """negate=True + mismatch → True."""
-        item = self._item("mqtt")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "light", item, "changedby", "knx", negate=True)
+        item = self._item('mqtt')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'light', item, 'changedby', 'knx', negate=True)
         self.assertTrue(cond.check(None))
 
     def test_stateengine_plugin_caller_matches(self):
         """StateEngine Plugin name in last_change_by matches correctly."""
-        item = self._item("StateEngine Plugin")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "light", item, "changedby", "StateEngine Plugin")
+        item = self._item('StateEngine Plugin')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'light', item, 'changedby', 'StateEngine Plugin')
         self.assertTrue(cond.check(None))
 
 
@@ -150,36 +150,36 @@ class TestConditionUpdatedBy(unittest.TestCase):
         self.abitem = MockAbItem()
 
     def _item(self, last_update_by):
-        item = MockItem("test.updatedby", value=True)
+        item = MockItem('test.updatedby', value=True)
         item.property.last_update_by = last_update_by
         return item
 
     def test_exact_match(self):
-        item = self._item("mqtt")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "sensor", item, "updatedby", "mqtt")
+        item = self._item('mqtt')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'sensor', item, 'updatedby', 'mqtt')
         self.assertTrue(cond.check(None))
 
     def test_mismatch(self):
-        item = self._item("knx")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "sensor", item, "updatedby", "mqtt")
+        item = self._item('knx')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'sensor', item, 'updatedby', 'mqtt')
         self.assertFalse(cond.check(None))
 
     def test_negate_inverts_match(self):
         """updatedby='knx', cond=knx, negate=True → False."""
-        item = self._item("knx")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "sensor", item, "updatedby", "knx", negate=True)
+        item = self._item('knx')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'sensor', item, 'updatedby', 'knx', negate=True)
         self.assertFalse(cond.check(None))
 
     def test_negate_inverts_non_match(self):
         """updatedby='mqtt', cond=knx, negate=True → True."""
-        item = self._item("mqtt")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "sensor", item, "updatedby", "knx", negate=True)
+        item = self._item('mqtt')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'sensor', item, 'updatedby', 'knx', negate=True)
         self.assertTrue(cond.check(None))
 
     def test_empty_string_no_match(self):
         """Item with empty last_update_by doesn't match 'knx'."""
-        item = self._item("")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "sensor", item, "updatedby", "knx")
+        item = self._item('')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'sensor', item, 'updatedby', 'knx')
         self.assertFalse(cond.check(None))
 
 
@@ -199,30 +199,30 @@ class TestConditionTriggeredBy(unittest.TestCase):
         self.abitem = MockAbItem()
 
     def _item(self, last_trigger_by):
-        item = MockItem("test.triggeredby", value=True)
+        item = MockItem('test.triggeredby', value=True)
         item.property.last_trigger_by = last_trigger_by
         return item
 
     def test_exact_match(self):
-        item = self._item("Admin")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "button", item, "triggeredby", "Admin")
+        item = self._item('Admin')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'button', item, 'triggeredby', 'Admin')
         self.assertTrue(cond.check(None))
 
     def test_mismatch(self):
-        item = self._item("knx")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "button", item, "triggeredby", "Admin")
+        item = self._item('knx')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'button', item, 'triggeredby', 'Admin')
         self.assertFalse(cond.check(None))
 
     def test_negate_inverts_match(self):
-        item = self._item("Admin")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "button", item, "triggeredby", "Admin", negate=True)
+        item = self._item('Admin')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'button', item, 'triggeredby', 'Admin', negate=True)
         self.assertFalse(cond.check(None))
 
     def test_negate_inverts_non_match(self):
-        item = self._item("knx")
-        cond = _make_byattr_cond(self.SeCondition, self.abitem, "button", item, "triggeredby", "Admin", negate=True)
+        item = self._item('knx')
+        cond = _make_byattr_cond(self.SeCondition, self.abitem, 'button', item, 'triggeredby', 'Admin', negate=True)
         self.assertTrue(cond.check(None))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

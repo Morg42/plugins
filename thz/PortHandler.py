@@ -42,11 +42,11 @@ import sys
 import logging
 
 # control characters
-STX = b"\x02"
-ETX = b"\x03"
-DLE = b"\x10"
-CAN = b"\x18"
-CODE_2B = b"\x2b"
+STX = b'\x02'
+ETX = b'\x03'
+DLE = b'\x10'
+CAN = b'\x18'
+CODE_2B = b'\x2b'
 
 # state enumeration
 IDLE = 0
@@ -57,16 +57,16 @@ ESCAPING_2B = 3
 
 class PortHandler(threading.Thread):
     def __init__(self, serial_port, baudrate, logger):
-        threading.Thread.__init__(self, name="THZ PortHandler")
+        threading.Thread.__init__(self, name='THZ PortHandler')
         self.logger = logger
         try:
             self._fd = serial.Serial(serial_port, baudrate, timeout=5)
-            self.logger.info("thz: Connected to serial port - {}".format(serial_port))
+            self.logger.info('thz: Connected to serial port - {}'.format(serial_port))
         except Exception:
             self._fd = None
-            self.logger.error("thz: Failed to open serial port - {}".format(sys.exc_info()))
+            self.logger.error('thz: Failed to open serial port - {}'.format(sys.exc_info()))
         self._state = IDLE
-        self._rxFrm = b""
+        self._rxFrm = b''
         self._alive = True
         self._rxQueue = multiprocessing.Queue(maxsize=0)
         self._txQueue = multiprocessing.Queue(maxsize=0)
@@ -78,12 +78,12 @@ class PortHandler(threading.Thread):
         according to the low-level protocol (message start/end, escaping of special
         characters).
         """
-        data = b""
+        data = b''
         while self._fd.inWaiting():
             data = self._fd.read(1)
             # self.logger.debug('{}'.format(data))
             if self._state == IDLE:
-                self._rxFrm = b""
+                self._rxFrm = b''
                 if data == DLE:
                     # discard
                     # self.logger.debug("Discard DLE")
@@ -96,7 +96,7 @@ class PortHandler(threading.Thread):
                     self._state = MSG_BODY
                     # self.logger.debug("Ack STX")
                 else:
-                    self.logger.warning("IDLE: Unexpected data {}".format(data))
+                    self.logger.warning('IDLE: Unexpected data {}'.format(data))
                     self._state = IDLE
                     self.rxFramingErrorCount += 1
 
@@ -119,7 +119,7 @@ class PortHandler(threading.Thread):
                     # return to collecting message bytes
                     self._state = MSG_BODY
                 else:
-                    self.logger.warning("ESCAPING_2B: Unexpected data {}".format(data))
+                    self.logger.warning('ESCAPING_2B: Unexpected data {}'.format(data))
                     self._state = IDLE
                     self.rxFramingErrorCount += 1
 
@@ -137,8 +137,8 @@ class PortHandler(threading.Thread):
                     # acknowledge with DLE
                     self._fd.write(DLE)
                 else:
-                    self.logger.warning("ESCAPING_DLE: Unexpected data {}".format(data))
-                    self._rxFrm = b""
+                    self.logger.warning('ESCAPING_DLE: Unexpected data {}'.format(data))
+                    self._rxFrm = b''
                     self._state = IDLE
                     self.rxFramingErrorCount += 1
 
@@ -172,14 +172,14 @@ class PortHandler(threading.Thread):
 
             # add header and trailer
             frm = STX + frm + DLE + ETX
-            self.logger.debug("Tx: " + " ".join(format(x, "02x") for x in frm))
+            self.logger.debug('Tx: ' + ' '.join(format(x, '02x') for x in frm))
 
             # and finally send the message
             self._fd.write(frm)
 
     def run(self):
         """implements the main loop of the port handler"""
-        self.logger.info("PortHandler started")
+        self.logger.info('PortHandler started')
         while self._alive:
             if self._fd is not None:
                 try:
@@ -194,13 +194,13 @@ class PortHandler(threading.Thread):
                             if event is self._txQueue._reader:
                                 self._processTxData()
                     except Exception:
-                        self.logger.error("Data processing failed - {}".format(sys.exc_info()))
+                        self.logger.error('Data processing failed - {}'.format(sys.exc_info()))
                         if self._fd is not None:
                             self._fd.close()
                             self._fd = None
 
                 except Exception:
-                    self.logger.error("select failed - {}".format(sys.exc_info()))
+                    self.logger.error('select failed - {}'.format(sys.exc_info()))
                     if self._fd is not None:
                         self._fd.close()
                         self._fd = None
@@ -212,7 +212,7 @@ class PortHandler(threading.Thread):
 
     def stop(self):
         """posts a request to stop the port handler thread"""
-        self.logger.debug("PortHandler.stop() called")
+        self.logger.debug('PortHandler.stop() called')
         self._alive = False
 
     def sendData(self, data):
@@ -238,7 +238,7 @@ class PortHandler(threading.Thread):
         """attempts to open the serial port"""
         try:
             self._fd = serial.Serial(serial_port, baudrate, timeout=5)
-            self.logger.info("Reconnected to serial port - {}".format(serial_port))
+            self.logger.info('Reconnected to serial port - {}'.format(serial_port))
             return True
         except Exception:
             self._fd = None
@@ -249,7 +249,7 @@ class PortHandler(threading.Thread):
         try:
             self._fd.close()
             self._fd = None
-            self.logger.info("Closed serial port.")
+            self.logger.info('Closed serial port.')
             return True
         except Exception:
             self._fd = None

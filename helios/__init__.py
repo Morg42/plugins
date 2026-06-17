@@ -48,34 +48,34 @@ CONST_BUS_LON = 0x28  # default for LON bus module (just for information --> exp
 CONST_BUS_ME = 0x2F  # stealth mode - we are behaving like a regular remote control
 
 CONST_MAP_VARIABLES_TO_ID = {
-    "power_state": {"varid": 0xA3, "type": "bit", "bitposition": 0, "read": True, "write": True},
-    "outside_temp": {"varid": 0x32, "type": "temperature", "bitposition": -1, "read": True, "write": False},
-    "exhaust_temp": {"varid": 0x33, "type": "temperature", "bitposition": -1, "read": True, "write": False},
-    "inside_temp": {"varid": 0x34, "type": "temperature", "bitposition": -1, "read": True, "write": False},
-    "incoming_temp": {"varid": 0x35, "type": "temperature", "bitposition": -1, "read": True, "write": False},
-    "fanspeed": {"varid": 0x29, "type": "fanspeed", "bitposition": -1, "read": True, "write": True},
-    "max_fanspeed": {"varid": 0xA5, "type": "fanspeed", "bitposition": -1, "read": True, "write": True},
-    "min_fanspeed": {"varid": 0xA9, "type": "fanspeed", "bitposition": -1, "read": True, "write": True},
-    "bypass_temp": {"varid": 0xAF, "type": "temperature", "bitposition": -1, "read": True, "write": True},
-    "bypass_disabled": {"varid": 0xA3, "type": "bit", "bitposition": 3, "read": True, "write": True},
-    "heating_on_off": {"varid": 0x70, "type": "bit", "bitposition": 7, "read": True, "write": True},
-    "heating_setpoint": {"varid": 0xA7, "type": "temperature", "bitposition": -1, "read": True, "write": True},
-    "frost_stop": {"varid": 0xA8, "type": "temperature", "bitposition": -1, "read": True, "write": True},
-    "cell_defrost": {"varid": 0xB2, "type": "dec", "bitposition": -1, "read": True, "write": True},
-    "boost_mode": {"varid": 0xAA, "type": "bit", "bitposition": 5, "read": True, "write": True},
-    "boost_on": {"varid": 0x71, "type": "bit", "bitposition": 5, "read": True, "write": True},
-    "boost_status": {"varid": 0x71, "type": "bit", "bitposition": 6, "read": True, "write": False},
-    "boost_remaining": {"varid": 0x79, "type": "dec", "bitposition": -1, "read": True, "write": False},
-    "fan_in_on_off": {"varid": 0x08, "type": "bit", "bitposition": 3, "read": True, "write": True},
-    "fan_in_percent": {"varid": 0xB0, "type": "dec", "bitposition": -1, "read": True, "write": True},
-    "fan_out_on_off": {"varid": 0x08, "type": "bit", "bitposition": 5, "read": True, "write": True},
-    "fan_out_percent": {"varid": 0xB1, "type": "dec", "bitposition": -1, "read": True, "write": True},
-    "clean_filter": {"varid": 0xAB, "type": "dec", "bitposition": -1, "read": True, "write": True},
-    "device_error": {"varid": 0x36, "type": "dec", "bitposition": -1, "read": True, "write": False},
+    'power_state': {'varid': 0xA3, 'type': 'bit', 'bitposition': 0, 'read': True, 'write': True},
+    'outside_temp': {'varid': 0x32, 'type': 'temperature', 'bitposition': -1, 'read': True, 'write': False},
+    'exhaust_temp': {'varid': 0x33, 'type': 'temperature', 'bitposition': -1, 'read': True, 'write': False},
+    'inside_temp': {'varid': 0x34, 'type': 'temperature', 'bitposition': -1, 'read': True, 'write': False},
+    'incoming_temp': {'varid': 0x35, 'type': 'temperature', 'bitposition': -1, 'read': True, 'write': False},
+    'fanspeed': {'varid': 0x29, 'type': 'fanspeed', 'bitposition': -1, 'read': True, 'write': True},
+    'max_fanspeed': {'varid': 0xA5, 'type': 'fanspeed', 'bitposition': -1, 'read': True, 'write': True},
+    'min_fanspeed': {'varid': 0xA9, 'type': 'fanspeed', 'bitposition': -1, 'read': True, 'write': True},
+    'bypass_temp': {'varid': 0xAF, 'type': 'temperature', 'bitposition': -1, 'read': True, 'write': True},
+    'bypass_disabled': {'varid': 0xA3, 'type': 'bit', 'bitposition': 3, 'read': True, 'write': True},
+    'heating_on_off': {'varid': 0x70, 'type': 'bit', 'bitposition': 7, 'read': True, 'write': True},
+    'heating_setpoint': {'varid': 0xA7, 'type': 'temperature', 'bitposition': -1, 'read': True, 'write': True},
+    'frost_stop': {'varid': 0xA8, 'type': 'temperature', 'bitposition': -1, 'read': True, 'write': True},
+    'cell_defrost': {'varid': 0xB2, 'type': 'dec', 'bitposition': -1, 'read': True, 'write': True},
+    'boost_mode': {'varid': 0xAA, 'type': 'bit', 'bitposition': 5, 'read': True, 'write': True},
+    'boost_on': {'varid': 0x71, 'type': 'bit', 'bitposition': 5, 'read': True, 'write': True},
+    'boost_status': {'varid': 0x71, 'type': 'bit', 'bitposition': 6, 'read': True, 'write': False},
+    'boost_remaining': {'varid': 0x79, 'type': 'dec', 'bitposition': -1, 'read': True, 'write': False},
+    'fan_in_on_off': {'varid': 0x08, 'type': 'bit', 'bitposition': 3, 'read': True, 'write': True},
+    'fan_in_percent': {'varid': 0xB0, 'type': 'dec', 'bitposition': -1, 'read': True, 'write': True},
+    'fan_out_on_off': {'varid': 0x08, 'type': 'bit', 'bitposition': 5, 'read': True, 'write': True},
+    'fan_out_percent': {'varid': 0xB1, 'type': 'dec', 'bitposition': -1, 'read': True, 'write': True},
+    'clean_filter': {'varid': 0xAB, 'type': 'dec', 'bitposition': -1, 'read': True, 'write': True},
+    'device_error': {'varid': 0x36, 'type': 'dec', 'bitposition': -1, 'read': True, 'write': False},
 }
 
 CONST_TEMPERATURE = array.array(
-    "i",
+    'i',
     [
         -74,
         -70,
@@ -342,24 +342,24 @@ class HeliosException(Exception):
 
 
 class HeliosBase(SmartPlugin):
-    PLUGIN_VERSION = "1.4.3"
+    PLUGIN_VERSION = '1.4.3'
     ALLOW_MULTIINSTANCE = False
 
     def __init__(self, sh, **kwargs):
         self.logger = logging.getLogger(__name__)
         self._is_connected = False
         self._lock = threading.Lock()
-        if "tty" in kwargs:
-            self._tty = kwargs["tty"]
-        if "port" in kwargs:
-            self._port = kwargs["port"]
+        if 'tty' in kwargs:
+            self._tty = kwargs['tty']
+        if 'port' in kwargs:
+            self._port = kwargs['port']
 
     def connect(self):
         if self._is_connected and self._port:
             return True
 
         try:
-            self.logger.debug("Helios: Connecting...")
+            self.logger.debug('Helios: Connecting...')
             self._port = serial.Serial(
                 self._tty,
                 baudrate=9600,
@@ -371,12 +371,12 @@ class HeliosBase(SmartPlugin):
             self._is_connected = True
             return True
         except Exception:
-            self.logger.error("Helios: Could not open {0}.".format(self._tty))
+            self.logger.error('Helios: Could not open {0}.'.format(self._tty))
             return False
 
     def disconnect(self):
         if self._is_connected and self._port:
-            self.logger.debug("HeliosBase: Disconnecting...")
+            self.logger.debug('HeliosBase: Disconnecting...')
             self._port.close()
             self._is_connected = False
 
@@ -445,10 +445,10 @@ class HeliosBase(SmartPlugin):
         return sum % 256
 
     def _telegramToString(self, telegram):
-        str = ""
+        str = ''
         for c in telegram:
             # str = str + hex(c) + " "     0x01 was showing as 0x1, 0x1A was showing as 0x1a
-            str = str + "0x%0*X" % (2, c) + " "
+            str = str + '0x%0*X' % (2, c) + ' '
         str = str[:-1]  # remove trailing space
         return str
 
@@ -456,9 +456,9 @@ class HeliosBase(SmartPlugin):
         value = None
         vardef = CONST_MAP_VARIABLES_TO_ID[varname]
 
-        if vardef["type"] == "temperature":
+        if vardef['type'] == 'temperature':
             value = CONST_TEMPERATURE[rawvalue]
-        elif vardef["type"] == "fanspeed":
+        elif vardef['type'] == 'fanspeed':
             if rawvalue == 0x01:
                 value = 1
             elif rawvalue == 0x03:
@@ -477,9 +477,9 @@ class HeliosBase(SmartPlugin):
                 value = 8
             else:
                 value = None
-        elif vardef["type"] == "bit":
-            value = rawvalue >> vardef["bitposition"] & 0x01
-        elif vardef["type"] == "dec":  # decimal value
+        elif vardef['type'] == 'bit':
+            value = rawvalue >> vardef['bitposition'] & 0x01
+        elif vardef['type'] == 'dec':  # decimal value
             value = rawvalue
 
         return value
@@ -488,9 +488,9 @@ class HeliosBase(SmartPlugin):
         rawvalue = None
         vardef = CONST_MAP_VARIABLES_TO_ID[varname]
 
-        if vardef["type"] == "temperature":
+        if vardef['type'] == 'temperature':
             rawvalue = CONST_TEMPERATURE.index(int(value))
-        elif vardef["type"] == "fanspeed":
+        elif vardef['type'] == 'fanspeed':
             value = int(value)
             if value == 1:
                 rawvalue = 0x01
@@ -510,20 +510,20 @@ class HeliosBase(SmartPlugin):
                 rawvalue = 0xFF
             else:
                 rawvalue = None
-        elif vardef["type"] == "bit":
+        elif vardef['type'] == 'bit':
             # for bits we have to keep the other bits of the byte (previous value)
-            if value in (True, 1, "true", "True", "1", "On", "on"):
-                rawvalue = prevvalue | (1 << vardef["bitposition"])
+            if value in (True, 1, 'true', 'True', '1', 'On', 'on'):
+                rawvalue = prevvalue | (1 << vardef['bitposition'])
             else:
-                rawvalue = prevvalue & ~(1 << vardef["bitposition"])
-        elif vardef["type"] == "dec":  # decimal value
+                rawvalue = prevvalue & ~(1 << vardef['bitposition'])
+        elif vardef['type'] == 'dec':  # decimal value
             rawvalue = int(value)
 
         return rawvalue
 
     def writeValue(self, varname, value):
-        if CONST_MAP_VARIABLES_TO_ID[varname]["write"] is not True:
-            self.logger.error("Helios: Variable {0} may not be written!".format(varname))
+        if CONST_MAP_VARIABLES_TO_ID[varname]['write'] is not True:
+            self.logger.error('Helios: Variable {0} may not be written!'.format(varname))
             return False
         success = False
 
@@ -531,17 +531,17 @@ class HeliosBase(SmartPlugin):
         try:
             # if we have got to write a single bit, we need the current (byte) value to
             # reproduce the other bits...
-            if CONST_MAP_VARIABLES_TO_ID[varname]["type"] == "bit":
+            if CONST_MAP_VARIABLES_TO_ID[varname]['type'] == 'bit':
                 currentval = None
                 if self._waitForSilence():
                     # Send poll request
                     telegram = self._createTelegram(
-                        CONST_BUS_ME, CONST_BUS_MAINBOARD1, 0, CONST_MAP_VARIABLES_TO_ID[varname]["varid"]
+                        CONST_BUS_ME, CONST_BUS_MAINBOARD1, 0, CONST_MAP_VARIABLES_TO_ID[varname]['varid']
                     )
                     self._sendTelegram(telegram)
                     # Read response
                     currentval = self._readTelegram(
-                        CONST_BUS_MAINBOARD1, CONST_BUS_ME, CONST_MAP_VARIABLES_TO_ID[varname]["varid"]
+                        CONST_BUS_MAINBOARD1, CONST_BUS_ME, CONST_MAP_VARIABLES_TO_ID[varname]['varid']
                     )
                 if currentval is None:
                     self.logger.error(
@@ -559,19 +559,19 @@ class HeliosBase(SmartPlugin):
                 if rawvalue is not None:
                     # Broadcasting value to all remote control boards
                     telegram = self._createTelegram(
-                        CONST_BUS_ME, CONST_BUS_ALL_REMOTES, CONST_MAP_VARIABLES_TO_ID[varname]["varid"], rawvalue
+                        CONST_BUS_ME, CONST_BUS_ALL_REMOTES, CONST_MAP_VARIABLES_TO_ID[varname]['varid'], rawvalue
                     )
                     self._sendTelegram(telegram)
 
                     # Broadcasting value to all mainboards
                     telegram = self._createTelegram(
-                        CONST_BUS_ME, CONST_BUS_ALL_MAINBOARDS, CONST_MAP_VARIABLES_TO_ID[varname]["varid"], rawvalue
+                        CONST_BUS_ME, CONST_BUS_ALL_MAINBOARDS, CONST_MAP_VARIABLES_TO_ID[varname]['varid'], rawvalue
                     )
                     self._sendTelegram(telegram)
 
                     # Writing value to 1st mainboard
                     telegram = self._createTelegram(
-                        CONST_BUS_ME, CONST_BUS_MAINBOARD1, CONST_MAP_VARIABLES_TO_ID[varname]["varid"], rawvalue
+                        CONST_BUS_ME, CONST_BUS_MAINBOARD1, CONST_MAP_VARIABLES_TO_ID[varname]['varid'], rawvalue
                     )
                     self._sendTelegram(telegram)
 
@@ -581,17 +581,17 @@ class HeliosBase(SmartPlugin):
                     # Special treatment to switch on remote controls after off state:
                     # TODO: doesn't work so far
                     if (
-                        CONST_MAP_VARIABLES_TO_ID[varname]["varid"] == 0xA3
-                        and CONST_MAP_VARIABLES_TO_ID[varname]["bitposition"] == 0
+                        CONST_MAP_VARIABLES_TO_ID[varname]['varid'] == 0xA3
+                        and CONST_MAP_VARIABLES_TO_ID[varname]['bitposition'] == 0
                     ):
-                        self.logger.debug("On/off command - special treatment for the remote controls")
+                        self.logger.debug('On/off command - special treatment for the remote controls')
                         telegram = self._createTelegram(
-                            CONST_BUS_ME, CONST_BUS_ALL_REMOTES, CONST_MAP_VARIABLES_TO_ID[varname]["varid"], rawvalue
+                            CONST_BUS_ME, CONST_BUS_ALL_REMOTES, CONST_MAP_VARIABLES_TO_ID[varname]['varid'], rawvalue
                         )
                         self._sendTelegram(telegram)
 
                         telegram = self._createTelegram(
-                            CONST_BUS_ME, CONST_BUS_REMOTE1, CONST_MAP_VARIABLES_TO_ID[varname]["varid"], rawvalue
+                            CONST_BUS_ME, CONST_BUS_REMOTE1, CONST_MAP_VARIABLES_TO_ID[varname]['varid'], rawvalue
                         )
                         self._sendTelegram(telegram)
 
@@ -609,44 +609,44 @@ class HeliosBase(SmartPlugin):
                     success = False
             else:
                 self.logger.error(
-                    "Helios: Sending value to ventilation system failed. No free slot for sending telegrams available."
+                    'Helios: Sending value to ventilation system failed. No free slot for sending telegrams available.'
                 )
                 success = False
         except Exception as e:
-            self.logger.error("Helios: Exception in writeValue() occurred: {0}".format(e))
+            self.logger.error('Helios: Exception in writeValue() occurred: {0}'.format(e))
         finally:
             self._lock.release()
 
         return success
 
     def readValue(self, varname):
-        if CONST_MAP_VARIABLES_TO_ID[varname]["read"] is not True:
-            self.logger.error("Variable {0} may not be read!".format(varname))
+        if CONST_MAP_VARIABLES_TO_ID[varname]['read'] is not True:
+            self.logger.error('Variable {0} may not be read!'.format(varname))
             return False
         value = None
 
         self._lock.acquire()
         try:
-            self.logger.debug("Helios: Reading value: {0}".format(varname))
+            self.logger.debug('Helios: Reading value: {0}'.format(varname))
             if self._waitForSilence():
                 # Send poll request
                 telegram = self._createTelegram(
-                    CONST_BUS_ME, CONST_BUS_MAINBOARD1, 0, CONST_MAP_VARIABLES_TO_ID[varname]["varid"]
+                    CONST_BUS_ME, CONST_BUS_MAINBOARD1, 0, CONST_MAP_VARIABLES_TO_ID[varname]['varid']
                 )
                 self._sendTelegram(telegram)
                 # Read response
                 value = self._readTelegram(
-                    CONST_BUS_MAINBOARD1, CONST_BUS_ME, CONST_MAP_VARIABLES_TO_ID[varname]["varid"]
+                    CONST_BUS_MAINBOARD1, CONST_BUS_ME, CONST_MAP_VARIABLES_TO_ID[varname]['varid']
                 )
                 if value is not None:
                     raw_value = value
                     value = self._convertFromRawValue(varname, value)
                     self.logger.debug(
-                        "Value for {0} ({1}) received: {2}|{3}|{4} --> converted = {5}".format(
+                        'Value for {0} ({1}) received: {2}|{3}|{4} --> converted = {5}'.format(
                             varname,
-                            "0x%0*X" % (2, CONST_MAP_VARIABLES_TO_ID[varname]["varid"]),
-                            "0x%0*X" % (2, raw_value),
-                            "{0:08b}".format(raw_value),
+                            '0x%0*X' % (2, CONST_MAP_VARIABLES_TO_ID[varname]['varid']),
+                            '0x%0*X' % (2, raw_value),
+                            '{0:08b}'.format(raw_value),
                             raw_value,
                             value,
                         )
@@ -657,10 +657,10 @@ class HeliosBase(SmartPlugin):
                     )
             else:
                 self.logger.warning(
-                    "Helios: Reading value from ventilation system failed. No free slot to send poll request available."
+                    'Helios: Reading value from ventilation system failed. No free slot to send poll request available.'
                 )
         except Exception as e:
-            self.logger.error("Helios: Exception in readValue() occurred: {0}".format(e))
+            self.logger.error('Helios: Exception in readValue() occurred: {0}'.format(e))
         finally:
             self._lock.release()
 
@@ -671,8 +671,8 @@ class Helios(HeliosBase):
     _items = {}
 
     def __init__(self, sh, **kwargs):
-        self._tty = self.get_parameter_value("tty")
-        self._cycle = self.get_parameter_value("cycle")
+        self._tty = self.get_parameter_value('tty')
+        self._cycle = self.get_parameter_value('cycle')
         self._port = None
         super().__init__(sh, **kwargs)
         self._alive = False
@@ -680,16 +680,16 @@ class Helios(HeliosBase):
     def run(self):
         self.connect()
         self._alive = True
-        self.scheduler_add("Helios", self._update, cycle=self._cycle)
+        self.scheduler_add('Helios', self._update, cycle=self._cycle)
 
     def stop(self):
-        self.scheduler_remove("Helios")
+        self.scheduler_remove('Helios')
         self.disconnect()
         self._alive = False
 
     def parse_item(self, item):
-        if "helios_var" in item.conf:
-            varname = item.conf["helios_var"]
+        if 'helios_var' in item.conf:
+            varname = item.conf['helios_var']
             if varname in CONST_MAP_VARIABLES_TO_ID.keys():
                 self._items[varname] = item
                 return self.update_item
@@ -697,33 +697,33 @@ class Helios(HeliosBase):
                 self.logger.warning("Helios: Ignoring unknown variable '{0}'".format(varname))
 
     def update_item(self, item, caller=None, source=None, dest=None):
-        if caller != "Helios":
-            self.writeValue(item.conf["helios_var"], item())
+        if caller != 'Helios':
+            self.writeValue(item.conf['helios_var'], item())
 
     def _update(self):
-        self.logger.debug("Helios: Updating values")
+        self.logger.debug('Helios: Updating values')
         for var in self._items.keys():
             val = self.readValue(var)
             if val is not None:
-                self._items[var](val, "Helios")
+                self._items[var](val, 'Helios')
 
 
 def main():
     import argparse
 
     parser = argparse.ArgumentParser(
-        description="Helios ventilation system commandline interface.",
-        epilog="Without arguments all readable values using default tty will be retrieved.",
+        description='Helios ventilation system commandline interface.',
+        epilog='Without arguments all readable values using default tty will be retrieved.',
         argument_default=argparse.SUPPRESS,
     )
-    parser.add_argument("-t", "--tty", dest="tty", default="/dev/ttyUSB0", help="Serial device to use")
-    parser.add_argument("-r", "--read", dest="read_var", help="Read variables from ventilation system")
-    parser.add_argument("-w", "--write", dest="write_var", help="Write variable to ventilation system")
-    parser.add_argument("-v", "--value", dest="value", help="Value to write (required with option -v)")
-    parser.add_argument("-d", "--debug", dest="enable_debug", action="store_true", help="Prints debug statements.")
+    parser.add_argument('-t', '--tty', dest='tty', default='/dev/ttyUSB0', help='Serial device to use')
+    parser.add_argument('-r', '--read', dest='read_var', help='Read variables from ventilation system')
+    parser.add_argument('-w', '--write', dest='write_var', help='Write variable to ventilation system')
+    parser.add_argument('-v', '--value', dest='value', help='Value to write (required with option -v)')
+    parser.add_argument('-d', '--debug', dest='enable_debug', action='store_true', help='Prints debug statements.')
     args = vars(parser.parse_args())
 
-    if "write_var" in args.keys() and "value" not in args.keys():
+    if 'write_var' in args.keys() and 'value' not in args.keys():
         parser.print_usage()
         return
 
@@ -742,25 +742,25 @@ def main():
 
     helios = None
     try:
-        helios = HeliosBase(None, tty=args["tty"])
+        helios = HeliosBase(None, tty=args['tty'])
         helios.connect()
         if not helios._is_connected:
-            raise Exception("Not connected")
+            raise Exception('Not connected')
 
-        if "read_var" in args.keys():
-            print("{0} = {1}".format(args["read_var"], helios.readValue(args["read_var"])))
-        elif "write_var" in args.keys():
-            helios.writeValue(args["write_var"], args["value"])
+        if 'read_var' in args.keys():
+            print('{0} = {1}'.format(args['read_var'], helios.readValue(args['read_var'])))
+        elif 'write_var' in args.keys():
+            helios.writeValue(args['write_var'], args['value'])
         else:
             for var in CONST_MAP_VARIABLES_TO_ID.keys():
-                print("{0} = {1}".format(var, helios.readValue(var)))
+                print('{0} = {1}'.format(var, helios.readValue(var)))
     except Exception as e:
-        print("Exception: {0}".format(e))
+        print('Exception: {0}'.format(e))
         return 1
     finally:
         if helios:
             helios.disconnect()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     sys.exit(main())

@@ -68,31 +68,31 @@ class WebInterface(SmartPluginWebIf):
         :return: contents of the template after beeing rendered
         """
 
-        if scan == "on":
+        if scan == 'on':
             self.plugin.discovered_bridges = self.plugin.discover_bridges()
 
         if connect is not None:
-            self.logger.info("Connect: connect={}".format(connect))
+            self.logger.info('Connect: connect={}'.format(connect))
             for db in self.plugin.discovered_bridges:
-                if db["serialNumber"] == connect:
-                    user = self.plugin.create_new_username(db["ip"], db["port"])
-                    if user != "":
+                if db['serialNumber'] == connect:
+                    user = self.plugin.create_new_username(db['ip'], db['port'])
+                    if user != '':
                         self.plugin.bridge = db
-                        self.plugin.bridge["username"] = user
+                        self.plugin.bridge['username'] = user
                         self.plugin.bridgeinfo = self.plugin.get_bridgeinfo()
                         self.plugin.update_plugin_config()
 
         if disconnect is not None:
-            self.logger.info("Disconnect: disconnect={}".format(disconnect))
+            self.logger.info('Disconnect: disconnect={}'.format(disconnect))
             self.plugin.remove_username(
-                self.plugin.bridge["ip"], self.plugin.bridge["port"], self.plugin.bridge["username"]
+                self.plugin.bridge['ip'], self.plugin.bridge['port'], self.plugin.bridge['username']
             )
             self.plugin.bridge = {}
             self.plugin.bridgeinfo = {}
             self.plugin.update_plugin_config()
 
         try:
-            tmpl = self.tplenv.get_template("index.html")
+            tmpl = self.tplenv.get_template('index.html')
         except Exception:
             self.logger.error("Template file 'index.html' not found")
         else:

@@ -69,12 +69,12 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(
             p=self.plugin,
-            webif_pagelength=self.plugin.get_parameter_value("webif_pagelength"),
-            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])),
+            webif_pagelength=self.plugin.get_parameter_value('webif_pagelength'),
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
         )
 
     @cherrypy.expose
@@ -93,15 +93,15 @@ class WebInterface(SmartPluginWebIf):
             for item in self.plugin.get_item_list():
                 item_config = self.plugin.get_item_config(item)
                 value_dict = {}
-                value_dict["path"] = item.property.path
-                value_dict["type"] = item.type()
-                value_dict["not_discovered"] = item_config["bus"] == ""
-                value_dict["sensor_addr"] = item_config["sensor_addr"]
-                value_dict["deviceclass"] = item_config["deviceclass"]
-                value_dict["value"] = item()
-                value_dict["value_unit"] = item_config["unit"]
-                value_dict["last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
-                value_dict["last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
+                value_dict['path'] = item.property.path
+                value_dict['type'] = item.type()
+                value_dict['not_discovered'] = item_config['bus'] == ''
+                value_dict['sensor_addr'] = item_config['sensor_addr']
+                value_dict['deviceclass'] = item_config['deviceclass']
+                value_dict['value'] = item()
+                value_dict['value_unit'] = item_config['unit']
+                value_dict['last_update'] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
+                value_dict['last_change'] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
                 item_list.append(value_dict)
 
             # callect data for 'buses' tab
@@ -114,23 +114,23 @@ class WebInterface(SmartPluginWebIf):
                 for device in self.plugin._webif_buses[bus]:
                     bus_dict[bus] += 1
                     value_dict = {}
-                    value_dict["device"] = device
-                    value_dict["bus"] = bus
-                    value_dict["deviceclass"] = self.plugin._webif_buses[bus][device]["deviceclass"]
-                    value_dict["devicetype"] = self.plugin._webif_buses[bus][device]["devicetype"]
-                    value_dict["items_defined"] = self.plugin.count_items_for_device(device)
-                    value_dict["keys"] = self.plugin._webif_buses[bus][device]["keys"]
+                    value_dict['device'] = device
+                    value_dict['bus'] = bus
+                    value_dict['deviceclass'] = self.plugin._webif_buses[bus][device]['deviceclass']
+                    value_dict['devicetype'] = self.plugin._webif_buses[bus][device]['devicetype']
+                    value_dict['items_defined'] = self.plugin.count_items_for_device(device)
+                    value_dict['keys'] = self.plugin._webif_buses[bus][device]['keys']
                     device_list.append(value_dict)
 
             bus_list = []
             for bus in bus_dict:
                 value_dict = {}
-                value_dict["bus"] = bus
-                value_dict["devicecount"] = bus_dict[bus]
+                value_dict['bus'] = bus
+                value_dict['devicecount'] = bus_dict[bus]
                 bus_list.append(value_dict)
 
-            bus_list = sorted(bus_list, key=lambda d: d["bus"])
-            result = {"items": item_list, "buses": bus_list, "devices": device_list}
+            bus_list = sorted(bus_list, key=lambda d: d['bus'])
+            result = {'items': item_list, 'buses': bus_list, 'devices': device_list}
 
             # send result to wen interface
             try:
@@ -140,6 +140,6 @@ class WebInterface(SmartPluginWebIf):
                 else:
                     return None
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
 
         return {}

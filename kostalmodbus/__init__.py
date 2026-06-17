@@ -29,27 +29,27 @@ from .inverter import Inverter
 
 
 class Kostalmodbus(SmartPlugin):
-    PLUGIN_VERSION = "1.6.3"
-    inverter = "None"
+    PLUGIN_VERSION = '1.6.3'
+    inverter = 'None'
     _items = []
 
     def __init__(self, sh, *args, **kwargs):
-        self.inverter = Inverter(self.get_parameter_value("inverter_ip"), self.get_parameter_value("modbus_port"))
-        self._cycle = int(self.get_parameter_value("update_cycle"))
+        self.inverter = Inverter(self.get_parameter_value('inverter_ip'), self.get_parameter_value('modbus_port'))
+        self._cycle = int(self.get_parameter_value('update_cycle'))
         return
 
     def run(self):
-        self.logger.debug("Run method called")
-        self.scheduler_add("poll_device", self.poll_device, cycle=self._cycle)
+        self.logger.debug('Run method called')
+        self.scheduler_add('poll_device', self.poll_device, cycle=self._cycle)
         self.alive = True
 
     def stop(self):
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.alive = False
 
     def parse_item(self, item):
         for i in self.inverter.decRow:
-            s = "kostal_" + str(i)
+            s = 'kostal_' + str(i)
             if self.has_iattr(item.conf, s):
                 self._items.append(item)
 
@@ -57,6 +57,6 @@ class Kostalmodbus(SmartPlugin):
         inverter_data = self.inverter.get_data()
         for item in self._items:
             for i in range(0, len(inverter_data)):
-                s = "kostal_" + str(inverter_data[i].adrDec)
+                s = 'kostal_' + str(inverter_data[i].adrDec)
                 if self.has_iattr(item.conf, s):
                     item(self.inverter.registers[i].value)

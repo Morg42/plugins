@@ -39,19 +39,19 @@ FLAG_RESERVED = (
 )
 
 # attribute keywords
-KNX_DPT = "knx_dpt"  # data point type
-KNX_STATUS = "knx_status"  # status
-KNX_SEND = "knx_send"  # send changes within SmartHomeNG to this ga
-KNX_REPLY = "knx_reply"  # answer read requests from knx with item value from SmartHomeNG
-KNX_CACHE = "knx_cache"  # get item from knx_cache
-KNX_INIT = "knx_init"  # query knx upon init
-KNX_LISTEN = "knx_listen"  # write or response from knx will change the value of this item
-KNX_POLL = "knx_poll"  # query (poll) a ga on knx in regular intervals
+KNX_DPT = 'knx_dpt'  # data point type
+KNX_STATUS = 'knx_status'  # status
+KNX_SEND = 'knx_send'  # send changes within SmartHomeNG to this ga
+KNX_REPLY = 'knx_reply'  # answer read requests from knx with item value from SmartHomeNG
+KNX_CACHE = 'knx_cache'  # get item from knx_cache
+KNX_INIT = 'knx_init'  # query knx upon init
+KNX_LISTEN = 'knx_listen'  # write or response from knx will change the value of this item
+KNX_POLL = 'knx_poll'  # query (poll) a ga on knx in regular intervals
 
-KNX_DTP = "knx_dtp"  # often misspelled argument in config files, instead should be knx_dpt
+KNX_DTP = 'knx_dtp'  # often misspelled argument in config files, instead should be knx_dpt
 
-ITEM = "item"
-ITEMS = "items"
-LOGIC = "logic"
-LOGICS = "logics"
-DPT = "dpt"
+ITEM = 'item'
+ITEMS = 'items'
+LOGIC = 'logic'
+LOGICS = 'logics'
+DPT = 'dpt'

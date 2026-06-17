@@ -29,9 +29,9 @@ class OverrulingMergerMerger:
         self.__slots_cache = None
 
     def introspect(self):
-        content = ", ".join(map(lambda s: str(s), self.get_slots()))
+        content = ', '.join(map(lambda s: str(s), self.get_slots()))
         return (
-            f"OverrulingMergerMerger, ({content}), based on "
-            f"base_merger ({self.__base_merger.introspect()}) overruled by "
-            f"overruling_merger ({self.__overruling_merger.introspect()})"
+            f'OverrulingMergerMerger, ({content}), based on '
+            f'base_merger ({self.__base_merger.introspect()}) overruled by '
+            f'overruling_merger ({self.__overruling_merger.introspect()})'
         )

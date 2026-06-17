@@ -70,15 +70,15 @@ class WebInterface(SmartPluginWebIf):
         plgitems = []
         _instance = self.plugin.get_instance_name()
         if _instance:
-            _keyword = "appletv@{}".format(_instance)
+            _keyword = 'appletv@{}'.format(_instance)
         else:
-            _keyword = "appletv"
+            _keyword = 'appletv'
         for item in self.items.return_items():
             if _keyword in item.conf:
                 plgitems.append(item)
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         return tmpl.render(
-            p=self.plugin, items=sorted(plgitems, key=lambda k: str.lower(k["_path"])), pinentry=self.pinentry
+            p=self.plugin, items=sorted(plgitems, key=lambda k: str.lower(k['_path'])), pinentry=self.pinentry
         )
 
     @cherrypy.expose
@@ -93,22 +93,22 @@ class WebInterface(SmartPluginWebIf):
         """
         if dataSet is None:
             data = {}
-            data["state"] = self.plugin._state
+            data['state'] = self.plugin._state
             # return it as json the the web page
             try:
                 return json.dumps(data)
             except Exception as e:
-                self.logger.error("get_data_html exception: {}".format(e))
+                self.logger.error('get_data_html exception: {}'.format(e))
                 # self.logger.debug(data)
         return {}
 
     @cherrypy.expose
     def button_pressed(self, button=None, pin=None):
-        if button == "discover":
-            self.logger.debug("Discover button pressed")
+        if button == 'discover':
+            self.logger.debug('Discover button pressed')
             self.plugin._loop.create_task(self.plugin.discover())
-        elif button == "start_authorization":
-            self.logger.debug("Start authentication")
+        elif button == 'start_authorization':
+            self.logger.debug('Start authentication')
             self.pinentry = True
 
             _protocol = self.plugin._atv.main_service().protocol
@@ -118,27 +118,27 @@ class WebInterface(SmartPluginWebIf):
             self._pairing = _task.result()
             if self._pairing.device_provides_pin:
                 self._pin = None
-                self.logger.info("Device provides pin")
+                self.logger.info('Device provides pin')
             else:
                 self._pin = randint(1111, 9999)
-                self.logger.info("SHNG must provide pin: {}".format(self._pin))
+                self.logger.info('SHNG must provide pin: {}'.format(self._pin))
 
             self.plugin._loop.create_task(self._pairing.begin())
 
-        elif button == "finish_authorization":
-            self.logger.debug("Finish authentication")
+        elif button == 'finish_authorization':
+            self.logger.debug('Finish authentication')
             self.pinentry = False
             self._pairing.pin(pin)
             _task = self.plugin._loop.create_task(self._pairing.finish())
             while not _task.done():
                 sleep(0.1)
             if self._pairing.has_paired:
-                self.logger.info("Pairing successfull !")
+                self.logger.info('Pairing successfull !')
                 self.plugin._credentials = self._pairing.service.credentials
                 self.plugin.save_credentials()
             else:
-                self.logger.error("Unable to pair, wrong Pin ?")
+                self.logger.error('Unable to pair, wrong Pin ?')
             self.plugin._loop.create_task(self._pairing.close())
         else:
-            self.logger.warning("Unknown button pressed in webif: {}".format(button))
-        raise cherrypy.HTTPRedirect("index")
+            self.logger.warning('Unknown button pressed in webif: {}'.format(button))
+        raise cherrypy.HTTPRedirect('index')

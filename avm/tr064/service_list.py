@@ -15,4 +15,4 @@ class ServiceList(list):
         if len(self) > index:
             return super().__getitem__(index)
 
-        raise TR064UnknownServiceIndexException("Exception in ServiceListIndex")
+        raise TR064UnknownServiceIndexException('Exception in ServiceListIndex')

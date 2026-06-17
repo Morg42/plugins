@@ -69,7 +69,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # Setting pagelength (max. number of table entries per page) for web interface
         try:
             pagelength = self.plugin.webif_pagelength
@@ -101,25 +101,25 @@ class WebInterface(SmartPluginWebIf):
         if dataSet is None:
             # get the new data
             data = dict()
-            data["items"] = {}
+            data['items'] = {}
 
             for item in self.plugin.item_list:
-                data["items"][item.property.path] = {}
-                data["items"][item.property.path]["value"] = item.property.value
-                data["items"][item.property.path]["last_update"] = item.property.last_update.strftime(
-                    "%d.%m.%Y %H:%M:%S"
+                data['items'][item.property.path] = {}
+                data['items'][item.property.path]['value'] = item.property.value
+                data['items'][item.property.path]['last_update'] = item.property.last_update.strftime(
+                    '%d.%m.%Y %H:%M:%S'
                 )
-                data["items"][item.property.path]["last_change"] = item.property.last_change.strftime(
-                    "%d.%m.%Y %H:%M:%S"
+                data['items'][item.property.path]['last_change'] = item.property.last_change.strftime(
+                    '%d.%m.%Y %H:%M:%S'
                 )
 
-            data["maintenance"] = True if self.plugin.log_level == 10 else False
-            data["prices"] = self.plugin.station_prices
+            data['maintenance'] = True if self.plugin.log_level == 10 else False
+            data['prices'] = self.plugin.station_prices
 
             try:
                 return json.dumps(data, default=str)
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
 
     @cherrypy.expose
     def submit(self, button=None, lat=None, lon=None, rad=4, clear=False):
@@ -127,20 +127,20 @@ class WebInterface(SmartPluginWebIf):
         Submit handler for Ajax
         """
 
-        self.logger.warning(f"submit called with button={button}, lat={lat}, lon={lon}, rad={rad}")
+        self.logger.warning(f'submit called with button={button}, lat={lat}, lon={lon}, rad={rad}')
         if button is not None:
             result = self.plugin.get_petrol_stations(lat=lat, lon=lon, rad=rad)
-            self.logger.warning(f"result={result}")
+            self.logger.warning(f'result={result}')
 
         elif clear:
             for addr in self._last_read:
-                self._last_read[addr]["val"] = ""
-            self._last_read["last"] = {"addr": None, "val": "", "cmd": ""}
+                self._last_read[addr]['val'] = ''
+            self._last_read['last'] = {'addr': None, 'val': '', 'cmd': ''}
 
-        cherrypy.response.headers["Content-Type"] = "application/json"
-        return json.dumps(self._last_read).encode("utf-8")
+        cherrypy.response.headers['Content-Type'] = 'application/json'
+        return json.dumps(self._last_read).encode('utf-8')
 
     @cherrypy.expose
     def recalc_all(self):
-        self.logger.debug("recalc_all called")
+        self.logger.debug('recalc_all called')
         self.plugin.update_status_data()

@@ -28,19 +28,19 @@ from lib.model.smartplugin import Modules, SmartPlugin, SmartPluginWebIf
 
 
 class Miflora(SmartPlugin):
-    PLUGIN_VERSION = "1.6.2"
+    PLUGIN_VERSION = '1.6.2'
 
     def __init__(self, sh, *args, **kwargs):
         """
         Initalizes the plugin.
         """
-        self._bt_addr = self.get_parameter_value("bt_addr")
-        self._bt_library = self.get_parameter_value("bt_library")
-        self._cycle = self.get_parameter_value("cycle")
+        self._bt_addr = self.get_parameter_value('bt_addr')
+        self._bt_library = self.get_parameter_value('bt_library')
+        self._cycle = self.get_parameter_value('cycle')
         self._items = []
-        if self._bt_library == "gatttool":
+        if self._bt_library == 'gatttool':
             self.poller = MiFloraPoller(self._bt_addr, GatttoolBackend)
-        elif self._bt_library == "pygatt":
+        elif self._bt_library == 'pygatt':
             self.poller = MiFloraPoller(self._bt_addr, PygattBackend)
         else:
             self.poller = MiFloraPoller(self._bt_addr, BluepyBackend)
@@ -76,26 +76,26 @@ class Miflora(SmartPlugin):
 
         :param item: The item to process.
         """
-        if self.has_iattr(item.conf, "miflora_data_type"):
+        if self.has_iattr(item.conf, 'miflora_data_type'):
             self.logger.debug("Plugin '{}': Parse item: {}.".format(self.get_fullname(), item))
             self._items.append(item)
 
     def _update_loop(self):
         try:
             for item in self._items:
-                if self.get_iattr_value(item.conf, "miflora_data_type") == "temperature":
-                    item(self.poller.parameter_value("temperature"))
-                elif self.get_iattr_value(item.conf, "miflora_data_type") == "light":
+                if self.get_iattr_value(item.conf, 'miflora_data_type') == 'temperature':
+                    item(self.poller.parameter_value('temperature'))
+                elif self.get_iattr_value(item.conf, 'miflora_data_type') == 'light':
                     item(self.poller.parameter_value(MI_LIGHT))
-                elif self.get_iattr_value(item.conf, "miflora_data_type") == "moisture":
+                elif self.get_iattr_value(item.conf, 'miflora_data_type') == 'moisture':
                     item(self.poller.parameter_value(MI_MOISTURE))
-                elif self.get_iattr_value(item.conf, "miflora_data_type") == "conductivity":
+                elif self.get_iattr_value(item.conf, 'miflora_data_type') == 'conductivity':
                     item(self.poller.parameter_value(MI_CONDUCTIVITY))
-                elif self.get_iattr_value(item.conf, "miflora_data_type") == "battery":
+                elif self.get_iattr_value(item.conf, 'miflora_data_type') == 'battery':
                     item(self.poller.parameter_value(MI_BATTERY))
-                elif self.get_iattr_value(item.conf, "miflora_data_type") == "name":
+                elif self.get_iattr_value(item.conf, 'miflora_data_type') == 'name':
                     item(self.poller.name())
-                elif self.get_iattr_value(item.conf, "miflora_data_type") == "firmware":
+                elif self.get_iattr_value(item.conf, 'miflora_data_type') == 'firmware':
                     item(self.poller.firmware_version())
         except Exception as e:
             self.logger.error(str(e))
@@ -110,7 +110,7 @@ class Miflora(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
@@ -118,12 +118,10 @@ class Miflora(SmartPlugin):
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
+        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            "/": {
-                "tools.staticdir.root": webif_dir,
-            },
-            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
         # Register the web interface as a cherrypy app
@@ -133,7 +131,7 @@ class Miflora(SmartPlugin):
             config,
             self.get_classname(),
             self.get_instance_name(),
-            description="",
+            description='',
         )
 
         return True
@@ -173,7 +171,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         return tmpl.render(
             plugin_shortname=self.plugin.get_shortname(),
             plugin_version=self.plugin.get_version(),
@@ -181,7 +179,7 @@ class WebInterface(SmartPluginWebIf):
             item_count=len(self.plugin.get_items()),
             plugin_info=self.plugin.get_info(),
             tabcount=1,
-            tab1title="Items (%s)" % len(self.plugin.get_items()),
+            tab1title='Items (%s)' % len(self.plugin.get_items()),
             p=self.plugin,
         )
 
@@ -199,9 +197,9 @@ class WebInterface(SmartPluginWebIf):
             # get the new data
             data = {}
             for item in self.plugin.get_items():
-                data[item.property.path + "_value"] = item()
-                data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
-                data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
+                data[item.property.path + '_value'] = item()
+                data[item.property.path + '_last_update'] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
+                data[item.property.path + '_last_change'] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
 
             # return it as json the the web page
             return json.dumps(data)

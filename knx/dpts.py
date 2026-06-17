@@ -86,7 +86,7 @@ Datapoint type one byte for one character
 
 def en4002(value):
     if isinstance(value, str):
-        value = value.encode("iso-8859-1", "replace")
+        value = value.encode('iso-8859-1', 'replace')
     else:
         value = str(value)
     return [0, ord(value) & 0xFF]
@@ -95,7 +95,7 @@ def en4002(value):
 def de4002(payload):
     if len(payload) != 1:
         return None
-    return payload.decode("iso-8859-1")
+    return payload.decode('iso-8859-1')
 
 
 """
@@ -114,7 +114,7 @@ def en5(value):
 def de5(payload):
     if len(payload) != 1:
         return None
-    return round(struct.unpack(">B", payload)[0], 1)
+    return round(struct.unpack('>B', payload)[0], 1)
 
 
 def en5001(value):
@@ -128,7 +128,7 @@ def en5001(value):
 def de5001(payload):
     if len(payload) != 1:
         return None
-    return round(struct.unpack(">B", payload)[0] * 100.0 / 255, 1)
+    return round(struct.unpack('>B', payload)[0] * 100.0 / 255, 1)
 
 
 def en5003(value):
@@ -139,7 +139,7 @@ def en5003(value):
 def de5003(payload):
     if len(payload) != 1:
         return None
-    return round(struct.unpack(">B", payload)[0] * 360.0 / 255, 1)
+    return round(struct.unpack('>B', payload)[0] * 360.0 / 255, 1)
 
 
 def en5999(value):
@@ -155,7 +155,7 @@ def de5999(payload):
     # artificial data point for tebis TS systems
     if len(payload) != 1:
         return None
-    return struct.unpack(">B", payload)[0] & 0x0F
+    return struct.unpack('>B', payload)[0] & 0x0F
 
 
 """
@@ -185,13 +185,13 @@ def en6(value):
         value = -128
     elif value > 127:
         value = 127
-    return [0, struct.pack("b", int(value))[0]]
+    return [0, struct.pack('b', int(value))[0]]
 
 
 def de6(payload):
     if len(payload) != 1:
         return None
-    return struct.unpack("b", payload)[0]
+    return struct.unpack('b', payload)[0]
 
 
 """
@@ -201,14 +201,14 @@ Datapoint type two Bytes with unsigned value
 
 def en7(value):
     ret = bytearray([0])
-    ret.extend(struct.pack(">H", int(value)))
+    ret.extend(struct.pack('>H', int(value)))
     return ret
 
 
 def de7(payload):
     if len(payload) != 2:
         return None
-    return struct.unpack(">H", payload)[0]
+    return struct.unpack('>H', payload)[0]
 
 
 """
@@ -222,14 +222,14 @@ def en8(value):
     elif value > 32767:
         value = 32767
     ret = bytearray([0])
-    ret.extend(struct.pack(">h", int(value)))
+    ret.extend(struct.pack('>h', int(value)))
     return ret
 
 
 def de8(payload):
     if len(payload) != 2:
         return None
-    return struct.unpack(">h", payload)[0]
+    return struct.unpack('>h', payload)[0]
 
 
 """
@@ -314,14 +314,14 @@ def en12(value):
     elif value > 4294967295:
         value = 4294967295
     ret = bytearray([0])
-    ret.extend(struct.pack(">I", int(value)))
+    ret.extend(struct.pack('>I', int(value)))
     return ret
 
 
 def de12(payload):
     if len(payload) != 4:
         return None
-    return struct.unpack(">I", payload)[0]
+    return struct.unpack('>I', payload)[0]
 
 
 """
@@ -335,14 +335,14 @@ def en13(value):
     elif value > 2147483647:
         value = 2147483647
     ret = bytearray([0])
-    ret.extend(struct.pack(">i", int(value)))
+    ret.extend(struct.pack('>i', int(value)))
     return ret
 
 
 def de13(payload):
     if len(payload) != 4:
         return None
-    return struct.unpack(">i", payload)[0]
+    return struct.unpack('>i', payload)[0]
 
 
 """
@@ -352,14 +352,14 @@ Datapoint type four bytes with float value
 
 def en14(value):
     ret = bytearray([0])
-    ret.extend(struct.pack(">f", value))
+    ret.extend(struct.pack('>f', value))
     return ret
 
 
 def de14(payload):
     if len(payload) != 4:
         return None
-    ret = struct.unpack(">f", payload)[0]
+    ret = struct.unpack('>f', payload)[0]
     if math.isnan(ret):
         return None
     else:
@@ -373,24 +373,24 @@ Datapoint type up to fourteen bytes with characters in ASCII or iso 8859-1
 
 def en16000(value):
     enc = bytearray(1)
-    enc.extend(value.encode("ascii", "replace")[:14])
+    enc.extend(value.encode('ascii', 'replace')[:14])
     enc.extend([0] * (15 - len(enc)))
     return enc
 
 
 def en16001(value):
     enc = bytearray(1)
-    enc.extend(value.encode("iso-8859-1", "replace")[:14])
+    enc.extend(value.encode('iso-8859-1', 'replace')[:14])
     enc.extend([0] * (15 - len(enc)))
     return enc
 
 
 def de16000(payload):
-    return payload.rstrip(b"0").decode()
+    return payload.rstrip(b'0').decode()
 
 
 def de16001(payload):
-    return payload.rstrip(b"0").decode("iso-8859-1")
+    return payload.rstrip(b'0').decode('iso-8859-1')
 
 
 """
@@ -405,7 +405,7 @@ def en17(value):
 def de17(payload):
     if len(payload) != 1:
         return None
-    return struct.unpack(">B", payload)[0] & 0x3F
+    return struct.unpack('>B', payload)[0] & 0x3F
 
 
 def en17001(value):
@@ -415,7 +415,7 @@ def en17001(value):
 def de17001(payload):
     if len(payload) != 1:
         return None
-    return (struct.unpack(">B", payload)[0] & 0x3F) + 1
+    return (struct.unpack('>B', payload)[0] & 0x3F) + 1
 
 
 """
@@ -430,7 +430,7 @@ def en18001(value):
 def de18001(payload):
     if len(payload) != 1:
         return None
-    return (struct.unpack(">B", payload)[0] & 0xBF) + 1
+    return (struct.unpack('>B', payload)[0] & 0xBF) + 1
 
 
 """
@@ -452,18 +452,18 @@ def en20(value):
 def de20(payload):
     if len(payload) != 1:
         return None
-    return struct.unpack(">B", payload)[0]
+    return struct.unpack('>B', payload)[0]
 
 
 def en24(value):
     enc = bytearray(1)
-    enc.extend(value.encode("iso-8859-1", "replace"))
+    enc.extend(value.encode('iso-8859-1', 'replace'))
     enc.append(0)
     return enc
 
 
 def de24(payload):
-    return payload.rstrip(b"\x00").decode("iso-8859-1")
+    return payload.rstrip(b'\x00').decode('iso-8859-1')
 
 
 """
@@ -473,13 +473,13 @@ Datapoint Type unicode UTF-8 string A[n]
 
 def en28(value):
     enc = bytearray(1)
-    enc.extend(value.encode("utf-8", "replace"))
+    enc.extend(value.encode('utf-8', 'replace'))
     enc.append(0)
     return enc
 
 
 def de28(payload):
-    return payload.rstrip(b"\x00").decode("utf-8")
+    return payload.rstrip(b'\x00').decode('utf-8')
 
 
 """
@@ -493,14 +493,14 @@ def en229(value):
     if len(value) != 3:
         return None
     retval = [0]
-    retval.extend(struct.pack(">lBB", value[0], value[1], value[2]))
+    retval.extend(struct.pack('>lBB', value[0], value[1], value[2]))
     return retval
 
 
 def de229(payload):
     if len(payload) != 6:
         return None
-    return list(struct.unpack(">lBB", payload))
+    return list(struct.unpack('>lBB', payload))
 
 
 """
@@ -516,7 +516,7 @@ def en232(value):
 def de232(payload):
     if len(payload) != 3:
         return None
-    return list(struct.unpack(">BBB", payload))
+    return list(struct.unpack('>BBB', payload))
 
 
 """
@@ -533,7 +533,7 @@ def en251(value):
 def de251(payload):
     if len(payload) != 6:
         return None
-    return list(struct.unpack(">BBBBBB", payload))[2:6]
+    return list(struct.unpack('>BBBBBB', payload))[2:6]
 
 
 """
@@ -569,13 +569,13 @@ def depa(ba):
     """expects a bytearray with length 2 in big endian"""
     if len(ba) != 2:
         return None
-    pa = struct.unpack(">H", ba)[0]
-    return "{0}.{1}.{2}".format((pa >> 12) & 0x0F, (pa >> 8) & 0x0F, (pa) & 0xFF)
+    pa = struct.unpack('>H', ba)[0]
+    return '{0}.{1}.{2}'.format((pa >> 12) & 0x0F, (pa >> 8) & 0x0F, (pa) & 0xFF)
 
 
 def enpa(pa):
     """expects a string containing the physical address of a device separated with a dot and no whitespace anywhere"""
-    pa = pa.split(".")
+    pa = pa.split('.')
     if len(pa) == 3:
         area = int(pa[0]) & 0x0F
         line = int(pa[1]) & 0x0F
@@ -591,117 +591,117 @@ Group Address from and to string
 
 
 def enga(ga):
-    ga = ga.split("/")
+    ga = ga.split('/')
     return [int(ga[0]) << 3 | int(ga[1]), int(ga[2])]
 
 
 def dega(string):
     if len(string) != 2:
         return None
-    ga = struct.unpack(">H", string)[0]
-    return "{0}/{1}/{2}".format((ga >> 11) & 0x1F, (ga >> 8) & 0x07, (ga) & 0xFF)
+    ga = struct.unpack('>H', string)[0]
+    return '{0}/{1}/{2}'.format((ga >> 11) & 0x1F, (ga >> 8) & 0x07, (ga) & 0xFF)
 
 
 decode = {
-    "1": de1,
-    "2": de2,
-    "3": de3,
-    "4002": de4002,
-    "4.002": de4002,
-    "5": de5,
-    "5001": de5001,
-    "5.001": de5001,
-    "5003": de5003,  # DPT_Angle [0..360] °
-    "5.003": de5003,  # DPT_Angle [0..360] °
-    "5999": de5999,
-    "5.999": de5999,
-    "6": de6,
-    "7": de7,
-    "8": de8,
-    "9": de9,
-    "10": de10,
-    "11": de11,
-    "12": de12,
-    "13": de13,
-    "14": de14,
-    "16000": de16000,
-    "16": de16000,
-    "16001": de16001,
-    "16.001": de16001,
-    "17": de17,
-    "17001": de17001,
-    "17.001": de17001,
-    "18001": de18001,
-    "18.001": de18001,
+    '1': de1,
+    '2': de2,
+    '3': de3,
+    '4002': de4002,
+    '4.002': de4002,
+    '5': de5,
+    '5001': de5001,
+    '5.001': de5001,
+    '5003': de5003,  # DPT_Angle [0..360] °
+    '5.003': de5003,  # DPT_Angle [0..360] °
+    '5999': de5999,
+    '5.999': de5999,
+    '6': de6,
+    '7': de7,
+    '8': de8,
+    '9': de9,
+    '10': de10,
+    '11': de11,
+    '12': de12,
+    '13': de13,
+    '14': de14,
+    '16000': de16000,
+    '16': de16000,
+    '16001': de16001,
+    '16.001': de16001,
+    '17': de17,
+    '17001': de17001,
+    '17.001': de17001,
+    '18001': de18001,
+    '18.001': de18001,
     # '19' : de19,      #DPT_DateTime
     # '19001' : de19,   #DPT_DateTime
     # '19.001' : de19,  #DPT_DateTime
-    "20": de20,
-    "24": de24,
-    "28": de28,  # DPT_UTF-8
-    "28001": de28,  # DPT_UTF-8
-    "28.001": de28,  # DPT_UTF-8
-    "229": de229,
-    "232": de232,
-    "251": de251,  # RGBW
-    "275.100": de275100,
-    "pa": depa,
-    "ga": dega,
-    "hex": dehex,
+    '20': de20,
+    '24': de24,
+    '28': de28,  # DPT_UTF-8
+    '28001': de28,  # DPT_UTF-8
+    '28.001': de28,  # DPT_UTF-8
+    '229': de229,
+    '232': de232,
+    '251': de251,  # RGBW
+    '275.100': de275100,
+    'pa': depa,
+    'ga': dega,
+    'hex': dehex,
 }
 
 encode = {
-    "1": en1,  # One Bit
-    "2": en2,  # Two Bits
-    "3": en3,  # One Byte: relative Dimming or Blinds
-    "4002": en4002,  # ASCII or 8859-1 encoded character
-    "4.002": en4002,
-    "5": en5,  # One Byte: unsigned value
-    "5001": en5001,  # DPT_Scaling [0 ... 100] %
-    "5.001": en5001,  # DPT_Scaling [0 ... 100] %
-    "5003": en5003,  # DPT_Angle [0..360] °
-    "5.003": en5003,  # DPT_Angle [0..360] °
+    '1': en1,  # One Bit
+    '2': en2,  # Two Bits
+    '3': en3,  # One Byte: relative Dimming or Blinds
+    '4002': en4002,  # ASCII or 8859-1 encoded character
+    '4.002': en4002,
+    '5': en5,  # One Byte: unsigned value
+    '5001': en5001,  # DPT_Scaling [0 ... 100] %
+    '5.001': en5001,  # DPT_Scaling [0 ... 100] %
+    '5003': en5003,  # DPT_Angle [0..360] °
+    '5.003': en5003,  # DPT_Angle [0..360] °
     # 5.004 -> DPT_Percent_U8 [0..255] %
     # 5.005 -> DPT_DecimalFactor
-    "5999": en5999,  # artificial data point for tebis TS systems
-    "5.999": en5999,  # artificial data point for tebis TS systems
-    "6": en6,  # One Byte: signed relative value or status with mode
-    "7": en7,  # Two Bytes: unsigned value
-    "8": en8,  # Two Bytes: signed value
-    "9": en9,  # Two Bytes: float value
-    "10": en10,  # Three Bytes: time (optional with day)
-    "11": en11,  # Three Bytes: date
-    "12": en12,  # Four Bytes: unsigned value
-    "13": en13,  # Four Bytes: signed value
-    "14": en14,  # Four Bytes: float value
+    '5999': en5999,  # artificial data point for tebis TS systems
+    '5.999': en5999,  # artificial data point for tebis TS systems
+    '6': en6,  # One Byte: signed relative value or status with mode
+    '7': en7,  # Two Bytes: unsigned value
+    '8': en8,  # Two Bytes: signed value
+    '9': en9,  # Two Bytes: float value
+    '10': en10,  # Three Bytes: time (optional with day)
+    '11': en11,  # Three Bytes: date
+    '12': en12,  # Four Bytes: unsigned value
+    '13': en13,  # Four Bytes: signed value
+    '14': en14,  # Four Bytes: float value
     # '15': en15,       #Four Bytes: DPT_Access_Data
-    "16": en16000,  # 14 Bytes
-    "16000": en16000,  #  ASCII
-    "16001": en16001,  #  8859-1
-    "16.001": en16001,
-    "17": en17,  # One Byte: Scene Number
-    "17001": en17001,
-    "17.001": en17001,
-    "18001": en18001,  # OneByte:
-    "18.001": en18001,  #  DPT_SceneControl
+    '16': en16000,  # 14 Bytes
+    '16000': en16000,  #  ASCII
+    '16001': en16001,  #  8859-1
+    '16.001': en16001,
+    '17': en17,  # One Byte: Scene Number
+    '17001': en17001,
+    '17.001': en17001,
+    '18001': en18001,  # OneByte:
+    '18.001': en18001,  #  DPT_SceneControl
     # '19' : en19,      #DPT_DateTime
     # '19001' : en19,   #DPT_DateTime
     # '19.001' : en19,  #DPT_DateTime
-    "20": en20,  # One Byte: modes of several flavours
+    '20': en20,  # One Byte: modes of several flavours
     # '21':en21,        #One Byte: status bit encoded
     # 22 undefined
     # '23': en23,       #OneByte: last two bits encode actions
-    "24": en24,  # Variable lenght string encoded in 8859-1
+    '24': en24,  # Variable lenght string encoded in 8859-1
     # 26                #One Byte: DPT_SceneInfo
     # 27                #Four Bytes: Combined Info On Off
-    "28": en28,  # DPT_UTF-8
-    "28001": en28,  # DPT_UTF-8
-    "28.001": en28,  # DPT_UTF-8
-    "229": en229,
-    "232": en232,  # RGB
-    "251": en251,  # RGBW
-    "275.100": en275100,  # Setpoint temperature, contains 4 values: Komfort, Standby, Night and Frost
-    "pa": enpa,
-    "ga": enga,
-    "hex": enhex,
+    '28': en28,  # DPT_UTF-8
+    '28001': en28,  # DPT_UTF-8
+    '28.001': en28,  # DPT_UTF-8
+    '229': en229,
+    '232': en232,  # RGB
+    '251': en251,  # RGBW
+    '275.100': en275100,  # Setpoint temperature, contains 4 values: Komfort, Standby, Night and Frost
+    'pa': enpa,
+    'ga': enga,
+    'hex': enhex,
 }

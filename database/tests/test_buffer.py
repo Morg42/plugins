@@ -14,13 +14,13 @@ class _Item:
         self.name = name
 
     def __repr__(self):
-        return f"Item({self.name})"
+        return f'Item({self.name})'
 
 
 class TestBufferManagerRegistration(unittest.TestCase):
     def setUp(self):
         self.mgr = BufferManager()
-        self.item = _Item("test.item")
+        self.item = _Item('test.item')
 
     def test_register_creates_empty_list(self):
         self.mgr.register(self.item)
@@ -39,7 +39,7 @@ class TestBufferManagerRegistration(unittest.TestCase):
 class TestBufferManagerPushPop(unittest.TestCase):
     def setUp(self):
         self.mgr = BufferManager()
-        self.item = _Item("test.item")
+        self.item = _Item('test.item')
         self.mgr.register(self.item)
 
     def _entry(self, t, d=None, v=1.0):
@@ -80,7 +80,7 @@ class TestBufferManagerPushPop(unittest.TestCase):
 class TestBufferManagerCloseOpen(unittest.TestCase):
     def setUp(self):
         self.mgr = BufferManager()
-        self.item = _Item("test.item")
+        self.item = _Item('test.item')
         self.mgr.register(self.item)
 
     def test_close_open_sets_duration(self):
@@ -115,7 +115,7 @@ class TestBufferManagerCloseOpen(unittest.TestCase):
 class TestBufferManagerQuality(unittest.TestCase):
     def setUp(self):
         self.mgr = BufferManager()
-        self.item = _Item("solar.power")
+        self.item = _Item('solar.power')
         self.mgr.register(self.item)
 
     def test_push_invalid_creates_no_data_entry(self):
@@ -143,5 +143,5 @@ class TestBufferManagerQuality(unittest.TestCase):
         self.assertEqual(last.quality, QUALITY_VALID)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main(verbosity=2)

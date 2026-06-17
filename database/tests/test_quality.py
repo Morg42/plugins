@@ -16,7 +16,7 @@ import sys
 import os
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 
 from plugins.database.constants import QUALITY_VALID, QUALITY_NO_DATA
 
@@ -96,17 +96,17 @@ class TestQualityStoreLevel(unittest.TestCase):
 
         class _DB:
             def __init__(self):
-                self._conn = sqlite3.connect(":memory:")
+                self._conn = sqlite3.connect(':memory:')
                 c = self._conn.cursor()
                 c.execute(
-                    "CREATE TABLE item (id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                    " name VARCHAR(255), time BIGINT, val_str TEXT,"
-                    " val_num REAL, val_bool BOOLEAN, changed BIGINT)"
+                    'CREATE TABLE item (id INTEGER PRIMARY KEY AUTOINCREMENT,'
+                    ' name VARCHAR(255), time BIGINT, val_str TEXT,'
+                    ' val_num REAL, val_bool BOOLEAN, changed BIGINT)'
                 )
                 c.execute(
-                    "CREATE TABLE log (time BIGINT, item_id INTEGER,"
-                    " duration BIGINT, val_str TEXT, val_num REAL,"
-                    " val_bool BOOLEAN, changed BIGINT, val_quality TINYINT DEFAULT 0)"
+                    'CREATE TABLE log (time BIGINT, item_id INTEGER,'
+                    ' duration BIGINT, val_str TEXT, val_num REAL,'
+                    ' val_bool BOOLEAN, changed BIGINT, val_quality TINYINT DEFAULT 0)'
                 )
                 self._conn.commit()
 
@@ -146,24 +146,23 @@ class TestQualityStoreLevel(unittest.TestCase):
                 return self._conn.cursor()
 
         tn = {
-            "item": "item",
-            "log": "log",
-            "item_columns": "id, name, time, val_str, val_num, val_bool, changed",
-            "log_columns": "time, item_id, duration, val_str, val_num, val_bool, changed",
+            'item': 'item',
+            'log': 'log',
+            'item_columns': 'id, name, time, val_str, val_num, val_bool, changed',
+            'log_columns': 'time, item_id, duration, val_str, val_num, val_bool, changed',
         }
         db = _DB()
         self.item_store = ItemStore(db, tn)
         self.log_store = LogStore(db, tn)
         self.db = db
         self.BE = BufferEntry
-        self.item_id = self.item_store.insert("solar.power")
+        self.item_id = self.item_store.insert('solar.power')
 
     def test_gap_entry_val_quality_is_one(self):
         gap = self.BE(time=5000, duration=600, value=None, quality=QUALITY_NO_DATA)
-        self.log_store.insert(self.item_id, gap, "num", changed=5600)
+        self.log_store.insert(self.item_id, gap, 'num', changed=5600)
         rows = self.db.fetchall(
-            "SELECT val_quality, val_num, val_str, val_bool FROM log WHERE item_id=? AND time=?",
-            (self.item_id, 5000),
+            'SELECT val_quality, val_num, val_str, val_bool FROM log WHERE item_id=? AND time=?', (self.item_id, 5000)
         )
         self.assertEqual(rows[0][0], QUALITY_NO_DATA)
         self.assertIsNone(rows[0][1])  # val_num
@@ -172,11 +171,8 @@ class TestQualityStoreLevel(unittest.TestCase):
 
     def test_valid_entry_val_quality_is_zero(self):
         e = self.BE(time=1000, duration=500, value=250.0, quality=QUALITY_VALID)
-        self.log_store.insert(self.item_id, e, "num", changed=1500)
-        rows = self.db.fetchall(
-            "SELECT val_quality FROM log WHERE item_id=? AND time=?",
-            (self.item_id, 1000),
-        )
+        self.log_store.insert(self.item_id, e, 'num', changed=1500)
+        rows = self.db.fetchall('SELECT val_quality FROM log WHERE item_id=? AND time=?', (self.item_id, 1000))
         self.assertEqual(rows[0][0], QUALITY_VALID)
 
 
@@ -212,7 +208,7 @@ class TestImplicitRevalidation(unittest.TestCase):
         """Open a gap in the buffer, mirroring _mark_item_invalid."""
         mgr.push(
             item,
-            __import__("plugins.database.constants", fromlist=["BufferEntry"]).BufferEntry(
+            __import__('plugins.database.constants', fromlist=['BufferEntry']).BufferEntry(
                 time=prior_start_ts, duration=None, value=prior_value
             ),
         )
@@ -270,7 +266,7 @@ class TestImplicitRevalidation(unittest.TestCase):
         self.assertEqual(
             gap_entry.duration,
             correct_duration,
-            f"Expected gap duration {correct_duration}, got {gap_entry.duration} (old bug would give {wrong_duration})",
+            f'Expected gap duration {correct_duration}, got {gap_entry.duration} (old bug would give {wrong_duration})',
         )
         self.assertIsNone(gap_entry.value)
 
@@ -290,7 +286,7 @@ class TestImplicitRevalidation(unittest.TestCase):
         self._simulate_update_item(mgr, gap_items, item, 3000, 200.0)
 
         # _gap_items must be cleared
-        self.assertNotIn(item, gap_items, "_gap_items must be cleared after implicit re-validation")
+        self.assertNotIn(item, gap_items, '_gap_items must be cleared after implicit re-validation')
 
     def test_no_stale_prev_value_emitted_during_gap(self):
         """When closing a gap implicitly, no step-1b prev_value entry must
@@ -307,7 +303,7 @@ class TestImplicitRevalidation(unittest.TestCase):
         self._simulate_update_item(mgr, gap_items, item, 3000, 180.0)
 
         entries = mgr.pop_all(item)
-        self.assertEqual(len(entries), 3, f"Expected [valid, gap, new_valid], got {len(entries)} entries")
+        self.assertEqual(len(entries), 3, f'Expected [valid, gap, new_valid], got {len(entries)} entries')
         self.assertEqual(entries[0].value, 250.0)  # prior valid
         self.assertIsNone(entries[1].value)  # gap
         self.assertEqual(entries[2].value, 180.0)  # new valid
@@ -325,7 +321,7 @@ class TestImplicitRevalidation(unittest.TestCase):
         # Simulate normal step-1a: close the previous entry, append new
         buf = mgr._buffer[item]
         in_gap = gap_items.get(item) is not None and buf and buf[-1].duration is None and buf[-1].value is None
-        self.assertFalse(in_gap, "Should not detect a gap when none was opened")
+        self.assertFalse(in_gap, 'Should not detect a gap when none was opened')
 
     def test_subsequent_mark_valid_is_noop_after_implicit_close(self):
         """After implicit re-validation, db_mark_valid() must not close the
@@ -353,8 +349,8 @@ class TestImplicitRevalidation(unittest.TestCase):
         # The new valid entry (180W) must still be open (duration=None)
         last = mgr.last_entry(item)
         self.assertEqual(last.value, 180.0)
-        self.assertIsNone(last.duration, "New valid entry must remain open after the (no-op) db_mark_valid() call")
+        self.assertIsNone(last.duration, 'New valid entry must remain open after the (no-op) db_mark_valid() call')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main(verbosity=2)

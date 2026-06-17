@@ -18,17 +18,17 @@ class MessageSourceProxy:
 
     def get_data(self):
         return {
-            "is_relevant": self.is_relevant,
-            "is_relevant_origin": self.__original_source.__is_relevant_path,
-            "content": self.content,
-            "content_origin": self.__original_source.__content_source_path,
+            'is_relevant': self.is_relevant,
+            'is_relevant_origin': self.__original_source.__is_relevant_path,
+            'content': self.content,
+            'content_origin': self.__original_source.__content_source_path,
         }
 
     def __repr__(self):
         res = self.__relevance_forcer()
         if res is None:
-            rel_str = "O" if self.is_relevant else " "
+            rel_str = 'O' if self.is_relevant else ' '
         else:
-            rel_str = "P" if res else "-"
+            rel_str = 'P' if res else '-'
 
-        return f"{rel_str} {self.content}"
+        return f'{rel_str} {self.content}'

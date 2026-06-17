@@ -9,7 +9,7 @@ class MessageSourceModel:
         try:
             return self.__is_relevant_fnc()
         except Exception:
-            raise Exception(f"Cannot read relevance from {self.__content_source_path}")
+            raise Exception(f'Cannot read relevance from {self.__content_source_path}')
 
     is_relevant = property(__get_is_relevant)
 
@@ -17,18 +17,18 @@ class MessageSourceModel:
         try:
             return self.__get_content()
         except Exception:
-            raise Exception(f"Cannot read value from {self.__content_source_path}")
+            raise Exception(f'Cannot read value from {self.__content_source_path}')
 
     content = property(__get_content_value)
 
     def get_data(self):
         return {
-            "is_relevant": self.__is_relevant_fnc(),
-            "is_relevant_origin": self.__is_relevant_path,
-            "content": self.__get_content(),
-            "content_origin": self.__content_source_path,
+            'is_relevant': self.__is_relevant_fnc(),
+            'is_relevant_origin': self.__is_relevant_path,
+            'content': self.__get_content(),
+            'content_origin': self.__content_source_path,
         }
 
     def __repr__(self):
-        rel_str = "O" if self.__is_relevant_fnc() else " "
-        return f"{rel_str} {self.__get_content()}"
+        rel_str = 'O' if self.__is_relevant_fnc() else ' '
+        return f'{rel_str} {self.__get_content()}'

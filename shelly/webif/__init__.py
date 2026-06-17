@@ -68,12 +68,12 @@ class WebInterface(MqttPluginWebIf):
         """
         self.plugin.get_broker_info()
 
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(
             p=self.plugin,
-            webif_pagelength=self.plugin.get_parameter_value("webif_pagelength"),
-            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])),
+            webif_pagelength=self.plugin.get_parameter_value('webif_pagelength'),
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
         )
 
     @cherrypy.expose
@@ -91,48 +91,48 @@ class WebInterface(MqttPluginWebIf):
             item_list = []
             for item in self.plugin.get_item_list():
                 value_dict = {}
-                value_dict["path"] = item.property.path
-                value_dict["type"] = item.type()
-                value_dict["shelly_type"] = self.plugin.get_shelly_device_from_item(item).get("app", "")
-                value_dict["shelly_id"] = self.plugin.get_iattr_value(item.conf, "shelly_id")
-                if value_dict["shelly_type"] == "":
-                    value_dict["value"] = ""
-                    value_dict["last_update"] = "Kein passendes Shelly"
-                    value_dict["last_change"] = "Device gefunden"
+                value_dict['path'] = item.property.path
+                value_dict['type'] = item.type()
+                value_dict['shelly_type'] = self.plugin.get_shelly_device_from_item(item).get('app', '')
+                value_dict['shelly_id'] = self.plugin.get_iattr_value(item.conf, 'shelly_id')
+                if value_dict['shelly_type'] == '':
+                    value_dict['value'] = ''
+                    value_dict['last_update'] = 'Kein passendes Shelly'
+                    value_dict['last_change'] = 'Device gefunden'
                 else:
-                    value_dict["value"] = item()
-                    value_dict["last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
-                    value_dict["last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
+                    value_dict['value'] = item()
+                    value_dict['last_update'] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
+                    value_dict['last_change'] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
                 item_list.append(value_dict)
 
             # callect data for 'buses' tab
             device_list = []
             for device in self.plugin.discovered_devices():
                 value_dict = {}
-                value_dict["shelly_id"] = device
-                value_dict["shelly_type"] = self.plugin.shelly_devices[device].get("app", "")
-                value_dict["shelly_gen"] = "Gen" + self.plugin.shelly_devices[device].get("gen", "?")
-                if "online" in self.plugin.shelly_devices[device]:
-                    value_dict["shelly_online"] = self.ja_nein(self.plugin.shelly_devices[device]["online"])
+                value_dict['shelly_id'] = device
+                value_dict['shelly_type'] = self.plugin.shelly_devices[device].get('app', '')
+                value_dict['shelly_gen'] = 'Gen' + self.plugin.shelly_devices[device].get('gen', '?')
+                if 'online' in self.plugin.shelly_devices[device]:
+                    value_dict['shelly_online'] = self.ja_nein(self.plugin.shelly_devices[device]['online'])
                 else:
-                    value_dict["shelly_online"] = "Unbekannt"
-                value_dict["shelly_mac"] = self.plugin.shelly_devices[device]["mac"]
-                value_dict["shelly_ip"] = self.plugin.shelly_devices[device]["ip"]
-                value_dict["shelly_fw"] = self.plugin.shelly_devices[device]["fw_ver"]
-                value_dict["shelly_newfw"] = self.ja_nein(self.plugin.shelly_devices[device]["new_fw"])
-                value_dict["shelly_rssi"] = self.plugin.shelly_devices[device].get("rssi", "")
-                value_dict["list_attrs"] = self.ja_nein(self.plugin.shelly_devices[device].get("list_attrs", ""))
-                value_dict["items_defined"] = self.ja_nein(self.plugin.shelly_devices[device]["connected_to_item"])
+                    value_dict['shelly_online'] = 'Unbekannt'
+                value_dict['shelly_mac'] = self.plugin.shelly_devices[device]['mac']
+                value_dict['shelly_ip'] = self.plugin.shelly_devices[device]['ip']
+                value_dict['shelly_fw'] = self.plugin.shelly_devices[device]['fw_ver']
+                value_dict['shelly_newfw'] = self.ja_nein(self.plugin.shelly_devices[device]['new_fw'])
+                value_dict['shelly_rssi'] = self.plugin.shelly_devices[device].get('rssi', '')
+                value_dict['list_attrs'] = self.ja_nein(self.plugin.shelly_devices[device].get('list_attrs', ''))
+                value_dict['items_defined'] = self.ja_nein(self.plugin.shelly_devices[device]['connected_to_item'])
                 device_list.append(value_dict)
 
             # get the new data about broker status
             self.plugin.get_broker_info()
             broker_data = {}
-            broker_data["broker_info"] = self.plugin._broker
-            broker_data["broker_uptime"] = self.plugin.broker_uptime()
-            broker_data["item_values"] = self.plugin._item_values
+            broker_data['broker_info'] = self.plugin._broker
+            broker_data['broker_uptime'] = self.plugin.broker_uptime()
+            broker_data['item_values'] = self.plugin._item_values
 
-            result = {"items": item_list, "devices": device_list, "broker": broker_data}
+            result = {'items': item_list, 'devices': device_list, 'broker': broker_data}
 
             # send result to wen interface
             try:
@@ -142,7 +142,7 @@ class WebInterface(MqttPluginWebIf):
                 else:
                     return None
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
 
         return {}
 
@@ -182,6 +182,6 @@ class WebInterface(MqttPluginWebIf):
         """
         if isinstance(value, bool):
             if value:
-                return self.translate("Ja")
-            return self.translate("Nein")
+                return self.translate('Ja')
+            return self.translate('Nein')
         return value

@@ -5,7 +5,7 @@ import requests
 from urllib.parse import urljoin
 from requests.auth import HTTPBasicAuth, HTTPDigestAuth
 
-ns = {"event2n": "http://www.2n.cz/2013/event", "wsnt": "http://docs.oasis-open.org/wsn/b-2"}
+ns = {'event2n': 'http://www.2n.cz/2013/event', 'wsnt': 'http://docs.oasis-open.org/wsn/b-2'}
 
 log = logging.getLogger(__name__)
 
@@ -21,10 +21,10 @@ class CommandService(object):
         if self.ip_cam.auth_type == 2:
             self.auth = HTTPDigestAuth(self.ip_cam.user, self.ip_cam.password)
 
-        schema = "http"
+        schema = 'http'
         if self.ip_cam.ssl:
-            schema = "https"
-        self.base_url = "{schema}://{ip}".format(schema=schema, ip=self.ip_cam.ip_address)
+            schema = 'https'
+        self.base_url = '{schema}://{ip}'.format(schema=schema, ip=self.ip_cam.ip_address)
 
     def system_info(self):
         """
@@ -55,7 +55,7 @@ class CommandService(object):
         deviceName: Device name set in the configuration interface on the Services / Web Server tab
 
         """
-        response = requests.get(urljoin(self.base_url, "/api/system/info"), auth=self.auth, verify=False)
+        response = requests.get(urljoin(self.base_url, '/api/system/info'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -83,7 +83,7 @@ class CommandService(object):
         upTime: Device operation time since the last restart in seconds
         """
 
-        response = requests.get(urljoin(self.base_url, "/api/system/status"), auth=self.auth, verify=False)
+        response = requests.get(urljoin(self.base_url, '/api/system/status'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -105,7 +105,7 @@ class CommandService(object):
 
         """
 
-        response = requests.get(urljoin(self.base_url, "/api/system/restart"), auth=self.auth, verify=False)
+        response = requests.get(urljoin(self.base_url, '/api/system/restart'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -139,10 +139,10 @@ class CommandService(object):
         """
 
         response = requests.put(
-            urljoin(self.base_url, "/api/firmware"),
+            urljoin(self.base_url, '/api/firmware'),
             auth=self.auth,
             verify=False,
-            files={"blob-fw": (os.path.basename(filename), open(filename, "rb"), "application/octet-stream")},
+            files={'blob-fw': (os.path.basename(filename), open(filename, 'rb'), 'application/octet-stream')},
         )
         response.raise_for_status()
         return response.text
@@ -164,7 +164,7 @@ class CommandService(object):
             "success" : true
         }
         """
-        response = requests.get(urljoin(self.base_url, "/api/firmware/apply"), auth=self.auth, verify=False)
+        response = requests.get(urljoin(self.base_url, '/api/firmware/apply'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -190,22 +190,22 @@ class CommandService(object):
         if filename is not None:
             save_dir = os.path.dirname(filename)
             if not os.access(save_dir, os.W_OK):
-                raise IOError("No write permissions to {dir}.".format(dir=save_dir))
+                raise IOError('No write permissions to {dir}.'.format(dir=save_dir))
 
-            response = requests.get(urljoin(self.base_url, "/api/config"), auth=self.auth, verify=False, stream=True)
+            response = requests.get(urljoin(self.base_url, '/api/config'), auth=self.auth, verify=False, stream=True)
             response.raise_for_status()
 
-            if response.headers["Content-Type"] == "application/json":
+            if response.headers['Content-Type'] == 'application/json':
                 return response.text
 
-            with open(filename, "wb") as f:
+            with open(filename, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     if chunk:  # filter out keep-alive new chunks
                         f.write(chunk)
 
-            return json.dumps({"success": True})
+            return json.dumps({'success': True})
 
-        raise ValueError("Parameter filename cannot be empty or None")
+        raise ValueError('Parameter filename cannot be empty or None')
 
     def config_upload(self, filename):
         """
@@ -225,10 +225,10 @@ class CommandService(object):
         }
         """
         response = requests.put(
-            urljoin(self.base_url, "/api/config"),
+            urljoin(self.base_url, '/api/config'),
             auth=self.auth,
             verify=False,
-            files={"blob-cfg": (os.path.basename(filename), open(filename, "rb"), "application/octet-stream")},
+            files={'blob-cfg': (os.path.basename(filename), open(filename, 'rb'), 'application/octet-stream')},
         )
         response.raise_for_status()
         return response.text
@@ -250,7 +250,7 @@ class CommandService(object):
             "success" : true
         }
         """
-        response = requests.get(urljoin(self.base_url, "/api/config/factoryreset"), auth=self.auth, verify=False)
+        response = requests.get(urljoin(self.base_url, '/api/config/factoryreset'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -306,7 +306,7 @@ class CommandService(object):
         type: Switch type ( normal , security )
 
         """
-        response = requests.get(urljoin(self.base_url, "/api/switch/caps"), auth=self.auth, verify=False)
+        response = requests.get(urljoin(self.base_url, '/api/switch/caps'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -351,9 +351,9 @@ class CommandService(object):
         """
         data = None
         if switch is not None and switch > 0:
-            data = {"switch": switch}
+            data = {'switch': switch}
 
-        response = requests.post(urljoin(self.base_url, "/api/switch/status"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/switch/status'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -384,11 +384,11 @@ class CommandService(object):
         """
 
         if response:
-            data = {"switch": switch, "action": action, "response": response}
+            data = {'switch': switch, 'action': action, 'response': response}
         else:
-            data = {"switch": switch, "action": action}
+            data = {'switch': switch, 'action': action}
 
-        response = requests.post(urljoin(self.base_url, "/api/switch/ctrl"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/switch/ctrl'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -431,9 +431,9 @@ class CommandService(object):
         data = None
 
         if port:
-            data = {"port": port}
+            data = {'port': port}
 
-        response = requests.post(urljoin(self.base_url, "/api/io/caps"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/io/caps'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -473,9 +473,9 @@ class CommandService(object):
         data = None
 
         if port:
-            data = {"port": port}
+            data = {'port': port}
 
-        response = requests.post(urljoin(self.base_url, "/api/io/status"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/io/status'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -506,11 +506,11 @@ class CommandService(object):
         """
 
         if response:
-            data = {"port": port, "action": action, "response": response}
+            data = {'port': port, 'action': action, 'response': response}
         else:
-            data = {"port": port, "action": action}
+            data = {'port': port, 'action': action}
 
-        response = requests.post(urljoin(self.base_url, "/api/io/ctrl"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/io/ctrl'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -557,9 +557,9 @@ class CommandService(object):
         data = None
 
         if account:
-            data = {"account": account}
+            data = {'account': account}
 
-        response = requests.post(urljoin(self.base_url, "/api/phone/status"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/phone/status'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -600,9 +600,9 @@ class CommandService(object):
         data = None
 
         if session:
-            data = {"session": session}
+            data = {'session': session}
 
-        response = requests.post(urljoin(self.base_url, "/api/call/status"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/call/status'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -633,9 +633,9 @@ class CommandService(object):
         /api/call/status or call termination with /api/call/hangup
         """
 
-        data = {"number": number}
+        data = {'number': number}
 
-        response = requests.post(urljoin(self.base_url, "/api/call/dial"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/call/dial'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -658,9 +658,9 @@ class CommandService(object):
         }
         """
 
-        data = {"session": session}
+        data = {'session': session}
 
-        response = requests.post(urljoin(self.base_url, "/api/call/answer"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/call/answer'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -686,11 +686,11 @@ class CommandService(object):
         }
         """
         if reason:
-            data = {"session": session, "reason": reason}
+            data = {'session': session, 'reason': reason}
         else:
-            data = {"session": session}
+            data = {'session': session}
 
-        response = requests.post(urljoin(self.base_url, "/api/call/hangup"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/call/hangup'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -751,7 +751,7 @@ class CommandService(object):
         source: Video source identifier
         """
 
-        response = requests.post(urljoin(self.base_url, "/api/camera/caps"), auth=self.auth, verify=False)
+        response = requests.post(urljoin(self.base_url, '/api/camera/caps'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -786,32 +786,32 @@ class CommandService(object):
         }
         """
 
-        data = {"width": width, "height": height}
+        data = {'width': width, 'height': height}
 
         if source:
-            data["source"] = source
+            data['source'] = source
         if time:
-            data["time"] = time
+            data['time'] = time
 
         if filename is not None:
             save_dir = os.path.dirname(filename)
             if not os.access(save_dir, os.W_OK):
-                raise IOError("No write permissions to {dir}.".format(dir=save_dir))
+                raise IOError('No write permissions to {dir}.'.format(dir=save_dir))
 
             response = requests.post(
-                urljoin(self.base_url, "/api/camera/snapshot"), auth=self.auth, verify=False, stream=True, data=data
+                urljoin(self.base_url, '/api/camera/snapshot'), auth=self.auth, verify=False, stream=True, data=data
             )
             response.raise_for_status()
 
-            if response.headers["Content-Type"] == "application/json":
+            if response.headers['Content-Type'] == 'application/json':
                 return response.text
 
-            with open(filename, "wb") as f:
+            with open(filename, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     if chunk:  # filter out keep-alive new chunks
                         f.write(chunk)
 
-        return json.dumps({"success": True})
+        return json.dumps({'success': True})
 
     def display_caps(self):
         """
@@ -843,7 +843,7 @@ class CommandService(object):
         display: Display identifier
         resolution: Display resolution in pixels
         """
-        response = requests.post(urljoin(self.base_url, "/api/display/caps"), auth=self.auth, verify=False)
+        response = requests.post(urljoin(self.base_url, '/api/display/caps'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -868,15 +868,15 @@ class CommandService(object):
         }
         """
 
-        data = {"display": display}
+        data = {'display': display}
 
         response = requests.put(
-            urljoin(self.base_url, "/api/display/image"),
+            urljoin(self.base_url, '/api/display/image'),
             auth=self.auth,
             verify=False,
             data=data,
             files={
-                "blob-image": (os.path.basename(gif_filename), open(gif_filename, "rb"), "application/octet-stream")
+                'blob-image': (os.path.basename(gif_filename), open(gif_filename, 'rb'), 'application/octet-stream')
             },
         )
         response.raise_for_status()
@@ -902,10 +902,10 @@ class CommandService(object):
         }
         """
 
-        data = {"display": display}
+        data = {'display': display}
 
         response = requests.delete(
-            urljoin(self.base_url, "/api/display/image"), auth=self.auth, verify=False, data=data
+            urljoin(self.base_url, '/api/display/image'), auth=self.auth, verify=False, data=data
         )
         response.raise_for_status()
         return response.text
@@ -941,7 +941,7 @@ class CommandService(object):
 
         events: Array of strings including a list of supported event types
         """
-        response = requests.post(urljoin(self.base_url, "/api/log/caps"), auth=self.auth, verify=False)
+        response = requests.post(urljoin(self.base_url, '/api/log/caps'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -1016,13 +1016,13 @@ class CommandService(object):
         data = {}
 
         if duration:
-            data["duration"] = duration
+            data['duration'] = duration
         if include:
-            data["include"] = include
+            data['include'] = include
         if filter:
-            data["filter"] = filter
+            data['filter'] = filter
 
-        response = requests.post(urljoin(self.base_url, "/api/log/subscribe"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/log/subscribe'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -1045,10 +1045,10 @@ class CommandService(object):
         }
         """
 
-        data = {"id": id}
+        data = {'id': id}
 
         response = requests.post(
-            urljoin(self.base_url, "/api/log/unsubscribe"), auth=self.auth, verify=False, data=data
+            urljoin(self.base_url, '/api/log/unsubscribe'), auth=self.auth, verify=False, data=data
         )
         response.raise_for_status()
         return response.text
@@ -1101,10 +1101,10 @@ class CommandService(object):
         events: Event object array. If no event occurs during the timeout, the array is empty.
         """
 
-        data = {"id": id, "timeout": timeout}
+        data = {'id': id, 'timeout': timeout}
 
         response = requests.post(
-            urljoin(self.base_url, "/api/log/pull"), auth=self.auth, verify=False, data=data, timeout=timeout + 5
+            urljoin(self.base_url, '/api/log/pull'), auth=self.auth, verify=False, data=data, timeout=timeout + 5
         )
         response.raise_for_status()
         return response.text
@@ -1126,7 +1126,7 @@ class CommandService(object):
             "success" : true
         }
         """
-        response = requests.post(urljoin(self.base_url, "/api/audio/test"), auth=self.auth, verify=False)
+        response = requests.post(urljoin(self.base_url, '/api/audio/test'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -1161,25 +1161,22 @@ class CommandService(object):
         }
         """
 
-        data = {
-            "to": to,
-            "subject": subject,
-        }
+        data = {'to': to, 'subject': subject}
 
         if body:
-            data["body"] = body
+            data['body'] = body
         if height:
-            data["height"] = height
+            data['height'] = height
         if width:
-            data["width"] = width
+            data['width'] = width
         if body:
-            data["body"] = body
+            data['body'] = body
         if picture_count:
-            data["pictureCount"] = picture_count
+            data['pictureCount'] = picture_count
         if timespan:
-            data["timeSpan"] = timespan
+            data['timeSpan'] = timespan
 
-        response = requests.post(urljoin(self.base_url, "/api/email/send"), auth=self.auth, verify=False, data=data)
+        response = requests.post(urljoin(self.base_url, '/api/email/send'), auth=self.auth, verify=False, data=data)
         response.raise_for_status()
         return response.text
 
@@ -1205,20 +1202,20 @@ class CommandService(object):
         if pcap_file is not None:
             save_dir = os.path.dirname(pcap_file)
             if not os.access(save_dir, os.W_OK):
-                raise IOError("No write permissions to {dir}.".format(dir=save_dir))
+                raise IOError('No write permissions to {dir}.'.format(dir=save_dir))
 
-            response = requests.post(urljoin(self.base_url, "/api/pcap"), auth=self.auth, verify=False, stream=True)
+            response = requests.post(urljoin(self.base_url, '/api/pcap'), auth=self.auth, verify=False, stream=True)
             response.raise_for_status()
 
-            if response.headers["Content-Type"] == "application/json":
+            if response.headers['Content-Type'] == 'application/json':
                 return response.text
 
-            with open(pcap_file, "wb") as f:
+            with open(pcap_file, 'wb') as f:
                 for chunk in response.iter_content(chunk_size=1024):
                     if chunk:  # filter out keep-alive new chunks
                         f.write(chunk)
 
-            return json.dumps({"success": True})
+            return json.dumps({'success': True})
 
     def pcap_restart(self):
         """
@@ -1237,7 +1234,7 @@ class CommandService(object):
             "success" : true
         }
         """
-        response = requests.post(urljoin(self.base_url, "/api/pcap/restart"), auth=self.auth, verify=False)
+        response = requests.post(urljoin(self.base_url, '/api/pcap/restart'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text
 
@@ -1257,6 +1254,6 @@ class CommandService(object):
             "success" : true
         }
         """
-        response = requests.post(urljoin(self.base_url, "/api/pcap/stop"), auth=self.auth, verify=False)
+        response = requests.post(urljoin(self.base_url, '/api/pcap/stop'), auth=self.auth, verify=False)
         response.raise_for_status()
         return response.text

@@ -69,11 +69,11 @@ class WebInterface(SmartPluginWebIf):
         """
         plgitems = []
         for item in self.items.return_items():
-            if "robvac" in item.conf:
+            if 'robvac' in item.conf:
                 plgitems.append(item)
-        self.logger.debug("Plugin : Render index Webif")
-        tmpl = self.tplenv.get_template("index.html")
-        pagelength = self.plugin.get_parameter_value("webif_pagelength")
+        self.logger.debug('Plugin : Render index Webif')
+        tmpl = self.tplenv.get_template('index.html')
+        pagelength = self.plugin.get_parameter_value('webif_pagelength')
         return tmpl.render(
             plugin_shortname=self.plugin.get_shortname(),
             plugin_version=self.plugin.get_version(),
@@ -82,6 +82,6 @@ class WebInterface(SmartPluginWebIf):
             webif_pagelength=pagelength,
             connection=self.plugin.get_connection_info(),
             webif_dir=self.webif_dir,
-            items=sorted(plgitems, key=lambda k: str.lower(k["_path"])),
+            items=sorted(plgitems, key=lambda k: str.lower(k['_path'])),
             item_count=len(plgitems),
         )

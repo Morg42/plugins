@@ -42,8 +42,8 @@ import cherrypy
 
 
 class ODLInfo(SmartPlugin):
-    PLUGIN_VERSION = "1.5.3"
-    _base_url = "https://www.imis.bfs.de/ogc/opendata/ows"
+    PLUGIN_VERSION = '1.5.3'
+    _base_url = 'https://www.imis.bfs.de/ogc/opendata/ows'
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -55,38 +55,38 @@ class ODLInfo(SmartPlugin):
         self._session = requests.Session()
         if not self.init_webinterface(WebInterface):
             self._init_complete = False
-        self._cycle = self.get_parameter_value("cycle")
-        self._verify = self.get_parameter_value("verify")
+        self._cycle = self.get_parameter_value('cycle')
+        self._verify = self.get_parameter_value('verify')
         self._stations = []
         self._items = {}
         self._update_timestamp = None
         return
 
     def run(self):
-        self.logger.debug("Run method called")
-        self.scheduler_add("get_stations_from_odlinfo", self._get_stations, cycle=self._cycle)
+        self.logger.debug('Run method called')
+        self.scheduler_add('get_stations_from_odlinfo', self._get_stations, cycle=self._cycle)
         self.alive = True
 
     def stop(self):
-        self.logger.debug("Stop method called")
-        self.scheduler_remove("get_stations_from_odlinfo")
+        self.logger.debug('Stop method called')
+        self.scheduler_remove('get_stations_from_odlinfo')
         self.alive = False
 
     def parse_item(self, item):
-        if self.has_iattr(item.conf, "odl_data_type") and self.has_iattr(item.conf, "odl_station"):
-            self.logger.debug(f"parse item: {item}")
-            if self.get_iattr_value(item.conf, "odl_station") not in self._items:
-                self._items[self.get_iattr_value(item.conf, "odl_station")] = {}
+        if self.has_iattr(item.conf, 'odl_data_type') and self.has_iattr(item.conf, 'odl_station'):
+            self.logger.debug(f'parse item: {item}')
+            if self.get_iattr_value(item.conf, 'odl_station') not in self._items:
+                self._items[self.get_iattr_value(item.conf, 'odl_station')] = {}
             if (
-                self.get_iattr_value(item.conf, "odl_data_type")
-                in self._items[self.get_iattr_value(item.conf, "odl_station")]
+                self.get_iattr_value(item.conf, 'odl_data_type')
+                in self._items[self.get_iattr_value(item.conf, 'odl_station')]
             ):
                 self.logger.error(
-                    "odl_data_type set twice, problem for item with odl_station %s"
-                    % self.get_iattr_value(item.conf, "odl_station")
+                    'odl_data_type set twice, problem for item with odl_station %s'
+                    % self.get_iattr_value(item.conf, 'odl_station')
                 )
-            self._items[self.get_iattr_value(item.conf, "odl_station")][
-                self.get_iattr_value(item.conf, "odl_data_type")
+            self._items[self.get_iattr_value(item.conf, 'odl_station')][
+                self.get_iattr_value(item.conf, 'odl_data_type')
             ] = item
 
     def get_items(self):
@@ -97,29 +97,29 @@ class ODLInfo(SmartPlugin):
         Returns an array of dicts with information on all radiation measurement stations from live request. Also caches the data.
         """
         try:
-            parameters = "service=WFS&version=1.1.0&request=GetFeature&typeName=opendata:odlinfo_odl_1h_latest&outputFormat=application/json&sortBy=plz"
+            parameters = 'service=WFS&version=1.1.0&request=GetFeature&typeName=opendata:odlinfo_odl_1h_latest&outputFormat=application/json&sortBy=plz'
             response = self._session.get(self._build_url(parameters), verify=self._verify)
             self._update_timestamp = self.shtime.now()
 
         except Exception as e:
-            self.logger.error("Exception when sending GET request for _get_stations: %s" % str(e))
+            self.logger.error('Exception when sending GET request for _get_stations: %s' % str(e))
             return
         json_obj = response.json()
         self._stations = []
-        for element in json_obj["features"]:
-            self._stations.append(element["properties"])
+        for element in json_obj['features']:
+            self._stations.append(element['properties'])
             for key in self._items:
-                if key == element["properties"]["id"] or key == element["properties"]["kenn"]:
+                if key == element['properties']['id'] or key == element['properties']['kenn']:
                     for data_type in self._items[key]:
                         self.logger.debug(
-                            "%s %s %s" % (key, element["properties"]["id"], element["properties"]["kenn"])
+                            '%s %s %s' % (key, element['properties']['id'], element['properties']['kenn'])
                         )
-                        if data_type == "value":
-                            self._items[key][data_type](element["properties"]["value"])
-                        elif data_type == "value_terrestrial":
-                            self._items[key][data_type](element["properties"]["value_terrestrial"])
-                        elif data_type == "value_cosmic":
-                            self._items[key][data_type](element["properties"]["value_cosmic"])
+                        if data_type == 'value':
+                            self._items[key][data_type](element['properties']['value'])
+                        elif data_type == 'value_terrestrial':
+                            self._items[key][data_type](element['properties']['value_terrestrial'])
+                        elif data_type == 'value_cosmic':
+                            self._items[key][data_type](element['properties']['value_cosmic'])
 
         return self._stations
 
@@ -140,7 +140,7 @@ class ODLInfo(SmartPlugin):
         @param odlinfo_id: internal odlinfo_id
         """
         for element in self.get_stations():
-            if odlinfo_id == element["kenn"] or odlinfo_id == element["id"]:
+            if odlinfo_id == element['kenn'] or odlinfo_id == element['id']:
                 return element
         return None
 
@@ -151,17 +151,17 @@ class ODLInfo(SmartPlugin):
         """
         result_stations = []
         for result_station in self.get_stations():
-            if (result_station["kenn"] in odlinfo_ids) or (result_station["id"] in odlinfo_ids):
+            if (result_station['kenn'] in odlinfo_ids) or (result_station['id'] in odlinfo_ids):
                 result_stations.append(result_station)
         return result_stations
 
-    def _build_url(self, parameters=""):
+    def _build_url(self, parameters=''):
         """
         Builds a request url, method included for a later use vs other data files of ODLINFO
         @return: string of the url
         """
         url = self._base_url
-        if parameters != "":
-            return "%s?%s" % (url, parameters)
+        if parameters != '':
+            return '%s?%s' % (url, parameters)
         else:
             return url

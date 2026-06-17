@@ -49,7 +49,7 @@ class mieleathome(SmartPlugin):
     """
 
     PLUGIN_VERSION = (
-        "1.0.0"  # (must match the version specified in plugin.yaml), use '1.0.0' for your initial plugin Release
+        '1.0.0'  # (must match the version specified in plugin.yaml), use '1.0.0' for your initial plugin Release
     )
 
     def __init__(self, sh):
@@ -68,8 +68,8 @@ class mieleathome(SmartPlugin):
         self.sh = self.get_sh()
         self.items = Items.get_instance()
         self.auth = False
-        self.AccessToken = ""
-        self.RefreshToken = ""
+        self.AccessToken = ''
+        self.RefreshToken = ''
         self.Expiration = 0
         self.all_devices = {}
         self.miele_devices_by_deviceID = {}
@@ -88,23 +88,23 @@ class mieleathome(SmartPlugin):
         # cycle time in seconds, only needed, if hardware/interface needs to be
         # polled for value changes by adding a scheduler entry in the run method of this plugin
         # (maybe you want to make it a plugin parameter?)
-        self.client_id = self.get_parameter_value("miele_client_id")
-        self.client_secret = self.get_parameter_value("miele_client_secret")
-        self.country = self.get_parameter_value("miele_client_country")
-        self._cycle = self.get_parameter_value("miele_cycle")
-        self.user = self.get_parameter_value("miele_user")
-        self.pwd = self.get_parameter_value("miele_pwd")
+        self.client_id = self.get_parameter_value('miele_client_id')
+        self.client_secret = self.get_parameter_value('miele_client_secret')
+        self.country = self.get_parameter_value('miele_client_country')
+        self._cycle = self.get_parameter_value('miele_cycle')
+        self.user = self.get_parameter_value('miele_user')
+        self.pwd = self.get_parameter_value('miele_pwd')
 
-        self.ValidFrom = ""  # Time and date when (new) tokens were received
-        self.ValidThrough = ""  # Time and date when tokens will expire
+        self.ValidFrom = ''  # Time and date when (new) tokens were received
+        self.ValidThrough = ''  # Time and date when tokens will expire
         self.ValidFor = 0  # Timeframe in days for validity of tokens
-        self.last_ping_time = ""  # Time of last Ping from Event-Listener
+        self.last_ping_time = ''  # Time of last Ping from Event-Listener
         self.last_ping_timestamp = datetime.now()  # Time of last Ping from Event-Listener
-        self.last_event_time = ""  # Time of last Event from Event-Listener
+        self.last_event_time = ''  # Time of last Event from Event-Listener
         self.last_event_action = {}  # Last dict for event_action
         self.last_event_device = {}  # Last dict for event_device
 
-        self.Url = "https://api.mcs3.miele.com/v1"
+        self.Url = 'https://api.mcs3.miele.com/v1'
         self.event_server = None
         self.auth = self._auth()
 
@@ -126,7 +126,7 @@ class mieleathome(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
 
         self.alive = True
         # setup scheduler for device poll loop   (disable the following line, if you don't need to poll the device. Rember to comment the self_cycle statement in __init__ as well)
@@ -136,15 +136,15 @@ class mieleathome(SmartPlugin):
             self._getMainItem4parseItem()
 
         self.event_server = miele_event(self.logger, self.Url, self.AccessToken, self)
-        self.event_server.name = "mieleEventListener"
+        self.event_server.name = 'mieleEventListener'
         self.event_server.start()
-        self.scheduler_add("poll_device", self.poll_device, cycle=self._cycle)
+        self.scheduler_add('poll_device', self.poll_device, cycle=self._cycle)
 
         # if you need to create child threads, do not make them daemon = True!
         # They will not shutdown properly. (It's a python bug)
 
         myTokenRefresh = self.Expiration - 100
-        self.scheduler_add("_refreshToken", self._refreshToken, cycle=myTokenRefresh)
+        self.scheduler_add('_refreshToken', self._refreshToken, cycle=myTokenRefresh)
         for device in self.miele_devices_by_deviceID:
             myPayload = self._getActions4Device(device)
             self._parseAction4Device(myPayload, device)
@@ -154,9 +154,9 @@ class mieleathome(SmartPlugin):
         Stop method for the plugin
         """
         self.alive = False
-        self.logger.debug("Stop method called")
-        self.scheduler_remove("poll_device")
-        self.scheduler_remove("_refreshToken")
+        self.logger.debug('Stop method called')
+        self.scheduler_remove('poll_device')
+        self.scheduler_remove('_refreshToken')
         self.event_server.alive = False
         self.event_server.stop()
         # self.event_server.join()
@@ -174,88 +174,88 @@ class mieleathome(SmartPlugin):
                     self.miele_parsed_item[ItemName] = Device
 
     def _auth(self):
-        myHeaders = {"accept": "application/json"}
+        myHeaders = {'accept': 'application/json'}
 
         payload = {
-            "grant_type": "password",
-            "password": self.pwd,
-            "username": self.user,
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "vg": self.country,
+            'grant_type': 'password',
+            'password': self.pwd,
+            'username': self.user,
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+            'vg': self.country,
         }
 
-        myResult = requests.post(self.Url[:-3] + "/thirdparty/token/", data=payload, headers=myHeaders)
+        myResult = requests.post(self.Url[:-3] + '/thirdparty/token/', data=payload, headers=myHeaders)
         try:
             if myResult.status_code == 200:
                 myRespPayload = json.loads(myResult.content.decode())
-                self.AccessToken = myRespPayload["access_token"]
-                self.RefreshToken = myRespPayload["refresh_token"]
-                self.Expiration = myRespPayload["expires_in"]
+                self.AccessToken = myRespPayload['access_token']
+                self.RefreshToken = myRespPayload['refresh_token']
+                self.Expiration = myRespPayload['expires_in']
                 self.ValidFor = int(self.Expiration / 86400)  # Timeframe in days for validity of tokens
                 self.ValidFrom = time.ctime(time.time())  # Time and date when (new) tokens were received
                 self.ValidThrough = time.ctime(time.time() + self.Expiration)  # Time and date when tokens will expire
                 return True
         except Exception:
-            self.logger.warning("Error while authentication on {}".format(self.Url + "/thirdparty/token/"))
+            self.logger.warning('Error while authentication on {}'.format(self.Url + '/thirdparty/token/'))
 
         return False
 
     def _refreshToken(self):
         myHeaders = {
-            "Authorization": "Bearer {}".format(self.AccessToken),
-            "Content-Type": "application/x-www-form-urlencoded",
-            "accept": "application/json",
+            'Authorization': 'Bearer {}'.format(self.AccessToken),
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'accept': 'application/json',
         }
         payload = {
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-            "refresh_token": self.RefreshToken,
-            "grant_type": "refresh_token",
+            'client_id': self.client_id,
+            'client_secret': self.client_secret,
+            'refresh_token': self.RefreshToken,
+            'grant_type': 'refresh_token',
         }
-        myResult = requests.post(self.Url + "/thirdparty/token/", data=payload, headers=myHeaders)
+        myResult = requests.post(self.Url + '/thirdparty/token/', data=payload, headers=myHeaders)
         try:
             if myResult.status_code == 200:
                 myRespPayload = json.loads(myResult.content.decode())
-                self.AccessToken = myRespPayload["access_token"]
+                self.AccessToken = myRespPayload['access_token']
                 self.event_server.access_token = self.AccessToken
-                self.RefreshToken = myRespPayload["refresh_token"]
-                self.Expiration = myRespPayload["expires_in"]
+                self.RefreshToken = myRespPayload['refresh_token']
+                self.Expiration = myRespPayload['expires_in']
                 myTokenRefresh = self.Expiration - 100
                 self.ValidFor = int(self.Expiration / 86400)  # Timeframe in days for validity of tokens
                 self.ValidFrom = time.ctime(time.time())  # Time and date when (new) tokens were received
                 self.ValidThrough = time.ctime(time.time() + self.Expiration)  # Time and date when tokens will expire
                 self.scheduler_change(
-                    "_refreshToken", cycle={myTokenRefresh: None}
+                    '_refreshToken', cycle={myTokenRefresh: None}
                 )  # Zum Testen von 6 auf 10 Sekunden geändert
                 self.auth = True
         except Exception:
-            self.logger.warning("Error while refresh Token on {}".format(self.Url + "/thirdparty/token/"))
+            self.logger.warning('Error while refresh Token on {}'.format(self.Url + '/thirdparty/token/'))
             self.auth = False
 
     def _parseAction4Device(self, myPayload, deviceId):
         myItemParent = self.miele_devices_by_deviceID[deviceId]
         # Parse Payload to Items
-        self._parseDict2Item(myPayload, myItemParent + ".actions")
+        self._parseDict2Item(myPayload, myItemParent + '.actions')
         for entry in myPayload:
-            myItem = self.items.return_item(myItemParent + ".actions." + entry)
+            myItem = self.items.return_item(myItemParent + '.actions.' + entry)
             if myItem is not None:
                 myItem(myPayload[entry], self.get_shortname())
-        myItem = self.items.return_item(myItemParent + ".actions.processAction")
+        myItem = self.items.return_item(myItemParent + '.actions.processAction')
         if myItem is not None:
             myAllowedValues = myItem()
             # Set allowed Action for processAction
             myActions = [
-                "start",
-                "stop",
-                "pause",
-                "start_superfreezing",
-                "stop_superfreezing",
-                "start_supercooling",
-                "stop_supercooling",
+                'start',
+                'stop',
+                'pause',
+                'start_superfreezing',
+                'stop_superfreezing',
+                'start_supercooling',
+                'stop_supercooling',
             ]
             for i in range(1, 7):
-                myItemName = myItemParent + ".visu.allowed_actions." + myActions[i - 1]
+                myItemName = myItemParent + '.visu.allowed_actions.' + myActions[i - 1]
                 myItem = self.items.return_item(myItemName)
                 if i in myAllowedValues:
                     myItem(True, self.get_shortname())
@@ -263,21 +263,21 @@ class mieleathome(SmartPlugin):
                     myItem(False, self.get_shortname())
 
     def _getalldevices(self):
-        myHeaders = {"Authorization": "Bearer {}".format(self.AccessToken)}
+        myHeaders = {'Authorization': 'Bearer {}'.format(self.AccessToken)}
 
-        myUrl = self.Url + "/devices?language={}".format(self.country[0:2])
+        myUrl = self.Url + '/devices?language={}'.format(self.country[0:2])
         myResult = requests.get(myUrl, headers=myHeaders, timeout=5.0)
         try:
             if myResult.status_code == 200:
                 self.all_devices = json.loads(myResult.content.decode())
-                self.logger.debug("Got all devices from Miele-Cloud - start parsing to Items")
+                self.logger.debug('Got all devices from Miele-Cloud - start parsing to Items')
                 self._parseAllDevices(self.all_devices)
-                self.logger.debug("Got all devices from Miele-Cloud - stopped parsing to Items")
+                self.logger.debug('Got all devices from Miele-Cloud - stopped parsing to Items')
             else:
                 pass
         except Exception:
             self.all_devices = {}
-            self.logger.warning("Error while getting devices from {}".format(myUrl))
+            self.logger.warning('Error while getting devices from {}'.format(myUrl))
 
     def _parseAllDevices(self, myPayload):
         """ """
@@ -292,78 +292,78 @@ class mieleathome(SmartPlugin):
             try:
                 self._parseDict2Item(myPayload[myDevice], self.miele_devices_by_deviceID[myDevice])
                 myObj = {}
-                myObj["DeviceID"] = myDevice
-                myObj["DeviceTyp"] = myPayload[myDevice]["ident"]["device_type"]["value_localized"]
-                myObj["DeviceModel"] = myPayload[myDevice]["ident"]["deviceIdentLabel"]["techType"]
+                myObj['DeviceID'] = myDevice
+                myObj['DeviceTyp'] = myPayload[myDevice]['ident']['device_type']['value_localized']
+                myObj['DeviceModel'] = myPayload[myDevice]['ident']['deviceIdentLabel']['techType']
 
                 self.miele_devices_raw.append(myObj)
             except Exception:
-                self.logger.warning("Error while Updating Device :{}".format(myDevice))
+                self.logger.warning('Error while Updating Device :{}'.format(myDevice))
                 pass
 
     def _parseDict2Item(self, my_dict, my_item_path):
         for entry in my_dict:
             if type(my_dict[entry]) is dict:
-                self._parseDict2Item(my_dict[entry], my_item_path + "." + entry)
+                self._parseDict2Item(my_dict[entry], my_item_path + '.' + entry)
             else:
                 if type(my_dict[entry]) is list:
                     if len(my_dict[entry]) > 0:
-                        if entry == "targetTemperature" and "action" in my_item_path:
-                            myItem = self.items.return_item(my_item_path + "." + entry)
+                        if entry == 'targetTemperature' and 'action' in my_item_path:
+                            myItem = self.items.return_item(my_item_path + '.' + entry)
                             if myItem is not None:
                                 myItem(my_dict[entry], self.get_shortname())
-                        elif entry == "targetTemperature" and "state" in my_item_path:
-                            myItem = self.items.return_item(my_item_path + "." + entry)
+                        elif entry == 'targetTemperature' and 'state' in my_item_path:
+                            myItem = self.items.return_item(my_item_path + '.' + entry)
                             if myItem is not None:
                                 myItem(my_dict[entry], self.get_shortname())
-                        elif entry == "temperature" and "state" in my_item_path:
-                            myItem = self.items.return_item(my_item_path + "." + entry)
+                        elif entry == 'temperature' and 'state' in my_item_path:
+                            myItem = self.items.return_item(my_item_path + '.' + entry)
                             if myItem is not None:
                                 myItem(my_dict[entry], self.get_shortname())
                         else:
                             for myArrayEntry in my_dict[entry]:
                                 if type(myArrayEntry) is dict:
-                                    self._parseDict2Item(myArrayEntry, my_item_path + "." + entry)
+                                    self._parseDict2Item(myArrayEntry, my_item_path + '.' + entry)
                                 else:
-                                    myItem = self.items.return_item(my_item_path + "." + entry)
+                                    myItem = self.items.return_item(my_item_path + '.' + entry)
                                     if myItem is not None:
                                         myItem(my_dict[entry], self.get_shortname())
                                     # print (my_item_path+'.'+ entry +'=' + str(my_dict[entry]))
                 else:
-                    myItem = self.items.return_item(my_item_path + "." + entry)
+                    myItem = self.items.return_item(my_item_path + '.' + entry)
                     if myItem is not None:
                         myItem(my_dict[entry], self.get_shortname())
                     # print (my_item_path+'.'+ entry +'=' + str(my_dict[entry]))
 
     def _getActions4Device(self, deviceId):
 
-        myHeaders = {"Authorization": "Bearer {}".format(self.AccessToken)}
+        myHeaders = {'Authorization': 'Bearer {}'.format(self.AccessToken)}
 
-        myUrl = self.Url + "/devices/{}/actions".format(deviceId)
+        myUrl = self.Url + '/devices/{}/actions'.format(deviceId)
         myResult = requests.get(myUrl, headers=myHeaders, timeout=5.0)
         try:
             if myResult.status_code == 200:
                 myActions = json.loads(myResult.content.decode())
-                self.logger.debug("Got all actions from Miele-Cloud for {} - start parsing to Items".format(deviceId))
+                self.logger.debug('Got all actions from Miele-Cloud for {} - start parsing to Items'.format(deviceId))
                 return myActions
         except Exception:
-            self.logger.warning("Error while getting Actions for Device :{}".format(deviceId))
+            self.logger.warning('Error while getting Actions for Device :{}'.format(deviceId))
 
     def putCommand2Device(self, deviceID, myPayload):
         try:
-            myHeaders = {"Authorization": "Bearer {}".format(self.AccessToken)}
+            myHeaders = {'Authorization': 'Bearer {}'.format(self.AccessToken)}
 
-            myUrl = self.Url + "/devices/{}/actions".format(deviceID)
+            myUrl = self.Url + '/devices/{}/actions'.format(deviceID)
             myResult = requests.put(myUrl, headers=myHeaders, json=myPayload, timeout=10.0)
         except Exception as err:
             self.logger.warning(
-                "Error while sending Command : {} to device {} using URL : {}- Error : {}".format(
+                'Error while sending Command : {} to device {} using URL : {}- Error : {}'.format(
                     myPayload, deviceID, myUrl, err
                 )
             )
             pass
         self.logger.debug(
-            "Result : {} sending command : {} to device {} using URL : {}".format(
+            'Result : {} sending command : {} to device {} using URL : {}'.format(
                 myResult.status_code, myPayload, deviceID, myUrl
             )
         )
@@ -381,24 +381,24 @@ class mieleathome(SmartPlugin):
                         with the item, caller, source and dest as arguments and in case of the knx plugin the value
                         can be sent to the knx with a knx write function within the knx plugin.
         """
-        if self.has_iattr(item.conf, "miele_deviceid"):
-            self.logger.debug("parse item: {}".format(item))
-            self.miele_devices_by_deviceID[item.conf["miele_deviceid"]] = item.property.path
-            self.miele_devices_by_item[item.property.path] = item.conf["miele_deviceid"]
+        if self.has_iattr(item.conf, 'miele_deviceid'):
+            self.logger.debug('parse item: {}'.format(item))
+            self.miele_devices_by_deviceID[item.conf['miele_deviceid']] = item.property.path
+            self.miele_devices_by_item[item.property.path] = item.conf['miele_deviceid']
             if item not in self.miele_items:
                 self.miele_items.append(item)
             return self.update_item
 
-        if self.has_iattr(item.conf, "miele_command"):
-            self.logger.debug("parse item: {}".format(item))
-            self.miele_device_by_action[item.property.path] = ""
+        if self.has_iattr(item.conf, 'miele_command'):
+            self.logger.debug('parse item: {}'.format(item))
+            self.miele_device_by_action[item.property.path] = ''
             if item not in self.miele_items:
                 self.miele_items.append(item)
             return self.update_item
 
-        if self.has_iattr(item.conf, "miele_parse_item"):
-            self.logger.debug("parse item: {}".format(item))
-            self.miele_parsed_item[item.property.path] = ""
+        if self.has_iattr(item.conf, 'miele_parse_item'):
+            self.logger.debug('parse item: {}'.format(item))
+            self.miele_parsed_item[item.property.path] = ''
             if item not in self.miele_items:
                 self.miele_items.append(item)
             return self.update_item
@@ -410,7 +410,7 @@ class mieleathome(SmartPlugin):
         """
         Default plugin parse_logic method
         """
-        if "xxx" in logic.conf:
+        if 'xxx' in logic.conf:
             # self.function(logic['name'])
             pass
 
@@ -431,77 +431,77 @@ class mieleathome(SmartPlugin):
         if self.alive and caller != self.get_shortname():
             # code to execute if the plugin is not stopped
             # and only, if the item has not been changed by this this plugin:
-            self.logger.info("Update item: {}, item has been changed inside this plugin".format(item.property.path))
+            self.logger.info('Update item: {}, item has been changed inside this plugin'.format(item.property.path))
 
-            if self.has_iattr(item.conf, "foo_itemtag"):
+            if self.has_iattr(item.conf, 'foo_itemtag'):
                 self.logger.debug(
                     "update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(
                         item, caller, source, dest
                     )
                 )
-            if self.has_iattr(item.conf, "miele_command") and item():
+            if self.has_iattr(item.conf, 'miele_command') and item():
                 deviceId = self.miele_device_by_action[item.property.path]
-                myPayload = json.loads(item.conf["miele_command"])
+                myPayload = json.loads(item.conf['miele_command'])
                 self.putCommand2Device(deviceId, myPayload)
                 myPayload = self._getActions4Device(deviceId)
                 self._parseAction4Device(myPayload, deviceId)
 
-            if self.has_iattr(item.conf, "miele_command") and "targetTemperature" in item.conf["miele_command"]:
+            if self.has_iattr(item.conf, 'miele_command') and 'targetTemperature' in item.conf['miele_command']:
                 deviceId = self.miele_device_by_action[item.property.path]
-                myPayload = item.conf["miele_command"].replace("%1", str(item()))
+                myPayload = item.conf['miele_command'].replace('%1', str(item()))
                 myPayload = json.loads(myPayload)
                 self.putCommand2Device(deviceId, myPayload)
                 self._getalldevices()
 
         # Function todo all the time when items are changed
         if self.alive:
-            if self.has_iattr(item.conf, "miele_parse_item"):
+            if self.has_iattr(item.conf, 'miele_parse_item'):
                 self._getMainItem4parseItem()
                 myMainItem = self.miele_parsed_item[item.property.path]
-                if "targetTemperature" in item.property.path and "actions" in item.property.path:
+                if 'targetTemperature' in item.property.path and 'actions' in item.property.path:
                     myValues = item()
                     for entry in myValues:
-                        myZone = entry["zone"]
-                        myMin = entry["min"]
-                        myMax = entry["max"]
+                        myZone = entry['zone']
+                        myMin = entry['min']
+                        myMax = entry['max']
                         myArray = []
                         myTextArray = []
                         for i in range(myMin, myMax + 1):
                             myArray.append(i)
-                            myTextArray.append(str(i) + "°")
-                        myTargetItem = myMainItem + ".values.temperatur_zone_" + str(myZone) + ".range_index"
+                            myTextArray.append(str(i) + '°')
+                        myTargetItem = myMainItem + '.values.temperatur_zone_' + str(myZone) + '.range_index'
                         myItem = self.items.return_item(myTargetItem)
                         if myItem is not None:
                             myItem(myArray, self.get_shortname())
 
-                        myTargetItem = myMainItem + ".values.temperatur_zone_" + str(myZone) + ".range_description"
+                        myTargetItem = myMainItem + '.values.temperatur_zone_' + str(myZone) + '.range_description'
                         myItem = self.items.return_item(myTargetItem)
                         if myItem is not None:
                             myItem(myTextArray, self.get_shortname())
-                if "targetTemperature" in item.property.path and "state" in item.property.path:
+                if 'targetTemperature' in item.property.path and 'state' in item.property.path:
                     myValues = item()
                     myZone = 0
                     for entry in myValues:
                         myZone += 1
                         myTargetItem = (
-                            myMainItem + ".visu.values.temperatur_zone_" + str(myZone) + ".target_temperature"
+                            myMainItem + '.visu.values.temperatur_zone_' + str(myZone) + '.target_temperature'
                         )
                         myItem = self.items.return_item(myTargetItem)
                         if myItem is not None:
-                            myItem(entry["value_localized"], self.get_shortname())
-                        myTargetItem = myMainItem + ".visu.values.temperatur_zone_" + str(myZone) + ".unit"
+                            myItem(entry['value_localized'], self.get_shortname())
+                        myTargetItem = myMainItem + '.visu.values.temperatur_zone_' + str(myZone) + '.unit'
                         myItem = self.items.return_item(myTargetItem)
                         if myItem is not None:
-                            myItem(entry["unit"], self.get_shortname())
-                if "temperature" in item.property.path and "state" in item.property.path:
+                            myItem(entry['unit'], self.get_shortname())
+                if 'temperature' in item.property.path and 'state' in item.property.path:
                     myValues = item()
                     myZone = 0
                     for entry in myValues:
                         myZone += 1
-                        myTargetItem = myMainItem + ".visu.values.temperatur_zone_" + str(myZone) + ".temperature"
+                        myTargetItem = myMainItem + '.visu.values.temperatur_zone_' + str(myZone) + '.temperature'
                         myItem = self.items.return_item(myTargetItem)
                         if myItem is not None:
-                            myItem(entry["value_localized"], self.get_shortname())
+                            myItem(entry['value_localized'], self.get_shortname())
 
     def poll_device(self):
         """
@@ -519,14 +519,14 @@ class mieleathome(SmartPlugin):
                     self._parseAction4Device(myPayload, device)
 
             except Exception as err:
-                self.logger.warning("mieleathome - error during _getalldevices in poll_device - {}".format(err))
+                self.logger.warning('mieleathome - error during _getalldevices in poll_device - {}'.format(err))
                 pass
             if self.last_ping_timestamp < datetime.now() - timedelta(minutes=5):
-                self.logger.debug("mieleathome - no ping since 5 minutes - retry to get new Event-Connection")
+                self.logger.debug('mieleathome - no ping since 5 minutes - retry to get new Event-Connection')
                 try:
                     self.event_server.reconnect()
                 except Exception:
-                    self.logger.warning("mieleathome - error while trying reconnect")
+                    self.logger.warning('mieleathome - error while trying reconnect')
                     pass
 
         # # get the value from the device
@@ -549,40 +549,40 @@ class miele_event(threading.Thread):
     def __init__(self, logger, url, access_token, mieleathome):
         threading.Thread.__init__(self)
         self.logger = logger
-        self.url = url + "/devices/all/events"
+        self.url = url + '/devices/all/events'
         self.access_token = access_token
         self.request = None
         self.alive = False
         self.mieleathome = mieleathome
-        self.last_event = ""
+        self.last_event = ''
 
     def run(self):
 
         self.alive = True
-        self.logger.debug("mieleathome - starting Event-Listener")
+        self.logger.debug('mieleathome - starting Event-Listener')
         self.connect()
 
     def reconnect(self):
-        self.logger.debug("mieleathome - try to establish new Event-Connection")
+        self.logger.debug('mieleathome - try to establish new Event-Connection')
         try:
             self.response.close()
         except Exception:
-            self.logger.warning("mieleathome - Error while closing Event-Connection")
+            self.logger.warning('mieleathome - Error while closing Event-Connection')
             pass
         try:
             self.connect()
         except Exception:
-            self.logger.warning("mieleathome - Error while estabslishing new Event-Connection")
+            self.logger.warning('mieleathome - Error while estabslishing new Event-Connection')
             pass
 
     def connect(self):
         while self.alive:
             try:
                 myHeaders = {
-                    "Authorization": "Bearer {}".format(self.access_token),
-                    "Accept": "text/event-stream",
-                    "Accept-Language": "de-DE",
-                    "Connection": "Keep-Alive",
+                    'Authorization': 'Bearer {}'.format(self.access_token),
+                    'Accept': 'text/event-stream',
+                    'Accept-Language': 'de-DE',
+                    'Connection': 'Keep-Alive',
                 }
                 self.response = requests.get(self.url, headers=myHeaders, stream=True, timeout=30.0)
 
@@ -596,33 +596,33 @@ class miele_event(threading.Thread):
                     if line:
                         myPayload = line.decode()
 
-                        if "event" in myPayload:
-                            self.last_event = myPayload.split(":")[1].strip()
+                        if 'event' in myPayload:
+                            self.last_event = myPayload.split(':')[1].strip()
                             continue
-                        elif "ping" not in myPayload:
+                        elif 'ping' not in myPayload:
                             myPayload = json.loads(myPayload[6:].strip())
 
-                        if self.last_event == "ping":
-                            self.last_event = ""
+                        if self.last_event == 'ping':
+                            self.last_event = ''
                             self.mieleathome.last_ping_time = datetime.fromtimestamp(time.time()).strftime(
-                                "%Y-%m-%d %H:%M:%S"
+                                '%Y-%m-%d %H:%M:%S'
                             )
                             self.mieleathome.last_ping_timestamp = datetime.now()
-                        elif self.last_event == "devices":
-                            self.logger.debug("mieleathome - got devices-Event :" + json.dumps(myPayload))
-                            self.last_event = ""
+                        elif self.last_event == 'devices':
+                            self.logger.debug('mieleathome - got devices-Event :' + json.dumps(myPayload))
+                            self.last_event = ''
                             self.mieleathome.last_event_time = datetime.fromtimestamp(time.time()).strftime(
-                                "%Y-%m-%d %H:%M:%S"
+                                '%Y-%m-%d %H:%M:%S'
                             )
                             self.mieleathome._parseAllDevices(myPayload)
                             if myPayload != {}:
                                 self.mieleathome.last_event_device = myPayload
-                        elif self.last_event == "actions":
-                            self.logger.debug("mieleathome - got actions-Event :" + json.dumps(myPayload))
+                        elif self.last_event == 'actions':
+                            self.logger.debug('mieleathome - got actions-Event :' + json.dumps(myPayload))
                             self.mieleathome.last_event_time = datetime.fromtimestamp(time.time()).strftime(
-                                "%Y-%m-%d %H:%M:%S"
+                                '%Y-%m-%d %H:%M:%S'
                             )
-                            self.last_event = ""
+                            self.last_event = ''
                             if myPayload != {}:
                                 self.mieleathome.last_event_action = myPayload
                             for device in myPayload:
@@ -632,14 +632,14 @@ class miele_event(threading.Thread):
                 # Happens when Internet-Connection was disconnted
                 if self.alive:
                     self.logger.warning(
-                        "mieleathome - connection canceled - waiting 30sec - retry to get new Event-Connection -  reason : {}".format(
+                        'mieleathome - connection canceled - waiting 30sec - retry to get new Event-Connection -  reason : {}'.format(
                             err
                         )
                     )
                     time.sleep(30)
-                    self.last_event = ""
+                    self.last_event = ''
                     pass
 
     def stop(self):
-        self.logger.debug("mieleathome - stoping Event-Listener")
+        self.logger.debug('mieleathome - stoping Event-Listener')
         self.response.close()

@@ -70,7 +70,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        if learn == "on":
+        if learn == 'on':
             self.plugin.hm.setInstallMode(self.plugin.hm_id)
 
         devices = []
@@ -94,26 +94,26 @@ class WebInterface(SmartPluginWebIf):
             #            d_type = str(dev.__class__).replace("<class '"+dev.__module__+'.', '').replace("'>",'')
             d_type = self.plugin.get_hmdevicetype(dev_id)
             d = {}
-            d["name"] = dev._name
-            d["address"] = dev_id
-            d["hmtype"] = dev._TYPE
-            d["type"] = d_type
-            d["firmware"] = dev._FIRMWARE
-            d["version"] = dev._VERSION
-            d["assigned"] = False
+            d['name'] = dev._name
+            d['address'] = dev_id
+            d['hmtype'] = dev._TYPE
+            d['type'] = d_type
+            d['firmware'] = dev._FIRMWARE
+            d['version'] = dev._VERSION
+            d['assigned'] = False
             for i in self.plugin.hm_items:
                 if i[2] == dev_id:
-                    d["assigned"] = True
+                    d['assigned'] = True
                     break
-            if d_type in ["Switch", "SwitchPowermeter", "ShutterContact"]:
+            if d_type in ['Switch', 'SwitchPowermeter', 'ShutterContact']:
                 try:
-                    d["value"] = dev.getValue("STATE")
+                    d['value'] = dev.getValue('STATE')
                 except Exception:
                     pass
 
             devices.append(d)
 
-            d["dev"] = dev
+            d['dev'] = dev
         device_count = len(devices)
 
         # get HomeMaticIP devices
@@ -122,30 +122,30 @@ class WebInterface(SmartPluginWebIf):
             #            d_type = str(dev.__class__).replace("<class '"+dev.__module__+'.', '').replace("'>",'')
             d_type = self.plugin.get_hmdevicetype(dev_id)
             d = {}
-            d["name"] = dev._name
-            d["address"] = dev_id
-            d["hmtype"] = dev._TYPE
-            d["type"] = d_type
-            d["firmware"] = dev._FIRMWARE
-            d["version"] = dev._VERSION
-            d["assigned"] = False
+            d['name'] = dev._name
+            d['address'] = dev_id
+            d['hmtype'] = dev._TYPE
+            d['type'] = d_type
+            d['firmware'] = dev._FIRMWARE
+            d['version'] = dev._VERSION
+            d['assigned'] = False
             for i in self.plugin.hm_items:
                 if i[2] == dev_id:
-                    d["assigned"] = True
+                    d['assigned'] = True
                     break
-            if d_type in ["Switch", "SwitchPowermeter", "ShutterContact"]:
+            if d_type in ['Switch', 'SwitchPowermeter', 'ShutterContact']:
                 try:
-                    d["value"] = dev.getValue("STATE")
+                    d['value'] = dev.getValue('STATE')
                 except Exception:
                     pass
 
             ipdevices.append(d)
 
-            d["dev"] = dev
+            d['dev'] = dev
         ipdevice_count = len(ipdevices)
         # self.logger.warning("ipdevice_count = {}, ipdevices = {}".format(ipdevice_count, ipdevices))
 
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # The first paramter for the render method has to be specified. the base template
         # for the web interface relys on the instance of the plugin to be passed as p
         return tmpl.render(

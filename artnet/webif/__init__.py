@@ -70,8 +70,8 @@ class WebInterface(SmartPluginWebIf):
         """
         tabcount = 1
 
-        tmpl = self.tplenv.get_template("index.html")
-        pagelength = self.plugin.get_parameter_value("webif_pagelength")
+        tmpl = self.tplenv.get_template('index.html')
+        pagelength = self.plugin.get_parameter_value('webif_pagelength')
         return tmpl.render(
             plugin_shortname=self.plugin.get_shortname(),
             plugin_version=self.plugin.get_version(),

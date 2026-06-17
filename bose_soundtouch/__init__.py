@@ -39,22 +39,22 @@ class BoseSoundtouch(SmartPlugin):
     """
 
     # Plugin parameters
-    PLUGIN_VERSION = "1.0.1"
+    PLUGIN_VERSION = '1.0.1'
     PLUGIN_PARAMETER_IP = None
     PLUGIN_PARAMETER_PORT = None
 
     # Misc constants
-    ITEM_ACTION_ATTR = "bose_soundtouch_action"
-    BOSE_STATE_STANDBY = "STANDBY"
-    BOSE_CMD_PLAY = "PLAY"
-    BOSE_CMD_PAUSE = "PAUSE"
-    BOSE_CMD_MUTE = "MUTE"
-    BOSE_CMD_NEXT_TRACK = "NEXT_TRACK"
-    BOSE_CMD_PREVIOUS_TRACK = "PREVIOUS_TRACK"
-    BOSE_CMD_SHUFFLE_ON = "SHUFFLE_ON"
-    BOSE_CMD_SHUFFLE_OFF = "SHUFFLE_OFF"
-    BOSE_CMD_REPEAT_ALL = "REPEAT_ALL"
-    BOSE_CMD_REPEAT_OFF = "REPEAT_OFF"
+    ITEM_ACTION_ATTR = 'bose_soundtouch_action'
+    BOSE_STATE_STANDBY = 'STANDBY'
+    BOSE_CMD_PLAY = 'PLAY'
+    BOSE_CMD_PAUSE = 'PAUSE'
+    BOSE_CMD_MUTE = 'MUTE'
+    BOSE_CMD_NEXT_TRACK = 'NEXT_TRACK'
+    BOSE_CMD_PREVIOUS_TRACK = 'PREVIOUS_TRACK'
+    BOSE_CMD_SHUFFLE_ON = 'SHUFFLE_ON'
+    BOSE_CMD_SHUFFLE_OFF = 'SHUFFLE_OFF'
+    BOSE_CMD_REPEAT_ALL = 'REPEAT_ALL'
+    BOSE_CMD_REPEAT_OFF = 'REPEAT_OFF'
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -75,7 +75,7 @@ class BoseSoundtouch(SmartPlugin):
         """
         from bin.smarthome import VERSION
 
-        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
+        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
             self.logger = logging.getLogger(__name__)
 
         # If an package import with try/except is done, handle an import error like this:
@@ -87,13 +87,13 @@ class BoseSoundtouch(SmartPlugin):
         #     return
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
-        self.PLUGIN_PARAMETER_IP = self.get_parameter_value("ip")
-        self.PLUGIN_PARAMETER_PORT = self.get_parameter_value("port")
+        self.PLUGIN_PARAMETER_IP = self.get_parameter_value('ip')
+        self.PLUGIN_PARAMETER_PORT = self.get_parameter_value('port')
 
         # cycle time in seconds, only needed, if hardware/interface needs to be
         # polled for value changes by adding a scheduler entry in the run method of this plugin
         # (maybe you want to make it a plugin parameter?)
-        self._cycle = self.get_parameter_value("cycle_time")
+        self._cycle = self.get_parameter_value('cycle_time')
 
         #######################################################################
         # BOSE SOUNDTOUCH INITIALIZATION
@@ -108,7 +108,7 @@ class BoseSoundtouch(SmartPlugin):
                 + self.getSoundtouchDevice().config.device_ip
             )
         except Exception as e:
-            self.logger.error("Fatal error during plugin initialization.")
+            self.logger.error('Fatal error during plugin initialization.')
             self.logger.error(e)
             self._init_complete = False
 
@@ -133,9 +133,9 @@ class BoseSoundtouch(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
         # setup scheduler for device poll loop   (disable the following line, if you don't need to poll the device. Rember to comment the self_cycle statement in __init__ as well
-        self.scheduler_add("poll_device", self.poll_device, cycle=self._cycle)
+        self.scheduler_add('poll_device', self.poll_device, cycle=self._cycle)
 
         self.alive = True
         # if you need to create child threads, do not make them daemon = True!
@@ -145,7 +145,7 @@ class BoseSoundtouch(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.alive = False
 
     def parse_item(self, item):
@@ -162,7 +162,7 @@ class BoseSoundtouch(SmartPlugin):
                         can be sent to the knx with a knx write function within the knx plugin.
         """
         if self.has_iattr(item.conf, self.ITEM_ACTION_ATTR):
-            self.logger.debug("Parse item: {}".format(item))
+            self.logger.debug('Parse item: {}'.format(item))
             # Update item
             return self.update_item
 
@@ -185,7 +185,7 @@ class BoseSoundtouch(SmartPlugin):
         """
         if caller != self.get_shortname():
             # code to execute, only if the item has not been changed by this this plugin:
-            self.logger.debug("Update item: {}, item has been changed outside this plugin".format(item.property.path))
+            self.logger.debug('Update item: {}, item has been changed outside this plugin'.format(item.property.path))
 
             if self.has_iattr(item.conf, self.ITEM_ACTION_ATTR):
                 action = self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR)
@@ -195,44 +195,44 @@ class BoseSoundtouch(SmartPlugin):
                     )
                 )
                 self.logger.debug(
-                    "Update item: Action = "
+                    'Update item: Action = '
                     + action
-                    + ", Item type = "
+                    + ', Item type = '
                     + str(type(item()))
-                    + ", Item value = "
+                    + ', Item value = '
                     + str(item())
                 )
 
                 # Execute logic according to requested action
-                if (action == "status.standby" and item() is False) or (action == "actions.power_on"):
+                if (action == 'status.standby' and item() is False) or (action == 'actions.power_on'):
                     self.powerOnSoundtouch()
-                elif (action == "status.standby" and item() is True) or (action == "actions.power_off"):
+                elif (action == 'status.standby' and item() is True) or (action == 'actions.power_off'):
                     self.powerOffSoundtouch()
-                elif action == "actions.select_preset":
+                elif action == 'actions.select_preset':
                     self.selectSoundtouchPreset(item())
-                elif action == "actions.play":
+                elif action == 'actions.play':
                     self.sendSoundtouchCommand(self.BOSE_CMD_PLAY)
-                elif action == "actions.pause":
+                elif action == 'actions.pause':
                     self.sendSoundtouchCommand(self.BOSE_CMD_PAUSE)
-                elif action == "actions.mute":
+                elif action == 'actions.mute':
                     self.sendSoundtouchCommand(self.BOSE_CMD_MUTE)
-                elif action == "actions.next_track":
+                elif action == 'actions.next_track':
                     self.sendSoundtouchCommand(self.BOSE_CMD_NEXT_TRACK)
-                elif action == "actions.previous_track":
+                elif action == 'actions.previous_track':
                     self.sendSoundtouchCommand(self.BOSE_CMD_PREVIOUS_TRACK)
-                elif action == "actions.shuffle":
+                elif action == 'actions.shuffle':
                     if item() is True:
                         self.sendSoundtouchCommand(self.BOSE_CMD_SHUFFLE_ON)
                     else:
                         self.sendSoundtouchCommand(self.BOSE_CMD_SHUFFLE_OFF)
-                elif action == "actions.repeat_all":
+                elif action == 'actions.repeat_all':
                     self.sendSoundtouchCommand(self.BOSE_CMD_REPEAT_ALL)
-                elif action == "actions.repeat_off":
+                elif action == 'actions.repeat_off':
                     self.sendSoundtouchCommand(self.BOSE_CMD_REPEAT_OFF)
-                elif action == "volume.actual":
+                elif action == 'volume.actual':
                     self.setSoundtouchVolume(item())
 
-                self.logger.debug("Update item: finished with Action = " + action)
+                self.logger.debug('Update item: finished with Action = ' + action)
             pass
 
     def poll_device(self):
@@ -254,82 +254,82 @@ class BoseSoundtouch(SmartPlugin):
 
     def updateSoundtouchStatus(self):
         status = None
-        self.logger.debug("Updating Soundtouch Status...")
+        self.logger.debug('Updating Soundtouch Status...')
         for item in self.get_sh().find_items(self.ITEM_ACTION_ATTR):
             if status is None:
                 status = self.getSoundtouchDevice().status()
-            if self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "status.album":
+            if self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'status.album':
                 item(status.album, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "status.artist":
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'status.artist':
                 item(status.artist, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "status.description":
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'status.description':
                 item(status.description, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "status.image":
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'status.image':
                 item(status.image, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "status.source":
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'status.source':
                 item(status.source, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "status.standby":
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'status.standby':
                 if status.source == self.BOSE_STATE_STANDBY:
                     item(True, self.get_shortname())
                 else:
                     item(False, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "status.track":
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'status.track':
                 item(status.track, self.get_shortname())
 
     def updateSoundtouchVolume(self):
         volume = None
-        self.logger.debug("Updating Soundtouch Volume...")
+        self.logger.debug('Updating Soundtouch Volume...')
         for item in self.get_sh().find_items(self.ITEM_ACTION_ATTR):
             if volume is None:
                 volume = self.getSoundtouchDevice().volume()
-            if self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "volume.actual":
+            if self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'volume.actual':
                 item(volume.actual, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "volume.muted":
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'volume.muted':
                 item(volume.muted, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "volume.target":
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'volume.target':
                 item(volume.target, self.get_shortname())
 
     def updateSoundtouchPresets(self):
         presets = None
-        self.logger.debug("Updating Soundtouch Presets...")
+        self.logger.debug('Updating Soundtouch Presets...')
         for item in self.get_sh().find_items(self.ITEM_ACTION_ATTR):
             if presets is None:
                 presets = self.getSoundtouchDevice().presets()
-            if self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.0.name" and len(presets) > 0:
+            if self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.0.name' and len(presets) > 0:
                 item(presets[0].name, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.0.preset_id" and len(presets) > 0:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.0.preset_id' and len(presets) > 0:
                 item(presets[0].preset_id, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.0.source" and len(presets) > 0:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.0.source' and len(presets) > 0:
                 item(presets[0].source, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.1.name" and len(presets) > 1:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.1.name' and len(presets) > 1:
                 item(presets[1].name, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.1.preset_id" and len(presets) > 1:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.1.preset_id' and len(presets) > 1:
                 item(presets[1].preset_id, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.1.source" and len(presets) > 1:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.1.source' and len(presets) > 1:
                 item(presets[1].source, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.2.name" and len(presets) > 2:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.2.name' and len(presets) > 2:
                 item(presets[2].name, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.2.preset_id" and len(presets) > 2:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.2.preset_id' and len(presets) > 2:
                 item(presets[2].preset_id, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.2.source" and len(presets) > 2:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.2.source' and len(presets) > 2:
                 item(presets[2].source, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.3.name" and len(presets) > 3:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.3.name' and len(presets) > 3:
                 item(presets[3].name, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.3.preset_id" and len(presets) > 3:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.3.preset_id' and len(presets) > 3:
                 item(presets[3].preset_id, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.3.source" and len(presets) > 3:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.3.source' and len(presets) > 3:
                 item(presets[3].source, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.4.name" and len(presets) > 4:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.4.name' and len(presets) > 4:
                 item(presets[4].name, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.4.preset_id" and len(presets) > 4:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.4.preset_id' and len(presets) > 4:
                 item(presets[4].preset_id, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.4.source" and len(presets) > 4:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.4.source' and len(presets) > 4:
                 item(presets[4].source, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.5.name" and len(presets) > 5:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.5.name' and len(presets) > 5:
                 item(presets[5].name, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.5.preset_id" and len(presets) > 5:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.5.preset_id' and len(presets) > 5:
                 item(presets[5].preset_id, self.get_shortname())
-            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == "presets.5.source" and len(presets) > 5:
+            elif self.get_iattr_value(item.conf, self.ITEM_ACTION_ATTR) == 'presets.5.source' and len(presets) > 5:
                 item(presets[5].source, self.get_shortname())
 
     def powerOnSoundtouch(self):

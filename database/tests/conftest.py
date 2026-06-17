@@ -16,5 +16,5 @@ See: smarthomeNG/smarthome tests/mock/core.py line 332
 import lib.item
 import lib.item.item
 
-if not hasattr(lib.item, "Item"):
+if not hasattr(lib.item, 'Item'):
     lib.item.Item = lib.item.item.Item

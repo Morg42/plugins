@@ -43,7 +43,7 @@ paired_nukis = []
 
 
 class Nuki(MqttPlugin):
-    PLUGIN_VERSION = "1.7.0"
+    PLUGIN_VERSION = '1.7.0'
 
     def __init__(self, sh, *args, **kwargs):
         super().__init__()
@@ -54,21 +54,21 @@ class Nuki(MqttPlugin):
         global nuki_door_items
         global nuki_battery_items
 
-        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
+        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
             self.logger = logging.getLogger(__name__)
 
-        self._mode = self.get_parameter_value("mode")
+        self._mode = self.get_parameter_value('mode')
         self._base_url = (
-            self.get_parameter_value("protocol")
-            + "://"
-            + self.get_parameter_value("bridge_ip")
-            + ":"
-            + str(self.get_parameter_value("bridge_port"))
-            + "/"
+            self.get_parameter_value('protocol')
+            + '://'
+            + self.get_parameter_value('bridge_ip')
+            + ':'
+            + str(self.get_parameter_value('bridge_port'))
+            + '/'
         )
-        self._token = self.get_parameter_value("bridge_api_token")
-        self._action = ""
-        self._noWait = self.get_parameter_value("no_wait")
+        self._token = self.get_parameter_value('bridge_api_token')
+        self._action = ''
+        self._noWait = self.get_parameter_value('no_wait')
         self.items = Items.get_instance()
 
         if not self.init_webinterfaces():
@@ -80,8 +80,8 @@ class Nuki(MqttPlugin):
             self._callback_port = self.mod_http.get_local_servicesport()  # get_parameter_value('bridge_callback_port')
 
             if self._callback_ip is None or self._callback_ip in [
-                "0.0.0.0",
-                "",
+                '0.0.0.0',
+                '',
             ]:  # 0.0.0.0 or empty means "all network interfaces" or self._callback_ip in ['0.0.0.0', '']:
                 self._callback_ip = Utils.get_local_ipv4_address()
 
@@ -104,7 +104,7 @@ class Nuki(MqttPlugin):
                         pluginname=self.get_shortname(), ip=self._callback_ip
                     )
                 )
-            self._callback_url = "http://{ip}:{port}/nuki_callback/".format(
+            self._callback_url = 'http://{ip}:{port}/nuki_callback/'.format(
                 ip=self._callback_ip, port=self._callback_port
             )
 
@@ -141,22 +141,22 @@ class Nuki(MqttPlugin):
             self.stop_subscriptions()
 
     def parse_item(self, item):
-        if self.has_iattr(item.conf, "nuki_id"):
+        if self.has_iattr(item.conf, 'nuki_id'):
             self.logger.debug("Plugin '{0}': parse item: {1}".format(self.get_shortname(), item.property.path))
-            nuki_id = self.get_iattr_value(item.conf, "nuki_id")
+            nuki_id = self.get_iattr_value(item.conf, 'nuki_id')
 
-            if self.has_iattr(item.conf, "nuki_trigger"):
-                nuki_trigger = self.get_iattr_value(item.conf, "nuki_trigger")
+            if self.has_iattr(item.conf, 'nuki_trigger'):
+                nuki_trigger = self.get_iattr_value(item.conf, 'nuki_trigger')
                 if nuki_trigger.lower() not in [
-                    "state",
-                    "mqtt_state",
-                    "mqtt_mode",
-                    "doorstate",
-                    "action",
-                    "battery",
-                    "mqtt_battery_charge_state",
-                    "mqtt_battery_critical",
-                    "mqtt_action",
+                    'state',
+                    'mqtt_state',
+                    'mqtt_mode',
+                    'doorstate',
+                    'action',
+                    'battery',
+                    'mqtt_battery_charge_state',
+                    'mqtt_battery_critical',
+                    'mqtt_action',
                 ]:
                     self.logger.warning(
                         "Plugin '{pluginname}': Item {item} defines an invalid Nuki trigger {trigger}! "
@@ -165,34 +165,34 @@ class Nuki(MqttPlugin):
                         )
                     )
                     return
-                if nuki_trigger.lower() in ["state", "mqtt_state"]:
+                if nuki_trigger.lower() in ['state', 'mqtt_state']:
                     nuki_event_items[item] = str(nuki_id)
-                elif nuki_trigger.lower() in ["doorstate", "mqtt_mode"]:
+                elif nuki_trigger.lower() in ['doorstate', 'mqtt_mode']:
                     nuki_door_items[item] = str(nuki_id)
-                elif nuki_trigger.lower() in ["action", "mqtt_action"]:
+                elif nuki_trigger.lower() in ['action', 'mqtt_action']:
                     nuki_action_items[item] = str(nuki_id)
                 else:
                     nuki_battery_items[item] = str(nuki_id)
 
-                if "mqtt" in nuki_trigger.lower() and "action" not in nuki_trigger.lower() and self._mode != 2:
+                if 'mqtt' in nuki_trigger.lower() and 'action' not in nuki_trigger.lower() and self._mode != 2:
                     bool_values = None
                     payload_type = item.property.type
                     callback = self.on_change
-                    subscription_suffix = ""
-                    if nuki_trigger.lower() == "mqtt_state":
-                        subscription_suffix = "state"
-                    elif nuki_trigger.lower() == "mqtt_mode":
-                        subscription_suffix = "mode"
-                    elif nuki_trigger.lower() == "mqtt_battery_charge_state":
-                        subscription_suffix = "batteryChargeState"
-                    elif nuki_trigger.lower() == "mqtt_battery_critical":
-                        subscription_suffix = "batteryCritical"
+                    subscription_suffix = ''
+                    if nuki_trigger.lower() == 'mqtt_state':
+                        subscription_suffix = 'state'
+                    elif nuki_trigger.lower() == 'mqtt_mode':
+                        subscription_suffix = 'mode'
+                    elif nuki_trigger.lower() == 'mqtt_battery_charge_state':
+                        subscription_suffix = 'batteryChargeState'
+                    elif nuki_trigger.lower() == 'mqtt_battery_critical':
+                        subscription_suffix = 'batteryCritical'
                     self.logger.debug(
                         "Plugin '%s': Adding subscription %s"
-                        % (self.get_shortname(), "nuki/%s/%s" % (nuki_id, subscription_suffix))
+                        % (self.get_shortname(), 'nuki/%s/%s' % (nuki_id, subscription_suffix))
                     )
                     self.add_subscription(
-                        "nuki/%s/%s" % (nuki_id, subscription_suffix),
+                        'nuki/%s/%s' % (nuki_id, subscription_suffix),
                         payload_type,
                         item=item,
                         bool_values=bool_values,
@@ -201,7 +201,7 @@ class Nuki(MqttPlugin):
             else:
                 self.logger.warning(
                     "Plugin '{pluginname}': Item {item} defines a Nuki ID but no Nuki trigger! "
-                    "This item has no effect.".format(pluginname=self.get_shortname(), item=item.property.path)
+                    'This item has no effect.'.format(pluginname=self.get_shortname(), item=item.property.path)
                 )
                 return
             return self.update_item
@@ -210,9 +210,9 @@ class Nuki(MqttPlugin):
         pass
 
     def update_item(self, item, caller=None, source=None, dest=None):
-        if caller != "plugin":
+        if caller != 'plugin':
             if item in nuki_action_items:
-                if "mqtt" not in self.get_iattr_value(item.conf, "nuki_trigger").lower() and self._mode != 1:
+                if 'mqtt' not in self.get_iattr_value(item.conf, 'nuki_trigger').lower() and self._mode != 1:
                     action = item()
                     if action not in self._lockActions:
                         self.logger.warning(
@@ -227,13 +227,13 @@ class Nuki(MqttPlugin):
                     response = self._api_call(
                         self._base_url,
                         nuki_id=nuki_action_items[item],
-                        endpoint="lockAction",
+                        endpoint='lockAction',
                         action=action,
                         token=self._token,
                         no_wait=self._noWait,
                     )
                     if response is not None:
-                        if response["success"]:
+                        if response['success']:
                             # self._get_nuki_status()
                             self.logger.debug(
                                 "Plugin '{0}': update item: {1}".format(self.get_shortname(), item.property.path)
@@ -244,8 +244,8 @@ class Nuki(MqttPlugin):
                         self.logger.error("Plugin '{}': no response.".format(self.get_shortname()))
                 if self._mode != 2:
                     action = item()
-                    suffix = "lockAction"
-                    self.publish_topic("nuki/%s/%s" % (nuki_action_items[item], suffix), action)
+                    suffix = 'lockAction'
+                    self.publish_topic('nuki/%s/%s' % (nuki_action_items[item], suffix), action)
 
     def on_change(self, topic, payload, qos=None, retain=None):
         """
@@ -257,26 +257,26 @@ class Nuki(MqttPlugin):
         self.logger.debug('on_change: called with topic "%s" and payload "%s"' % (topic, payload))
         if payload is not None:
             for item, nuki_id in self.get_door_items().items():
-                if self.get_iattr_value(item.conf, "nuki_trigger") == "mqtt_mode" and topic == "nuki/%s/mode" % nuki_id:
+                if self.get_iattr_value(item.conf, 'nuki_trigger') == 'mqtt_mode' and topic == 'nuki/%s/mode' % nuki_id:
                     item(payload)
             for item, nuki_id in self.get_event_items().items():
                 if (
-                    self.get_iattr_value(item.conf, "nuki_trigger") == "mqtt_state"
-                    and topic == "nuki/%s/state" % nuki_id
+                    self.get_iattr_value(item.conf, 'nuki_trigger') == 'mqtt_state'
+                    and topic == 'nuki/%s/state' % nuki_id
                 ):
                     item(payload)
             for item, nuki_id in self.get_battery_items().items():
                 if (
-                    self.get_iattr_value(item.conf, "nuki_trigger") == "mqtt_battery_critical"
-                    and topic == "nuki/%s/batteryCritical" % nuki_id
+                    self.get_iattr_value(item.conf, 'nuki_trigger') == 'mqtt_battery_critical'
+                    and topic == 'nuki/%s/batteryCritical' % nuki_id
                 ):
                     self.logger.debug(
                         "Plugin '%s': Setting battery critical via mqtt %s" % (payload, self.get_shortname())
                     )
                     item(payload)
                 elif (
-                    self.get_iattr_value(item.conf, "nuki_trigger") == "mqtt_battery_charge_state"
-                    and topic == "nuki/%s/batteryChargeState" % nuki_id
+                    self.get_iattr_value(item.conf, 'nuki_trigger') == 'mqtt_battery_charge_state'
+                    and topic == 'nuki/%s/batteryChargeState' % nuki_id
                 ):
                     self.logger.debug(
                         "Plugin '%s': Setting battery charge state via mqtt %s" % (payload, self.get_shortname())
@@ -289,27 +289,27 @@ class Nuki(MqttPlugin):
             nuki_state = None
             nuki_doorstate = None
 
-            lock_state = nuki_data["lastKnownState"]
+            lock_state = nuki_data['lastKnownState']
 
-            if "state" in lock_state:
-                nuki_state = lock_state["state"]
-            if "doorsensorState" in lock_state:
-                nuki_doorstate = lock_state["doorsensorState"]
-            if "batteryCritical" in lock_state:
-                nuki_battery = 0 if not lock_state["batteryCritical"] else 1
+            if 'state' in lock_state:
+                nuki_state = lock_state['state']
+            if 'doorsensorState' in lock_state:
+                nuki_doorstate = lock_state['doorsensorState']
+            if 'batteryCritical' in lock_state:
+                nuki_battery = 0 if not lock_state['batteryCritical'] else 1
 
             for item, key in nuki_event_items.items():
-                if key == str(nuki_id) and "mqtt" not in self.get_iattr_value(item.conf, "nuki_trigger").lower():
+                if key == str(nuki_id) and 'mqtt' not in self.get_iattr_value(item.conf, 'nuki_trigger').lower():
                     self.logger.debug("Plugin '{0}': update item: {1}".format(self.get_shortname(), item.property.path))
-                    item(nuki_state, "NUKI")
+                    item(nuki_state, 'NUKI')
             for item, key in nuki_door_items.items():
-                if key == str(nuki_id) and "mqtt" not in self.get_iattr_value(item.conf, "nuki_trigger").lower():
+                if key == str(nuki_id) and 'mqtt' not in self.get_iattr_value(item.conf, 'nuki_trigger').lower():
                     self.logger.debug("Plugin '{0}': update item: {1}".format(self.get_shortname(), item.property.path))
-                    item(nuki_doorstate, "NUKI")
+                    item(nuki_doorstate, 'NUKI')
             for item, key in nuki_battery_items.items():
-                if key == str(nuki_id) and "mqtt" not in self.get_iattr_value(item.conf, "nuki_trigger").lower():
+                if key == str(nuki_id) and 'mqtt' not in self.get_iattr_value(item.conf, 'nuki_trigger').lower():
                     self.logger.debug("Plugin '{0}': update item: {1}".format(self.get_shortname(), item.property.path))
-                    item(nuki_battery, "NUKI")
+                    item(nuki_battery, 'NUKI')
 
     def update_lock_state(self, nuki_id, lock_state):
         if self._mode != 1:
@@ -317,25 +317,25 @@ class Nuki(MqttPlugin):
             nuki_state = None
             nuki_doorstate = None
 
-            if "state" in lock_state:
-                nuki_state = lock_state["state"]
-            if "doorsensorState" in lock_state:
-                nuki_doorstate = lock_state["doorsensorState"]
-            if "batteryCritical" in lock_state:
-                nuki_battery = 0 if not lock_state["batteryCritical"] else 1
+            if 'state' in lock_state:
+                nuki_state = lock_state['state']
+            if 'doorsensorState' in lock_state:
+                nuki_doorstate = lock_state['doorsensorState']
+            if 'batteryCritical' in lock_state:
+                nuki_battery = 0 if not lock_state['batteryCritical'] else 1
 
             for item, key in nuki_event_items.items():
-                if str(key) == str(nuki_id) and "mqtt" not in self.get_iattr_value(item.conf, "nuki_trigger").lower():
+                if str(key) == str(nuki_id) and 'mqtt' not in self.get_iattr_value(item.conf, 'nuki_trigger').lower():
                     self.logger.debug("Plugin '{0}': update item: {1}".format(self.get_shortname(), item.property.path))
-                    item(nuki_state, "NUKI")
+                    item(nuki_state, 'NUKI')
             for item, key in nuki_door_items.items():
-                if str(key) == str(nuki_id) and "mqtt" not in self.get_iattr_value(item.conf, "nuki_trigger").lower():
+                if str(key) == str(nuki_id) and 'mqtt' not in self.get_iattr_value(item.conf, 'nuki_trigger').lower():
                     self.logger.debug("Plugin '{0}': update item: {1}".format(self.get_shortname(), item.property.path))
-                    item(nuki_doorstate, "NUKI")
+                    item(nuki_doorstate, 'NUKI')
             for item, key in nuki_battery_items.items():
-                if str(key) == str(nuki_id) and "mqtt" not in self.get_iattr_value(item.conf, "nuki_trigger").lower():
+                if str(key) == str(nuki_id) and 'mqtt' not in self.get_iattr_value(item.conf, 'nuki_trigger').lower():
                     self.logger.debug("Plugin '{0}': update item: {1}".format(self.get_shortname(), item.property.path))
-                    item(nuki_battery, "NUKI")
+                    item(nuki_battery, 'NUKI')
 
     def get_paired_nukis(self):
         return paired_nukis
@@ -343,33 +343,33 @@ class Nuki(MqttPlugin):
     def _get_paired_nukis(self):
         # reset list of nukis
         del paired_nukis[:]
-        response = self._api_call(self._base_url, endpoint="list", token=self._token)
+        response = self._api_call(self._base_url, endpoint='list', token=self._token)
         if response is None:
             return
         for nuki in response:
-            paired_nukis.append(nuki["nukiId"])
+            paired_nukis.append(nuki['nukiId'])
             self.logger.debug(
                 "Plugin '{pluginname}': Paired Nuki Lock found: {name} - {id}".format(
-                    pluginname=self.get_shortname(), name=nuki["name"], id=nuki["nukiId"]
+                    pluginname=self.get_shortname(), name=nuki['name'], id=nuki['nukiId']
                 )
             )
             self.logger.debug(paired_nukis)
 
     def _clear_callbacks(self):
-        callbacks = self._api_call(self._base_url, endpoint="callback/list", token=self._token)
+        callbacks = self._api_call(self._base_url, endpoint='callback/list', token=self._token)
         if callbacks is not None:
-            for c in callbacks["callbacks"]:
-                response = self._api_call(self._base_url, endpoint="callback/remove", token=self._token, id=c["id"])
-                if response["success"]:
+            for c in callbacks['callbacks']:
+                response = self._api_call(self._base_url, endpoint='callback/remove', token=self._token, id=c['id'])
+                if response['success']:
                     self.logger.debug(
                         "Plugin '{pluginname}': Callback with id {id} removed.".format(
-                            pluginname=self.get_shortname(), id=c["id"]
+                            pluginname=self.get_shortname(), id=c['id']
                         )
                     )
                     return
                 self.logger.debug(
                     "Plugin '{pluginname}': Could not remove callback with id {id}: {message}".format(
-                        pluginname=self.get_shortname(), id=c["id"], message=c["message"]
+                        pluginname=self.get_shortname(), id=c['id'], message=c['message']
                     )
                 )
 
@@ -377,20 +377,20 @@ class Nuki(MqttPlugin):
         if self._mode != 1:
             found = False
             # Setting up the callback URL
-            if self._callback_ip != "":
-                callbacks = self._api_call(self._base_url, endpoint="callback/list", token=self._token)
+            if self._callback_ip != '':
+                callbacks = self._api_call(self._base_url, endpoint='callback/list', token=self._token)
                 if callbacks is not None:
-                    for c in callbacks["callbacks"]:
-                        if c["url"] == self._callback_url:
+                    for c in callbacks['callbacks']:
+                        if c['url'] == self._callback_url:
                             found = True
                     if not found:
                         response = self._api_call(
-                            self._base_url, endpoint="callback/add", token=self._token, callback_url=self._callback_url
+                            self._base_url, endpoint='callback/add', token=self._token, callback_url=self._callback_url
                         )
-                        if not response["success"]:
+                        if not response['success']:
                             self.logger.warning(
                                 "Plugin '{pluginname}': Error establishing the callback url: {message}".format(
-                                    pluginname=self.get_shortname(), message=response["message"]
+                                    pluginname=self.get_shortname(), message=response['message']
                                 )
                             )
                         else:
@@ -407,14 +407,14 @@ class Nuki(MqttPlugin):
     def _get_nuki_status_via_list(self):
         self.logger.info("Plugin '{}': Getting Nuki status ...".format(self.get_shortname()))
         if self._mode != 1:
-            response = self._api_call(self._base_url, endpoint="list", token=self._token, no_wait=self._noWait)
+            response = self._api_call(self._base_url, endpoint='list', token=self._token, no_wait=self._noWait)
 
             if response is None:
                 self.logger.info("Plugin '{}': Getting Nuki status ... Response is None.".format(self.get_shortname()))
                 return
             for nuki_id in paired_nukis:
                 for nuki_data in response:
-                    if str(nuki_data["nukiId"]) == str(nuki_id):
+                    if str(nuki_data['nukiId']) == str(nuki_id):
                         self.update_lock_state_via_list(nuki_id, nuki_data)
 
     def _get_nuki_status(self):
@@ -422,7 +422,7 @@ class Nuki(MqttPlugin):
             self.logger.info("Plugin '{}': Getting Nuki status ...".format(self.get_shortname()))
             for nuki_id in paired_nukis:
                 response = self._api_call(
-                    self._base_url, endpoint="lockState", nuki_id=nuki_id, token=self._token, no_wait=self._noWait
+                    self._base_url, endpoint='lockState', nuki_id=nuki_id, token=self._token, no_wait=self._noWait
                 )
                 if response is None:
                     self.logger.info(
@@ -443,18 +443,18 @@ class Nuki(MqttPlugin):
             try:
                 payload = {}
                 if nuki_id is not None:
-                    payload["nukiID"] = nuki_id
+                    payload['nukiID'] = nuki_id
                 if token is not None:
-                    payload["token"] = token
+                    payload['token'] = token
                 if action is not None:
-                    payload["action"] = action
+                    payload['action'] = action
                 if no_wait is not None:
-                    payload["noWait"] = int(no_wait)
+                    payload['noWait'] = int(no_wait)
                     self.logger.debug("Plugin '{}': noWait is {}".format(self.get_shortname(), int(no_wait)))
                 if callback_url is not None:
-                    payload["url"] = callback_url
+                    payload['url'] = callback_url
                 if id is not None:
-                    payload["id"] = id
+                    payload['id'] = id
                 url = urllib.parse.urljoin(base_url, endpoint)
                 self.logger.debug(
                     "Plugin '{}': starting API Call to Nuki Bridge at {} with payload {}.".format(
@@ -505,25 +505,23 @@ class Nuki(MqttPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
             self.logger.error(
                 "Plugin '{}': Not initializing the web interface. If not already done so, please configure "
-                "http module in etc/module.yaml.".format(self.get_fullname())
+                'http module in etc/module.yaml.'.format(self.get_fullname())
             )
             return False
 
-        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
+        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            "/": {
-                "tools.staticdir.root": webif_dir,
-            },
-            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
-        config_callback_ws = {"/": {}}
+        config_callback_ws = {'/': {}}
 
         # Register the web interface as a cherrypy app
         self.mod_http.register_webif(
@@ -532,7 +530,7 @@ class Nuki(MqttPlugin):
             config,
             self.get_classname(),
             self.get_instance_name(),
-            description="Nuki Web Interface",
+            description='Nuki Web Interface',
         )
         if self._mode != 1:
             # Register the callback interface as a cherrypy app
@@ -542,8 +540,8 @@ class Nuki(MqttPlugin):
                 config_callback_ws,
                 self.get_classname(),
                 self.get_instance_name(),
-                description="",
-                servicename="nuki_callback",
+                description='',
+                servicename='nuki_callback',
                 use_global_basic_auth=False,
             )
 

@@ -25,12 +25,12 @@ def CreateStreamPayLoad(myItemConf):
     offset = timedelta(seconds=86400)  # Experition time 24h
     now = now + offset
     now = now.isoformat()
-    expirationDate = now[0:22] + "Z"
+    expirationDate = now[0:22] + 'Z'
     cameraStream = []
     cameraUri = []
     imageuri = myItemConf.camera_imageUri
-    if myItemConf.alexa_auth_cred != "":
-        imageuri = imageuri.replace("//", "//" + myItemConf.alexa_auth_cred + "@")
+    if myItemConf.alexa_auth_cred != '':
+        imageuri = imageuri.replace('//', '//' + myItemConf.alexa_auth_cred + '@')
 
     if len(myItemConf.proxied_Urls) == 0:
         for k, v in myItemConf.camera_uri.items():
@@ -41,58 +41,58 @@ def CreateStreamPayLoad(myItemConf):
 
     i = 0
     for k, v in myItemConf.camera_setting.items():
-        if myItemConf.alexa_auth_cred != "" and myItemConf.alexa_proxy_credentials == "":
-            uri = v["protocols"][0].lower() + "://" + myItemConf.alexa_auth_cred + "@" + cameraUri[i]
+        if myItemConf.alexa_auth_cred != '' and myItemConf.alexa_proxy_credentials == '':
+            uri = v['protocols'][0].lower() + '://' + myItemConf.alexa_auth_cred + '@' + cameraUri[i]
 
-        elif myItemConf.alexa_proxy_credentials != "":
-            uri = v["protocols"][0].lower() + "://" + myItemConf.alexa_proxy_credentials + "@" + cameraUri[i]
+        elif myItemConf.alexa_proxy_credentials != '':
+            uri = v['protocols'][0].lower() + '://' + myItemConf.alexa_proxy_credentials + '@' + cameraUri[i]
 
         else:
-            uri = v["protocols"][0].lower() + "://" + cameraUri[i]
+            uri = v['protocols'][0].lower() + '://' + cameraUri[i]
         # Find highest resolution
         streamResolution = {}
         highestRes = 0
-        for res in v["resolutions"]:
-            if res["width"] > highestRes:
+        for res in v['resolutions']:
+            if res['width'] > highestRes:
                 streamResolution = res
-                highestRes = res["width"]
+                highestRes = res['width']
 
         myStream = {
-            "uri": uri,
-            "expirationTime": expirationDate,
-            "idleTimeoutSeconds": 30,
-            "protocol": v["protocols"][0].upper(),
-            "resolution": streamResolution,
-            "authorizationType": v["authorizationTypes"][0].upper(),
-            "videoCodec": v["videoCodecs"][0].upper(),
-            "audioCodec": v["audioCodecs"][0].upper(),
+            'uri': uri,
+            'expirationTime': expirationDate,
+            'idleTimeoutSeconds': 30,
+            'protocol': v['protocols'][0].upper(),
+            'resolution': streamResolution,
+            'authorizationType': v['authorizationTypes'][0].upper(),
+            'videoCodec': v['videoCodecs'][0].upper(),
+            'audioCodec': v['audioCodecs'][0].upper(),
         }
         cameraStream.append(myStream)
         i += 1
-    response = {"cameraStreams": cameraStream}
-    response.update({"imageUri": imageuri})
+    response = {'cameraStreams': cameraStream}
+    response.update({'imageUri': imageuri})
     # only interesting for debugging
     # DumpStreamInfo(response)
     return response
 
 
 def DumpStreamInfo(directive):
-    myFile = open("streamdump.txt", "a+")
+    myFile = open('streamdump.txt', 'a+')
     myString = json.dumps(directive)
 
-    myFile.write(myString + "\r\n")
-    myFile.write("=====================\r\n")
+    myFile.write(myString + '\r\n')
+    myFile.write('=====================\r\n')
     myFile.close()
 
 
 # Calculating HSV to RGB based on
 # https://www.rapidtables.com/convert/color/hsv-to-rgb.html
 def hsv_to_rgb(h, s, v):
-    if h == "":
+    if h == '':
         h = 0
-    if s == "":
+    if s == '':
         s = 0
-    if v == "":
+    if v == '':
         v = 0
     if h < 0:
         h = 0
@@ -146,11 +146,11 @@ def hsv_to_rgb(h, s, v):
 
 
 def rgb_to_hsv(r, g, b):
-    if r == "":
+    if r == '':
         r = 0
-    if g == "":
+    if g == '':
         g = 0
-    if b == "":
+    if b == '':
         b = 0
 
     if r < 0:

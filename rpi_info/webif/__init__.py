@@ -67,7 +67,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # Setting pagelength (max. number of table entries per page) for web interface
         try:
             pagelength = self.plugin.webif_pagelength
@@ -77,7 +77,7 @@ class WebInterface(SmartPluginWebIf):
         return tmpl.render(
             p=self.plugin,
             webif_pagelength=pagelength,
-            items=sorted(self.plugin.item_list, key=lambda k: str.lower(k["_path"])),
+            items=sorted(self.plugin.item_list, key=lambda k: str.lower(k['_path'])),
             item_count=len(self.plugin.item_list),
             plugin_shortname=self.plugin.get_shortname(),
             plugin_version=self.plugin.get_version(),
@@ -100,29 +100,29 @@ class WebInterface(SmartPluginWebIf):
             # get the new data
             data = dict()
 
-            data["items"] = {}
+            data['items'] = {}
             for item in self.plugin.item_list:
-                data["items"][item.property.path] = {}
-                data["items"][item.property.path]["value"] = item.property.value
-                data["items"][item.property.path]["last_update"] = item.property.last_update.strftime(
-                    "%d.%m.%Y %H:%M:%S"
+                data['items'][item.property.path] = {}
+                data['items'][item.property.path]['value'] = item.property.value
+                data['items'][item.property.path]['last_update'] = item.property.last_update.strftime(
+                    '%d.%m.%Y %H:%M:%S'
                 )
-                data["items"][item.property.path]["last_change"] = item.property.last_change.strftime(
-                    "%d.%m.%Y %H:%M:%S"
+                data['items'][item.property.path]['last_change'] = item.property.last_change.strftime(
+                    '%d.%m.%Y %H:%M:%S'
                 )
-            data["plugin_suspended"] = self.plugin.suspended
-            data["maintenance"] = True if self.plugin.log_level <= 20 else False
+            data['plugin_suspended'] = self.plugin.suspended
+            data['maintenance'] = True if self.plugin.log_level <= 20 else False
             try:
                 return json.dumps(data, default=str)
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
 
     @cherrypy.expose
     def activate(self):
-        self.logger.debug("active called")
+        self.logger.debug('active called')
         self.plugin.suspend(False)
 
     @cherrypy.expose
     def suspend(self):
-        self.logger.debug("suspend called")
+        self.logger.debug('suspend called')
         self.plugin.suspend(True)

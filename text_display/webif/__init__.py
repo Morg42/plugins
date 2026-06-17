@@ -69,10 +69,10 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(
-            p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])), item_count=0
+            p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])), item_count=0
         )
 
     @cherrypy.expose
@@ -92,9 +92,9 @@ class WebInterface(SmartPluginWebIf):
                 value = []
                 for slot in self.plugin._model.get_ring_model(ring).get_slots():
                     value.append(slot.get_data())
-                data.append({"ring": ring, "slots": value})
+                data.append({'ring': ring, 'slots': value})
             try:
                 return json.dumps(data)
             except Exception as e:
-                self.logger.error("get_data_html exception: {}".format(e))
+                self.logger.error('get_data_html exception: {}'.format(e))
         return {}

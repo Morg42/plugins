@@ -49,51 +49,51 @@ class OpenWeatherMapNoValueSoftException(Exception):
 
 
 class OpenWeatherMap(SmartPlugin):
-    PLUGIN_VERSION = "1.8.8"
+    PLUGIN_VERSION = '1.8.8'
 
-    _base_url = "https://api.openweathermap.org/"
-    _base_img_url = "https://tile.openweathermap.org/map/%s/%s/%s/%s.png?appid=%s"
+    _base_url = 'https://api.openweathermap.org/'
+    _base_img_url = 'https://tile.openweathermap.org/map/%s/%s/%s/%s.png?appid=%s'
 
     # source for german descriptions https://www.smarthomeng.de/vom-winde-verweht
     _beaufort_descriptions_de = [
-        "Windstille",
-        "leiser Zug",
-        "leichte Brise",
-        "schwacher Wind",
-        "mäßiger Wind",
-        "frischer Wind",
-        "starker Wind",
-        "steifer Wind",
-        "stürmischer Wind",
-        "Sturm",
-        "schwerer Sturm",
-        "orkanartiger Sturm",
-        "Orkan",
+        'Windstille',
+        'leiser Zug',
+        'leichte Brise',
+        'schwacher Wind',
+        'mäßiger Wind',
+        'frischer Wind',
+        'starker Wind',
+        'steifer Wind',
+        'stürmischer Wind',
+        'Sturm',
+        'schwerer Sturm',
+        'orkanartiger Sturm',
+        'Orkan',
     ]
     # source for english descriptions https://simple.wikipedia.org/wiki/Beaufort_scale
     _beaufort_descriptions_en = [
-        "Calm",
-        "Light air",
-        "Light breeze",
-        "Gentle breeze",
-        "Moderate breeze",
-        "Fresh breeze",
-        "Strong breeze",
-        "High wind",
-        "Fresh Gale",
-        "Strong Gale",
-        "Storm",
-        "Violent storm",
-        "Hurricane-force",
+        'Calm',
+        'Light air',
+        'Light breeze',
+        'Gentle breeze',
+        'Moderate breeze',
+        'Fresh breeze',
+        'Strong breeze',
+        'High wind',
+        'Fresh Gale',
+        'Strong Gale',
+        'Storm',
+        'Violent storm',
+        'Hurricane-force',
     ]
 
     _placebo_alarm = {
-        "sender_name": "Placebo",
-        "event": "None",
-        "start": 1609455600,
-        "end": 1924988400,
-        "description": "No Alarm",
-        "tags": [],
+        'sender_name': 'Placebo',
+        'event': 'None',
+        'start': 1609455600,
+        'end': 1924988400,
+        'description': 'No Alarm',
+        'tags': [],
     }
 
     def __init__(self, sh, *args, **kwargs):
@@ -106,76 +106,76 @@ class OpenWeatherMap(SmartPlugin):
 
         self.shtime = Shtime.get_instance()
 
-        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
+        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
             self.logger = logging.getLogger(__name__)
-        self._key = self.get_parameter_value("key")
+        self._key = self.get_parameter_value('key')
         if (
-            self.get_parameter_value("latitude") != ""
-            and self.get_parameter_value("longitude") != ""
-            and self.get_parameter_value("altitude") != ""
+            self.get_parameter_value('latitude') != ''
+            and self.get_parameter_value('longitude') != ''
+            and self.get_parameter_value('altitude') != ''
         ):
-            self._lat = self.get_parameter_value("latitude")
-            self._lon = self.get_parameter_value("longitude")
-            self._elev = self.get_parameter_value("altitude")
+            self._lat = self.get_parameter_value('latitude')
+            self._lon = self.get_parameter_value('longitude')
+            self._elev = self.get_parameter_value('altitude')
         else:
-            self.logger.debug("__init__: latitude and longitude not provided, using shng system values instead.")
+            self.logger.debug('__init__: latitude and longitude not provided, using shng system values instead.')
             self._lat = self.get_sh()._lat
             self._lon = self.get_sh()._lon
             self._elev = self.get_sh()._elev
-        self._lang = self.get_parameter_value("lang")
-        self._units = self.get_parameter_value("units")
-        self._api_version = self.get_parameter_value("api_version")
+        self._lang = self.get_parameter_value('lang')
+        self._units = self.get_parameter_value('units')
+        self._api_version = self.get_parameter_value('api_version')
 
-        softfail_mode_precipitation = self.get_parameter_value("softfail_precipitation")
-        softfail_mode_wind_gust = self.get_parameter_value("softfail_wind_gust")
+        softfail_mode_precipitation = self.get_parameter_value('softfail_precipitation')
+        softfail_mode_wind_gust = self.get_parameter_value('softfail_wind_gust')
 
         self._soft_fails = {
-            "rain/1h": softfail_mode_precipitation,
-            "rain/3h": softfail_mode_precipitation,
-            "snow/1h": softfail_mode_precipitation,
-            "snow/3h": softfail_mode_precipitation,
-            "rain/": softfail_mode_precipitation,
-            "snow/": softfail_mode_precipitation,
-            "wind_gust/": softfail_mode_wind_gust,
+            'rain/1h': softfail_mode_precipitation,
+            'rain/3h': softfail_mode_precipitation,
+            'snow/1h': softfail_mode_precipitation,
+            'snow/3h': softfail_mode_precipitation,
+            'rain/': softfail_mode_precipitation,
+            'snow/': softfail_mode_precipitation,
+            'wind_gust/': softfail_mode_wind_gust,
         }
 
-        self._data_source_key_weather = "weather"
-        self._data_source_key_forecast = "forecast"
-        self._data_source_key_uvi = "uvi"
-        self._data_source_key_back0day = "onecall-0"
-        self._data_source_key_back1day = "onecall-1"
-        self._data_source_key_back2day = "onecall-2"
-        self._data_source_key_back3day = "onecall-3"
-        self._data_source_key_back4day = "onecall-4"
-        self._data_source_key_onecall = "onecall"
+        self._data_source_key_weather = 'weather'
+        self._data_source_key_forecast = 'forecast'
+        self._data_source_key_uvi = 'uvi'
+        self._data_source_key_back0day = 'onecall-0'
+        self._data_source_key_back1day = 'onecall-1'
+        self._data_source_key_back2day = 'onecall-2'
+        self._data_source_key_back3day = 'onecall-3'
+        self._data_source_key_back4day = 'onecall-4'
+        self._data_source_key_onecall = 'onecall'
 
-        self._data_source_key_airpollution_current = "airpollution_current"
-        self._data_source_key_airpollution_forecast = "airpollution_forecast"
-        self._data_source_key_airpollution_back1day = "airpollution-1"
-        self._data_source_key_airpollution_back2day = "airpollution-2"
-        self._data_source_key_airpollution_back3day = "airpollution-3"
-        self._data_source_key_airpollution_back4day = "airpollution-4"
+        self._data_source_key_airpollution_current = 'airpollution_current'
+        self._data_source_key_airpollution_forecast = 'airpollution_forecast'
+        self._data_source_key_airpollution_back1day = 'airpollution-1'
+        self._data_source_key_airpollution_back2day = 'airpollution-2'
+        self._data_source_key_airpollution_back3day = 'airpollution-3'
+        self._data_source_key_airpollution_back4day = 'airpollution-4'
 
         self._data_sources = {
-            self._data_source_key_weather: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_forecast: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_uvi: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_back0day: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_back1day: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_back2day: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_back3day: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_back4day: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_onecall: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_airpollution_current: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_airpollution_forecast: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_airpollution_back1day: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_airpollution_back2day: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_airpollution_back3day: {"url": "", "fetched": "", "data": "Not downloaded!"},
-            self._data_source_key_airpollution_back4day: {"url": "", "fetched": "", "data": "Not downloaded!"},
+            self._data_source_key_weather: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_forecast: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_uvi: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_back0day: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_back1day: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_back2day: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_back3day: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_back4day: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_onecall: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_airpollution_current: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_airpollution_forecast: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_airpollution_back1day: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_airpollution_back2day: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_airpollution_back3day: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
+            self._data_source_key_airpollution_back4day: {'url': '', 'fetched': '', 'data': 'Not downloaded!'},
         }
 
         self._session = requests.Session()
-        self._cycle = int(self.get_parameter_value("cycle"))
+        self._cycle = int(self.get_parameter_value('cycle'))
         self._items = {}
         self._raw_items = {}
 
@@ -206,40 +206,40 @@ class OpenWeatherMap(SmartPlugin):
 
         self._forced_download_happened = False
 
-        self._origins_onecall = ["lat", "lon", "timezone", "timezone_offset", "alerts"]
+        self._origins_onecall = ['lat', 'lon', 'timezone', 'timezone_offset', 'alerts']
 
         self._origins_weather = [
-            "base",
-            "clouds",
-            "cod",
-            "coord",
-            "dt",
-            "id",
-            "name",
-            "main/feels_like",
-            "main/humidity",
-            "main/pressure",
-            "main/temp",
-            "main/temp_max",
-            "main/temp_min",
-            "sys/country",
-            "sys/id",
-            "sys/sunrise",
-            "sys/sunset",
-            "sys/type",
-            "snow/3h",
-            "snow/1h",
-            "rain/3h",
-            "rain/1h",
-            "timezone",
-            "visibility",
-            "weather",
-            "wind/deg",
-            "wind/speed",
-            "wind/gust",
+            'base',
+            'clouds',
+            'cod',
+            'coord',
+            'dt',
+            'id',
+            'name',
+            'main/feels_like',
+            'main/humidity',
+            'main/pressure',
+            'main/temp',
+            'main/temp_max',
+            'main/temp_min',
+            'sys/country',
+            'sys/id',
+            'sys/sunrise',
+            'sys/sunset',
+            'sys/type',
+            'snow/3h',
+            'snow/1h',
+            'rain/3h',
+            'rain/1h',
+            'timezone',
+            'visibility',
+            'weather',
+            'wind/deg',
+            'wind/speed',
+            'wind/gust',
         ]
 
-        self._origins_layer = ["clouds_new", "precipitation_new", "pressure_new", "wind_new", "temp_new"]
+        self._origins_layer = ['clouds_new', 'precipitation_new', 'pressure_new', 'wind_new', 'temp_new']
 
         self.init_webinterface(WebInterface)
 
@@ -254,7 +254,7 @@ class OpenWeatherMap(SmartPlugin):
         """
         Starts the update loop for all known items.
         """
-        self.logger.debug("Starting update loop for instance %s" % self.get_instance_name())
+        self.logger.debug('Starting update loop for instance %s' % self.get_instance_name())
         if not self.alive:
             return
 
@@ -321,88 +321,88 @@ class OpenWeatherMap(SmartPlugin):
         self.__query_api_if(self._data_source_key_back3day, only_if=self._request_back3day, delta_t=-3)
         self.__query_api_if(self._data_source_key_back4day, only_if=self._request_back4day, delta_t=-4)
 
-    def get_value_with_meta(self, owm_matchstring, correlation_hint=""):
+    def get_value_with_meta(self, owm_matchstring, correlation_hint=''):
         s = owm_matchstring
-        wrk_typ = "WRONG"
+        wrk_typ = 'WRONG'
         ret_val = None
         was_ok = True
 
-        if s.startswith("forecast/daily/"):
+        if s.startswith('forecast/daily/'):
             ret_val = self.get_daily_forecast(s)
-            wrk_typ = "forecast [calculation]"
+            wrk_typ = 'forecast [calculation]'
             return (ret_val, wrk_typ, s, True)
-        elif s.startswith("virtual/"):
+        elif s.startswith('virtual/'):
             ret_val = self.__get_virtual_value(s[8:], correlation_hint)
-            wrk_typ = "virtual [calculation]"
+            wrk_typ = 'virtual [calculation]'
             return (ret_val, wrk_typ, s, True)
 
-        if s.startswith("forecast/"):
-            wrk = self._data_sources[self._data_source_key_forecast]["data"]
+        if s.startswith('forecast/'):
+            wrk = self._data_sources[self._data_source_key_forecast]['data']
             wrk_typ = self._data_source_key_forecast
-            s = s.replace("forecast/", "list/")
-        elif s.startswith("uvi_"):
-            wrk = self._data_sources[self._data_source_key_uvi]["data"]
+            s = s.replace('forecast/', 'list/')
+        elif s.startswith('uvi_'):
+            wrk = self._data_sources[self._data_source_key_uvi]['data']
             wrk_typ = self._data_source_key_uvi
-            s = s.replace("uvi_", "")
-        elif s.startswith("current/"):
-            wrk = self._data_sources[self._data_source_key_onecall]["data"]
+            s = s.replace('uvi_', '')
+        elif s.startswith('current/'):
+            wrk = self._data_sources[self._data_source_key_onecall]['data']
             wrk_typ = self._data_source_key_onecall
-        elif s.startswith("airpollution/forecast/"):
-            wrk = self._data_sources[self._data_source_key_airpollution_forecast]["data"]
-            prefix = "airpollution/forecast/"
-            s = s.replace(prefix, "list/")
+        elif s.startswith('airpollution/forecast/'):
+            wrk = self._data_sources[self._data_source_key_airpollution_forecast]['data']
+            prefix = 'airpollution/forecast/'
+            s = s.replace(prefix, 'list/')
             wrk_typ = self._data_source_key_airpollution_forecast
-        elif s.startswith("airpollution/day/-"):
+        elif s.startswith('airpollution/day/-'):
             minus_days = s[18]
-            wrk = self._data_sources[f"airpollution-{minus_days}"]["data"]
-            prefix = f"airpollution/day/-{minus_days}"
-            s = s.replace(f"{prefix}/hour/", "list/")
-            wrk_typ = f"airpollution-{minus_days}"
-        elif s.startswith("airpollution/hour/"):
-            wrk = self._data_sources[self._data_source_key_airpollution_forecast]["data"]
-            prefix = "airpollution/hour/"
-            s = s.replace(prefix, "list/")
+            wrk = self._data_sources[f'airpollution-{minus_days}']['data']
+            prefix = f'airpollution/day/-{minus_days}'
+            s = s.replace(f'{prefix}/hour/', 'list/')
+            wrk_typ = f'airpollution-{minus_days}'
+        elif s.startswith('airpollution/hour/'):
+            wrk = self._data_sources[self._data_source_key_airpollution_forecast]['data']
+            prefix = 'airpollution/hour/'
+            s = s.replace(prefix, 'list/')
             wrk_typ = self._data_source_key_airpollution_forecast
-        elif s.startswith("airpollution/"):
-            wrk = self._data_sources[self._data_source_key_airpollution_current]["data"]
-            s = s.replace("airpollution/", "list/0/")
+        elif s.startswith('airpollution/'):
+            wrk = self._data_sources[self._data_source_key_airpollution_current]['data']
+            s = s.replace('airpollution/', 'list/0/')
             wrk_typ = self._data_source_key_airpollution_current
-        elif s.startswith("alerts"):
-            wrk = self._data_sources[self._data_source_key_onecall]["data"]
-            if "alerts" not in wrk:
-                wrk.update({"alerts": [self._placebo_alarm]})
+        elif s.startswith('alerts'):
+            wrk = self._data_sources[self._data_source_key_onecall]['data']
+            if 'alerts' not in wrk:
+                wrk.update({'alerts': [self._placebo_alarm]})
             wrk_typ = self._data_source_key_onecall
         elif s in self._origins_onecall:
-            wrk = self._data_sources[self._data_source_key_onecall]["data"]
+            wrk = self._data_sources[self._data_source_key_onecall]['data']
             wrk_typ = self._data_source_key_onecall
-        elif s.startswith("day/-"):
+        elif s.startswith('day/-'):
             minus_days = s[5]
-            wrk = self._data_sources[f"onecall-{minus_days}"]["data"]
-            prefix = f"day/-{minus_days}"
-            s = s.replace(f"{prefix}/hour/", "hourly/")
+            wrk = self._data_sources[f'onecall-{minus_days}']['data']
+            prefix = f'day/-{minus_days}'
+            s = s.replace(f'{prefix}/hour/', 'hourly/')
             # wierd to have a "current" in historic data :-)
-            if not s.endswith("/eto"):
-                s = s.replace(f"{prefix}/", "current/")
-            wrk_typ = f"onecall-{minus_days}"
-        elif s.startswith("day/"):
-            wrk = self._data_sources[self._data_source_key_onecall]["data"]
+            if not s.endswith('/eto'):
+                s = s.replace(f'{prefix}/', 'current/')
+            wrk_typ = f'onecall-{minus_days}'
+        elif s.startswith('day/'):
+            wrk = self._data_sources[self._data_source_key_onecall]['data']
             try:
                 new_day = int(s[4])
-                s = s.replace(s[0:5], "daily/" + str(new_day))
+                s = s.replace(s[0:5], 'daily/' + str(new_day))
             except Exception:
-                s = s.replace("day/", "daily/0/")
+                s = s.replace('day/', 'daily/0/')
                 was_ok = False
                 self.logger.warning(
                     f"{correlation_hint}Missing integer after 'day/' assuming 'day/0/' in matchstring {owm_matchstring}"
                 )
             wrk_typ = self._data_source_key_onecall
-        elif s.startswith("hour/"):
-            wrk = self._data_sources[self._data_source_key_onecall]["data"]
+        elif s.startswith('hour/'):
+            wrk = self._data_sources[self._data_source_key_onecall]['data']
             try:
                 new_day = int(s[5])
-                s = s.replace(s[0:6], "hourly/" + str(new_day))
+                s = s.replace(s[0:6], 'hourly/' + str(new_day))
             except Exception:
-                s = s.replace("hour/", "hourly/0/")
+                s = s.replace('hour/', 'hourly/0/')
                 was_ok = False
                 self.logger.warning(
                     f"{correlation_hint}Missing integer after 'hour/' assuming 'hour/0/' in matchstring {owm_matchstring}"
@@ -410,43 +410,43 @@ class OpenWeatherMap(SmartPlugin):
             wrk_typ = self._data_source_key_onecall
         else:
             wrk_typ = self._data_source_key_weather
-            wrk = self._data_sources[self._data_source_key_weather]["data"]
+            wrk = self._data_sources[self._data_source_key_weather]['data']
 
         try:
-            if (s.startswith("current/") or s.startswith("daily/") or s.startswith("day/")) and s.endswith("/eto"):
-                s = s.replace("current/", "day/0/")
-                s = s.replace("daily/", "day/")
+            if (s.startswith('current/') or s.startswith('daily/') or s.startswith('day/')) and s.endswith('/eto'):
+                s = s.replace('current/', 'day/0/')
+                s = s.replace('daily/', 'day/')
                 ret_val = self.__calculate_eto(s, correlation_hint)
-                wrk_typ = "onecall [eto-calculation]"
+                wrk_typ = 'onecall [eto-calculation]'
             elif (
-                s.startswith("current/") or s.startswith("daily/") or s.startswith("day/") or s.startswith("hour/")
-            ) and (s.endswith("/wind_speed/beaufort") or s.endswith("/wind_speed/description")):
-                wrk_typ = "onecall [bft-calculation]"
-                mps_string = s.replace("/wind_speed/beaufort", "/wind_speed")
-                mps_string = mps_string.replace("/wind_speed/description", "/wind_speed")
+                s.startswith('current/') or s.startswith('daily/') or s.startswith('day/') or s.startswith('hour/')
+            ) and (s.endswith('/wind_speed/beaufort') or s.endswith('/wind_speed/description')):
+                wrk_typ = 'onecall [bft-calculation]'
+                mps_string = s.replace('/wind_speed/beaufort', '/wind_speed')
+                mps_string = mps_string.replace('/wind_speed/description', '/wind_speed')
                 wind_mps, updated_s = self.__get_val_from_dict(mps_string, wrk, correlation_hint, owm_matchstring)
                 bft_val = self.get_beaufort_number(wind_mps)
-                if s.endswith("/beaufort"):
+                if s.endswith('/beaufort'):
                     ret_val = bft_val
-                elif s.endswith("/description"):
+                elif s.endswith('/description'):
                     ret_val = self.get_beaufort_description(bft_val)
                 else:
-                    raise Exception(f"Cannot make sense of {s}")
+                    raise Exception(f'Cannot make sense of {s}')
                 s = updated_s
             elif (
-                s.startswith("current/") or s.startswith("daily/") or s.startswith("day/") or s.startswith("hour/")
-            ) and (s.endswith("/wind_gust/beaufort") or s.endswith("/wind_gust/description")):
-                wrk_typ = "onecall [bft-calculation]"
-                mps_string = s.replace("/wind_gust/beaufort", "/wind_gust")
-                mps_string = mps_string.replace("/wind_gust/description", "/wind_gust")
+                s.startswith('current/') or s.startswith('daily/') or s.startswith('day/') or s.startswith('hour/')
+            ) and (s.endswith('/wind_gust/beaufort') or s.endswith('/wind_gust/description')):
+                wrk_typ = 'onecall [bft-calculation]'
+                mps_string = s.replace('/wind_gust/beaufort', '/wind_gust')
+                mps_string = mps_string.replace('/wind_gust/description', '/wind_gust')
                 wind_mps, updated_s = self.__get_val_from_dict(mps_string, wrk, correlation_hint, owm_matchstring)
                 bft_val = self.get_beaufort_number(wind_mps)
-                if s.endswith("/beaufort"):
+                if s.endswith('/beaufort'):
                     ret_val = bft_val
-                elif s.endswith("/description"):
+                elif s.endswith('/description'):
                     ret_val = self.get_beaufort_description(bft_val)
                 else:
-                    raise Exception(f"Cannot make sense of {s}")
+                    raise Exception(f'Cannot make sense of {s}')
                 s = updated_s
             else:
                 ret_val, s = self.__get_val_from_dict(s, wrk, correlation_hint, owm_matchstring)
@@ -456,11 +456,11 @@ class OpenWeatherMap(SmartPlugin):
 
         return (ret_val, wrk_typ, s, was_ok)
 
-    def get_value(self, owm_matchstring, correlation_hint=""):
+    def get_value(self, owm_matchstring, correlation_hint=''):
         ret_val, _, _, _ = self.get_value_with_meta(owm_matchstring, correlation_hint)
         return ret_val
 
-    def get_value_or_raise(self, owm_matchstring, correlation_hint=""):
+    def get_value_or_raise(self, owm_matchstring, correlation_hint=''):
         ret_val, _, _, _ = self.get_value_with_meta(owm_matchstring, correlation_hint)
         if isinstance(ret_val, Exception):
             raise ret_val
@@ -474,55 +474,55 @@ class OpenWeatherMap(SmartPlugin):
 
         for item_path, owm_item_data in self._raw_items.items():
             data_source_key, item = owm_item_data
-            raw = json.dumps(self._data_sources[data_source_key]["data"], indent=4)
-            item(raw, self.get_shortname(), f"raw // {data_source_key}")
+            raw = json.dumps(self._data_sources[data_source_key]['data'], indent=4)
+            item(raw, self.get_shortname(), f'raw // {data_source_key}')
             pass
 
         for item_path, owm_item_data in self._items.items():
             owm_matchstring, item = owm_item_data
             if owm_matchstring in self._origins_layer:
-                ret_val = self.__build_url("owm_layer", item)
-                wrk_typ = "owm_layer"
-                item(ret_val, self.get_shortname(), f"{wrk_typ} // {owm_matchstring}")
-                self.logger.debug("%s OK: owm-string: %s as layer" % (item, owm_matchstring))
+                ret_val = self.__build_url('owm_layer', item)
+                wrk_typ = 'owm_layer'
+                item(ret_val, self.get_shortname(), f'{wrk_typ} // {owm_matchstring}')
+                self.logger.debug('%s OK: owm-string: %s as layer' % (item, owm_matchstring))
             else:
                 try:
                     ret_val, wrk_typ, changed_match_string, was_ok = self.get_value_with_meta(
-                        owm_matchstring, f"{item_path} "
+                        owm_matchstring, f'{item_path} '
                     )
 
                     if ret_val is None:
                         return
                     elif isinstance(ret_val, OpenWeatherMapNoValueSoftException):
                         self.logger.info(
-                            "%s INFO: owm-string: %s --> %s from wrk=%s, Info: %s"
+                            '%s INFO: owm-string: %s --> %s from wrk=%s, Info: %s'
                             % (item, owm_matchstring, changed_match_string, wrk_typ, ret_val)
                         )
                     elif isinstance(ret_val, Exception):
-                        if str(ret_val) == "cannot unpack non-iterable NoneType object":
+                        if str(ret_val) == 'cannot unpack non-iterable NoneType object':
                             self.logger.debug(
-                                "%s ERROR: owm-string: %s --> %s from wrk=%s, Error: %s"
+                                '%s ERROR: owm-string: %s --> %s from wrk=%s, Error: %s'
                                 % (item, owm_matchstring, changed_match_string, wrk_typ, ret_val)
                             )
                         else:
                             self.logger.info(
-                                "%s ERROR: owm-string: %s --> %s from wrk=%s, Error: %s"
+                                '%s ERROR: owm-string: %s --> %s from wrk=%s, Error: %s'
                                 % (item, owm_matchstring, changed_match_string, wrk_typ, ret_val)
                             )
                     else:
-                        item(ret_val, self.get_shortname(), f"{wrk_typ} // {changed_match_string}")
+                        item(ret_val, self.get_shortname(), f'{wrk_typ} // {changed_match_string}')
                         if was_ok:
                             self.logger.debug(
-                                "%s OK: owm-string: %s --> %s from wrk=%s"
+                                '%s OK: owm-string: %s --> %s from wrk=%s'
                                 % (item, owm_matchstring, changed_match_string, wrk_typ)
                             )
                         else:
                             self.logger.warning(
-                                "%s OK, FIXED: owm-string: %s --> %s from wrk=%s"
+                                '%s OK, FIXED: owm-string: %s --> %s from wrk=%s'
                                 % (item, owm_matchstring, changed_match_string, wrk_typ)
                             )
                 except Exception as e:
-                    self.logger.error("%s FATAL: owm-string: %s, Error: %s" % (item, owm_matchstring, e))
+                    self.logger.error('%s FATAL: owm-string: %s, Error: %s' % (item, owm_matchstring, e))
 
         return
 
@@ -534,19 +534,19 @@ class OpenWeatherMap(SmartPlugin):
 
         TODO: solar_rad values are kWh/m2 - the uvi values seem to coincidentally fit the scale.
         """
-        self.logger.debug("%s _calculate_eto: for %s" % ((correlation_hint, s)))
-        sunrise_value = self.get_value_or_raise(s.replace("/eto", "/sunrise"), correlation_hint)
+        self.logger.debug('%s _calculate_eto: for %s' % ((correlation_hint, s)))
+        sunrise_value = self.get_value_or_raise(s.replace('/eto', '/sunrise'), correlation_hint)
         climate_sunrise = self.shtime.utcfromtimestamp(int(sunrise_value))
-        climate_humidity = self.get_value_or_raise(s.replace("/eto", "/humidity"), correlation_hint)
-        climate_pressure = self.get_value_or_raise(s.replace("/eto", "/pressure"), correlation_hint)
+        climate_humidity = self.get_value_or_raise(s.replace('/eto', '/humidity'), correlation_hint)
+        climate_pressure = self.get_value_or_raise(s.replace('/eto', '/pressure'), correlation_hint)
         climate_min = self.get_value_or_raise(
-            s.replace("/eto", "/temp" if s.startswith("day/-") else "/temp/min"), correlation_hint
+            s.replace('/eto', '/temp' if s.startswith('day/-') else '/temp/min'), correlation_hint
         )
         climate_max = self.get_value_or_raise(
-            s.replace("/eto", "/temp" if s.startswith("day/-") else "/temp/max"), correlation_hint
+            s.replace('/eto', '/temp' if s.startswith('day/-') else '/temp/max'), correlation_hint
         )
-        climate_speed = self.get_value_or_raise(s.replace("/eto", "/wind_speed"), correlation_hint)
-        solarRad = self.get_value_or_raise(s.replace("/eto", "/uvi"), correlation_hint)
+        climate_speed = self.get_value_or_raise(s.replace('/eto', '/wind_speed'), correlation_hint)
+        solarRad = self.get_value_or_raise(s.replace('/eto', '/uvi'), correlation_hint)
         alt = float(self._elev)
         lat = float(self._lat)
 
@@ -586,22 +586,22 @@ class OpenWeatherMap(SmartPlugin):
         etWind = PT * TT * (eS - eA)
         eTo = etRad + etWind
 
-        self.logger.debug("%s _calculate_eto: %s, eTo: %s" % (correlation_hint, s, eTo))
+        self.logger.debug('%s _calculate_eto: %s, eTo: %s' % (correlation_hint, s, eTo))
         return eTo
 
     def __tokenize_matchstring(self, virtual_ms):
-        tokens = virtual_ms.split("/")
-        if tokens[0].startswith("next"):
-            mode = "next"
-        elif tokens[0].startswith("past"):
-            mode = "past"
-        numbers = "".join(filter(str.isdigit, tokens[0]))
+        tokens = virtual_ms.split('/')
+        if tokens[0].startswith('next'):
+            mode = 'next'
+        elif tokens[0].startswith('past'):
+            mode = 'past'
+        numbers = ''.join(filter(str.isdigit, tokens[0]))
         operation = tokens[1]
-        unit = tokens[0].replace(f"{mode}{numbers}", "")
-        data_field = "/".join(tokens[2:])
+        unit = tokens[0].replace(f'{mode}{numbers}', '')
+        data_field = '/'.join(tokens[2:])
 
         self.logger.debug(
-            f"transformed {virtual_ms} into: M:{mode}, n:{numbers}, u:{unit}, O:{operation}, DF: {data_field}"
+            f'transformed {virtual_ms} into: M:{mode}, n:{numbers}, u:{unit}, O:{operation}, DF: {data_field}'
         )
 
         return (mode, int(numbers), unit, operation, data_field)
@@ -610,90 +610,90 @@ class OpenWeatherMap(SmartPlugin):
         pool = []
         mode, number, unit, operation, data_field = self.__tokenize_matchstring(virtual_ms)
 
-        if mode == "next":
-            if unit == "h":
+        if mode == 'next':
+            if unit == 'h':
                 if number > 48:
                     raise Exception(
                         "Cannot get value further than 48h in future, switch unit to 'd' to see further into the future"
                     )
                 for hr in range(0, number):
-                    val = self.get_value(f"hour/{hr}/{data_field}", correlation_hint)
+                    val = self.get_value(f'hour/{hr}/{data_field}', correlation_hint)
                     if not isinstance(val, Exception):
                         pool.append(val)
-            elif unit == "d":
+            elif unit == 'd':
                 if number > 6:
-                    raise Exception("Cannot get value further than 6d in future")
+                    raise Exception('Cannot get value further than 6d in future')
                 for day in range(0, number):
-                    val = self.get_value(f"day/{day}/{data_field}", correlation_hint)
+                    val = self.get_value(f'day/{day}/{data_field}', correlation_hint)
                     if not isinstance(val, Exception):
                         pool.append(val)
-        elif mode == "past":
-            if unit == "d":
+        elif mode == 'past':
+            if unit == 'd':
                 hours = number * 24
             else:
                 hours = number
 
             days_back = int(hours / 24) + 1
-            self.logger.debug(f"PAST: {virtual_ms} into: hrs:{hours}, days_back:{days_back}")
+            self.logger.debug(f'PAST: {virtual_ms} into: hrs:{hours}, days_back:{days_back}')
             for day_back in range(days_back, -1, -1):
                 for hr in range(0, 24):
                     try:
-                        val = self.get_value(f"day/-{day_back}/hour/{hr}/{data_field}", correlation_hint)
+                        val = self.get_value(f'day/-{day_back}/hour/{hr}/{data_field}', correlation_hint)
                         if not isinstance(val, Exception):
                             pool.append(val)
                     except Exception:
                         pass
             pool = pool[-hours:]
 
-        self.logger.debug(f"{correlation_hint} {virtual_ms}  Pool: {pformat(pool, width=4000)}")
+        self.logger.debug(f'{correlation_hint} {virtual_ms}  Pool: {pformat(pool, width=4000)}')
 
-        if operation == "max":
+        if operation == 'max':
             return max(pool)
-        elif operation == "min":
+        elif operation == 'min':
             return min(pool)
-        elif operation == "avg":
+        elif operation == 'avg':
             if len(pool) == 0:
                 return 0
             return round(functools.reduce(lambda x, y: x + y, pool) / len(pool), 2)
-        elif operation == "sum":
+        elif operation == 'sum':
             if len(pool) == 0:
                 return 0
             return round(functools.reduce(lambda x, y: x + y, pool), 2)
-        elif operation == "all":
+        elif operation == 'all':
             return pool
         else:
             return f"Unknown operation '{operation}' in match_string '{virtual_ms}'"
 
     def __handle_fail(self, last_popped, current_leaf, successful_path, original_match_string, correlation_hint):
-        missing_child_path = last_popped if len(current_leaf) == 0 else f"{last_popped}/{'/'.join(current_leaf)}"
-        fail_match_string = f"{last_popped}/{'/'.join(current_leaf)}"
+        missing_child_path = last_popped if len(current_leaf) == 0 else f'{last_popped}/{"/".join(current_leaf)}'
+        fail_match_string = f'{last_popped}/{"/".join(current_leaf)}'
 
         if fail_match_string in self._soft_fails:
             soft_fail_mode = self._soft_fails[fail_match_string]
-            if soft_fail_mode == "log_info":
+            if soft_fail_mode == 'log_info':
                 raise OpenWeatherMapNoValueSoftException(
                     f"Missing child '{last_popped}' after '{'/'.join(successful_path)}' (complete path missing: {missing_child_path})"
                 )
-            elif soft_fail_mode == "no_update":
-                changed_match_string = "/".join(successful_path) + missing_child_path
+            elif soft_fail_mode == 'no_update':
+                changed_match_string = '/'.join(successful_path) + missing_child_path
                 self.logger.debug(
-                    "%s DEBUG: owm-string: %s --> %s, Missing Child, Soft-Fail to no_update"
+                    '%s DEBUG: owm-string: %s --> %s, Missing Child, Soft-Fail to no_update'
                     % (correlation_hint, original_match_string, changed_match_string)
                 )
                 return None
-            elif soft_fail_mode.startswith("number="):
-                return int(soft_fail_mode.replace("number=", ""))
-            elif soft_fail_mode.startswith("string="):
-                return soft_fail_mode.replace("string=", "")
-            elif soft_fail_mode.startswith("relative="):
-                relative_match_string = soft_fail_mode.replace("relative=", "")
-                match_path = original_match_string.split("/")
-                for fragment in relative_match_string.split("/"):
-                    if fragment == "..":
+            elif soft_fail_mode.startswith('number='):
+                return int(soft_fail_mode.replace('number=', ''))
+            elif soft_fail_mode.startswith('string='):
+                return soft_fail_mode.replace('string=', '')
+            elif soft_fail_mode.startswith('relative='):
+                relative_match_string = soft_fail_mode.replace('relative=', '')
+                match_path = original_match_string.split('/')
+                for fragment in relative_match_string.split('/'):
+                    if fragment == '..':
                         match_path.pop()
                     else:
                         match_path.append(fragment)
-                new_match_string = "/".join(match_path)
+                new_match_string = '/'.join(match_path)
                 self.logger.debug(
                     f"{correlation_hint} '{original_match_string}' is matching soft_fail '{fail_match_string}' and will query '{new_match_string}'"
                 )
@@ -708,15 +708,15 @@ class OpenWeatherMap(SmartPlugin):
         """
 
         # Check if dictionary data in variable wrk are invalid. This occurs, if download fails.
-        if wrk == "Not downloaded!":
+        if wrk == 'Not downloaded!':
             self.logger.debug(
-                f"{correlation_hint} __get_val_from_dict function aborted because dictionary data are invalid."
+                f'{correlation_hint} __get_val_from_dict function aborted because dictionary data are invalid.'
             )
             return
 
         successful_path = []
         last_popped = None
-        sp = s.split("/")
+        sp = s.split('/')
         while True:
             if (len(sp) == 0) or (wrk is None):
                 if wrk is None:
@@ -731,8 +731,8 @@ class OpenWeatherMap(SmartPlugin):
                         raise OpenWeatherMapNoValueHardException(
                             f"Integer index ({int(sp[0])}) out of range after '{'/'.join(successful_path)}'"
                         )
-                elif sp[0] == "@count":
-                    if last_popped == "alerts" and wrk[0] == self._placebo_alarm:
+                elif sp[0] == '@count':
+                    if last_popped == 'alerts' and wrk[0] == self._placebo_alarm:
                         wrk = 0
                     else:
                         wrk = len(wrk)
@@ -744,17 +744,17 @@ class OpenWeatherMap(SmartPlugin):
                     )
                     if last_popped is not None:
                         successful_path.append(last_popped)
-                    last_popped = "0"
+                    last_popped = '0'
                     continue
             else:
                 if type(wrk) is not dict:
-                    self.logger.error(f"{correlation_hint}s={s} wrk={wrk} type(wrk)={type(wrk)}")
+                    self.logger.error(f'{correlation_hint}s={s} wrk={wrk} type(wrk)={type(wrk)}')
                 wrk = wrk.get(sp[0])
 
             if last_popped is not None:
                 successful_path.append(last_popped)
             last_popped = sp.pop(0)
-        return (wrk, f"{'/'.join(successful_path)}/{last_popped}")
+        return (wrk, f'{"/".join(successful_path)}/{last_popped}')
 
     def get_daily_forecast(self, s):
         """
@@ -764,14 +764,14 @@ class OpenWeatherMap(SmartPlugin):
         Uses local time to determine which entries to include/exclude.
         """
         original_match_string = s
-        s = s.replace("forecast/daily/", "")
-        forecast = self._data_sources[self._data_source_key_forecast]["data"]
+        s = s.replace('forecast/daily/', '')
+        forecast = self._data_sources[self._data_source_key_forecast]['data']
         if forecast is None:
-            self.logger.error("get_daily_forecast: forecast is None")
+            self.logger.error('get_daily_forecast: forecast is None')
             return None
         datetime_now = datetime.now()
         date_requested = datetime(datetime_now.year, datetime_now.month, datetime_now.day)
-        sp = s.split("/")
+        sp = s.split('/')
         if self.is_int(sp[0]):
             days_in_future = int(sp[0]) + 1
             date_requested = date_requested + timedelta(days=days_in_future)
@@ -787,14 +787,14 @@ class OpenWeatherMap(SmartPlugin):
         too_far = date_requested + timedelta(days=1)
         wrk = []
         if forecast is not None:
-            forecast_list = forecast.get("list")
+            forecast_list = forecast.get('list')
             if forecast_list is not None:
                 for entry in forecast_list:
-                    dt = int(entry.get("dt"))
+                    dt = int(entry.get('dt'))
                     if dt >= int(too_far.timestamp()):
                         break
                     if dt >= int(date_requested.timestamp()):
-                        val, _ = self.__get_val_from_dict("/".join(sp), entry, "", original_match_string)
+                        val, _ = self.__get_val_from_dict('/'.join(sp), entry, '', original_match_string)
                         if isinstance(val, float) or isinstance(val, int):
                             wrk.append(val)
                         elif val is None:
@@ -814,13 +814,13 @@ class OpenWeatherMap(SmartPlugin):
             else:
                 self.logger.error("get_daily_forecast: forecast.get('list') is None.")
         else:
-            self.logger.error("get_daily_forecast: forecast data is None.")
+            self.logger.error('get_daily_forecast: forecast data is None.')
             return 0
 
         result = 0
-        if "max" in sp[len(sp) - 1]:
+        if 'max' in sp[len(sp) - 1]:
             result = max(wrk)
-        elif "min" in sp[len(sp) - 1]:
+        elif 'min' in sp[len(sp) - 1]:
             result = min(wrk)
         else:  # average
             result = round(functools.reduce(lambda x, y: x + y, wrk) / len(wrk), 2)
@@ -830,9 +830,9 @@ class OpenWeatherMap(SmartPlugin):
         if only_if or force:
             self.__query_api(data_source_key, delta_t, force)
         else:
-            if self._data_sources[data_source_key]["data"] == "Not downloaded!":
-                self._data_sources[data_source_key]["data"] = (
-                    "Not requested by any item, you may download this via the web-interface!"
+            if self._data_sources[data_source_key]['data'] == 'Not downloaded!':
+                self._data_sources[data_source_key]['data'] = (
+                    'Not requested by any item, you may download this via the web-interface!'
                 )
             # otherwise keep previous data
 
@@ -845,12 +845,12 @@ class OpenWeatherMap(SmartPlugin):
             url = self.__build_url(data_source_key, delta_t=delta_t, force=force)
             response = self._session.get(url)
         except Exception as e:
-            self.logger.error(f"Request failed for DataSource {data_source_key}: {str(e)}")
+            self.logger.error(f'Request failed for DataSource {data_source_key}: {str(e)}')
             return False
 
         if response.ok:
             num_bytes = len(response.content)
-            self.logger.debug(f"Received {num_bytes} bytes for {data_source_key} from {url}")
+            self.logger.debug(f'Received {num_bytes} bytes for {data_source_key} from {url}')
             if num_bytes < 50:
                 self.logger.error(
                     f"Response for {data_source_key} from {url} was too short to be meaningful ({num_bytes} bytes): '{response.content}'"
@@ -859,9 +859,9 @@ class OpenWeatherMap(SmartPlugin):
             try:
                 json_obj = response.json()
 
-                self._data_sources[data_source_key]["url"] = url
-                self._data_sources[data_source_key]["fetched"] = datetime.now()
-                self._data_sources[data_source_key]["data"] = json_obj
+                self._data_sources[data_source_key]['url'] = url
+                self._data_sources[data_source_key]['fetched'] = datetime.now()
+                self._data_sources[data_source_key]['data'] = json_obj
                 return True
             except json.JSONDecodeError as decode_error:
                 self.logger.error(
@@ -884,7 +884,7 @@ class OpenWeatherMap(SmartPlugin):
 
         :param item: The item to process.
         """
-        owm_raw = self.get_iattr_value(item.conf, "owm_raw_file")
+        owm_raw = self.get_iattr_value(item.conf, 'owm_raw_file')
         if owm_raw:
             for ds_key in self._data_sources:
                 if owm_raw == ds_key:
@@ -893,60 +893,60 @@ class OpenWeatherMap(SmartPlugin):
             self.logger.warn(f"Unmatched owm_raw_file name '{owm_raw}'")
             return
 
-        owm_pfx = self.get_iattr_value(item.conf, "owm_match_prefix")
-        owm_ms = self.get_iattr_value(item.conf, "owm_matchstring")
+        owm_pfx = self.get_iattr_value(item.conf, 'owm_match_prefix')
+        owm_ms = self.get_iattr_value(item.conf, 'owm_matchstring')
         if owm_ms:
             if owm_pfx:
-                owm_ms = f"{owm_pfx}/{owm_ms}"
-                owm_ms = owm_ms.replace("///", "/")
-                owm_ms = owm_ms.replace("//", "/")
+                owm_ms = f'{owm_pfx}/{owm_ms}'
+                owm_ms = owm_ms.replace('///', '/')
+                owm_ms = owm_ms.replace('//', '/')
 
             self._items[item.property.path] = (owm_ms, item)
 
             if owm_ms in self._origins_weather:
                 self._request_weather = True
-            elif owm_ms.startswith("uvi_"):
+            elif owm_ms.startswith('uvi_'):
                 self.logger.warning(
                     f"{item.property.path} The UVI API is deprecated - if you intend to query the current UV-index, use 'current/uvi' instead"
                 )
                 self._request_uvi = True
-            elif owm_ms.startswith("forecast"):
+            elif owm_ms.startswith('forecast'):
                 self._request_forecast = True
-            elif owm_ms.startswith("current"):
+            elif owm_ms.startswith('current'):
                 self._request_current = True
-            elif owm_ms.startswith("minute"):
+            elif owm_ms.startswith('minute'):
                 self._request_minutely = True
-            elif owm_ms.startswith("hour"):
+            elif owm_ms.startswith('hour'):
                 self._request_hourly = True
-            elif owm_ms.startswith("day/-0"):
+            elif owm_ms.startswith('day/-0'):
                 self._request_back0day = True
-            elif owm_ms.startswith("day/-1"):
+            elif owm_ms.startswith('day/-1'):
                 self._request_back1day = True
-            elif owm_ms.startswith("day/-2"):
+            elif owm_ms.startswith('day/-2'):
                 self._request_back2day = True
-            elif owm_ms.startswith("day/-3"):
+            elif owm_ms.startswith('day/-3'):
                 self._request_back3day = True
-            elif owm_ms.startswith("day/-4"):
+            elif owm_ms.startswith('day/-4'):
                 self._request_back4day = True
-            elif owm_ms.startswith("airpollution/hour"):
+            elif owm_ms.startswith('airpollution/hour'):
                 self._request_airpollution_forecast = True
-            elif owm_ms.startswith("airpollution/day/-1"):
+            elif owm_ms.startswith('airpollution/day/-1'):
                 self._request_airpollution_back1day = True
-            elif owm_ms.startswith("airpollution/day/-2"):
+            elif owm_ms.startswith('airpollution/day/-2'):
                 self._request_airpollution_back2day = True
-            elif owm_ms.startswith("airpollution/day/-3"):
+            elif owm_ms.startswith('airpollution/day/-3'):
                 self._request_airpollution_back3day = True
-            elif owm_ms.startswith("airpollution/day/-4"):
+            elif owm_ms.startswith('airpollution/day/-4'):
                 self._request_airpollution_back4day = True
-            elif owm_ms.startswith("airpollution/"):
+            elif owm_ms.startswith('airpollution/'):
                 self._request_airpollution_current = True
-            elif owm_ms.startswith("day"):
+            elif owm_ms.startswith('day'):
                 self._request_daily = True
-            elif owm_ms.startswith("alerts"):
+            elif owm_ms.startswith('alerts'):
                 self._request_alerts = True
-            elif owm_ms.startswith("virtual/past"):
+            elif owm_ms.startswith('virtual/past'):
                 _, number, unit, _, _ = self.__tokenize_matchstring(owm_ms[8:])
-                if unit == "d":
+                if unit == 'd':
                     hours = number * 24
                 else:
                     hours = number
@@ -959,7 +959,7 @@ class OpenWeatherMap(SmartPlugin):
                     self._request_back2day = True
                 self._request_back0day = True
                 self._request_back1day = True
-            elif owm_ms.startswith("virtual/next"):
+            elif owm_ms.startswith('virtual/next'):
                 self._request_hourly = True
 
     def __get_timestamp_for_delta_days(self, delta_t):
@@ -981,80 +981,80 @@ class OpenWeatherMap(SmartPlugin):
         @param url_type: url type (currently on 'forecast', as historic data are not supported.
         @return: string of the url
         """
-        url = ""
+        url = ''
         if url_type is None or url_type == self._data_source_key_weather:
-            url = self._base_url + "data/" + "2.5" + "/weather"
-            parameters = "?lat=%s&lon=%s&appid=%s&lang=%s&units=%s" % (
+            url = self._base_url + 'data/' + '2.5' + '/weather'
+            parameters = '?lat=%s&lon=%s&appid=%s&lang=%s&units=%s' % (
                 self._lat,
                 self._lon,
                 self._key,
                 self._lang,
                 self._units,
             )
-            url = "%s%s" % (url, parameters)
+            url = '%s%s' % (url, parameters)
         elif url_type == self._data_source_key_forecast:
-            url = self._base_url + "data/" + "2.5" + "/forecast"
-            parameters = "?lat=%s&lon=%s&appid=%s&lang=%s&units=%s" % (
+            url = self._base_url + 'data/' + '2.5' + '/forecast'
+            parameters = '?lat=%s&lon=%s&appid=%s&lang=%s&units=%s' % (
                 self._lat,
                 self._lon,
                 self._key,
                 self._lang,
                 self._units,
             )
-            url = "%s%s" % (url, parameters)
+            url = '%s%s' % (url, parameters)
         elif url_type == self._data_source_key_uvi:
-            url = self._base_url + "data/" + "2.5" + "/uvi"
-            parameters = "?lat=%s&lon=%s&appid=%s&lang=%s&units=%s" % (
+            url = self._base_url + 'data/' + '2.5' + '/uvi'
+            parameters = '?lat=%s&lon=%s&appid=%s&lang=%s&units=%s' % (
                 self._lat,
                 self._lon,
                 self._key,
                 self._lang,
                 self._units,
             )
-            url = "%s%s" % (url, parameters)
+            url = '%s%s' % (url, parameters)
         elif url_type == self._data_source_key_airpollution_current:
-            url = self._base_url + "data/" + "2.5" + "/air_pollution"
-            parameters = "?lat=%s&lon=%s&appid=%s" % (self._lat, self._lon, self._key)
-            url = "%s%s" % (url, parameters)
+            url = self._base_url + 'data/' + '2.5' + '/air_pollution'
+            parameters = '?lat=%s&lon=%s&appid=%s' % (self._lat, self._lon, self._key)
+            url = '%s%s' % (url, parameters)
         elif url_type == self._data_source_key_airpollution_forecast:
-            url = self._base_url + "data/" + "2.5" + "/air_pollution/history"
-            parameters = "?lat=%s&lon=%s&start=%i&end=%i&appid=%s" % (
+            url = self._base_url + 'data/' + '2.5' + '/air_pollution/history'
+            parameters = '?lat=%s&lon=%s&start=%i&end=%i&appid=%s' % (
                 self._lat,
                 self._lon,
                 self.shtime.utcnow().timestamp(),
                 self.__get_timestamp_for_delta_days(5),
                 self._key,
             )
-            url = "%s%s" % (url, parameters)
-        elif url_type.startswith("airpollution-"):
-            url = self._base_url + "data/" + "2.5" + "/air_pollution/history"
-            parameters = "?lat=%s&lon=%s&start=%i&end=%i&appid=%s" % (
+            url = '%s%s' % (url, parameters)
+        elif url_type.startswith('airpollution-'):
+            url = self._base_url + 'data/' + '2.5' + '/air_pollution/history'
+            parameters = '?lat=%s&lon=%s&start=%i&end=%i&appid=%s' % (
                 self._lat,
                 self._lon,
                 self.__get_timestamp_for_delta_days(delta_t),
                 self.__get_timestamp_for_delta_days(delta_t + 1),
                 self._key,
             )
-            url = "%s%s" % (url, parameters)
+            url = '%s%s' % (url, parameters)
         elif url_type == self._data_source_key_onecall:
             # Two different API versions exists for the onecall API: 2.5 and 3.0, configurable via plugin config.
-            url = self._base_url + "data/" + self._api_version + "/onecall"
+            url = self._base_url + 'data/' + self._api_version + '/onecall'
             if force:
-                exclude = ""
+                exclude = ''
             else:
                 excluded = []
                 if not self._request_current:
-                    excluded.append("current")
+                    excluded.append('current')
                 if not self._request_minutely:
-                    excluded.append("minutely")
+                    excluded.append('minutely')
                 if not self._request_hourly:
-                    excluded.append("hourly")
+                    excluded.append('hourly')
                 if not self._request_daily:
-                    excluded.append("daily")
+                    excluded.append('daily')
                 if not self._request_alerts:
-                    excluded.append("alerts")
-                exclude = ",".join(excluded)
-            parameters = "?lat=%s&lon=%s&exclude=%s&appid=%s&lang=%s&units=%s" % (
+                    excluded.append('alerts')
+                exclude = ','.join(excluded)
+            parameters = '?lat=%s&lon=%s&exclude=%s&appid=%s&lang=%s&units=%s' % (
                 self._lat,
                 self._lon,
                 exclude,
@@ -1062,11 +1062,11 @@ class OpenWeatherMap(SmartPlugin):
                 self._lang,
                 self._units,
             )
-            url = "%s%s" % (url, parameters)
-        elif url_type.startswith("onecall-"):
+            url = '%s%s' % (url, parameters)
+        elif url_type.startswith('onecall-'):
             # Two different API versions exists for the onecall API: 2.5 and 3.0, configurable via plugin config.
-            url = self._base_url + "data/" + self._api_version + "/onecall/timemachine"
-            parameters = "?lat=%s&lon=%s&dt=%i&appid=%s&lang=%s&units=%s" % (
+            url = self._base_url + 'data/' + self._api_version + '/onecall/timemachine'
+            parameters = '?lat=%s&lon=%s&dt=%i&appid=%s&lang=%s&units=%s' % (
                 self._lat,
                 self._lon,
                 self.__get_timestamp_for_delta_days(delta_t),
@@ -1074,70 +1074,70 @@ class OpenWeatherMap(SmartPlugin):
                 self._lang,
                 self._units,
             )
-            url = "%s%s" % (url, parameters)
-        elif url_type == "owm_layer":
-            if self.has_iattr(item.conf, "owm_matchstring"):
-                layer = self.get_iattr_value(item.conf, "owm_matchstring")
-            elif "owm_matchstring" in item.conf:
-                layer = item.conf["owm_matchstring"]
+            url = '%s%s' % (url, parameters)
+        elif url_type == 'owm_layer':
+            if self.has_iattr(item.conf, 'owm_matchstring'):
+                layer = self.get_iattr_value(item.conf, 'owm_matchstring')
+            elif 'owm_matchstring' in item.conf:
+                layer = item.conf['owm_matchstring']
 
-            if self.has_iattr(item.conf, "owm_coord_z"):
-                z = self.get_iattr_value(item.conf, "owm_coord_z")
-            elif "owm_coord_z" in item.conf:
-                z = item.conf["owm_coord_z"]
+            if self.has_iattr(item.conf, 'owm_coord_z'):
+                z = self.get_iattr_value(item.conf, 'owm_coord_z')
+            elif 'owm_coord_z' in item.conf:
+                z = item.conf['owm_coord_z']
             else:
-                self.logger.warning(f"{item.property.path} owm_coord_z attribute not set for item, setting default 7")
+                self.logger.warning(f'{item.property.path} owm_coord_z attribute not set for item, setting default 7')
                 z = 7
 
             x_fallback, y_fallback = self.__get_map_tile_from_geo_coord(float(self._lat), float(self._lon), z)
 
-            if self.has_iattr(item.conf, "owm_coord_x"):
-                x = self.get_iattr_value(item.conf, "owm_coord_x")
-            elif "owm_coord_x" in item.conf:
-                x = item.conf["owm_coord_x"]
+            if self.has_iattr(item.conf, 'owm_coord_x'):
+                x = self.get_iattr_value(item.conf, 'owm_coord_x')
+            elif 'owm_coord_x' in item.conf:
+                x = item.conf['owm_coord_x']
             else:
                 x = x_fallback
                 self.logger.warning(
-                    f"{item.property.path} owm_coord_x attribute not set for item, setting default as per plugin-coordinates: {x}"
+                    f'{item.property.path} owm_coord_x attribute not set for item, setting default as per plugin-coordinates: {x}'
                 )
 
-            if self.has_iattr(item.conf, "owm_coord_y"):
-                y = self.get_iattr_value(item.conf, "owm_coord_y")
-            elif "owm_coord_y" in item.conf:
-                y = item.conf["y"]
+            if self.has_iattr(item.conf, 'owm_coord_y'):
+                y = self.get_iattr_value(item.conf, 'owm_coord_y')
+            elif 'owm_coord_y' in item.conf:
+                y = item.conf['y']
             else:
                 y = y_fallback
                 self.logger.warning(
-                    f"{item.property.path} owm_coord_y attribute not set for item, setting default as per plugin-coordinates: {y}"
+                    f'{item.property.path} owm_coord_y attribute not set for item, setting default as per plugin-coordinates: {y}'
                 )
 
             url = self._base_img_url % (layer, z, x, y, self._key)
         else:
-            self.logger.error("%s __build_url: Wrong url type specified: %s" % (item.property.path, url_type))
+            self.logger.error('%s __build_url: Wrong url type specified: %s' % (item.property.path, url_type))
         return url
 
     def _get_all_data_for_webif(self):
         rslt = []
         for data_source_key in self._data_sources:
-            src = self._data_sources[data_source_key]["data"]
+            src = self._data_sources[data_source_key]['data']
             rslt.append(
                 {
-                    "key": data_source_key.replace("-", "_minus_"),
-                    "data": json.dumps(src, indent=4),
-                    "url": self._data_sources[data_source_key]["url"],
-                    "fetched": self._data_sources[data_source_key]["fetched"],
+                    'key': data_source_key.replace('-', '_minus_'),
+                    'data': json.dumps(src, indent=4),
+                    'url': self._data_sources[data_source_key]['url'],
+                    'fetched': self._data_sources[data_source_key]['fetched'],
                 }
             )
 
         return rslt
 
     def get_raw_data_file(self, data_source_key):
-        src = self._data_sources[data_source_key]["data"]
+        src = self._data_sources[data_source_key]['data']
         return json.dumps(src, indent=4)
 
     def _get_position_hint_within_json(self, data_source_key, match_string_within_file):
-        splitted = match_string_within_file.split("/")
-        src = self._data_sources[data_source_key]["data"]
+        splitted = match_string_within_file.split('/')
+        src = self._data_sources[data_source_key]['data']
         daten = json.dumps(src, indent=4).splitlines()
 
         last_line = 0
@@ -1145,14 +1145,14 @@ class OpenWeatherMap(SmartPlugin):
             if splitted[pos_in_match_string].isnumeric():
                 number = int(splitted[pos_in_match_string]) + 1
                 for line_in_file in range(last_line, len(daten)):
-                    now_search_for = ((" " * 4) * (pos_in_match_string + 1)) + "{"
+                    now_search_for = ((' ' * 4) * (pos_in_match_string + 1)) + '{'
                     if daten[line_in_file] == now_search_for:
                         number = number - 1
                         if number == 0:
                             last_line = line_in_file
                             break
             else:
-                now_search_for = ((" " * 4) * (pos_in_match_string + 1)) + f'"{splitted[pos_in_match_string]}":'
+                now_search_for = ((' ' * 4) * (pos_in_match_string + 1)) + f'"{splitted[pos_in_match_string]}":'
                 for line_in_file in range(last_line, len(daten)):
                     if daten[line_in_file].startswith(now_search_for):
                         last_line = line_in_file
@@ -1184,7 +1184,7 @@ class OpenWeatherMap(SmartPlugin):
 
     def get_beaufort_description(self, speed_in_bft):
         if speed_in_bft is None:
-            self.logger.warning("speed_in_bft is given as None")
+            self.logger.warning('speed_in_bft is given as None')
             return None
         if type(speed_in_bft) is not int:
             self.logger.error(f"speed_in_bft is not given as int: '{speed_in_bft}'")
@@ -1192,6 +1192,6 @@ class OpenWeatherMap(SmartPlugin):
         if (speed_in_bft < 0) or (speed_in_bft > 12):
             self.logger.error(f"speed_in_bft is out of scale: '{speed_in_bft}'")
             return None
-        if self._lang == "de":
+        if self._lang == 'de':
             return self._beaufort_descriptions_de[speed_in_bft]
         return self._beaufort_descriptions_en[speed_in_bft]

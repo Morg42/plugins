@@ -107,7 +107,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # Setting pagelength (max. number of table entries per page) for web interface
         try:
             pagelength = self.plugin.webif_pagelength
@@ -117,7 +117,7 @@ class WebInterface(SmartPluginWebIf):
         return tmpl.render(
             p=self.plugin,
             webif_pagelength=pagelength,
-            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])),
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
             item_count=0,
         )
 
@@ -169,33 +169,33 @@ class WebInterface(SmartPluginWebIf):
 
         :return: result of the evaluation
         """
-        result = ""
+        result = ''
 
         g = {}
-        loc = {"sh": self.plugin.get_sh()}
-        self.logger.debug(f"eval {eline} (raw) for item path {path}")
+        loc = {'sh': self.plugin.get_sh()}
+        self.logger.debug(f'eval {eline} (raw) for item path {path}')
         eline = urllib.parse.unquote(eline)
-        if path != "":
+        if path != '':
             try:
                 path = self.items.return_item(path)
-                eline = path.get_stringwithabsolutepathes(eline, "sh.", "(")
-                eline = path.get_stringwithabsolutepathes(eline, "sh.", ".property")
-                self.logger.debug(f"eval {eline} (unquoted) for item path {path}")
+                eline = path.get_stringwithabsolutepathes(eline, 'sh.', '(')
+                eline = path.get_stringwithabsolutepathes(eline, 'sh.', '.property')
+                self.logger.debug(f'eval {eline} (unquoted) for item path {path}')
             except Exception as e:
                 res = f"Error '{e}' while evaluating"
-                result = f"{res}"
+                result = f'{res}'
                 return result
 
         try:
             if eline:
                 res = eval(eline, g, loc)
             else:
-                res = "Nothing to do"
+                res = 'Nothing to do'
         except Exception as e:
             res = f"Error '{e}' while evaluating"
 
-        result = f"{res}"
-        self.logger.debug(f"{result=}")
+        result = f'{res}'
+        self.logger.debug(f'{result=}')
         return result
 
     @cherrypy.expose
@@ -205,7 +205,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: result of the evaluation
         """
-        result = ""
+        result = ''
         stub_logger = Stub(
             warning=print,
             info=print,
@@ -220,110 +220,110 @@ class WebInterface(SmartPluginWebIf):
 
         g = {}
         loc = {
-            "sh": self.plugin.get_sh(),
-            "time": time,
-            "datetime": datetime,
-            "random": random,
-            "json": json,
-            "pprint": pprint,
-            "logger": stub_logger,
-            "logging": logging,
+            'sh': self.plugin.get_sh(),
+            'time': time,
+            'datetime': datetime,
+            'random': random,
+            'json': json,
+            'pprint': pprint,
+            'logger': stub_logger,
+            'logging': logging,
         }
-        self.logger.debug(f"Got request to evaluate {eline} (raw)")
+        self.logger.debug(f'Got request to evaluate {eline} (raw)')
         eline = urllib.parse.unquote(eline)
-        self.logger.debug(f"Got request to evaluate {eline} (unquoted)")
+        self.logger.debug(f'Got request to evaluate {eline} (unquoted)')
         with PrintCapture() as p:
             try:
                 if eline:
                     exec(eline, g, loc)
-                res = ""
+                res = ''
             except Exception as e:
                 res = f"Error '{e}' while evaluating"
 
-        result = "".join(p.data) + res
-        self.logger.debug(f"{result=}")
+        result = ''.join(p.data) + res
+        self.logger.debug(f'{result=}')
         return result
 
     @cherrypy.expose
-    def get_code(self, filename=""):
+    def get_code(self, filename=''):
         """loads and returns the given filename from the defined script path"""
-        self.logger.debug(f"get_code called with {filename=}")
+        self.logger.debug(f'get_code called with {filename=}')
         try:
-            if (self.plugin.executor_scripts is not None and filename != "") or filename.startswith("examples/"):
-                if filename.startswith("examples/"):
+            if (self.plugin.executor_scripts is not None and filename != '') or filename.startswith('examples/'):
+                if filename.startswith('examples/'):
                     filepath = os.path.join(self.plugin.get_plugin_dir(), filename)
-                    self.logger.debug(f"Getting file from example path {filepath=}")
+                    self.logger.debug(f'Getting file from example path {filepath=}')
                 else:
                     filepath = os.path.join(self.plugin.executor_scripts, filename)
-                    self.logger.debug(f"Getting file from script path {filepath=}")
+                    self.logger.debug(f'Getting file from script path {filepath=}')
                 code_file = open(filepath)
                 data = code_file.read()
                 code_file.close()
                 return data
         except Exception as e:
-            self.logger.error(f"{filepath} could not be read: {e}")
-        return f"### {filename} could not be read ###"
+            self.logger.error(f'{filepath} could not be read: {e}')
+        return f'### {filename} could not be read ###'
 
     @cherrypy.expose
-    def save_code(self, filename="", code=""):
+    def save_code(self, filename='', code=''):
         """save the given code at filename from the defined script path"""
-        self.logger.debug(f"save_code called with {filename=}")
+        self.logger.debug(f'save_code called with {filename=}')
         try:
-            if self.plugin.executor_scripts is not None and filename != "" and code != "":
-                if "/" in filename or "\\" in filename or ".." in filename:
-                    raise ValueError("Special Characters not allowed in filename")
-                if filename[-3:] != ".py":
-                    filename += ".py"
+            if self.plugin.executor_scripts is not None and filename != '' and code != '':
+                if '/' in filename or '\\' in filename or '..' in filename:
+                    raise ValueError('Special Characters not allowed in filename')
+                if filename[-3:] != '.py':
+                    filename += '.py'
                 filepath = os.path.join(self.plugin.executor_scripts, filename)
-                self.logger.debug(f"{filepath=}")
-                with open(filepath, "w") as code_file:
+                self.logger.debug(f'{filepath=}')
+                with open(filepath, 'w') as code_file:
                     code_file.write(code)
-                return f"{filename} was saved"
+                return f'{filename} was saved'
         except Exception as e:
-            self.logger.error(f"{filepath} could not be saved, {e}")
-        return f"{filename} could not be saved"
+            self.logger.error(f'{filepath} could not be saved, {e}')
+        return f'{filename} could not be saved'
 
     @cherrypy.expose
-    def delete_file(self, filename=""):
+    def delete_file(self, filename=''):
         """deletes the file with given filename from the defined script path"""
-        self.logger.debug(f"delete_file called with {filename=}")
+        self.logger.debug(f'delete_file called with {filename=}')
         try:
-            if self.plugin.executor_scripts is not None and filename != "":
+            if self.plugin.executor_scripts is not None and filename != '':
                 filepath = os.path.join(self.plugin.executor_scripts, filename)
                 if os.path.exists(filepath) and os.path.isfile(filepath):
                     os.remove(filepath)
-                    self.logger.debug(f"{filepath} successfully deleted")
-                    return f"{filepath} successfully deleted"
+                    self.logger.debug(f'{filepath} successfully deleted')
+                    return f'{filepath} successfully deleted'
                 else:
-                    self.logger.debug(f"{filepath} was not deleted")
+                    self.logger.debug(f'{filepath} was not deleted')
         except Exception as e:
-            self.logger.error(f"{e}: {filepath} could not be deleted")
-        return f"### {filename} could not be deleted ###"
+            self.logger.error(f'{e}: {filepath} could not be deleted')
+        return f'### {filename} could not be deleted ###'
 
     @cherrypy.expose
     def get_filelist(self):
         """returns all filenames from the defined script path with suffix ``.py``, newest first"""
         files = []
         files2 = []
-        subdir = "{}/examples".format(self.plugin.get_plugin_dir())
-        self.logger.debug(f"list files in plugin examples {subdir}")
+        subdir = '{}/examples'.format(self.plugin.get_plugin_dir())
+        self.logger.debug(f'list files in plugin examples {subdir}')
 
         def mtime(f):
             return os.stat(os.path.join(subdir, f)).st_mtime
 
         files = list(reversed(sorted(os.listdir(subdir), key=mtime)))
         files = [f for f in files if os.path.isfile(os.path.join(subdir, f))]
-        files = ["examples/{}".format(f) for f in files if f.endswith(".py")]
+        files = ['examples/{}'.format(f) for f in files if f.endswith('.py')]
         # files = '\n'.join(f for f in files)
-        self.logger.debug(f"Examples Scripts {files}")
+        self.logger.debug(f'Examples Scripts {files}')
         if self.plugin.executor_scripts is not None:
             subdir = self.plugin.executor_scripts
-            self.logger.debug(f"list files in {subdir}")
+            self.logger.debug(f'list files in {subdir}')
             files2 = list(reversed(sorted(os.listdir(subdir), key=mtime)))
             files2 = [f for f in files2 if os.path.isfile(os.path.join(subdir, f))]
-            files2 = [f for f in files2 if f.endswith(".py")]
+            files2 = [f for f in files2 if f.endswith('.py')]
             # files = '\n'.join(f for f in files)
-            self.logger.debug(f"User scripts {files2}")
+            self.logger.debug(f'User scripts {files2}')
 
         return json.dumps(files2 + files)
 
@@ -339,11 +339,11 @@ class WebInterface(SmartPluginWebIf):
                     api = x.metadata.get_plugin_function_defstrings(with_type=True, with_default=True)
                     if api is not None:
                         for function in api:
-                            plugin_list.append("sh." + plugin_config_name + "." + function)
+                            plugin_list.append('sh.' + plugin_config_name + '.' + function)
 
         myItems = _sh.return_items()
         itemList = []
         for item in myItems:
-            itemList.append("sh." + str(item.property.path) + "()")
-        retValue = {"items": itemList, "plugins": plugin_list}
+            itemList.append('sh.' + str(item.property.path) + '()')
+        retValue = {'items': itemList, 'plugins': plugin_list}
         return json.dumps(retValue)

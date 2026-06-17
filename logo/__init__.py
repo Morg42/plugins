@@ -36,7 +36,7 @@ from lib.item import Items
 
 
 class LOGO(SmartPlugin):
-    PLUGIN_VERSION = "1.2.4"
+    PLUGIN_VERSION = '1.2.4'
 
     def __init__(self, sh):
         # Call init code of parent class (SmartPlugin)
@@ -44,13 +44,13 @@ class LOGO(SmartPlugin):
 
         from bin.smarthome import VERSION
 
-        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
+        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
             self.logger = logging.getLogger(__name__)
 
-        self.host = self.get_parameter_value("host")
-        self.port = self.get_parameter_value("port")
-        self._version = self.get_parameter_value("version")
-        self._io_wait = self.get_parameter_value("io_wait")
+        self.host = self.get_parameter_value('host')
+        self.port = self.get_parameter_value('port')
+        self._version = self.get_parameter_value('version')
+        self._io_wait = self.get_parameter_value('io_wait')
         self._sock = False
         self._lock = threading.Lock()
         self.connected = False
@@ -62,35 +62,35 @@ class LOGO(SmartPlugin):
         self._vm = 0  # lesen der VM ab VM-Adresse VM0
         self._vm_len = 850  # Anzahl der zu lesenden Bytes VM0-850
         self.tableVM_IO = {  # Address-Tab der I,Q,M,AI,AQ,AM im PLC-VM-Buffer
-            "I": {"VMaddr": 923, "bytes": 3, "bits": 24},
-            "Q": {"VMaddr": 942, "bytes": 2, "bits": 16},
-            "M": {"VMaddr": 948, "bytes": 3, "bits": 27},
-            "AI": {"VMaddr": 926, "words": 8},
-            "AQ": {"VMaddr": 944, "words": 2},
-            "AM": {"VMaddr": 952, "words": 16},
-            "VM": {"VMaddr": 0, "bytes": 850},
+            'I': {'VMaddr': 923, 'bytes': 3, 'bits': 24},
+            'Q': {'VMaddr': 942, 'bytes': 2, 'bits': 16},
+            'M': {'VMaddr': 948, 'bytes': 3, 'bits': 27},
+            'AI': {'VMaddr': 926, 'words': 8},
+            'AQ': {'VMaddr': 944, 'words': 2},
+            'AM': {'VMaddr': 952, 'words': 16},
+            'VM': {'VMaddr': 0, 'bytes': 850},
         }
-        self.logger.info("LOGO: init {0}:{1} ".format(self.get_instance_name(), self.host))
+        self.logger.info('LOGO: init {0}:{1} '.format(self.get_instance_name(), self.host))
 
         # Hardware Version 0BA8
         self._vmIO_0BA8 = 1024  # lesen der I Q M AI AQ AM ab VM-Adresse VM1024
         self._vmIO_len_0BA8 = 445  # Anzahl der zu lesenden Bytes 445
         self.table_VM_IO_0BA8 = {  # Address-Tab der I,Q,M,AI,AQ,AM im PLC-VM-Buffer
-            "I": {"VMaddr": 1024, "bytes": 8, "bits": 64},
-            "Q": {"VMaddr": 1064, "bytes": 8, "bits": 64},
-            "M": {"VMaddr": 1104, "bytes": 14, "bits": 112},
-            "AI": {"VMaddr": 1032, "words": 16},
-            "AQ": {"VMaddr": 1072, "words": 16},
-            "AM": {"VMaddr": 1118, "words": 64},
-            "NI": {"VMaddr": 1256, "bytes": 16, "bits": 128},
-            "NAI": {"VMaddr": 1262, "words": 64},
-            "NQ": {"VMaddr": 1390, "bytes": 16, "bits": 128},
-            "NAQ": {"VMaddr": 1406, "words": 32},
-            "VM": {"VMaddr": 0, "bytes": 850},
+            'I': {'VMaddr': 1024, 'bytes': 8, 'bits': 64},
+            'Q': {'VMaddr': 1064, 'bytes': 8, 'bits': 64},
+            'M': {'VMaddr': 1104, 'bytes': 14, 'bits': 112},
+            'AI': {'VMaddr': 1032, 'words': 16},
+            'AQ': {'VMaddr': 1072, 'words': 16},
+            'AM': {'VMaddr': 1118, 'words': 64},
+            'NI': {'VMaddr': 1256, 'bytes': 16, 'bits': 128},
+            'NAI': {'VMaddr': 1262, 'words': 64},
+            'NQ': {'VMaddr': 1390, 'bytes': 16, 'bits': 128},
+            'NAQ': {'VMaddr': 1406, 'words': 32},
+            'VM': {'VMaddr': 0, 'bytes': 850},
         }
 
-        if self._version == "0BA8":
-            self.logger.info("{0}: LOGO-Version {1}".format(self.get_instance_name(), self._version))
+        if self._version == '0BA8':
+            self.logger.info('{0}: LOGO-Version {1}'.format(self.get_instance_name(), self._version))
             self.tableVM_IO = self.table_VM_IO_0BA8
             self._vmIO = self._vmIO_0BA8
             self._vmIO_len = self._vmIO_len_0BA8
@@ -98,7 +98,7 @@ class LOGO(SmartPlugin):
 
         self.reads = {}
         self.writes = {}
-        self.Dateipfad = "/lib"  # Dateipfad zur Bibliothek
+        self.Dateipfad = '/lib'  # Dateipfad zur Bibliothek
         self.threadLastRead = 0  # verstrichene Zeit zwischen zwei LeseBefehlen
 
         self.get_sh().connections.monitor(self)  # damit connect ausgeführt wird
@@ -111,7 +111,7 @@ class LOGO(SmartPlugin):
         self.rack = 1
         self.slot = 0
         self.mpi = 2
-        self.dave = ""
+        self.dave = ''
         self.daveDB = 132
         self.daveFlags = 131
         self.daveOutputs = 130
@@ -122,28 +122,28 @@ class LOGO(SmartPlugin):
     def connect(self):
         self._lock.acquire()
         try:
-            self.logger.info("{0}: Try open connection {1}:{2} ".format(self.get_instance_name(), self.host, self.port))
-            if os.name == "nt":
-                DLL_LOC = self.Dateipfad + "/" + ("libnodave.dll")
+            self.logger.info('{0}: Try open connection {1}:{2} '.format(self.get_instance_name(), self.host, self.port))
+            if os.name == 'nt':
+                DLL_LOC = self.Dateipfad + '/' + ('libnodave.dll')
                 self.dave = ctypes.cdll.LoadLibrary(DLL_LOC)
-            if os.name == "posix":
-                DLL_LOC = self.Dateipfad + "/" + ("libnodave.so")
+            if os.name == 'posix':
+                DLL_LOC = self.Dateipfad + '/' + ('libnodave.so')
                 self.dave = ctypes.cdll.LoadLibrary(DLL_LOC)
 
             # self.logger.info('{0}: DLL-Path: {1}, operating system {2}'.format(self.get_instance_name(), DLL_LOC, os.name))
 
             self.ph = self.dave.openSocket(self.port, self.host)
             if self.ph < 0:
-                raise LOGO("{0}:Port Handle N.O.K.".format(self.get_instance_name()))
+                raise LOGO('{0}:Port Handle N.O.K.'.format(self.get_instance_name()))
 
             # Dave Interface handle
-            self.di = self.dave.daveNewInterface(self.ph, self.ph, "IF1", 0, 122, 2)
+            self.di = self.dave.daveNewInterface(self.ph, self.ph, 'IF1', 0, 122, 2)
             # self.logger.info('{0}: - Dave Interface Handle: {1}'.format(self.get_instance_name(), self.di))
 
             # Init Adapter
             self.res = self.dave.daveInitAdapter(self.di)
             if self.res != 0:
-                raise LOGO("{0}:Init Adapter N.O.K.".format(self.get_instance_name()))
+                raise LOGO('{0}:Init Adapter N.O.K.'.format(self.get_instance_name()))
 
             # dave Connection
             self.dc = self.dave.daveNewConnection(self.di, self.mpi, self.rack, self.slot)
@@ -152,20 +152,20 @@ class LOGO(SmartPlugin):
             self.res = self.dave.daveConnectPLC(self.dc)
             self.dave.daveSetTimeout(self.di, self.timeOut)
             if self.res < 0:
-                raise LOGO("{0}:connection result:{1} ".format(self.get_instance_name(), self.res))
+                raise LOGO('{0}:connection result:{1} '.format(self.get_instance_name(), self.res))
 
         except Exception as e:
             self._connection_attempts -= 1
             if self._connection_attempts <= 0:
                 self.logger.error(
-                    "{0}: could not connect to {1}:{2}: {3}".format(self.get_instance_name(), self.host, self.port, e)
+                    '{0}: could not connect to {1}:{2}: {3}'.format(self.get_instance_name(), self.host, self.port, e)
                 )
                 self._connection_attempts = self._connection_errorlog
             self._lock.release()
             return
         else:
             self.connected = True
-            self.logger.info("{0}: connected to {1}:{2}".format(self.get_instance_name(), self.host, self.port))
+            self.logger.info('{0}: connected to {1}:{2}'.format(self.get_instance_name(), self.host, self.port))
             self._connection_attempts = 0
             self._lock.release()
 
@@ -178,8 +178,8 @@ class LOGO(SmartPlugin):
         self.close()
 
     def _write_read_loop(self):
-        threading.currentThread().name = self.get_instance_name() + "cycle"  #'logo_cycle'
-        self.logger.debug("{0}: Starting write-read cycle".format(self.get_instance_name()))
+        threading.currentThread().name = self.get_instance_name() + 'cycle'  #'logo_cycle'
+        self.logger.debug('{0}: Starting write-read cycle'.format(self.get_instance_name()))
         while self.alive:
             start = time.time()
             t = start - self.threadLastRead
@@ -201,40 +201,40 @@ class LOGO(SmartPlugin):
             remove = []  # Liste der bereits geschriebenen Items
             for k, v in self.writes.items():  # zu schreibend Items I1,Q1,M1, AI1, AQ1, AM1, VM850, VM850.2, VMW0
                 # self.logger.debug('{0}: write_cycle() {1} : {2} '.format(self.get_instance_name(), k, v))
-                typ = v["typ"]  # z.B. I Q M AI AQ AM VM VMW
-                value = v["value"]
+                typ = v['typ']  # z.B. I Q M AI AQ AM VM VMW
+                value = v['value']
                 write_res = -1
-                if typ in ["I", "Q", "M", "NI", "NQ"]:  # I1 Q1 M1
+                if typ in ['I', 'Q', 'M', 'NI', 'NQ']:  # I1 Q1 M1
                     if value is True:
                         # self.logger.debug("{0}: set {1} : {2} : {3} ".format(self.get_instance_name(), k, v, value))
-                        write_res = self.set_vm_bit(v["VMaddr"], v["VMbit"])  # Setzen
+                        write_res = self.set_vm_bit(v['VMaddr'], v['VMbit'])  # Setzen
                     else:
                         # self.logger.debug("{0}: clear {1} : {2} : {3} ".format(self.get_instance_name(), k, v, value))
-                        write_res = self.clear_vm_bit(v["VMaddr"], v["VMbit"])  # Löschen
+                        write_res = self.clear_vm_bit(v['VMaddr'], v['VMbit'])  # Löschen
 
-                elif typ in ["AI", "AQ", "AM", "NAI", "NAQ", "VMW"]:  # AI1 AQ1 AM1 VMW
-                    write_res = self.write_vm_word(v["VMaddr"], value)
+                elif typ in ['AI', 'AQ', 'AM', 'NAI', 'NAQ', 'VMW']:  # AI1 AQ1 AM1 VMW
+                    write_res = self.write_vm_word(v['VMaddr'], value)
 
-                elif typ == "VM":  # VM0 VM10.6
-                    if "VMbit" in v:  # VM10.6
+                elif typ == 'VM':  # VM0 VM10.6
+                    if 'VMbit' in v:  # VM10.6
                         if value is True:
-                            write_res = self.set_vm_bit(v["VMaddr"], v["VMbit"])
+                            write_res = self.set_vm_bit(v['VMaddr'], v['VMbit'])
                         else:
-                            write_res = self.clear_vm_bit(v["VMaddr"], v["VMbit"])
+                            write_res = self.clear_vm_bit(v['VMaddr'], v['VMbit'])
                     else:  # VM0
-                        write_res = self.write_vm_byte(v["VMaddr"], value)
+                        write_res = self.write_vm_byte(v['VMaddr'], value)
                 else:
-                    raise LOGO("{0}:invalid typ: {1}".format(self.get_instance_name(), typ))
+                    raise LOGO('{0}:invalid typ: {1}'.format(self.get_instance_name(), typ))
 
                 if write_res != 0:
-                    raise LOGO("{0}:LOGO: write failed: {1} {2} ".format(self.get_instance_name(), typ, value))
+                    raise LOGO('{0}:LOGO: write failed: {1} {2} '.format(self.get_instance_name(), typ, value))
                     self.close()
                 else:
-                    self.logger.debug("{0}: write {1} : {2} : {3} ".format(self.get_instance_name(), k, value, v))
+                    self.logger.debug('{0}: write {1} : {2} : {3} '.format(self.get_instance_name(), k, value, v))
                     remove.append(k)  # nach dem Übertragen aus der Liste write entfernen
 
         except Exception as e:
-            self.logger.error("{0}: write_cycle(){1} write error {2} ".format(self.get_instance_name(), k, e))
+            self.logger.error('{0}: write_cycle(){1} write error {2} '.format(self.get_instance_name(), k, e))
             return
 
         for k in remove:  # nach dem Übertragen aus der Liste writes entfernen - damit das Item nur 1x übertragen wird
@@ -255,7 +255,7 @@ class LOGO(SmartPlugin):
             resVMIO = self.dave.daveReadManyBytes(self.dc, self.daveDB, 1, self._vmIO, self._vmIO_len, buf_VMIO_p)
             if resVMIO != 0:
                 self.logger.error(
-                    "{0}: read_cycle() failed ro read VM_IO-Buffer daveReadManyBytes".format(self.get_instance_name())
+                    '{0}: read_cycle() failed ro read VM_IO-Buffer daveReadManyBytes'.format(self.get_instance_name())
                 )
                 self.close()
                 return
@@ -267,7 +267,7 @@ class LOGO(SmartPlugin):
             resVM = self.dave.daveReadManyBytes(self.dc, self.daveDB, 1, self._vm, self._vm_len, buf_VM_p)
             if resVM != 0:
                 self.logger.error(
-                    "{0}: read_cycle() failed ro read VM-Buffer daveReadManyBytes".format(self.get_instance_name())
+                    '{0}: read_cycle() failed ro read VM-Buffer daveReadManyBytes'.format(self.get_instance_name())
                 )
                 self.close()
                 return
@@ -279,52 +279,52 @@ class LOGO(SmartPlugin):
             for k, v in self.reads.items():
                 # self.logger.debug('{0}: read_cycle() {1} : {2} '.format(self.get_instance_name(), k, v))
                 new_value = 0
-                item = v["item"]
+                item = v['item']
 
-                if v["DataType"] == "byte":
-                    new_value = ord(pBuf_VM[v["VMaddr"] - self._vm])  # VM byte   z.B. VM0
-                elif v["DataType"] == "word":
+                if v['DataType'] == 'byte':
+                    new_value = ord(pBuf_VM[v['VMaddr'] - self._vm])  # VM byte   z.B. VM0
+                elif v['DataType'] == 'word':
                     # self.logger.debug('{0}: read_cycle() h{1} : l{2} '.format(self.get_instance_name(), pBuf_VM[v['VMaddr']-self._vm], pBuf_VM[v['VMaddr']+1-self._vm]))
-                    if v["typ"] == "VMW":  # VMW word   z.B. VMW0
-                        h = ord(pBuf_VM[v["VMaddr"] - self._vm])
-                        lo = ord(pBuf_VM[v["VMaddr"] + 1 - self._vm])
+                    if v['typ'] == 'VMW':  # VMW word   z.B. VMW0
+                        h = ord(pBuf_VM[v['VMaddr'] - self._vm])
+                        lo = ord(pBuf_VM[v['VMaddr'] + 1 - self._vm])
                     else:  # AI AQ AM word z.B, AM1
-                        h = ord(pBuf_VMIO[v["VMaddr"] - self._vmIO])
-                        lo = ord(pBuf_VMIO[v["VMaddr"] + 1 - self._vmIO])
+                        h = ord(pBuf_VMIO[v['VMaddr'] - self._vmIO])
+                        lo = ord(pBuf_VMIO[v['VMaddr'] + 1 - self._vmIO])
                     new_value = lo + (h << 8)
-                elif v["DataType"] == "bit":
-                    if v["typ"] == "VM":  # VM bit z.B.VM10.6
-                        new_byte = ord(pBuf_VM[v["VMaddr"] - self._vm])
+                elif v['DataType'] == 'bit':
+                    if v['typ'] == 'VM':  # VM bit z.B.VM10.6
+                        new_byte = ord(pBuf_VM[v['VMaddr'] - self._vm])
                     else:  # I Q M bit z.B. M1
-                        new_byte = ord(pBuf_VMIO[v["VMaddr"] - self._vmIO])
-                    new_value = self.get_bit(new_byte, v["VMbit"])
+                        new_byte = ord(pBuf_VMIO[v['VMaddr'] - self._vmIO])
+                    new_value = self.get_bit(new_byte, v['VMbit'])
                 else:
                     raise LOGO(
-                        "{0}:{1} invalid DataType in reads: {2}".format(self.get_instance_name(), k, v["DataType"])
+                        '{0}:{1} invalid DataType in reads: {2}'.format(self.get_instance_name(), k, v['DataType'])
                     )
 
-                if "old" in v:  # Variable wurde schon einmal gelesen
-                    if v["old"] != new_value:  # Variable hat sich geändert
+                if 'old' in v:  # Variable wurde schon einmal gelesen
+                    if v['old'] != new_value:  # Variable hat sich geändert
                         self.logger.debug(
-                            "{0}: read_cycle():{1} newV:{2} oldV:{3} item:{4} ".format(
-                                self.get_instance_name(), k, new_value, v["old"], v["item"]
+                            '{0}: read_cycle():{1} newV:{2} oldV:{3} item:{4} '.format(
+                                self.get_instance_name(), k, new_value, v['old'], v['item']
                             )
                         )
                         item(new_value)  # aktualisiere das Item
-                        v.update({"old": new_value})  # speichere den aktuellen Zustand
+                        v.update({'old': new_value})  # speichere den aktuellen Zustand
                     # else:   # Variable hat sich nicht geändert
                     # self.logger.debug("{0}: read:{1} newV:{2} = oldV:{3} item:{4} ".format(self.get_instance_name(), k, new_value, v['old'], v['item']))
                 else:  # Variable wurde noch nie gelesen
                     self.logger.debug(
-                        "{0}: read_cycle() first read:{1} value:{2} item:{3}".format(
-                            self.get_instance_name(), k, new_value, v["item"]
+                        '{0}: read_cycle() first read:{1} value:{2} item:{3}'.format(
+                            self.get_instance_name(), k, new_value, v['item']
                         )
                     )
                     item(new_value)  # aktualisiere das Item zum ersten mal
-                    v.update({"old": new_value})  # speichere den aktuellen Zustand
+                    v.update({'old': new_value})  # speichere den aktuellen Zustand
 
         except Exception as e:
-            self.logger.error("{0}: read_cycle(){1} read error {2} ".format(self.get_instance_name(), k, e))
+            self.logger.error('{0}: read_cycle(){1} read error {2} '.format(self.get_instance_name(), k, e))
             return
 
         if not self.connected:
@@ -334,7 +334,7 @@ class LOGO(SmartPlugin):
         self.connected = False
         try:
             self.disconnect()
-            self.logger.info("{0}: disconnected {1}:{2}".format(self.get_instance_name(), self.host, self.port))
+            self.logger.info('{0}: disconnected {1}:{2}'.format(self.get_instance_name(), self.host, self.port))
         except Exception:
             pass
 
@@ -344,13 +344,13 @@ class LOGO(SmartPlugin):
 
     def parse_item(self, item):
 
-        if self.has_iattr(item.conf, "logo_read"):  # if 'logo_read' in item.conf:
-            addr = self.get_iattr_value(item.conf, "logo_read")  # for addr in logo_read:
-            self.logger.debug("{0}: parse_item {1} {2}".format(self.get_instance_name(), item, addr))
+        if self.has_iattr(item.conf, 'logo_read'):  # if 'logo_read' in item.conf:
+            addr = self.get_iattr_value(item.conf, 'logo_read')  # for addr in logo_read:
+            self.logger.debug('{0}: parse_item {1} {2}'.format(self.get_instance_name(), item, addr))
             addressInfo = self.getAddressInfo(addr)
             if addressInfo is not False:
-                addressInfo.update({"value": item()})  # Wert des Items hinzufügen
-                addressInfo.update({"item": item})  # Item hinzufügen
+                addressInfo.update({'value': item()})  # Wert des Items hinzufügen
+                addressInfo.update({'item': item})  # Item hinzufügen
                 self.reads.update({addr: addressInfo})  # zu lesende Items
 
             # logo_read = item.conf['logo_read']
@@ -364,7 +364,7 @@ class LOGO(SmartPlugin):
             #        addressInfo.update({'item': item})      # Item hinzufügen
             #        self.reads.update({addr: addressInfo})  # zu lesende Items
 
-        if self.has_iattr(item.conf, "logo_write"):  # if 'logo_write' in item.conf:
+        if self.has_iattr(item.conf, 'logo_write'):  # if 'logo_write' in item.conf:
             return self.update_item
         #    if isinstance(item.conf['logo_write'], str):
         #        item.conf['logo_write'] = [item.conf['logo_write'], ]
@@ -375,14 +375,14 @@ class LOGO(SmartPlugin):
         # self.function(logic['name'])
 
     def update_item(self, item, caller=None, source=None, dest=None):
-        if self.has_iattr(item.conf, "logo_write"):  # if 'logo_write' in item.conf:
-            if caller != "LOGO":
-                addr = self.get_iattr_value(item.conf, "logo_write")  # for addr in item.conf['logo_write']:
-                self.logger.debug("{0}: update_item() item:{1} addr:{2}".format(self.get_instance_name(), item, addr))
+        if self.has_iattr(item.conf, 'logo_write'):  # if 'logo_write' in item.conf:
+            if caller != 'LOGO':
+                addr = self.get_iattr_value(item.conf, 'logo_write')  # for addr in item.conf['logo_write']:
+                self.logger.debug('{0}: update_item() item:{1} addr:{2}'.format(self.get_instance_name(), item, addr))
                 addressInfo = self.getAddressInfo(addr)
                 if addressInfo is not False:
-                    addressInfo.update({"value": item()})  # Wert des Items hinzufügen
-                    addressInfo.update({"item": item})
+                    addressInfo.update({'value': item()})  # Wert des Items hinzufügen
+                    addressInfo.update({'item': item})
                     self.writes.update({addr: addressInfo})  # zu schreibende Items
 
     def getAddressInfo(self, value):  # I1,Q1,M1, AI1, AQ1, AM1, VM850, VM850.2, VMW0
@@ -393,12 +393,12 @@ class LOGO(SmartPlugin):
                     break
                 else:
                     indexDigit += 1
-            indexComma = value.find(".")  # ermittle ob ein Komma vorhanden ist (z.B. VM10.6)
+            indexComma = value.find('.')  # ermittle ob ein Komma vorhanden ist (z.B. VM10.6)
             # self.logger.debug('{0}: getAddressInfo() value:{1} iC:{2} iD:{3}'.format(self.get_instance_name(), value, indexComma, indexDigit))
             if len(value) < 2:
-                raise LOGO("{0}:invalid address {1} indexDigit < 1".format(self.get_instance_name(), value))
+                raise LOGO('{0}:invalid address {1} indexDigit < 1'.format(self.get_instance_name(), value))
             if indexDigit < 1:
-                raise LOGO("{0}:invalid address {1} indexDigit < 1".format(self.get_instance_name(), value))
+                raise LOGO('{0}:invalid address {1} indexDigit < 1'.format(self.get_instance_name(), value))
             typ = value[0:indexDigit]  # I Q M AI AQ AM VM VMW
             if indexComma == -1:  # kein Komma (z.B. M1)
                 address = int(value[indexDigit : len(value)])
@@ -406,57 +406,57 @@ class LOGO(SmartPlugin):
                 address = int(value[indexDigit:indexComma])
                 bitNr = int(value[indexComma + 1 : len(value)])
                 if (bitNr < 0) or (bitNr > 8):
-                    raise LOGO("{0}:invalid address {1} bitNr invalid".format(self.get_instance_name(), value))
+                    raise LOGO('{0}:invalid address {1} bitNr invalid'.format(self.get_instance_name(), value))
 
             # self.logger.debug('{0}: getAddressInfo() typ:{1} address:{2}'.format(self.get_instance_name(), typ, address))
 
-            if typ == "VMW":
-                VMaddr = int(self.tableVM_IO["VM"]["VMaddr"])  # Startaddresse
+            if typ == 'VMW':
+                VMaddr = int(self.tableVM_IO['VM']['VMaddr'])  # Startaddresse
             else:
-                VMaddr = int(self.tableVM_IO[typ]["VMaddr"])  # Startaddresse
+                VMaddr = int(self.tableVM_IO[typ]['VMaddr'])  # Startaddresse
 
-            if typ in ["I", "Q", "M", "NI", "NQ"]:  # I1 Q1 M1
-                MaxBits = int(self.tableVM_IO[typ]["bits"])  # Anzahl bits
+            if typ in ['I', 'Q', 'M', 'NI', 'NQ']:  # I1 Q1 M1
+                MaxBits = int(self.tableVM_IO[typ]['bits'])  # Anzahl bits
                 if address > MaxBits:
-                    raise LOGO("{0}:Address out of range. {1}1-{1}{2}".format(self.get_instance_name(), typ, MaxBits))
+                    raise LOGO('{0}:Address out of range. {1}1-{1}{2}'.format(self.get_instance_name(), typ, MaxBits))
                 q, r = divmod(address - 1, 8)
                 VMaddr = VMaddr + q
                 bitNr = r
-                return {"VMaddr": VMaddr, "VMbit": bitNr, "typ": typ, "DataType": "bit"}
+                return {'VMaddr': VMaddr, 'VMbit': bitNr, 'typ': typ, 'DataType': 'bit'}
 
-            elif typ in ["AI", "AQ", "AM", "NAI", "NAQ"]:  # AI1 AQ1 AM1
-                MaxWords = int(self.tableVM_IO[typ]["words"])  # Anzahl words
+            elif typ in ['AI', 'AQ', 'AM', 'NAI', 'NAQ']:  # AI1 AQ1 AM1
+                MaxWords = int(self.tableVM_IO[typ]['words'])  # Anzahl words
                 if address > MaxWords:
-                    raise LOGO("{0}:Address out of range. {1}1-{1}{2}".format(self.get_instance_name(), typ, MaxWords))
+                    raise LOGO('{0}:Address out of range. {1}1-{1}{2}'.format(self.get_instance_name(), typ, MaxWords))
                 VMaddr = VMaddr + ((address - 1) * 2)
-                return {"VMaddr": VMaddr, "typ": typ, "DataType": "word"}
+                return {'VMaddr': VMaddr, 'typ': typ, 'DataType': 'word'}
 
-            elif typ == "VMW":  # VMW0
+            elif typ == 'VMW':  # VMW0
                 # typ = 'VM'
-                MaxBytes = int(self.tableVM_IO["VM"]["bytes"])  # Anzahl words
+                MaxBytes = int(self.tableVM_IO['VM']['bytes'])  # Anzahl words
                 if address > MaxBytes:
-                    raise LOGO("{0}:Address out of range. {0}0-{1}{2}".format(self.get_instance_name(), typ, MaxBytes))
+                    raise LOGO('{0}:Address out of range. {0}0-{1}{2}'.format(self.get_instance_name(), typ, MaxBytes))
                 VMaddr = VMaddr + address
-                return {"VMaddr": VMaddr, "typ": typ, "DataType": "word"}
+                return {'VMaddr': VMaddr, 'typ': typ, 'DataType': 'word'}
 
-            elif (typ == "VM") and (indexComma == -1):  # VM0
-                MaxBytes = int(self.tableVM_IO[typ]["bytes"])  # Anzahl bytes
+            elif (typ == 'VM') and (indexComma == -1):  # VM0
+                MaxBytes = int(self.tableVM_IO[typ]['bytes'])  # Anzahl bytes
                 if address > MaxBytes:
-                    raise LOGO("{0}:Address out of range. {0}0-{1}{2}".format(self.get_instance_name(), typ, MaxBytes))
+                    raise LOGO('{0}:Address out of range. {0}0-{1}{2}'.format(self.get_instance_name(), typ, MaxBytes))
                 VMaddr = VMaddr + address
-                return {"VMaddr": VMaddr, "typ": typ, "DataType": "byte"}
+                return {'VMaddr': VMaddr, 'typ': typ, 'DataType': 'byte'}
 
-            elif (typ == "VM") and (indexComma > 2):  # VM10.6
-                MaxBytes = int(self.tableVM_IO[typ]["bytes"])  # Anzahl bytes
+            elif (typ == 'VM') and (indexComma > 2):  # VM10.6
+                MaxBytes = int(self.tableVM_IO[typ]['bytes'])  # Anzahl bytes
                 if address > MaxBytes:
-                    raise LOGO("{0}:Address out of range. {0}0-{1}{2}".format(self.get_instance_name(), typ, MaxBytes))
+                    raise LOGO('{0}:Address out of range. {0}0-{1}{2}'.format(self.get_instance_name(), typ, MaxBytes))
                 VMaddr = VMaddr + address
-                return {"VMaddr": VMaddr, "VMbit": bitNr, "typ": typ, "DataType": "bit"}
+                return {'VMaddr': VMaddr, 'VMbit': bitNr, 'typ': typ, 'DataType': 'bit'}
             else:
-                raise LOGO("{0}:invalid typ: {1}".format(self.get_instance_name(), typ))
+                raise LOGO('{0}:invalid typ: {1}'.format(self.get_instance_name(), typ))
 
         except Exception as e:
-            self.logger.error("{0}: getAddressInfo() {1} : {2} ".format(self.get_instance_name(), value, e))
+            self.logger.error('{0}: getAddressInfo() {1} : {2} '.format(self.get_instance_name(), value, e))
             return False
 
     def get_bit(self, byteval, idx):
@@ -527,10 +527,10 @@ class LOGO(SmartPlugin):
         Q3 = self.get_output(0, 2)
         Q4 = self.get_output(0, 3)
 
-        s = "Q1 : " + str(Q1)
-        s += ", Q2 : " + str(Q2)
-        s += ", Q3 : " + str(Q3)
-        s += ", Q4 : " + str(Q4)
+        s = 'Q1 : ' + str(Q1)
+        s += ', Q2 : ' + str(Q2)
+        s += ', Q3 : ' + str(Q3)
+        s += ', Q4 : ' + str(Q4)
         return s
 
     # MARKS

@@ -43,7 +43,7 @@ class Raumfeld_ng(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = "1.5.2"
+    PLUGIN_VERSION = '1.5.2'
 
     def __init__(self, sh):
         """
@@ -63,20 +63,20 @@ class Raumfeld_ng(SmartPlugin):
 
         from bin.smarthome import VERSION
 
-        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
+        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
             self.logger = logging.getLogger(__name__)
 
         # get parameter used throughout the plugin from metadata:
 
-        self._Host = self.get_parameter_value("host")
-        self._Port = self.get_parameter_value("port")
-        self._baseURL = "http://{}:{}/raumserver".format(self._Host, self._Port)
-        self.logger.warning("self._baseURL= {}".format(self._baseURL))
+        self._Host = self.get_parameter_value('host')
+        self._Port = self.get_parameter_value('port')
+        self._baseURL = 'http://{}:{}/raumserver'.format(self._Host, self._Port)
+        self.logger.warning('self._baseURL= {}'.format(self._baseURL))
 
         # cycle time in seconds, only needed, if hardware/interface needs to be
         # polled for value changes by adding a scheduler entry in the run method of this plugin
         # (maybe you want to make it a plugin parameter?)
-        self._cycle = self.get_parameter_value("cycle")
+        self._cycle = self.get_parameter_value('cycle')
 
         # Initialization code goes here
         self.Zones = []
@@ -131,16 +131,16 @@ class Raumfeld_ng(SmartPlugin):
         """
         # retrieves all Zones present in any "power state" item - from previous attempts, not used currently
         if (
-            self.has_iattr(item.conf, "rf_renderer_name")
-            and self.get_iattr_value(item.conf, "rf_attr") == "power_state"
-            and self.get_iattr_value(item.conf, "rf_scope") == "zone"
+            self.has_iattr(item.conf, 'rf_renderer_name')
+            and self.get_iattr_value(item.conf, 'rf_attr') == 'power_state'
+            and self.get_iattr_value(item.conf, 'rf_scope') == 'zone'
         ):
-            ZoneObject = {"Name": item.conf["rf_renderer_name"]}
-            self.logger.info("Zonenitem found :{}".format(ZoneObject["Name"]))
+            ZoneObject = {'Name': item.conf['rf_renderer_name']}
+            self.logger.info('Zonenitem found :{}'.format(ZoneObject['Name']))
             self.Zones.append(ZoneObject)
 
         # check for raumfeld related items and updates 'em .
-        if self.has_iattr(item.conf, "rf_attr"):
+        if self.has_iattr(item.conf, 'rf_attr'):
             return self.update_item
 
     def parse_logic(self, logic):
@@ -162,116 +162,116 @@ class Raumfeld_ng(SmartPlugin):
         :param source: if given it represents the source
         :param dest: if given it represents the dest
         """
-        self.logger.info("item has been updated and sent to raumfeld: {}".format(item.property.path))
+        self.logger.info('item has been updated and sent to raumfeld: {}'.format(item.property.path))
         if self.alive and caller != self.get_shortname():
             # code to execute, only if the item has not been changed by this this plugin:
-            self.logger.info("Update item: {}, item has been changed outside this plugin".format(item.property.path))
+            self.logger.info('Update item: {}, item has been changed outside this plugin'.format(item.property.path))
             urlaction = []
             # all items which interact with this plugin have to have the "rf_attr"
-            if self.has_iattr(item.conf, "rf_attr"):
+            if self.has_iattr(item.conf, 'rf_attr'):
                 self.logger.debug(
                     "Plugin '{}': update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(
                         self.get_fullname(), item, caller, source, dest
                     )
                 )
                 # get info of item
-                renderer = self.get_iattr_value(item.conf, "rf_renderer_name")
+                renderer = self.get_iattr_value(item.conf, 'rf_renderer_name')
                 value = item()
 
                 # Power_state item is bool. If it is set to true,power has to be switched on. If not -> switched off.
-                if self.get_iattr_value(item.conf, "rf_attr") == "power_state":
-                    scope = self.get_iattr_value(item.conf, "rf_scope")
+                if self.get_iattr_value(item.conf, 'rf_attr') == 'power_state':
+                    scope = self.get_iattr_value(item.conf, 'rf_scope')
                     if value:
-                        action = "leaveStandby"
+                        action = 'leaveStandby'
                     else:
-                        action = "enterManualStandby"
-                    urlaction = [self._baseURL + "/controller/" + action + "?id=" + renderer + "&scope=" + scope]
+                        action = 'enterManualStandby'
+                    urlaction = [self._baseURL + '/controller/' + action + '?id=' + renderer + '&scope=' + scope]
 
                 # all case-insensitive parameter-less actions can be done here:
-                if self.get_iattr_value(item.conf, "rf_attr") == "play_state":
-                    if value.lower() in ("stop", "play", "pause", "next", "prev"):
+                if self.get_iattr_value(item.conf, 'rf_attr') == 'play_state':
+                    if value.lower() in ('stop', 'play', 'pause', 'next', 'prev'):
                         action = value.lower()
                         # play state actionsalways act on zone level
-                        urlaction = [self._baseURL + "/controller/" + action + "?id=" + renderer + "&scope=zone"]
+                        urlaction = [self._baseURL + '/controller/' + action + '?id=' + renderer + '&scope=zone']
                     else:
-                        self.logger.debug("Status nicht erkannt:" + value)
+                        self.logger.debug('Status nicht erkannt:' + value)
 
                 # mute-related actions are case sensitive and scope dependend, therefore own check:
-                if self.get_iattr_value(item.conf, "rf_attr") == "set_mute":
-                    if value.lower() in ("mute", "unmute", "togglemute"):
-                        if value.lower() in ("mute"):
-                            action = "mute"
-                        elif value.lower() in ("unmute"):
-                            action = "unMute"
-                        elif value.lower() in ("togglemute"):
-                            action = "toggleMute"
+                if self.get_iattr_value(item.conf, 'rf_attr') == 'set_mute':
+                    if value.lower() in ('mute', 'unmute', 'togglemute'):
+                        if value.lower() in ('mute'):
+                            action = 'mute'
+                        elif value.lower() in ('unmute'):
+                            action = 'unMute'
+                        elif value.lower() in ('togglemute'):
+                            action = 'toggleMute'
                         else:
-                            self.logger.debug("mute action nicht erkannt")
+                            self.logger.debug('mute action nicht erkannt')
 
-                        scope = self.get_iattr_value(item.conf, "rf_scope")
-                        urlaction = [self._baseURL + "/controller/" + action + "?id=" + renderer + "&scope=" + scope]
+                        scope = self.get_iattr_value(item.conf, 'rf_scope')
+                        urlaction = [self._baseURL + '/controller/' + action + '?id=' + renderer + '&scope=' + scope]
                     else:
-                        self.logger.debug("Status nicht erkannt:" + value)
+                        self.logger.debug('Status nicht erkannt:' + value)
 
                 # loads the playlist, jumps to a tracknumber and starts. playlist name is always a string, track number an integer.
                 # Both can be packed in a list: ["plname",4]. Without track number always 1st track is played.
                 # For call w/o tracknumber playlist name can be a single element list or simple string : ["plname"] or "plname"
-                if self.get_iattr_value(item.conf, "rf_attr") == "load_playlist":
-                    action = "loadPlaylist"
+                if self.get_iattr_value(item.conf, 'rf_attr') == 'load_playlist':
+                    action = 'loadPlaylist'
                     if isinstance(value, list):
                         pl = self.urlencode(value[0])
-                        self.logger.info("Playlist item gefunden: {}".format(pl))
-                        urlaction = [self._baseURL + "/controller/" + action + "?id=" + renderer + "&value=" + pl]
+                        self.logger.info('Playlist item gefunden: {}'.format(pl))
+                        urlaction = [self._baseURL + '/controller/' + action + '?id=' + renderer + '&value=' + pl]
                         if len(value) == 2:
                             tracknum = str(value[1])
-                            self.logger.info("Track im Playlist item gefunden: {}".format(tracknum))
+                            self.logger.info('Track im Playlist item gefunden: {}'.format(tracknum))
                             urlaction.append(
-                                self._baseURL + "/controller/seekToTrack?id=" + renderer + "&TrackNumber=" + tracknum
+                                self._baseURL + '/controller/seekToTrack?id=' + renderer + '&TrackNumber=' + tracknum
                             )
                     else:
                         pl = self.urlencode(value)
-                        urlaction = [self._baseURL + "/controller/" + action + "?id=" + renderer + "&value=" + pl]
+                        urlaction = [self._baseURL + '/controller/' + action + '?id=' + renderer + '&value=' + pl]
 
                 # change track item...
-                if self.get_iattr_value(item.conf, "rf_attr") == "load_track":
+                if self.get_iattr_value(item.conf, 'rf_attr') == 'load_track':
                     tracknum = str(value)
-                    action = "seekToTrack"
+                    action = 'seekToTrack'
                     urlaction = [
-                        self._baseURL + "/controller/" + action + "?id=" + renderer + "&TrackNumber=" + tracknum
+                        self._baseURL + '/controller/' + action + '?id=' + renderer + '&TrackNumber=' + tracknum
                     ]
 
                 # Volume...rf_mode can be used to make volume change relative.
-                if self.get_iattr_value(item.conf, "rf_attr") == "set_volume":
-                    scope = self.get_iattr_value(item.conf, "rf_scope")
-                    action = "setVolume"
+                if self.get_iattr_value(item.conf, 'rf_attr') == 'set_volume':
+                    scope = self.get_iattr_value(item.conf, 'rf_scope')
+                    action = 'setVolume'
                     url = (
                         self._baseURL
-                        + "/controller/"
+                        + '/controller/'
                         + action
-                        + "?value="
+                        + '?value='
                         + str(value)
-                        + "&id="
+                        + '&id='
                         + renderer
-                        + "&scope="
+                        + '&scope='
                         + scope
                     )
-                    if self.has_iattr(item.conf, "rf_mode"):
-                        setmode = self.get_iattr_value(item.conf, "rf_mode")
-                        if setmode == "relative":
-                            url += "&relative=1"
+                    if self.has_iattr(item.conf, 'rf_mode'):
+                        setmode = self.get_iattr_value(item.conf, 'rf_mode')
+                        if setmode == 'relative':
+                            url += '&relative=1'
                     urlaction = [url]
 
                 # here the action is performed.
                 # this loop can be used if items are created which need multiple calls of the server (example: load playlist,set volume,...)
                 # was used before to combine load playlist and seek to track -> no combined within one item.
                 for taskindex, task in enumerate(urlaction):
-                    if task != "":
-                        urlobj = httplib2.Http(".cache")
-                        (resp_headers, content) = urlobj.request(task, "GET")
-                        response = json.loads(content.decode("utf-8"))
+                    if task != '':
+                        urlobj = httplib2.Http('.cache')
+                        (resp_headers, content) = urlobj.request(task, 'GET')
+                        response = json.loads(content.decode('utf-8'))
                         self.logger.info(json.dumps(response, sort_keys=True, indent=3, ensure_ascii=False))
-                        if response["error"]:
-                            self.logger.error(response["data"]["errorMessage"])
+                        if response['error']:
+                            self.logger.error(response['data']['errorMessage'])
                         # if multiple calls need some delay inbetween to give raumserver some time to perform action.
                         # would make sense to make delay configurable. only happens if more than 1 task is defined.
                         if taskindex + 1 < len(urlaction):
@@ -292,84 +292,84 @@ class Raumfeld_ng(SmartPlugin):
         self.ZoneConfig = self.getZoneConfig()
 
         # now we update a couple of rf items
-        items = self.get_sh().find_items("rf_attr")  # all raumfeld related items
+        items = self.get_sh().find_items('rf_attr')  # all raumfeld related items
         try:
             for i in items:  # check each item...
-                renderer = i.conf["rf_renderer_name"]  # which somehow has a renderer-relation
-                for Zone in self.ZoneConfig["Zones"]:
-                    if renderer in Zone["Name"]:
-                        if i.conf["rf_attr"] == "power_state":
-                            scope = i.conf["rf_scope"]
+                renderer = i.conf['rf_renderer_name']  # which somehow has a renderer-relation
+                for Zone in self.ZoneConfig['Zones']:
+                    if renderer in Zone['Name']:
+                        if i.conf['rf_attr'] == 'power_state':
+                            scope = i.conf['rf_scope']
                             # for room scope
-                            if scope == "room":
-                                for room in Zone["Rooms"]:
-                                    if renderer in room["Name"]:
-                                        ps = room["PowerState"] == "ACTIVE"
+                            if scope == 'room':
+                                for room in Zone['Rooms']:
+                                    if renderer in room['Name']:
+                                        ps = room['PowerState'] == 'ACTIVE'
                                         i(ps, self.get_shortname())
                             # for zone scope - if speaker of a zone are "off" or "on" it is filled,
                             # if some speakers are "on" and some "off" -> set to "None"
-                            if scope == "zone":
-                                ps = Zone["PowerState"]
-                                if ps == "Off":
+                            if scope == 'zone':
+                                ps = Zone['PowerState']
+                                if ps == 'Off':
                                     i(False, self.get_shortname())
-                                elif ps == "On":
+                                elif ps == 'On':
                                     i(True, self.get_shortname())
                                 else:
                                     i(None, self.get_shortname())
                         # use a little translation between raumfeld states and plugin states to make it readable...
-                        if i.conf["rf_attr"] == "play_state":
-                            ps = Zone["PlayState"]
-                            if ps == "STOPPED":
-                                i("Stop", self.get_shortname())
-                            elif ps == "PAUSED_PLAYBACK":
-                                i("Pause", self.get_shortname())
-                            elif ps == "PLAYING":
-                                i("Play", self.get_shortname())
+                        if i.conf['rf_attr'] == 'play_state':
+                            ps = Zone['PlayState']
+                            if ps == 'STOPPED':
+                                i('Stop', self.get_shortname())
+                            elif ps == 'PAUSED_PLAYBACK':
+                                i('Pause', self.get_shortname())
+                            elif ps == 'PLAYING':
+                                i('Play', self.get_shortname())
                             else:
                                 i(None, self.get_shortname())
 
-                        if i.conf["rf_attr"] == "set_volume":
-                            for room in Zone["Rooms"]:
-                                if renderer in room["Name"]:
-                                    ps = room["Volume"]
+                        if i.conf['rf_attr'] == 'set_volume':
+                            for room in Zone['Rooms']:
+                                if renderer in room['Name']:
+                                    ps = room['Volume']
                                     i(ps, self.get_shortname())
 
-                        if i.conf["rf_attr"] == "get_mediainfo":
-                            if "CurrentTrack" in Zone["PlayMedia"].keys():
-                                TrackNum = int(Zone["PlayMedia"]["CurrentTrack"])
+                        if i.conf['rf_attr'] == 'get_mediainfo':
+                            if 'CurrentTrack' in Zone['PlayMedia'].keys():
+                                TrackNum = int(Zone['PlayMedia']['CurrentTrack'])
                             else:
                                 TrackNum = None
                             ps = [
-                                Zone["PlayMedia"]["Album"],
-                                Zone["PlayMedia"]["Artist"],
-                                Zone["PlayMedia"]["Title"],
+                                Zone['PlayMedia']['Album'],
+                                Zone['PlayMedia']['Artist'],
+                                Zone['PlayMedia']['Title'],
                                 TrackNum,
                             ]
-                            self.logger.info("Current Media Info: {}".format(ps))
+                            self.logger.info('Current Media Info: {}'.format(ps))
                             i(ps, self.get_shortname())
 
-                        if i.conf["rf_attr"] == "load_track":
-                            if "CurrentTrack" in Zone["PlayMedia"].keys():
-                                ps = int(Zone["PlayMedia"]["CurrentTrack"])
-                                self.logger.info("Current Track Info: {}".format(ps))
+                        if i.conf['rf_attr'] == 'load_track':
+                            if 'CurrentTrack' in Zone['PlayMedia'].keys():
+                                ps = int(Zone['PlayMedia']['CurrentTrack'])
+                                self.logger.info('Current Track Info: {}'.format(ps))
                                 i(ps, self.get_shortname())
                             else:
                                 i(None, self.get_shortname())
-                                self.logger.info("No Track Info found in Zone {}".format(Zone["Name"]))
+                                self.logger.info('No Track Info found in Zone {}'.format(Zone['Name']))
 
         except Exception as err:
-            self.logger.error("Beim Powerraumupdate geht was schief")
+            self.logger.error('Beim Powerraumupdate geht was schief')
             self.logger.error(err.args)
 
     def urlencode(self, plain):  # if playlist names are not URL-encoded this hand-made translation. maybe not needed?
         urltext = (
-            plain.replace(" ", "%20")
-            .replace("ä", "%C3%A4")
-            .replace("ö", "%C3%B6")
-            .replace("ü", "%C3%BC")
-            .replace("Ä", "%C3%84")
-            .replace("Ö", "%C3%96")
-            .replace("Ü", "%C3%9C")
+            plain.replace(' ', '%20')
+            .replace('ä', '%C3%A4')
+            .replace('ö', '%C3%B6')
+            .replace('ü', '%C3%BC')
+            .replace('Ä', '%C3%84')
+            .replace('Ö', '%C3%96')
+            .replace('Ü', '%C3%9C')
         )
         # %C3%A4=ä
         # %C3%B6=ö
@@ -382,100 +382,100 @@ class Raumfeld_ng(SmartPlugin):
 
     def getZoneConfig(self):
         # build central Config Object
-        urlobj = httplib2.Http(".cache")
-        (resp_headers, content) = urlobj.request(self._baseURL + "/data/getZoneConfig", "GET")
-        response = json.loads(content.decode("utf-8"))
+        urlobj = httplib2.Http('.cache')
+        (resp_headers, content) = urlobj.request(self._baseURL + '/data/getZoneConfig', 'GET')
+        response = json.loads(content.decode('utf-8'))
         try:
-            info = response["data"]["zoneConfig"]["zones"]
+            info = response['data']['zoneConfig']['zones']
         except Exception:
-            self.logger.error(response["errorMsg"])
+            self.logger.error(response['errorMsg'])
             return None
         ZoneCheckList = []
-        Config = {"NumOfZones": 0, "Zones": []}
+        Config = {'NumOfZones': 0, 'Zones': []}
         for zoneListNum, zoneList in enumerate(info):
             # Seems to be always an one-element list...but to be save
-            for ZoneNum, zone in enumerate(zoneList["zone"]):
+            for ZoneNum, zone in enumerate(zoneList['zone']):
                 if zone not in ZoneCheckList:
-                    ZoneCheckList.append(zone["$"]["udn"])
-                    Config["NumOfZones"] += 1
+                    ZoneCheckList.append(zone['$']['udn'])
+                    Config['NumOfZones'] += 1
                     ZoneObject = {
-                        "Name": zone["$"]["udn"],
-                        "PowerState": "Off",
-                        "PlayState": "unknown",
-                        "PlayMedia": {"Title": "", "Artist": "", "Album": ""},
-                        "Rooms": [],
+                        'Name': zone['$']['udn'],
+                        'PowerState': 'Off',
+                        'PlayState': 'unknown',
+                        'PlayMedia': {'Title': '', 'Artist': '', 'Album': ''},
+                        'Rooms': [],
                     }
                     RoomObjectList = []
                     PowerState = []
-                    for roomNum, room in enumerate(zone["room"]):
-                        if room["$"]["name"] not in RoomObjectList:
+                    for roomNum, room in enumerate(zone['room']):
+                        if room['$']['name'] not in RoomObjectList:
                             RoomObject = {
-                                "Name": room["$"]["name"],
-                                "PowerState": room["$"]["powerState"],
-                                "Mute": 0,
-                                "Volume": 0,
+                                'Name': room['$']['name'],
+                                'PowerState': room['$']['powerState'],
+                                'Mute': 0,
+                                'Volume': 0,
                             }
-                            RoomObjectList.append(room["$"]["name"])
-                            ZoneObject["Rooms"].append(RoomObject)
-                            PowerState.append(room["$"]["powerState"] in "ACTIVE")
+                            RoomObjectList.append(room['$']['name'])
+                            ZoneObject['Rooms'].append(RoomObject)
+                            PowerState.append(room['$']['powerState'] in 'ACTIVE')
                     if all(PowerState):
-                        ZoneObject["PowerState"] = "On"
+                        ZoneObject['PowerState'] = 'On'
                     elif any(PowerState):
-                        ZoneObject["PowerState"] = "Any"
+                        ZoneObject['PowerState'] = 'Any'
                     else:
-                        ZoneObject["PowerState"] = "Off"
-                    ZoneObject["Name"] = ".".join(RoomObjectList)
+                        ZoneObject['PowerState'] = 'Off'
+                    ZoneObject['Name'] = '.'.join(RoomObjectList)
                     self.updateRendererState(ZoneObject)
-                    Config["Zones"].append(ZoneObject)
+                    Config['Zones'].append(ZoneObject)
         return Config
 
     def updateRendererState(self, zone):
         # fill in information about current play state and tracks infos of zone
-        urlobj = httplib2.Http(".cache")
+        urlobj = httplib2.Http('.cache')
         # asking for one room yields data for whole zone-> take first room
         (resp_headers, content) = urlobj.request(
-            self._baseURL + "/data/getRendererState?id=" + zone["Rooms"][0]["Name"] + "&scope=zone&onlyVirtual=true",
-            "GET",
+            self._baseURL + '/data/getRendererState?id=' + zone['Rooms'][0]['Name'] + '&scope=zone&onlyVirtual=true',
+            'GET',
         )
-        response = json.loads(content.decode("utf-8"))
+        response = json.loads(content.decode('utf-8'))
         try:
-            zs = response["data"][0]
+            zs = response['data'][0]
         except Exception:
-            self.logger.error("No Data for Zone " + zone["Name"] + " found")
+            self.logger.error('No Data for Zone ' + zone['Name'] + ' found')
             return
 
-        zone["PlayState"] = zs["TransportState"]
-        if zs["TransportState"] not in "NO_MEDIA_PRESENT":
+        zone['PlayState'] = zs['TransportState']
+        if zs['TransportState'] not in 'NO_MEDIA_PRESENT':
             try:
-                if zs["mediaItem"]["title"] is not None:
-                    zone["PlayMedia"]["Title"] = zs["mediaItem"]["title"]
+                if zs['mediaItem']['title'] is not None:
+                    zone['PlayMedia']['Title'] = zs['mediaItem']['title']
                 else:
-                    zone["PlayMedia"]["Title"] = "No title found"
+                    zone['PlayMedia']['Title'] = 'No title found'
 
-                if zs["mediaItem"]["album"] is not None:
-                    zone["PlayMedia"]["Album"] = zs["mediaItem"]["album"]
+                if zs['mediaItem']['album'] is not None:
+                    zone['PlayMedia']['Album'] = zs['mediaItem']['album']
                 else:
-                    zone["PlayMedia"]["Album"] = zs["mediaItem"]["section"]
+                    zone['PlayMedia']['Album'] = zs['mediaItem']['section']
 
-                if zs["mediaItem"]["artist"] is not None:
-                    zone["PlayMedia"]["Artist"] = zs["mediaItem"]["artist"]
+                if zs['mediaItem']['artist'] is not None:
+                    zone['PlayMedia']['Artist'] = zs['mediaItem']['artist']
                 else:
-                    zone["PlayMedia"]["Artist"] = zs["mediaItem"]["name"]
-                zone["PlayMedia"]["Section"] = zs["mediaItem"]["section"]
-                zone["PlayMedia"]["CurrentTrack"] = zs["CurrentTrack"]
+                    zone['PlayMedia']['Artist'] = zs['mediaItem']['name']
+                zone['PlayMedia']['Section'] = zs['mediaItem']['section']
+                zone['PlayMedia']['CurrentTrack'] = zs['CurrentTrack']
 
-                zone["PlayMedia"]["PlayState"] = zs["TransportState"]
+                zone['PlayMedia']['PlayState'] = zs['TransportState']
             except Exception:
                 print(json.dumps(zs, sort_keys=True, indent=3, ensure_ascii=False))
-                print("Media Meta Data incomplete")
+                print('Media Meta Data incomplete')
 
-        for zroom in zone["Rooms"]:
-            for room in zs["rooms"]:
-                if "name" in room.keys():
-                    if zroom["Name"] == room["name"]:
-                        zroom["PowerState"] = room["powerState"]
-                        zroom["Volume"] = room["Volume"]
-                        zroom["Mute"] = room["Mute"]
+        for zroom in zone['Rooms']:
+            for room in zs['rooms']:
+                if 'name' in room.keys():
+                    if zroom['Name'] == room['name']:
+                        zroom['PowerState'] = room['powerState']
+                        zroom['Volume'] = room['Volume']
+                        zroom['Mute'] = room['Mute']
 
     def getZonebyroom(self, room):
         pass
@@ -491,26 +491,24 @@ class Raumfeld_ng(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
-            self.logger.error("Not initializing the web interface")
+            self.logger.error('Not initializing the web interface')
             return False
 
         import sys
 
-        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
-            self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
+        if 'SmartPluginWebIf' not in list(sys.modules['lib.model.smartplugin'].__dict__):
+            self.logger.warning('Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface')
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
+        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            "/": {
-                "tools.staticdir.root": webif_dir,
-            },
-            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
         # Register the web interface as a cherrypy app
@@ -520,7 +518,7 @@ class Raumfeld_ng(SmartPlugin):
             config,
             self.get_classname(),
             self.get_instance_name(),
-            description="",
+            description='',
         )
 
         return True
@@ -560,9 +558,9 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])))
+        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])))
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):

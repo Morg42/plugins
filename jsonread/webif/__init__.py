@@ -63,8 +63,8 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template("index.html")
-        pagelength = self.plugin.get_parameter_value("webif_pagelength")
+        tmpl = self.tplenv.get_template('index.html')
+        pagelength = self.plugin.get_parameter_value('webif_pagelength')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(
             p=self.plugin,
@@ -86,14 +86,14 @@ class WebInterface(SmartPluginWebIf):
         """
         if dataSet is None:
             # get the new data
-            data = {"items": {}, "laststr": "", "lastjq": ""}
+            data = {'items': {}, 'laststr': '', 'lastjq': ''}
 
             for item in self.plugin._items.keys():
-                data["items"][item.property.path] = item.property.value
-            data["laststr"] = self.plugin._lastresultstr
-            data["lastjq"] = self.plugin._lastresultjq
+                data['items'][item.property.path] = item.property.value
+            data['laststr'] = self.plugin._lastresultstr
+            data['lastjq'] = self.plugin._lastresultjq
             try:
                 return json.dumps(data)
             except Exception as e:
-                self.logger.error("get_data_html exception: {}".format(e))
+                self.logger.error('get_data_html exception: {}'.format(e))
         return {}

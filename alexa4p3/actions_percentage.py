@@ -22,26 +22,26 @@ def clamp_percentage(percent, range):
     return min(_max, max(_min, percent))
 
 
-@alexa("setPercentage", "SetPercentageRequest", "SetPercentageConfirmation", "", [], "2")
+@alexa('setPercentage', 'SetPercentageRequest', 'SetPercentageConfirmation', '', [], '2')
 def set_percentage(self, payload):
-    device_id = payload["appliance"]["applianceId"]
+    device_id = payload['appliance']['applianceId']
     items = self.items(device_id)
-    new_percentage = float(payload["percentageState"]["value"])
+    new_percentage = float(payload['percentageState']['value'])
 
     for item in items:
         item_range = self.item_range(item, DEFAULT_RANGE)
         item_new = calc_percentage(new_percentage, item_range)
-        self.logger.info("Alexa: setPercentage({}, {:.1f})".format(item.property.path, item_new))
+        self.logger.info('Alexa: setPercentage({}, {:.1f})'.format(item.property.path, item_new))
         item(item_new)
 
     return self.respond()
 
 
-@alexa("incrementPercentage", "IncrementPercentageRequest", "IncrementPercentageConfirmation", "", [], "2")
+@alexa('incrementPercentage', 'IncrementPercentageRequest', 'IncrementPercentageConfirmation', '', [], '2')
 def incr_percentage(self, payload):
-    device_id = payload["appliance"]["applianceId"]
+    device_id = payload['appliance']['applianceId']
     items = self.items(device_id)
-    percentage_delta = float(payload["deltaPercentage"]["value"])
+    percentage_delta = float(payload['deltaPercentage']['value'])
 
     for item in items:
         item_range = self.item_range(item, DEFAULT_RANGE)
@@ -49,17 +49,17 @@ def incr_percentage(self, payload):
         percentage_now = what_percentage(item_now, item_range)
         percentage_new = clamp_percentage(percentage_now + percentage_delta, item_range)
         item_new = calc_percentage(percentage_new, item_range)
-        self.logger.info("Alexa: incrementPercentage({}, {:.1f})".format(item.property.path, item_new))
+        self.logger.info('Alexa: incrementPercentage({}, {:.1f})'.format(item.property.path, item_new))
         item(item_new)
 
     return self.respond()
 
 
-@alexa("decrementPercentage", "DecrementPercentageRequest", "DecrementPercentageConfirmation", "", [], "2")
+@alexa('decrementPercentage', 'DecrementPercentageRequest', 'DecrementPercentageConfirmation', '', [], '2')
 def decr_percentage(self, payload):
-    device_id = payload["appliance"]["applianceId"]
+    device_id = payload['appliance']['applianceId']
     items = self.items(device_id)
-    percentage_delta = float(payload["deltaPercentage"]["value"])
+    percentage_delta = float(payload['deltaPercentage']['value'])
 
     for item in items:
         item_range = self.item_range(item, DEFAULT_RANGE)
@@ -67,7 +67,7 @@ def decr_percentage(self, payload):
         percentage_now = what_percentage(item_now, item_range)
         percentage_new = clamp_percentage(percentage_now - percentage_delta, item_range)
         item_new = calc_percentage(percentage_new, item_range)
-        self.logger.info("Alexa: decrementPercentage({}, {:.1f})".format(item.property.path, item_new))
+        self.logger.info('Alexa: decrementPercentage({}, {:.1f})'.format(item.property.path, item_new))
         item(item_new)
 
     return self.respond()

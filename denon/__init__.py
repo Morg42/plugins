@@ -28,7 +28,7 @@ import sys
 import time
 from typing import Any
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     builtins.SDP_standalone = True
 
     class SmartPlugin:
@@ -68,7 +68,7 @@ builtins.SDP_standalone = False
 class denon(SmartDevicePlugin):
     """Device class for Denon AV."""
 
-    PLUGIN_VERSION = "1.2.0"
+    PLUGIN_VERSION = '1.2.0'
 
     def _set_device_defaults(self):
         self._use_callbacks = True
@@ -81,103 +81,103 @@ class denon(SmartDevicePlugin):
             self._parameters[PLUGIN_ATTR_CONNECTION] = CONN_SER_ASYNC
         else:
             self.logger.error(
-                "Neither host nor serialport set, connection not possible. Using dummy connection, plugin will not work"
+                'Neither host nor serialport set, connection not possible. Using dummy connection, plugin will not work'
             )
             self._parameters[PLUGIN_ATTR_CONNECTION] = CONN_NULL
 
         self._parameters[PLUGIN_ATTR_CMD_CLASS] = SDPCommandParseStr
 
         b = self._parameters[PLUGIN_ATTR_CONN_TERMINATOR].encode()
-        b = b.decode("unicode-escape").encode()
+        b = b.decode('unicode-escape').encode()
         self._parameters[PLUGIN_ATTR_CONN_TERMINATOR] = b
 
     def _transform_send_data(self, data=None, **kwargs):
         if isinstance(data, dict):
-            data["limit_response"] = self._parameters[PLUGIN_ATTR_CONN_TERMINATOR]
-            data["payload"] = f"{data.get('payload', '')}{data['limit_response'].decode('unicode-escape')}"
+            data['limit_response'] = self._parameters[PLUGIN_ATTR_CONN_TERMINATOR]
+            data['payload'] = f'{data.get("payload", "")}{data["limit_response"].decode("unicode-escape")}'
         return data
 
     def update_item(self, item: Item, caller: str | None = None, source: str | None = None, dest: str | None = None):
-        cond_custominputnames = item.conf.get("denon_command") == "general.custom_inputnames"
-        cond_commandexists = "general.custom_inputnames" in self._commands._commands
-        cond_caller = caller not in [self.get_fullname(), "custom_inputnames"]
+        cond_custominputnames = item.conf.get('denon_command') == 'general.custom_inputnames'
+        cond_commandexists = 'general.custom_inputnames' in self._commands._commands
+        cond_caller = caller not in [self.get_fullname(), 'custom_inputnames']
         if self.alive and cond_custominputnames and cond_commandexists and cond_caller:
-            self.logger.debug(f"Custom input command dictionary got changed by {caller}")
+            self.logger.debug(f'Custom input command dictionary got changed by {caller}')
             try:
-                dict1 = self.get_lookup("INPUT", "fwd")
+                dict1 = self.get_lookup('INPUT', 'fwd')
                 dict2 = item.property.value
                 merged_dict = {key: dict2[key] if key in dict2 else value for key, value in dict1.items()}
-                self.logger.debug(f"Updated input lookup to: {merged_dict}")
-                item(merged_dict, "custom_inputnames")
+                self.logger.debug(f'Updated input lookup to: {merged_dict}')
+                item(merged_dict, 'custom_inputnames')
             except Exception as e:
-                self.logger.debug(f"Issue updating input lookup: {e}")
+                self.logger.debug(f'Issue updating input lookup: {e}')
             try:
                 itemsApi = Items.get_instance()
-                input3 = itemsApi.return_item(f"{item.property.path}.input3")
-                dict1 = self.get_lookup("INPUT3", "fwd")
+                input3 = itemsApi.return_item(f'{item.property.path}.input3')
+                dict1 = self.get_lookup('INPUT3', 'fwd')
                 dict2 = item.property.value
                 merged_dict = {key: dict2[key] if key in dict2 else value for key, value in dict1.items()}
-                self.logger.debug(f"Updated input3 lookup to: {merged_dict}")
-                input3(merged_dict, "custom_inputnames")
+                self.logger.debug(f'Updated input3 lookup to: {merged_dict}')
+                input3(merged_dict, 'custom_inputnames')
             except Exception as e:
-                self.logger.debug(f"Issue updating input3 lookup: {e}")
+                self.logger.debug(f'Issue updating input3 lookup: {e}')
             try:
-                dict1 = self.get_lookup("VIDEOSELECT", "fwd")
+                dict1 = self.get_lookup('VIDEOSELECT', 'fwd')
                 dict2 = item.property.value
                 merged_dict = {key: dict2[key] if key in dict2 else value for key, value in dict1.items()}
-                table = "VIDEOSELECT"
-                self.logger.debug(f"Updating videoselect lookup to: {merged_dict}")
+                table = 'VIDEOSELECT'
+                self.logger.debug(f'Updating videoselect lookup to: {merged_dict}')
                 self._commands.update_lookup_table(table, merged_dict)
-                for mode in ("rev", "rci", "list"):
+                for mode in ('rev', 'rci', 'list'):
                     try:
-                        self.logger.debug(f"trying to set item for lookup {table} and mode {mode}.")
+                        self.logger.debug(f'trying to set item for lookup {table} and mode {mode}.')
                         lu_items = self._items_by_lookup[table][mode]
                         if not isinstance(lu_items, list):
                             lu_items = [lu_items]
                         for lu_item in lu_items:
                             lu_item(self.get_lookup(table, mode), self.get_fullname())
-                            self.logger.debug(f"Set lu_item {lu_item}")
+                            self.logger.debug(f'Set lu_item {lu_item}')
                     except (KeyError, AttributeError):
                         pass
             except Exception as e:
-                self.logger.debug(f"Issue updating videoselect lookup: {e}")
-            self.logger.debug("Querying input of all zones.")
+                self.logger.debug(f'Issue updating videoselect lookup: {e}')
+            self.logger.debug('Querying input of all zones.')
             for zone in range(1, 5):
-                if f"zone{zone}.control.input" in self._commands._commands:
-                    self.send_command(f"zone{zone}.control.input")
+                if f'zone{zone}.control.input' in self._commands._commands:
+                    self.send_command(f'zone{zone}.control.input')
         else:
             super().update_item(item, caller=caller, source=source, dest=dest)
 
     def _process_additional_data(self, command: str, data: Any, value: Any, custom: int, by: str | None = None):
         zone = 0
-        if command == "zone1.control.power":
+        if command == 'zone1.control.power':
             zone = 1
-        elif command == "zone2.control.power":
+        elif command == 'zone2.control.power':
             zone = 2
-        elif command == "zone3.control.power":
+        elif command == 'zone3.control.power':
             zone = 3
         if zone > 0 and value is True:
-            self.logger.debug(f"Device is turned on by command {command}. Requesting current state of zone {zone}.")
+            self.logger.debug(f'Device is turned on by command {command}. Requesting current state of zone {zone}.')
             time.sleep(1)
-            self.send_command(f"zone{zone}.control.mute")
-            self.send_command(f"zone{zone}.control.sleep")
-            self.send_command(f"zone{zone}.control.standby")
-            if self._parameters[PLUGIN_ATTR_MODEL] == "":
-                self.read_all_commands(f"ALL.zone{zone}.settings")
+            self.send_command(f'zone{zone}.control.mute')
+            self.send_command(f'zone{zone}.control.sleep')
+            self.send_command(f'zone{zone}.control.standby')
+            if self._parameters[PLUGIN_ATTR_MODEL] == '':
+                self.read_all_commands(f'ALL.zone{zone}.settings')
             else:
-                self.read_all_commands(f"{self._parameters[PLUGIN_ATTR_MODEL]}.zone{zone}.settings")
+                self.read_all_commands(f'{self._parameters[PLUGIN_ATTR_MODEL]}.zone{zone}.settings')
         if zone == 1 and value is True:
             time.sleep(1)
-            self.send_command(f"zone{zone}.control.input")
-            self.send_command(f"zone{zone}.control.volume")
-            self.send_command(f"zone{zone}.control.listeningmode")
+            self.send_command(f'zone{zone}.control.input')
+            self.send_command(f'zone{zone}.control.volume')
+            self.send_command(f'zone{zone}.control.listeningmode')
 
-        if command == "general.inputrate" and value != 0:
-            self.send_command("general.inputsignal")
-            self.send_command("general.inputformat")
-            self.send_command("general.inputresolution")
-            self.send_command("general.outputresolution")
+        if command == 'general.inputrate' and value != 0:
+            self.send_command('general.inputsignal')
+            self.send_command('general.inputformat')
+            self.send_command('general.inputresolution')
+            self.send_command('general.outputresolution')
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     s = Standalone(denon, sys.argv[0])

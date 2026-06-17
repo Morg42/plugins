@@ -64,7 +64,7 @@ class Mode:
                     self._mode_hvac = 2
                 return
         else:
-            self._type_error("non-boolean")
+            self._type_error('non-boolean')
             return
 
     @property
@@ -93,7 +93,7 @@ class Mode:
                     self._mode_hvac = 2
                 return
         else:
-            self._type_error("non-boolean")
+            self._type_error('non-boolean')
             return
 
     @property
@@ -122,7 +122,7 @@ class Mode:
                     self._mode_hvac = 2
                 return
         else:
-            self._type_error("non-boolean")
+            self._type_error('non-boolean')
             return
 
     @property
@@ -152,7 +152,7 @@ class Mode:
                     self._mode_hvac = 2
             return
         else:
-            self._type_error("non-boolean")
+            self._type_error('non-boolean')
             return
 
     @property
@@ -180,19 +180,19 @@ class Mode:
                 self.logger.error("Cannot set property 'hvac' to a value of {}".format(value))
             return
         else:
-            self._type_error("non-integer", value)
+            self._type_error('non-integer', value)
             return
 
     def _get_modename(self, mode):
         if mode == 1:
-            return "comfort"
+            return 'comfort'
         elif mode == 2:
-            return "standby"
+            return 'standby'
         elif mode == 3:
-            return "night"
+            return 'night'
         elif mode == 4:
-            return "frost"
-        return "unknown"
+            return 'frost'
+        return 'unknown'
 
     @property
     def mode(self):
@@ -206,7 +206,7 @@ class Mode:
 
     def __repr__(self):
         if self._mode_hvac == 4:
-            return self.mode + f" ({self._get_modename(self._mode_before_frost)})"
+            return self.mode + f' ({self._get_modename(self._mode_before_frost)})'
         return self.mode
 
     def _type_error(self, err, value=None):

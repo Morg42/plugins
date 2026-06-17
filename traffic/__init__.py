@@ -28,8 +28,8 @@ from lib.model.smartplugin import SmartPlugin
 
 class Traffic(SmartPlugin):
     ALLOW_MULTIINSTANCE = False
-    PLUGIN_VERSION = "1.5.1"
-    _base_url = "https://maps.googleapis.com/maps/api/directions/json"
+    PLUGIN_VERSION = '1.5.1'
+    _base_url = 'https://maps.googleapis.com/maps/api/directions/json'
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -39,8 +39,8 @@ class Traffic(SmartPlugin):
         @param language: two char language code. default: de
         """
         self.logger = logging.getLogger(__name__)
-        self._apikey = self.get_parameter_value("apikey")
-        self._language = self.get_parameter_value("language")
+        self._apikey = self.get_parameter_value('apikey')
+        self._language = self.get_parameter_value('language')
         self._session = requests.Session()
 
     def run(self):
@@ -49,7 +49,7 @@ class Traffic(SmartPlugin):
     def stop(self):
         self.alive = False
 
-    def get_route_info(self, origin, destination, alternatives=False, departure_time="now", mode="driving"):
+    def get_route_info(self, origin, destination, alternatives=False, departure_time='now', mode='driving'):
         """
         Returns route information for a provided origin and destination
         @param origin: string representing the origin according to google directions api
@@ -63,7 +63,7 @@ class Traffic(SmartPlugin):
         routes = []
         try:
             response = self._session.get(
-                "%s?language=%s&alternatives=%s&origin=%s&destination=%s&mode=%s&departure_time=%s&key=%s"
+                '%s?language=%s&alternatives=%s&origin=%s&destination=%s&mode=%s&departure_time=%s&key=%s'
                 % (
                     self._base_url,
                     self._language,
@@ -84,36 +84,36 @@ class Traffic(SmartPlugin):
             return
         json_obj = response.json()
         route_information = {}
-        for route in json_obj["routes"]:
+        for route in json_obj['routes']:
             route_information = {}
-            for leg in route["legs"]:
-                route_information["distance"] = leg["distance"]["value"]
-                route_information["duration"] = leg["duration"]["value"]
-                if "duration_in_traffic" in leg:
-                    route_information["duration_in_traffic"] = leg["duration_in_traffic"]["value"]
-                route_information["start_address"] = leg["start_address"]
-                route_information["start_location_lat"] = leg["start_location"]["lat"]
-                route_information["start_location_lon"] = leg["start_location"]["lng"]
-                if "end_address" in leg:
-                    route_information["end_address"] = leg["end_address"]
+            for leg in route['legs']:
+                route_information['distance'] = leg['distance']['value']
+                route_information['duration'] = leg['duration']['value']
+                if 'duration_in_traffic' in leg:
+                    route_information['duration_in_traffic'] = leg['duration_in_traffic']['value']
+                route_information['start_address'] = leg['start_address']
+                route_information['start_location_lat'] = leg['start_location']['lat']
+                route_information['start_location_lon'] = leg['start_location']['lng']
+                if 'end_address' in leg:
+                    route_information['end_address'] = leg['end_address']
                 else:
-                    route_information["end_address"] = "n/a"
-                route_information["end_location_lat"] = leg["end_location"]["lat"]
-                route_information["end_location_lon"] = leg["end_location"]["lng"]
-                route_information["html_instructions"] = ""
-                route_information["instructions"] = []
-                for step in leg["steps"]:
-                    route_information["html_instructions"] = (
-                        route_information["html_instructions"] + "<p>" + step["html_instructions"] + "</p>"
+                    route_information['end_address'] = 'n/a'
+                route_information['end_location_lat'] = leg['end_location']['lat']
+                route_information['end_location_lon'] = leg['end_location']['lng']
+                route_information['html_instructions'] = ''
+                route_information['instructions'] = []
+                for step in leg['steps']:
+                    route_information['html_instructions'] = (
+                        route_information['html_instructions'] + '<p>' + step['html_instructions'] + '</p>'
                     )
-                    route_information["instructions"].append(step["html_instructions"])
-            route_information["summary"] = route["summary"]
-            route_information["html_warnings"] = ""
-            route_information["warnings"] = []
-            for warning in route["warnings"]:
-                route_information["html_warnings"] = route_information["html_warnings"] + "<p>" + warning + "</p>"
-                route_information["warnings"].append(warning)
-            route_information["copyrights"] = route["copyrights"]
+                    route_information['instructions'].append(step['html_instructions'])
+            route_information['summary'] = route['summary']
+            route_information['html_warnings'] = ''
+            route_information['warnings'] = []
+            for warning in route['warnings']:
+                route_information['html_warnings'] = route_information['html_warnings'] + '<p>' + warning + '</p>'
+                route_information['warnings'].append(warning)
+            route_information['copyrights'] = route['copyrights']
 
             routes.append(route_information)
         if alternatives:

@@ -74,23 +74,23 @@ class WebInterface(SmartPluginWebIf):
         pairingCompleted = None
 
         if action is not None:
-            if action == "requestCode":
-                self.logger.info("Request code triggered via webinterface")
+            if action == 'requestCode':
+                self.logger.info('Request code triggered via webinterface')
                 codeRequestSuccessfull = self.plugin.startPairing()
-            elif action == "confirmCode":
-                self.logger.info("Confirm code triggered via webinterface")
-                if (code is not None) and (not code == ""):
+            elif action == 'confirmCode':
+                self.logger.info('Confirm code triggered via webinterface')
+                if (code is not None) and (not code == ''):
                     pairingCompleted = self.plugin.completePairing(code)
-                elif (code is None) or (code == ""):
-                    self.logger.error("Confirmation not possible: TV Paring code missing.")
+                elif (code is None) or (code == ''):
+                    self.logger.error('Confirmation not possible: TV Paring code missing.')
                     pairingCompleted = False
                 else:
-                    self.logger.error("Confirmation no possible: Missing argument.")
+                    self.logger.error('Confirmation no possible: Missing argument.')
                     pairingCompleted = False
             else:
-                self.logger.error("Unknown command received via webinterface")
+                self.logger.error('Unknown command received via webinterface')
 
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(
             p=self.plugin, codeRequestSuccessfull=codeRequestSuccessfull, pairingCompleted=pairingCompleted
@@ -107,14 +107,14 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         # if dataSets are used, define them here
-        if dataSet == "overview":
+        if dataSet == 'overview':
             # get the new data from the plugin variable called _webdata
             data = self.plugin._webdata
             try:
                 data = json.dumps(data)
                 return data
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
         if dataSet is None:
             # get the new data
             data = {}

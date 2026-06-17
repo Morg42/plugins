@@ -8,7 +8,7 @@ import urllib.error
 import cherrypy
 
 # Not strictly speaking mandatory but just makes sense
-cherrypy.config.update({"environment": "test_suite"})
+cherrypy.config.update({'environment': 'test_suite'})
 
 # This is mandatory so that the HTTP server isn't started
 # if you need to actually start (why would you?), simply
@@ -16,13 +16,13 @@ cherrypy.config.update({"environment": "test_suite"})
 cherrypy.server.unsubscribe()
 
 # simulate fake socket address... they are irrelevant in our context
-local = cherrypy.lib.httputil.Host("127.0.0.1", 50000, "")
-remote = cherrypy.lib.httputil.Host("127.0.0.1", 50001, "")
+local = cherrypy.lib.httputil.Host('127.0.0.1', 50000, '')
+remote = cherrypy.lib.httputil.Host('127.0.0.1', 50001, '')
 
 
 class BaseCherryPyTestCase(unittest.TestCase):
     def request(
-        self, path="/", method="GET", app_path="", scheme="http", proto="HTTP/1.1", data=None, headers=None, **kwargs
+        self, path='/', method='GET', app_path='', scheme='http', proto='HTTP/1.1', data=None, headers=None, **kwargs
     ):
         """
         CherryPy does not have a facility for serverless unit testing.
@@ -50,7 +50,7 @@ class BaseCherryPyTestCase(unittest.TestCase):
         .. seealso: http://docs.cherrypy.org/stable/refman/_cprequest.html#cherrypy._cprequest.Response
         """
         # This is a required header when running HTTP/1.1
-        h = {"Host": "127.0.0.1"}
+        h = {'Host': '127.0.0.1'}
 
         if headers is not None:
             h.update(headers)
@@ -58,10 +58,10 @@ class BaseCherryPyTestCase(unittest.TestCase):
         # If we have a POST/PUT request but no data
         # we urlencode the named arguments in **kwargs
         # and set the content-type header
-        if method in ("POST", "PUT") and not data:
+        if method in ('POST', 'PUT') and not data:
             data = urllib.parse.urlencode(kwargs)
             kwargs = None
-            h["content-type"] = "application/x-www-form-urlencoded"
+            h['content-type'] = 'application/x-www-form-urlencoded'
 
         # If we did have named arguments, let's
         # urlencode them and use them as a querystring
@@ -73,7 +73,7 @@ class BaseCherryPyTestCase(unittest.TestCase):
         # let's make sure we have the content-length set
         fd = None
         if data is not None:
-            h["content-length"] = "%d" % len(data)
+            h['content-length'] = '%d' % len(data)
             # fd = StringIO(data)
             fd = BytesIO(data.encode())
 
@@ -97,9 +97,9 @@ class BaseCherryPyTestCase(unittest.TestCase):
                 fd.close()
                 fd = None
 
-        if response.output_status.startswith(b"500"):
+        if response.output_status.startswith(b'500'):
             print(response.body)
-            raise AssertionError("Unexpected error")
+            raise AssertionError('Unexpected error')
 
         # collapse the response into a bytestring
         response.collapse_body()

@@ -10,7 +10,7 @@ class MessageRingModel:
         self.__ring_slots.append(message_source)
 
     def introspect(self):
-        content = ", ".join(map(lambda s: str(s), self.__ring_slots))
+        content = ', '.join(map(lambda s: str(s), self.__ring_slots))
         return f"Ring '{self.__ring_name}': ({content})"
 
     def get_slots(self):

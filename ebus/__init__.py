@@ -37,7 +37,7 @@ class eBus(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = "1.6.0"
+    PLUGIN_VERSION = '1.6.0'
 
     _items = []
 
@@ -62,9 +62,9 @@ class eBus(SmartPlugin):
         # Call init code of parent class (SmartPlugin)
         super().__init__()
 
-        self.host = self.get_parameter_value("host")
-        self.port = self.get_parameter_value("port")
-        self._cycle = self.get_parameter_value("cycle")
+        self.host = self.get_parameter_value('host')
+        self.port = self.get_parameter_value('port')
+        self._cycle = self.get_parameter_value('cycle')
 
         self._sock = False
         self.connected = False
@@ -86,7 +86,7 @@ class eBus(SmartPlugin):
                         with the item, caller, source and dest as arguments and in case of the knx plugin the value
                         can be sent to the knx with a knx write function within the knx plugin.
         """
-        if "ebus_type" in item.conf and "ebus_cmd" in item.conf:
+        if 'ebus_type' in item.conf and 'ebus_cmd' in item.conf:
             self._items.append(item)
             return self.update_item
 
@@ -94,7 +94,7 @@ class eBus(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
         self.alive = True
         self.scheduler_add(self.get_fullname(), self.refresh, prio=5, cycle=self._cycle, offset=2)
 
@@ -104,16 +104,16 @@ class eBus(SmartPlugin):
         """
         for item in self._items:
             time.sleep(1)
-            ebus_type = item.conf["ebus_type"]
-            ebus_cmd = item.conf["ebus_cmd"]
-            if ebus_cmd == "cycle":
-                request = ebus_type + " " + ebus_cmd + "\n"  # build command
+            ebus_type = item.conf['ebus_type']
+            ebus_cmd = item.conf['ebus_cmd']
+            if ebus_cmd == 'cycle':
+                request = ebus_type + ' ' + ebus_cmd + '\n'  # build command
             else:
-                request = "read" + " -c " + ebus_cmd + "\n"  # build command
+                request = 'read' + ' -c ' + ebus_cmd + '\n'  # build command
             value = self.request(request)
             # if reading fails (i.e. at broadcast-commands) the value will not be updated
-            if "command not found" not in str(value) and value is not None:
-                item(value, self.get_fullname(), "refresh")
+            if 'command not found' not in str(value) and value is not None:
+                item(value, self.get_fullname(), 'refresh')
             if not self.alive:
                 break
 
@@ -125,33 +125,33 @@ class eBus(SmartPlugin):
         :type request: str
         """
         if not self.connected:
-            self.logger.info("eBusd not connected, try to connect")
+            self.logger.info('eBusd not connected, try to connect')
             self.connect()
 
         if not self.connected:
-            self.logger.info("eBusd not connected, giving up")
+            self.logger.info('eBusd not connected, giving up')
             return
 
         self._lock.acquire()
         try:
             self._sock.send(request.encode())
-            self.logger.debug("REQUEST: {0}".format(request))
+            self.logger.debug('REQUEST: {0}'.format(request))
         except Exception as e:
             self._lock.release()
             self.close()
-            self.logger.warning("error sending request: {0} => {1}".format(request, e))
+            self.logger.warning('error sending request: {0} => {1}'.format(request, e))
             return
         try:
             answer = self._sock.recv(256).decode()[:-2]
-            self.logger.debug("ANSWER: {0}".format(answer))
+            self.logger.debug('ANSWER: {0}'.format(answer))
         except socket.timeout:
             self._lock.release()
-            self.logger.warning("error receiving answer: timeout")
+            self.logger.warning('error receiving answer: timeout')
             return
         except Exception as e:
             self._lock.release()
             self.close()
-            self.logger.warning("error receiving answer: {0}".format(e))
+            self.logger.warning('error receiving answer: {0}'.format(e))
             return
         self._lock.release()
         return answer
@@ -168,11 +168,11 @@ class eBus(SmartPlugin):
         except Exception as e:
             self._connection_attempts -= 1
             if self._connection_attempts <= 0:
-                self.logger.error("eBus: could not connect to ebusd at {0}:{1}: {2}".format(self.host, self.port, e))
+                self.logger.error('eBus: could not connect to ebusd at {0}:{1}: {2}'.format(self.host, self.port, e))
                 self._connection_attempts = self._connection_errorlog
             self._lock.release()
             return
-            self.logger.info("Connected to {0}:{1}".format(self.host, self.port))
+            self.logger.info('Connected to {0}:{1}'.format(self.host, self.port))
         self.connected = True
         self._connection_attempts = 0
         self._lock.release()
@@ -189,7 +189,7 @@ class eBus(SmartPlugin):
         try:
             self._sock.close()
             self._sock = False
-            self.logger.info("Connection closed to {0}:{1}".format(self.host, self.port))
+            self.logger.info('Connection closed to {0}:{1}'.format(self.host, self.port))
         except Exception:
             pass
 
@@ -197,7 +197,7 @@ class eBus(SmartPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.close()
         self.scheduler_remove(self.get_fullname())
         self.alive = False
@@ -212,15 +212,15 @@ class eBus(SmartPlugin):
         """
         if caller != self.get_fullname():
             value = str(int(item()))
-            cmd = item.conf["ebus_cmd"]
-            request = "write -c " + cmd + " " + value + "\n"
+            cmd = item.conf['ebus_cmd']
+            request = 'write -c ' + cmd + ' ' + value + '\n'
             set_answer = self.request(request)
             # just check if set was no broadcast-message
-            if "broadcast done" not in set_answer:
-                request = "read -c " + cmd + "\n"
+            if 'broadcast done' not in set_answer:
+                request = 'read -c ' + cmd + '\n'
                 answer = self.request(request)
                 # transfer value and answer to float for better comparsion
                 if float(answer) != float(value) or answer is None:
                     self.logger.warning(
-                        "Failed to set parameter: value: {0} cmd: {1} answer {2}".format(value, request, answer)
+                        'Failed to set parameter: value: {0} cmd: {1} answer {2}'.format(value, request, answer)
                     )

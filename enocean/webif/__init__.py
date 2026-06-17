@@ -82,38 +82,38 @@ class WebInterface(SmartPluginWebIf):
         learn_triggered = False
 
         if action is not None:
-            if action == "toggle_tx_blocking":
+            if action == 'toggle_tx_blocking':
                 self.plugin.toggle_block_external_out_messages()
-            elif action == "toggle_UTE":
+            elif action == 'toggle_UTE':
                 self.plugin.toggle_UTE_mode(device_offset)
-                self.logger.warning(f"UTE mode triggered via webinterface (Offset: {device_offset})")
-            elif action == "toggle_log_unknown":
+                self.logger.warning(f'UTE mode triggered via webinterface (Offset: {device_offset})')
+            elif action == 'toggle_log_unknown':
                 self.plugin.toggle_log_unknown_msg()
-                self.logger.info("Toogle state of log unknown messages triggered via webinterface")
+                self.logger.info('Toogle state of log unknown messages triggered via webinterface')
             elif (
-                action == "send_learn"
+                action == 'send_learn'
                 and (device_id is not None)
-                and not (device_id == "")
+                and not (device_id == '')
                 and (device_offset is not None)
-                and not (device_offset == "")
+                and not (device_offset == '')
             ):
                 self.logger.warning(
-                    f"Learn telegram triggered via webinterface (ID:{device_id} Offset:{device_offset})"
+                    f'Learn telegram triggered via webinterface (ID:{device_id} Offset:{device_offset})'
                 )
                 ret = self.plugin.send_learn_protocol(int(device_offset), int(device_id))
                 if ret:
                     learn_triggered = True
             else:
-                self.logger.error("Unknown comman received via webinterface")
+                self.logger.error('Unknown comman received via webinterface')
 
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         return tmpl.render(
             p=self.plugin,
-            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"]), reverse=False),
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path']), reverse=False),
             tabcount=1,
             item_id=item_id,
             learn_triggered=learn_triggered,
-            action="",
+            action='',
         )
 
     @cherrypy.expose
@@ -127,14 +127,14 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         # if dataSets are used, define them here
-        if dataSet == "overview":
+        if dataSet == 'overview':
             # get the new data from the plugin variable called _webdata
             data = self.plugin._webdata
             try:
                 data = json.dumps(data)
                 return data
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
         if dataSet is None:
             # get the new data
             data = {}

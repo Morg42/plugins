@@ -29,12 +29,12 @@ from lib.model.smartplugin import SmartPlugin
 
 class LevelJet(SmartPlugin):
     ALLOW_MULTIINSTANCE = False
-    PLUGIN_VERSION = "1.0.1"
+    PLUGIN_VERSION = '1.0.1'
 
-    _ljetdata = ["dist", "level", "liter", "percent", "outflags"]
+    _ljetdata = ['dist', 'level', 'liter', 'percent', 'outflags']
     _items = []
 
-    def __init__(self, smarthome, serialport, baudrate="19200", update_cycle="240"):
+    def __init__(self, smarthome, serialport, baudrate='19200', update_cycle='240'):
         self._sh = smarthome
         self.enable = False
         self.logger = logging.getLogger(__name__)
@@ -43,7 +43,7 @@ class LevelJet(SmartPlugin):
             self._serial = serial.Serial(serialport, int(baudrate), timeout=2)
             self.enable = True
         except Exception:
-            self.logger.error("leveljet: Serial Port could not be opened. Device connected?")
+            self.logger.error('leveljet: Serial Port could not be opened. Device connected?')
 
     def run(self):
         # if(self.enable == True):
@@ -51,7 +51,7 @@ class LevelJet(SmartPlugin):
             if self._serial.isOpen():
                 self.alive = True
                 # self.logger.debug("Plugin '{}': run method called".format(self.get_fullname()))
-                self._sh.scheduler.add("LevelJet", self._update_values, prio=5, cycle=self._update_cycle)
+                self._sh.scheduler.add('LevelJet', self._update_values, prio=5, cycle=self._update_cycle)
         except Exception:
             return
 
@@ -59,7 +59,7 @@ class LevelJet(SmartPlugin):
         self.alive = False
         # self.logger.debug("Plugin '{}': stop method called".format(self.get_fullname()))
         self._serial.close()
-        self._sh.scheduler.remove("LevelJet")
+        self._sh.scheduler.remove('LevelJet')
 
     def _update_values(self):
         start = time.time()
@@ -74,24 +74,24 @@ class LevelJet(SmartPlugin):
                 if (length >= 12) and (rcv[-12] == 0x00) and (rcv[-11] == 0x10):
                     break
                 if length == prev_length:
-                    self.logger.warning("leveljet: read timeout! - rcv={}".format(rcv))
+                    self.logger.warning('leveljet: read timeout! - rcv={}'.format(rcv))
                     return
                 prev_length = length
         except Exception as e:
-            self.logger.warning("leveljet:Exception {0}".format(e))
+            self.logger.warning('leveljet:Exception {0}'.format(e))
             return
-        self.logger.debug("leveljet: reading took: {:.2f}s".format(time.time() - start))
+        self.logger.debug('leveljet: reading took: {:.2f}s'.format(time.time() - start))
         # perform check (checksum match)
         crc = Crc16Buypass.calc(rcv[-12:-2])
         crc_high, crc_low = divmod(crc, 0x100)
         if (rcv[-2] != crc_low) or (rcv[-1] != crc_high):
             self.logger.warning(
-                "leveljet: checksum error: RX-Frame={} checksum={}".format(" ".join(hex(i) for i in rcv), hex(crc))
+                'leveljet: checksum error: RX-Frame={} checksum={}'.format(' '.join(hex(i) for i in rcv), hex(crc))
             )
             return
-        self.logger.debug("leveljet: RX-Frame={}".format(" ".join(hex(i) for i in rcv)))
+        self.logger.debug('leveljet: RX-Frame={}'.format(' '.join(hex(i) for i in rcv)))
         for item in self._items:
-            ljet_cmd = item.conf["ljet_cmd"]
+            ljet_cmd = item.conf['ljet_cmd']
             if ljet_cmd == self._ljetdata[0]:  # dist
                 value = (rcv[-9] << 8) + rcv[-10]
             elif ljet_cmd == self._ljetdata[1]:  # level
@@ -103,13 +103,13 @@ class LevelJet(SmartPlugin):
             elif ljet_cmd == self._ljetdata[4]:  # outflags:
                 value = rcv[-3]
             else:
-                self.logger.warning("leveljet: unknown ljetcmd: {}".format(ljet_cmd))
+                self.logger.warning('leveljet: unknown ljetcmd: {}'.format(ljet_cmd))
                 continue
             # self.logger.debug("leveljet: {}:{}".format(ljet_cmd, value))
-            item(value, "LevelJet", "refresh")
+            item(value, 'LevelJet', 'refresh')
         return
 
     def parse_item(self, item):
-        if "ljet_cmd" in item.conf:
+        if 'ljet_cmd' in item.conf:
             self._items.append(item)
         return

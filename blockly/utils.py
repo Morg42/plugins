@@ -46,7 +46,7 @@ def remove_prefix(string, prefix):
 
 
 def html_escape(str):
-    str = str.rstrip().replace("<", "&lt;").replace(">", "&gt;")
-    str = str.rstrip().replace("(", "&#40;").replace(")", "&#41;")
-    html = str.rstrip().replace("'", "&#39;").replace('"', "&quot;")
+    str = str.rstrip().replace('<', '&lt;').replace('>', '&gt;')
+    str = str.rstrip().replace('(', '&#40;').replace(')', '&#41;')
+    html = str.rstrip().replace("'", '&#39;').replace('"', '&quot;')
     return html

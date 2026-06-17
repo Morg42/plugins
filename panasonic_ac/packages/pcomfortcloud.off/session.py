@@ -33,7 +33,7 @@ class Session(Authentication):
     def dump(self, id):
         return self._api.dump(id)
 
-    def history(self, id, mode, date, tz="+01:00"):
+    def history(self, id, mode, date, tz='+01:00'):
         return self._api.history(id, mode, date, tz)
 
     def get_device(self, id):

@@ -45,7 +45,7 @@ class Blockly(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = "1.5.0"
+    PLUGIN_VERSION = '1.5.0'
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -55,7 +55,7 @@ class Blockly(SmartPlugin):
         """
         #        self.logger = SmartPluginLogger(__name__, self)
         self.logger = logging.getLogger(__name__)
-        self.logger.debug("Blockly.__init__")
+        self.logger.debug('Blockly.__init__')
 
         self.init_webinterface(WebInterface)
 
@@ -88,7 +88,7 @@ class Blockly(SmartPlugin):
                         with the item, caller, source and dest as arguments and in case of the knx plugin the value
                         can be sent to the knx with a knx write function within the knx plugin.
         """
-        if self.has_iattr(item.conf, "foo_itemtag"):
+        if self.has_iattr(item.conf, 'foo_itemtag'):
             self.logger.debug("Plugin '{}': parse item: {}".format(self.get_shortname(), item))
 
         # todo
@@ -99,7 +99,7 @@ class Blockly(SmartPlugin):
         """
         Default plugin parse_logic method
         """
-        if "xxx" in logic.conf:
+        if 'xxx' in logic.conf:
             # self.function(logic['name'])
             pass
 
@@ -114,7 +114,7 @@ class Blockly(SmartPlugin):
         # todo
         # change 'foo_itemtag' into your attribute name
         if item():
-            if self.has_iattr(item.conf, "foo_itemtag"):
+            if self.has_iattr(item.conf, 'foo_itemtag'):
                 self.logger.debug(
                     "Plugin '{}': update_item ws called with item '{}' from caller '{}', source '{}' and dest '{}'".format(
                         self.get_shortname(), item, caller, source, dest

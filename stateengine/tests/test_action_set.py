@@ -22,7 +22,7 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 import tests.common as common
 
 common.register_shng_log_levels()
@@ -32,21 +32,21 @@ from plugins.stateengine import StateEngineDefaults
 
 
 def _setup():
-    StateEngineDefaults.logger = logging.getLogger("test.se")
+    StateEngineDefaults.logger = logging.getLogger('test.se')
 
 
 class _MockState:
-    id = "mock.state"
-    name = "Mock State"
+    id = 'mock.state'
+    name = 'Mock State'
 
 
-def _make_set_action(abitem, name="light"):
+def _make_set_action(abitem, name='light'):
     """Build a SeActionSetItem with item and state injected."""
     from plugins.stateengine.StateEngineAction import SeActionSetItem
 
     action = SeActionSetItem(abitem, name)
     action._state = _MockState()
-    action._action_type = "actions_enter"
+    action._action_type = 'actions_enter'
     return action
 
 
@@ -75,16 +75,12 @@ class TestSeActionSetItemExecute(unittest.TestCase):
         """
         Create action targeting a MockItem, run it, return MockItem's value.
         """
-        item = MockItem("test.light", value=item_value_before)
-        action = _make_set_action(self.abitem, "light")
+        item = MockItem('test.light', value=item_value_before)
+        action = _make_set_action(self.abitem, 'light')
         _inject_item(action, item)
         _inject_value(action, set_to)
         result = action.real_execute(
-            state=_MockState(),
-            actionname="Action 'light'",
-            namevar="light",
-            repeat_text="",
-            returnvalue=returnvalue,
+            state=_MockState(), actionname="Action 'light'", namevar='light', repeat_text='', returnvalue=returnvalue
         )
         return item, result
 
@@ -105,43 +101,35 @@ class TestSeActionSetItemExecute(unittest.TestCase):
 
     def test_set_string(self):
         """Action sets item to string value."""
-        item, _ = self._run(item_value_before="off", set_to="on")
-        self.assertEqual(item._value, "on")
+        item, _ = self._run(item_value_before='off', set_to='on')
+        self.assertEqual(item._value, 'on')
 
     def test_returnvalue_true_returns_value_without_setting(self):
         """
         When returnvalue=True, the action returns the value without
         actually calling item().  The item value must remain unchanged.
         """
-        item = MockItem("test.bypass", value="original")
-        action = _make_set_action(self.abitem, "bypass")
+        item = MockItem('test.bypass', value='original')
+        action = _make_set_action(self.abitem, 'bypass')
         _inject_item(action, item)
-        _inject_value(action, "changed")
+        _inject_value(action, 'changed')
         result = action.real_execute(
-            state=_MockState(),
-            actionname="Action 'bypass'",
-            namevar="bypass",
-            returnvalue=True,
+            state=_MockState(), actionname="Action 'bypass'", namevar='bypass', returnvalue=True
         )
-        self.assertEqual(result, "changed")  # returned the value
-        self.assertEqual(item._value, "original")  # item untouched
+        self.assertEqual(result, 'changed')  # returned the value
+        self.assertEqual(item._value, 'original')  # item untouched
 
     def test_value_none_skips_set(self):
         """
         When _value is None (empty), real_execute() should skip the item set.
         The item value must remain unchanged.
         """
-        item = MockItem("test.skip", value="unchanged")
-        action = _make_set_action(self.abitem, "skip")
+        item = MockItem('test.skip', value='unchanged')
+        action = _make_set_action(self.abitem, 'skip')
         _inject_item(action, item)
         # Leave _value as None (is_empty() == True)
-        action.real_execute(
-            state=_MockState(),
-            actionname="Action 'skip'",
-            namevar="skip",
-            value=None,
-        )
-        self.assertEqual(item._value, "unchanged")
+        action.real_execute(state=_MockState(), actionname="Action 'skip'", namevar='skip', value=None)
+        self.assertEqual(item._value, 'unchanged')
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -157,18 +145,14 @@ class TestSeActionSetItemLast_run(unittest.TestCase):
     def test_last_run_recorded(self):
         import datetime
 
-        item = MockItem("test.item", value=False)
-        action = _make_set_action(self.abitem, "myaction")
+        item = MockItem('test.item', value=False)
+        action = _make_set_action(self.abitem, 'myaction')
         _inject_item(action, item)
         _inject_value(action, True)
-        action.real_execute(
-            state=_MockState(),
-            actionname="Action 'myaction'",
-            namevar="myaction",
-        )
-        self.assertIn("myaction", self.abitem.last_run)
-        self.assertIsInstance(self.abitem.last_run["myaction"], datetime.datetime)
+        action.real_execute(state=_MockState(), actionname="Action 'myaction'", namevar='myaction')
+        self.assertIn('myaction', self.abitem.last_run)
+        self.assertIsInstance(self.abitem.last_run['myaction'], datetime.datetime)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

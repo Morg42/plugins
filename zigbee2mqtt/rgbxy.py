@@ -12,42 +12,30 @@ import math
 import random
 from collections import namedtuple
 
-__version__ = "0.5.1a"
+__version__ = '0.5.1a'
 
 # Represents a CIE 1931 XY coordinate pair.
-XYPoint = namedtuple("XYPoint", ["x", "y"])
+XYPoint = namedtuple('XYPoint', ['x', 'y'])
 
 # LivingColors Iris, Bloom, Aura, LightStrips
-GamutA = (
-    XYPoint(0.704, 0.296),
-    XYPoint(0.2151, 0.7106),
-    XYPoint(0.138, 0.08),
-)
+GamutA = (XYPoint(0.704, 0.296), XYPoint(0.2151, 0.7106), XYPoint(0.138, 0.08))
 
 # Hue A19 bulbs
-GamutB = (
-    XYPoint(0.675, 0.322),
-    XYPoint(0.4091, 0.518),
-    XYPoint(0.167, 0.04),
-)
+GamutB = (XYPoint(0.675, 0.322), XYPoint(0.4091, 0.518), XYPoint(0.167, 0.04))
 
 # Hue BR30, A19 (Gen 3), Hue Go, LightStrips plus
-GamutC = (
-    XYPoint(0.692, 0.308),
-    XYPoint(0.17, 0.7),
-    XYPoint(0.153, 0.048),
-)
+GamutC = (XYPoint(0.692, 0.308), XYPoint(0.17, 0.7), XYPoint(0.153, 0.048))
 
 
 def get_light_gamut(modelId):
     """Gets the correct color gamut for the provided model id.
     Docs: https://developers.meethue.com/develop/hue-api/supported-devices/
     """
-    if modelId in ("LST001", "LLC005", "LLC006", "LLC007", "LLC010", "LLC011", "LLC012", "LLC013", "LLC014"):
+    if modelId in ('LST001', 'LLC005', 'LLC006', 'LLC007', 'LLC010', 'LLC011', 'LLC012', 'LLC013', 'LLC014'):
         return GamutA
-    elif modelId in ("LCT001", "LCT007", "LCT002", "LCT003", "LLM001"):
+    elif modelId in ('LCT001', 'LCT007', 'LCT002', 'LCT003', 'LLM001'):
         return GamutB
-    elif modelId in ("LCT010", "LCT011", "LCT012", "LCT014", "LCT015", "LCT016", "LLC020", "LST002"):
+    elif modelId in ('LCT010', 'LCT011', 'LCT012', 'LCT014', 'LCT015', 'LCT016', 'LLC020', 'LST002'):
         return GamutC
     else:
         raise ValueError
@@ -79,7 +67,7 @@ class ColorHelper:
 
     def rgb_to_hex(self, r, g, b):
         """Converts RGB to hex."""
-        return "%02x%02x%02x" % (r, g, b)
+        return '%02x%02x%02x' % (r, g, b)
 
     def random_rgb_value(self):
         """Return a random Integer in the range of 0 to 255, representing an RGB color value."""

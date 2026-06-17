@@ -35,17 +35,17 @@ from .webif import WebInterface
 
 
 class PirateWeather(SmartPlugin):
-    PLUGIN_VERSION = "1.2.5"
+    PLUGIN_VERSION = '1.2.5'
 
     # https://api.pirateweather.net/forecast/[apikey]/[latitude],[longitude]
-    _base_url = "https://api.pirateweather.net/forecast/"
+    _base_url = 'https://api.pirateweather.net/forecast/'
 
     _http_response = {
-        500: "Internal Server Error",
-        501: "Not Implemented",
-        502: "Bad Gateway",
-        503: "Service Unavailable",
-        504: "Internal Server Error",
+        500: 'Internal Server Error',
+        501: 'Not Implemented',
+        502: 'Bad Gateway',
+        503: 'Service Unavailable',
+        504: 'Internal Server Error',
     }
 
     def get_http_response(self, code):
@@ -53,18 +53,18 @@ class PirateWeather(SmartPlugin):
         description = self._http_response.get(code, None)
         if description is None:
             if code >= 100 and code < 200:
-                description = "Informational"
+                description = 'Informational'
             elif code < 300:
-                description = "Success"
+                description = 'Success'
             elif code < 400:
-                description = "Redirection"
+                description = 'Redirection'
             elif code < 500:
-                description = "Client Error"
+                description = 'Client Error'
             elif code < 600:
-                description = "Server Error"
+                description = 'Server Error'
             else:
-                description = "Unknown Response"
-        description += " (" + str(code) + ")"
+                description = 'Unknown Response'
+        description += ' (' + str(code) + ')'
         return description
 
     def __init__(self, sh, *args, **kwargs):
@@ -84,19 +84,19 @@ class PirateWeather(SmartPlugin):
         super().__init__()
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
-        self._key = self.get_parameter_value("key")
-        if self.get_parameter_value("latitude") != 0 and self.get_parameter_value("longitude") != 0:
-            self._lat = self.get_parameter_value("latitude")
-            self._lon = self.get_parameter_value("longitude")
+        self._key = self.get_parameter_value('key')
+        if self.get_parameter_value('latitude') != 0 and self.get_parameter_value('longitude') != 0:
+            self._lat = self.get_parameter_value('latitude')
+            self._lon = self.get_parameter_value('longitude')
         else:
-            self.logger.debug("__init__: latitude and longitude not provided, using shng system values instead.")
+            self.logger.debug('__init__: latitude and longitude not provided, using shng system values instead.')
             self._lat = self.get_sh().lat
             self._lon = self.get_sh().lon
-        self._lang = self.get_parameter_value("lang")
-        self._units = self.get_parameter_value("units")
+        self._lang = self.get_parameter_value('lang')
+        self._units = self.get_parameter_value('units')
         self._jsonData = {}
         self._session = requests.Session()
-        self._cycle = int(self.get_parameter_value("cycle"))
+        self._cycle = int(self.get_parameter_value('cycle'))
         self._items = {}  # Items that are handled by this plugin
 
         self.init_webinterface(WebInterface)
@@ -112,7 +112,7 @@ class PirateWeather(SmartPlugin):
         """
         Starts the update loop for all known items.
         """
-        self.logger.debug("Starting update loop for instance {}".format(self.get_instance_name()))
+        self.logger.debug('Starting update loop for instance {}'.format(self.get_instance_name()))
         if not self.alive:
             return
 
@@ -124,37 +124,37 @@ class PirateWeather(SmartPlugin):
         """
         forecast = self.get_forecast()
         if forecast is None:
-            self.logger.info("Forecast is None! Server did not answer or sent an invalid reply?")
+            self.logger.info('Forecast is None! Server did not answer or sent an invalid reply?')
             return
         self._jsonData = forecast
         for s, matchStringItems in self._items.items():
             wrk = forecast
-            sp = s.split("/")
-            if s == "flags/sources":
-                wrk = ", ".join(wrk["flags"]["sources"])
-            elif s == "alerts" or s == "alerts_string":
-                if "alerts" in wrk:
-                    if s == "alerts":
-                        wrk = wrk["alerts"]
+            sp = s.split('/')
+            if s == 'flags/sources':
+                wrk = ', '.join(wrk['flags']['sources'])
+            elif s == 'alerts' or s == 'alerts_string':
+                if 'alerts' in wrk:
+                    if s == 'alerts':
+                        wrk = wrk['alerts']
                     else:
-                        alerts_string = ""
-                        if "alerts" in wrk:
-                            for alert in wrk["alerts"]:
-                                start_time = datetime.datetime.fromtimestamp(int(alert["time"])).strftime(
-                                    "%d.%m.%Y %H:%M"
+                        alerts_string = ''
+                        if 'alerts' in wrk:
+                            for alert in wrk['alerts']:
+                                start_time = datetime.datetime.fromtimestamp(int(alert['time'])).strftime(
+                                    '%d.%m.%Y %H:%M'
                                 )
-                                expire_time = datetime.datetime.fromtimestamp(int(alert["expires"])).strftime(
-                                    "%d.%m.%Y %H:%M"
+                                expire_time = datetime.datetime.fromtimestamp(int(alert['expires'])).strftime(
+                                    '%d.%m.%Y %H:%M'
                                 )
                                 alerts_string_wrk = (
-                                    "<p><h1>" + alert["title"] + " (" + start_time + " - " + expire_time + ")</h1>"
+                                    '<p><h1>' + alert['title'] + ' (' + start_time + ' - ' + expire_time + ')</h1>'
                                 )
-                                alerts_string_wrk = alerts_string_wrk + "<span>" + alert["description"] + "</span></p>"
+                                alerts_string_wrk = alerts_string_wrk + '<span>' + alert['description'] + '</span></p>'
                                 alerts_string = alerts_string + alerts_string_wrk
                         wrk = alerts_string
                 else:
-                    if s == "alerts_string":
-                        wrk = ""
+                    if s == 'alerts_string':
+                        wrk = ''
                     else:
                         wrk = []
             else:
@@ -178,7 +178,7 @@ class PirateWeather(SmartPlugin):
                     else:
                         wrk = wrk.get(sp[0])
                     if len(sp) == 1:
-                        spl = s.split("/")
+                        spl = s.split('/')
                         self.logger.debug(
                             "_update: pw_matchstring split len={}, content={} -> '{}'".format(
                                 str(len(spl)), str(spl), str(wrk)
@@ -189,7 +189,7 @@ class PirateWeather(SmartPlugin):
             # if a value was found, store it to item
             if wrk is not None:
                 for sameMatchStringItem in matchStringItems:
-                    sameMatchStringItem(wrk, "piratewthr")
+                    sameMatchStringItem(wrk, 'piratewthr')
                     self.logger.debug('_update: Value "{0}" written to item {1}'.format(wrk, sameMatchStringItem))
 
         return
@@ -199,30 +199,30 @@ class PirateWeather(SmartPlugin):
         Requests the forecast information at pirateweather.net
         """
         url_to_send = self._build_url()
-        self.logger.info(f"get_forecast: url={url_to_send}")
+        self.logger.info(f'get_forecast: url={url_to_send}')
         json_obj = None
         try:
             response = self._session.get(url_to_send)
         except Exception as e:
-            self.logger.warning(f"get_forecast: Exception when sending GET request: {e}")
+            self.logger.warning(f'get_forecast: Exception when sending GET request: {e}')
             return
         try:
             json_obj = response.json()
         except Exception as e:
             self.logger.warning(f"get_forecast: Response '{response}' is no valid json format: {e}")
             return
-        self.logger.info(f"get_forecast: json response={json_obj}")
+        self.logger.info(f'get_forecast: json response={json_obj}')
 
         if response.status_code >= 500:
             self.logger.warning(
-                f"api.pirateweather.net: {self.get_http_response(response.status_code)} - Ignoring response."
+                f'api.pirateweather.net: {self.get_http_response(response.status_code)} - Ignoring response.'
             )
             return
 
-        if json_obj["flags"]["units"].lower() != self._units.lower():
+        if json_obj['flags']['units'].lower() != self._units.lower():
             # Log data, if receiving data in other format than the requested units
-            self.logger.notice(f"get_forecast: url sent={url_to_send}")
-            self.logger.notice(f"get_forecast: Ignoring data in other units than requested: {json_obj}")
+            self.logger.notice(f'get_forecast: url sent={url_to_send}')
+            self.logger.notice(f'get_forecast: Ignoring data in other units than requested: {json_obj}')
             return
 
         # if json_obj['currently']['temperature'] > 45:
@@ -231,104 +231,104 @@ class PirateWeather(SmartPlugin):
         #     self.logger.notice(f"get_forecast: Data in imperial units?: {json_obj}")
 
         daily_data = OrderedDict()
-        if not json_obj.get("daily", False):
+        if not json_obj.get('daily', False):
             self.logger.warning(
-                f"api.pirateweather.net: {self.get_http_response(response.status_code)} - No info for daily values."
+                f'api.pirateweather.net: {self.get_http_response(response.status_code)} - No info for daily values.'
             )
             # return
         else:
             # add icon_visu to daily
-            json_obj["daily"].update({"icon_visu": self.map_icon(json_obj["daily"]["icon"])})
+            json_obj['daily'].update({'icon_visu': self.map_icon(json_obj['daily']['icon'])})
 
-        if not json_obj.get("hourly", False):
+        if not json_obj.get('hourly', False):
             self.logger.warning(
-                f"api.pirateweather.net: {self.get_http_response(response.status_code)} - No info for hourly values."
+                f'api.pirateweather.net: {self.get_http_response(response.status_code)} - No info for hourly values.'
             )
             # return
         else:
             # add icon_visu to hourly
-            json_obj["hourly"].update({"icon_visu": self.map_icon(json_obj["hourly"]["icon"])})
+            json_obj['hourly'].update({'icon_visu': self.map_icon(json_obj['hourly']['icon'])})
 
-        if not json_obj.get("currently"):
+        if not json_obj.get('currently'):
             self.logger.warning(
                 f"api.pirateweather.net: {self.get_http_response(response.status_code)} - No info for current values. Skipping update for 'currently' values."
             )
         else:
-            date_entry = datetime.datetime.fromtimestamp(json_obj["currently"]["time"]).strftime("%d.%m.%Y")
-            day_entry = datetime.datetime.fromtimestamp(json_obj["currently"]["time"]).strftime("%A")
-            hour_entry = datetime.datetime.fromtimestamp(json_obj["currently"]["time"]).hour
-            json_obj["currently"].update(
+            date_entry = datetime.datetime.fromtimestamp(json_obj['currently']['time']).strftime('%d.%m.%Y')
+            day_entry = datetime.datetime.fromtimestamp(json_obj['currently']['time']).strftime('%A')
+            hour_entry = datetime.datetime.fromtimestamp(json_obj['currently']['time']).hour
+            json_obj['currently'].update(
                 {
-                    "date": date_entry,
-                    "weekday": day_entry,
-                    "hour": hour_entry,
-                    "icon_visu": self.map_icon(json_obj["currently"]["icon"]),
+                    'date': date_entry,
+                    'weekday': day_entry,
+                    'hour': hour_entry,
+                    'icon_visu': self.map_icon(json_obj['currently']['icon']),
                 }
             )
 
-        if json_obj.get("daily", False):
+        if json_obj.get('daily', False):
             # add icon_visu, date and day to each day
-            for day in json_obj["daily"].get("data"):
-                date_entry = datetime.datetime.fromtimestamp(day["time"]).strftime("%d.%m.%Y")
-                day_entry = datetime.datetime.fromtimestamp(day["time"]).strftime("%A")
-                day.update({"date": date_entry, "weekday": day_entry, "icon_visu": self.map_icon(day["icon"])})
-                daily_data.update({datetime.datetime.fromtimestamp(day["time"]).date(): day})
-            json_obj["daily"].update(daily_data)
-            json_obj["daily"].pop("data")
+            for day in json_obj['daily'].get('data'):
+                date_entry = datetime.datetime.fromtimestamp(day['time']).strftime('%d.%m.%Y')
+                day_entry = datetime.datetime.fromtimestamp(day['time']).strftime('%A')
+                day.update({'date': date_entry, 'weekday': day_entry, 'icon_visu': self.map_icon(day['icon'])})
+                daily_data.update({datetime.datetime.fromtimestamp(day['time']).date(): day})
+            json_obj['daily'].update(daily_data)
+            json_obj['daily'].pop('data')
 
-        if json_obj.get("hourly", False):
+        if json_obj.get('hourly', False):
             # add icon_visu, date and day to each hour. Add the hours to the corresponding day as well as map to hour0, hour1, etc.
-            for number, hour in enumerate(json_obj["hourly"].get("data")):
-                date_entry = datetime.datetime.fromtimestamp(hour["time"]).strftime("%d.%m.%Y")
-                day_entry = datetime.datetime.fromtimestamp(hour["time"]).strftime("%A")
-                hour_entry = datetime.datetime.fromtimestamp(hour["time"]).hour
-                date_key = datetime.datetime.fromtimestamp(hour["time"]).date()
+            for number, hour in enumerate(json_obj['hourly'].get('data')):
+                date_entry = datetime.datetime.fromtimestamp(hour['time']).strftime('%d.%m.%Y')
+                day_entry = datetime.datetime.fromtimestamp(hour['time']).strftime('%A')
+                hour_entry = datetime.datetime.fromtimestamp(hour['time']).hour
+                date_key = datetime.datetime.fromtimestamp(hour['time']).date()
                 hour.update(
                     {
-                        "date": date_entry,
-                        "weekday": day_entry,
-                        "hour": hour_entry,
-                        "icon_visu": self.map_icon(hour["icon"]),
+                        'date': date_entry,
+                        'weekday': day_entry,
+                        'hour': hour_entry,
+                        'icon_visu': self.map_icon(hour['icon']),
                     }
                 )
-                if json_obj["daily"].get(date_key) is None:
-                    json_obj["daily"].update({date_key: {}})
-                if json_obj["daily"][date_key].get("hours") is None:
-                    json_obj["daily"][date_key].update({"hours": {}})
-                json_obj["daily"][date_key]["hours"].update(OrderedDict({hour_entry: hour}))
-                json_obj["hourly"].update(OrderedDict({"hour{}".format(number): hour}))
-                if json_obj["daily"][date_key].get("precipProbability_mean") is None:
-                    json_obj["daily"][date_key].update({"precipProbability_mean": []})
-                if json_obj["daily"][date_key].get("precipIntensity_mean") is None:
-                    json_obj["daily"][date_key].update({"precipIntensity_mean": []})
-                if json_obj["daily"][date_key].get("temperature_mean") is None:
-                    json_obj["daily"][date_key].update({"temperature_mean": []})
-                json_obj["daily"][date_key]["precipProbability_mean"].append(hour.get("precipProbability"))
-                json_obj["daily"][date_key]["precipIntensity_mean"].append(hour.get("precipIntensity"))
-                json_obj["daily"][date_key]["temperature_mean"].append(hour.get("temperature"))
-            json_obj["hourly"].pop("data")
+                if json_obj['daily'].get(date_key) is None:
+                    json_obj['daily'].update({date_key: {}})
+                if json_obj['daily'][date_key].get('hours') is None:
+                    json_obj['daily'][date_key].update({'hours': {}})
+                json_obj['daily'][date_key]['hours'].update(OrderedDict({hour_entry: hour}))
+                json_obj['hourly'].update(OrderedDict({'hour{}'.format(number): hour}))
+                if json_obj['daily'][date_key].get('precipProbability_mean') is None:
+                    json_obj['daily'][date_key].update({'precipProbability_mean': []})
+                if json_obj['daily'][date_key].get('precipIntensity_mean') is None:
+                    json_obj['daily'][date_key].update({'precipIntensity_mean': []})
+                if json_obj['daily'][date_key].get('temperature_mean') is None:
+                    json_obj['daily'][date_key].update({'temperature_mean': []})
+                json_obj['daily'][date_key]['precipProbability_mean'].append(hour.get('precipProbability'))
+                json_obj['daily'][date_key]['precipIntensity_mean'].append(hour.get('precipIntensity'))
+                json_obj['daily'][date_key]['temperature_mean'].append(hour.get('temperature'))
+            json_obj['hourly'].pop('data')
 
-        if json_obj.get("daily", False):
+        if json_obj.get('daily', False):
             # add mean values to each day and replace datetime object by day0, day1, day2, etc.
             i = 0
             # for entry in json_obj['daily']:
-            json_keys = list(json_obj["daily"].keys())
+            json_keys = list(json_obj['daily'].keys())
             for entry in json_keys:
                 if isinstance(entry, datetime.date):
                     try:
-                        precip_probability = json_obj["daily"][entry]["precipProbability_mean"]
-                        json_obj["daily"][entry]["precipProbability_mean"] = round(
+                        precip_probability = json_obj['daily'][entry]['precipProbability_mean']
+                        json_obj['daily'][entry]['precipProbability_mean'] = round(
                             sum(precip_probability) / len(precip_probability), 2
                         )
-                        precip_intensity = json_obj["daily"][entry]["precipIntensity_mean"]
-                        json_obj["daily"][entry]["precipIntensity_mean"] = round(
+                        precip_intensity = json_obj['daily'][entry]['precipIntensity_mean']
+                        json_obj['daily'][entry]['precipIntensity_mean'] = round(
                             sum(precip_intensity) / len(precip_intensity), 2
                         )
-                        temperature = json_obj["daily"][entry]["temperature_mean"]
-                        json_obj["daily"][entry]["temperature_mean"] = round(sum(temperature) / len(temperature), 2)
+                        temperature = json_obj['daily'][entry]['temperature_mean']
+                        json_obj['daily'][entry]['temperature_mean'] = round(sum(temperature) / len(temperature), 2)
                     except Exception:
                         pass
-                    json_obj["daily"]["day{}".format(i)] = json_obj["daily"].pop(entry)
+                    json_obj['daily']['day{}'.format(i)] = json_obj['daily'].pop(entry)
                     i += 1
 
         return json_obj
@@ -340,28 +340,28 @@ class PirateWeather(SmartPlugin):
         :param icon icon to map, as string.
         :return SmartVisu icon as string.
         """
-        if icon == "clear-day":
-            return "sun_1"
-        elif icon == "clear-night":
-            return "sun_1"
-        elif icon == "partly-cloudy-day":
-            return "sun_4"
-        elif icon == "partly-cloudy-night":
-            return "sun_4"
-        elif icon == "fog":
-            return "sun_6"
-        elif icon == "rain":
-            return "cloud_8"
-        elif icon == "wind":
-            return "sun_10"
-        elif icon == "snow":
-            return "sun_12"
-        elif icon == "cloudy":
-            return "cloud_4"
-        elif icon == "sleet":
-            return "cloud_11"
+        if icon == 'clear-day':
+            return 'sun_1'
+        elif icon == 'clear-night':
+            return 'sun_1'
+        elif icon == 'partly-cloudy-day':
+            return 'sun_4'
+        elif icon == 'partly-cloudy-night':
+            return 'sun_4'
+        elif icon == 'fog':
+            return 'sun_6'
+        elif icon == 'rain':
+            return 'cloud_8'
+        elif icon == 'wind':
+            return 'sun_10'
+        elif icon == 'snow':
+            return 'sun_12'
+        elif icon == 'cloudy':
+            return 'cloud_4'
+        elif icon == 'sleet':
+            return 'cloud_11'
         else:
-            return "high"
+            return 'high'
 
     def parse_item(self, item):
         """
@@ -370,7 +370,7 @@ class PirateWeather(SmartPlugin):
 
         :param item: The item to process.
         """
-        pw_matchstring = self.get_iattr_value(item.conf, "pw_matchstring")
+        pw_matchstring = self.get_iattr_value(item.conf, 'pw_matchstring')
         if pw_matchstring:
             if pw_matchstring not in self._items:
                 self._items[pw_matchstring] = []
@@ -390,20 +390,20 @@ class PirateWeather(SmartPlugin):
 
         return json.dumps(self._jsonData, indent=4)
 
-    def _build_url(self, url_type="forecast"):
+    def _build_url(self, url_type='forecast'):
         """
         Builds a request url
         @param url_type: url type (currently on 'forecast', as historic data are not supported.
         @return: string of the url
         """
-        url = ""
-        if url_type == "forecast":
+        url = ''
+        if url_type == 'forecast':
             # url = self._base_forecast_url % (self._key, self._lat, self._lon)
-            url = self._base_url + f"{self._key}/{self._lat},{self._lon}"
-            parameters = f"?lang={self._lang}"
+            url = self._base_url + f'{self._key}/{self._lat},{self._lon}'
+            parameters = f'?lang={self._lang}'
             if self._units is not None:
-                parameters += f"&units={self._units}"
+                parameters += f'&units={self._units}'
             url += parameters
         else:
-            self.logger.error(f"_build_url: Wrong url type specified: {url_type}")
+            self.logger.error(f'_build_url: Wrong url type specified: {url_type}')
         return url

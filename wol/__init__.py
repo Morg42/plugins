@@ -29,7 +29,7 @@ from lib.item import Items
 
 from .webif import WebInterface
 
-ITEM_TAG = ["wol_mac", "wol_ip"]
+ITEM_TAG = ['wol_mac', 'wol_ip']
 
 
 class WakeOnLan(SmartPlugin):
@@ -42,7 +42,7 @@ class WakeOnLan(SmartPlugin):
     are already available!
     """
 
-    PLUGIN_VERSION = "1.2.0"
+    PLUGIN_VERSION = '1.2.0'
 
     def __init__(self, sh, *args, **kwargs):
         # Call init code of parent class (SmartPlugin)
@@ -58,14 +58,14 @@ class WakeOnLan(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
         self.alive = True
 
     def stop(self):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.alive = False
 
     def parse_item(self, item):
@@ -121,29 +121,29 @@ class WakeOnLan(SmartPlugin):
         :param ip_adr: ip address, if not given defaults to '<broadcast>'
         :type ip_adr: ip4
         """
-        self.logger.debug(f"WakeOnLan: send magic paket to {mac_adr}")
+        self.logger.debug(f'WakeOnLan: send magic paket to {mac_adr}')
         # check length and format
         if not self.is_mac(mac_adr):
-            self.logger.warning(f"WakeOnLan: invalid mac address {mac_adr}!")
+            self.logger.warning(f'WakeOnLan: invalid mac address {mac_adr}!')
             return
         if len(mac_adr) == 12 + 5:
             sep = mac_adr[2]
-            mac_adr = mac_adr.replace(sep, "")
+            mac_adr = mac_adr.replace(sep, '')
         # create magic packet
-        data = "".join(["FF" * 6, mac_adr * 20])
+        data = ''.join(['FF' * 6, mac_adr * 20])
 
         # Broadcast
         if isinstance(ip_adr, str):
-            if ip_adr.strip() == "":
+            if ip_adr.strip() == '':
                 ip_adr = None
 
         if ip_adr is None:
-            ip_adr = "<broadcast>"
+            ip_adr = '<broadcast>'
 
         if ip_adr:
-            self.logger.debug(f"WakeOnLan: send magic paket {data} to ip/mac {ip_adr}/{mac_adr}")
+            self.logger.debug(f'WakeOnLan: send magic paket {data} to ip/mac {ip_adr}/{mac_adr}')
         else:
-            self.logger.debug(f"WakeOnLan: send magic paket {data} to mac {mac_adr}")
+            self.logger.debug(f'WakeOnLan: send magic paket {data} to mac {mac_adr}')
         sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
         sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
         sock.sendto(bytearray.fromhex(data), (ip_adr, 7))

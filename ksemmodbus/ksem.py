@@ -27,20 +27,20 @@ class Ksem:
         try:
             self.client.connect()
             for i in self.registers:
-                if i.type == "Float":
+                if i.type == 'Float':
                     i.value = self.__read_float(i.adrDec)
-                elif i.type == "U16":
+                elif i.type == 'U16':
                     i.value = self.__read_u16(i.adrDec)
-                elif i.type == "U16_2":
+                elif i.type == 'U16_2':
                     i.value = self.__read_u16_2(i.adrDec)
-                elif i.type == "U32":
+                elif i.type == 'U32':
                     i.value = self.__read_u32(i.adrDec)
-                elif i.type == "U64":
+                elif i.type == 'U64':
                     i.value = self.__read_u64(i.adrDec)
-                elif i.type == "S16":
+                elif i.type == 'S16':
                     i.value = self.__read_s16(i.adrDec)
         except Exception as exc:
-            print("Error getting Data from Kostal Smart Energy Meter :", exc)
+            print('Error getting Data from Kostal Smart Energy Meter :', exc)
 
         self.client.close()
         return self.registers
@@ -82,24 +82,24 @@ class Ksem:
     decRow = [0, 2, 4, 6, 16, 18, 24, 512, 516, 520, 524, 544, 548]
 
     __descriptionRow = [
-        "Active Power +",
-        "Active Power -",
-        "Reactive Power +",
-        "Reactive Power -",
-        "Apparent power +",
-        "Apparent power -",
-        "Power Factor",
-        "Active energy+",
-        "Active energy-",
-        "Reactive energy+",
-        "Reactive energy-",
-        "Apparent energy+",
-        "Apparent energy-",
+        'Active Power +',
+        'Active Power -',
+        'Reactive Power +',
+        'Reactive Power -',
+        'Apparent power +',
+        'Apparent power -',
+        'Power Factor',
+        'Active energy+',
+        'Active energy-',
+        'Reactive energy+',
+        'Reactive energy-',
+        'Apparent energy+',
+        'Apparent energy-',
     ]
 
-    __unitRow = ["W", "W", "var", "var", "VA", "VA", "", "Wh", "Wh", "varh", "varh", "VAh", "VAh"]
+    __unitRow = ['W', 'W', 'var', 'var', 'VA', 'VA', '', 'Wh', 'Wh', 'varh', 'varh', 'VAh', 'VAh']
 
-    __typeRow = ["U32", "U32", "U32", "U32", "U32", "U32", "Float", "U64", "U64", "U64", "U64", "U64", "U64"]
+    __typeRow = ['U32', 'U32', 'U32', 'U32', 'U32', 'U32', 'Float', 'U64', 'U64', 'U64', 'U64', 'U64', 'U64']
 
 
 class Register:
@@ -108,4 +108,4 @@ class Register:
         self.description = description
         self.type = val_type
         self.unit = unit
-        self.value = ""
+        self.value = ''

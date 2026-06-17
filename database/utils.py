@@ -54,20 +54,12 @@ def encode_value(item_type: str, value) -> dict:
     :rtype:           dict
     """
     if value is None:
-        return {"val_str": None, "val_num": None, "val_bool": None}
+        return {'val_str': None, 'val_num': None, 'val_bool': None}
 
-    if item_type in ("num", "bool"):
-        return {
-            "val_str": None,
-            "val_num": float(value),
-            "val_bool": int(bool(value)),
-        }
+    if item_type in ('num', 'bool'):
+        return {'val_str': None, 'val_num': float(value), 'val_bool': int(bool(value))}
     # str and all other types
-    return {
-        "val_str": str(value),
-        "val_num": None,
-        "val_bool": int(bool(value)),
-    }
+    return {'val_str': str(value), 'val_num': None, 'val_bool': int(bool(value))}
 
 
 def decode_value(item_type: str, val_str, val_num, val_bool):
@@ -83,9 +75,9 @@ def decode_value(item_type: str, val_str, val_num, val_bool):
     :param val_bool:  Value of the ``val_bool`` database column.
     :returns:         The decoded Python value, or ``None``.
     """
-    if item_type == "num":
+    if item_type == 'num':
         return None if val_num is None else float(val_num)
-    if item_type == "bool":
+    if item_type == 'bool':
         return None if val_bool is None else bool(int(val_bool))
     # str and others
     return None if val_str is None else str(val_str)
@@ -140,14 +132,7 @@ def apply_table_names(query: str, table_names: dict) -> str:
 
 
 def build_where_clause(
-    item_id: int,
-    *,
-    time=None,
-    time_start=None,
-    time_end=None,
-    changed=None,
-    changed_start=None,
-    changed_end=None,
+    item_id: int, *, time=None, time_start=None, time_end=None, changed=None, changed_start=None, changed_end=None
 ) -> tuple:
     """Build a parameterised SQL WHERE clause from optional filter criteria.
 
@@ -167,26 +152,26 @@ def build_where_clause(
                           a parameterised query.
     :rtype:               tuple[str, dict]
     """
-    clauses = ["item_id = :item_id"]
-    params: dict = {"item_id": item_id}
+    clauses = ['item_id = :item_id']
+    params: dict = {'item_id': item_id}
 
     if time is not None:
-        clauses.append("time = :time")
-        params["time"] = time
+        clauses.append('time = :time')
+        params['time'] = time
     if time_start is not None:
-        clauses.append("time > :time_start")
-        params["time_start"] = time_start
+        clauses.append('time > :time_start')
+        params['time_start'] = time_start
     if time_end is not None:
-        clauses.append("time < :time_end")
-        params["time_end"] = time_end
+        clauses.append('time < :time_end')
+        params['time_end'] = time_end
     if changed is not None:
-        clauses.append("changed = :changed")
-        params["changed"] = changed
+        clauses.append('changed = :changed')
+        params['changed'] = changed
     if changed_start is not None:
-        clauses.append("changed > :changed_start")
-        params["changed_start"] = changed_start
+        clauses.append('changed > :changed_start')
+        params['changed_start'] = changed_start
     if changed_end is not None:
-        clauses.append("changed < :changed_end")
-        params["changed_end"] = changed_end
+        clauses.append('changed < :changed_end')
+        params['changed_end'] = changed_end
 
-    return " AND ".join(clauses), params
+    return ' AND '.join(clauses), params

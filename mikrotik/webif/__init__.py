@@ -69,15 +69,15 @@ class WebInterface(SmartPluginWebIf):
         """
 
         if learn is not None:
-            self.logger.debug(f"Found learn: {learn}")
+            self.logger.debug(f'Found learn: {learn}')
 
-        pagelength = self.plugin.get_parameter_value("webif_pagelength")
-        tmpl = self.tplenv.get_template("index.html")
+        pagelength = self.plugin.get_parameter_value('webif_pagelength')
+        tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(
             p=self.plugin,
             webif_pagelength=pagelength,
-            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])),
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
             item_count=0,
         )
 
@@ -97,7 +97,7 @@ class WebInterface(SmartPluginWebIf):
                 data = json.dumps(data)
                 return data
             except Exception as e:
-                self.logger.error(f"get_data_html exception: {e}")
+                self.logger.error(f'get_data_html exception: {e}')
         return {}
 
     @cherrypy.expose

@@ -69,19 +69,19 @@ class WebInterface(SmartPluginWebIf):
         """
         token = self.plugin.get_hc().token_load()
 
-        if grant_type == "authorization_code" and code is not None and state is not None:
-            os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
-            self.logger.error("Token expired, refreshing!")
+        if grant_type == 'authorization_code' and code is not None and state is not None:
+            os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+            self.logger.error('Token expired, refreshing!')
             self.plugin.get_hc().get_token(
-                cherrypy.url() + "?code=" + code + "&state=" + state + "&grant_type=" + grant_type
+                cherrypy.url() + '?code=' + code + '&state=' + state + '&grant_type=' + grant_type
             )
             token = self.plugin.get_hc().token_load()
 
         token_expiry_date = None
         if token is not None:
-            token_expiry_date = datetime.fromtimestamp(token["expires_at"])
+            token_expiry_date = datetime.fromtimestamp(token['expires_at'])
 
-        tmpl = self.tplenv.get_template("index.html")
+        tmpl = self.tplenv.get_template('index.html')
         return tmpl.render(
             plugin_shortname=self.plugin.get_shortname(),
             plugin_version=self.plugin.get_version(),
@@ -89,7 +89,7 @@ class WebInterface(SmartPluginWebIf):
             item_count=len(self.plugin.get_items()),
             plugin_info=self.plugin.get_info(),
             tabcount=3,
-            tab1title="HomeConnect Items (%s)" % len(self.plugin.get_items()),
+            tab1title='HomeConnect Items (%s)' % len(self.plugin.get_items()),
             token=token,
             token_expiry_date=token_expiry_date,
             p=self.plugin,

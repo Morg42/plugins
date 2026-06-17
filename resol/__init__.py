@@ -25,7 +25,7 @@ from lib.model.smartplugin import SmartPlugin, logging
 
 
 class Resol(SmartPlugin):
-    PLUGIN_VERSION = "1.1.0"  # (must match the version specified in plugin.yaml)
+    PLUGIN_VERSION = '1.1.0'  # (must match the version specified in plugin.yaml)
 
     def __init__(self, sh):
         """
@@ -38,10 +38,10 @@ class Resol(SmartPlugin):
 
         self._sh = sh
         self._items = []
-        self._ip = self.get_parameter_value("ip")
-        self._port = self.get_parameter_value("port")
-        self._cycle = self.get_parameter_value("cycle")
-        self._password = self.get_parameter_value("password")
+        self._ip = self.get_parameter_value('ip')
+        self._port = self.get_parameter_value('port')
+        self._cycle = self.get_parameter_value('cycle')
+        self._password = self.get_parameter_value('password')
         self._to_do = True
         self.socket = None
         self._last_request_successfull = False
@@ -49,12 +49,12 @@ class Resol(SmartPlugin):
 
     def run(self):
         self.alive = True
-        self.scheduler_add("PollData", self.pull_socket, prio=5, cycle=self._cycle, offset=2)
+        self.scheduler_add('PollData', self.pull_socket, prio=5, cycle=self._cycle, offset=2)
         # if you want to create child threads, do not make them daemon = True!
         # They will not shutdown properly. (It's a python bug)
 
     def stop(self):
-        self.scheduler_remove("PollData")
+        self.scheduler_remove('PollData')
 
         try:
             if self.socket:
@@ -67,24 +67,24 @@ class Resol(SmartPlugin):
         self.alive = False
 
     def parse_item(self, item):
-        if self.has_iattr(item.conf, "resol_offset"):
+        if self.has_iattr(item.conf, 'resol_offset'):
             parentItem = item.return_parent()
-            if self.has_iattr(parentItem.conf, "resol_source"):
-                resol_source = self.get_iattr_value(parentItem.conf, "resol_source")
-                self.logger.debug(f"Parent source: {resol_source}")
+            if self.has_iattr(parentItem.conf, 'resol_source'):
+                resol_source = self.get_iattr_value(parentItem.conf, 'resol_source')
+                self.logger.debug(f'Parent source: {resol_source}')
             else:
-                self.logger.error(f"Attribute resol_source missing in parent item of item {item}")
+                self.logger.error(f'Attribute resol_source missing in parent item of item {item}')
                 return
 
-            if self.has_iattr(item.conf, "resol_bituse"):
-                resol_bituse = self.get_iattr_value(item.conf, "resol_bituse")
+            if self.has_iattr(item.conf, 'resol_bituse'):
+                resol_bituse = self.get_iattr_value(item.conf, 'resol_bituse')
                 self._items.append(item)
-                self.logger.debug(f"Debug: added item {item} with resol_bituse {resol_bituse}")
+                self.logger.debug(f'Debug: added item {item} with resol_bituse {resol_bituse}')
                 # As plugin is read-only, no need to register item for event handling via smarthomeNG core:
 
             else:
                 self.logger.error(
-                    f"resol_offset found in item {item} but no bitsize given, specify bitsize in item with resol_bitsize = "
+                    f'resol_offset found in item {item} but no bitsize given, specify bitsize in item with resol_bitsize = '
                 )
 
     def update_item(self, item, caller=None, source=None, dest=None):
@@ -95,61 +95,61 @@ class Resol(SmartPlugin):
         if not self.alive:
             self._last_request_successfull = False
             return
-        self.logger.info("1) Starting sock function")
+        self.logger.info('1) Starting sock function')
         self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.logger.info("2) Connecting socket")
+        self.logger.info('2) Connecting socket')
         try:
             self.socket.connect((self._ip, self._port))
         except socket.timeout as e:
-            self.logger.warning("Timeout exception during socket connect: %s" % str(e))
+            self.logger.warning('Timeout exception during socket connect: %s' % str(e))
             self._last_request_successfull = False
             return
         except Exception as e:
             self._last_request_successfull = False
-            self.logger.error("Exception during socket connect: %s" % str(e))
+            self.logger.error('Exception during socket connect: %s' % str(e))
             return
-        self.logger.info("3) Logging in")
+        self.logger.info('3) Logging in')
         if self.login():
-            self.logger.info("4) Loading data")
+            self.logger.info('4) Loading data')
             self.load_data()
         else:
-            self.logger.warning("Cannot login")
+            self.logger.warning('Cannot login')
             self._last_request_successfull = False
-        self.logger.info("5) Shutting down socket")
+        self.logger.info('5) Shutting down socket')
         try:
             if self.socket:
                 self.socket.shutdown(0)
                 self.socket.close()
         except Exception as e:
-            self.logger.warning("Exception during shutdown socket command: {0}".format(e))
+            self.logger.warning('Exception during shutdown socket command: {0}'.format(e))
             pass
-        self.logger.info("6) Ending socket function")
+        self.logger.info('6) Ending socket function')
         self.socket = None
 
     # Logs in onto the DeltaSol BS Plus over LAN. Also starts (and maintains) the
     # actual stream of data.
     def login(self):
         dat = self.recv()
-        self.logger.debug("Login response: " + str(dat))
+        self.logger.debug('Login response: ' + str(dat))
 
         # Check if device answered
-        if dat != "+HELLO\n":
-            self.logger.warning("WRONG REPLY FROM VBUS LAN: " + str(dat))
+        if dat != '+HELLO\n':
+            self.logger.warning('WRONG REPLY FROM VBUS LAN: ' + str(dat))
             return False
 
         # Send Password
-        self.send("PASS %s\n" % self._password)
+        self.send('PASS %s\n' % self._password)
 
         dat = self.recv()
         if not dat:
-            self.logger.warning("No data received following password send")
+            self.logger.warning('No data received following password send')
             return False
 
-        self.logger.debug("Response to pwd: " + str(dat))
+        self.logger.debug('Response to pwd: ' + str(dat))
 
         # Check if device accepted password
-        if not dat.startswith("+OK"):
-            self.logger.warning("Password not accepted:" + str(dat))
+        if not dat.startswith('+OK'):
+            self.logger.warning('Password not accepted:' + str(dat))
             return False
 
         return True
@@ -157,20 +157,20 @@ class Resol(SmartPlugin):
     def load_data(self):
         # Request Data
         global new_data
-        self.logger.info("Requesting data...")
-        self.send("DATA\n")
+        self.logger.info('Requesting data...')
+        self.send('DATA\n')
         dat = self.recv()
 
         if not dat:
-            self.logger.warning("Could not receive data via socket")
+            self.logger.warning('Could not receive data via socket')
             self._last_request_successfull = False
             return
 
-        self.logger.info("Response to data: " + str(dat))
+        self.logger.info('Response to data: ' + str(dat))
 
         # Check if device is ready to send Data
-        if not dat.startswith("+OK"):
-            self.logger.warning("Vbus Lan is not ready, reply: " + str(dat))
+        if not dat.startswith('+OK'):
+            self.logger.warning('Vbus Lan is not ready, reply: ' + str(dat))
             self._last_request_successfull = False
             return
         buf = self.readstream()
@@ -195,7 +195,7 @@ class Resol(SmartPlugin):
         msgs = self.splitmsg(buf)
         for msg in msgs:
             # self.logger.debug("Msg protocol version {0}".format(self.get_protocolversion(msg)))
-            if "PV1" == self.get_protocolversion(msg):
+            if 'PV1' == self.get_protocolversion(msg):
                 self.parse_payload_pv1(msg)
             else:
                 pass
@@ -204,16 +204,16 @@ class Resol(SmartPlugin):
     # Receive 1024 bytes from stream
     def recv(self):
         if not self.socket:
-            self.logger.error("Error during data reception: Socket is not valid")
+            self.logger.error('Error during data reception: Socket is not valid')
             return None
         self.socket.settimeout(5)
         try:
-            dat = self.socket.recv(1024).decode("Cp1252")
+            dat = self.socket.recv(1024).decode('Cp1252')
         except socket.timeout:
-            self.logger.info("Exception in recv(): Socket reception timeout")
+            self.logger.info('Exception in recv(): Socket reception timeout')
             return None
         except Exception as e:
-            self.logger.error("Exception during socket recv.decode: %s" % str(e))
+            self.logger.error('Exception during socket recv.decode: %s' % str(e))
             return None
 
         return dat
@@ -222,7 +222,7 @@ class Resol(SmartPlugin):
     def send(self, dat):
         if not self.socket:
             return
-        self.socket.send(dat.encode("utf-8"))
+        self.socket.send(dat.encode('utf-8'))
 
     # Read Data until minimum 1 message is received
     def readstream(self):
@@ -231,10 +231,10 @@ class Resol(SmartPlugin):
             # No error logging because error was logged in recv function
             return None
         if not data:
-            self.logger.warning("No data received during readstream()")
+            self.logger.warning('No data received during readstream()')
             return None
         else:
-            self.logger.debug("Readstream() received {0}".format(data))
+            self.logger.debug('Readstream() received {0}'.format(data))
 
         while data.count(chr(0xAA)) < 4:
             data_rcv = self.recv()
@@ -243,10 +243,10 @@ class Resol(SmartPlugin):
                 return None
 
             if not data_rcv:
-                self.logger.warning("No data received during readstream() count")
+                self.logger.warning('No data received during readstream() count')
                 return None
             else:
-                self.logger.debug("Readstream count received {0}".format(data_rcv))
+                self.logger.debug('Readstream count received {0}'.format(data_rcv))
             data += data_rcv
         return data
 
@@ -256,17 +256,17 @@ class Resol(SmartPlugin):
 
     # Format 1 byte as String
     def format_byte(self, byte):
-        return hex(ord(byte))[0:2] + "0" + hex(ord(byte))[2:] if len(hex(ord(byte))) < 4 else hex(ord(byte))
+        return hex(ord(byte))[0:2] + '0' + hex(ord(byte))[2:] if len(hex(ord(byte))) < 4 else hex(ord(byte))
 
     # Extract protocol Version from msg
     def get_protocolversion(self, msg):
-        if hex(ord(msg[4])) == "0x10":
-            return "PV1"
-        if hex(ord(msg[4])) == "0x20":
-            return "PV2"
-        if hex(ord(msg[4])) == "0x30":
-            return "PV3"
-        return "UNKNOWN"
+        if hex(ord(msg[4])) == '0x10':
+            return 'PV1'
+        if hex(ord(msg[4])) == '0x20':
+            return 'PV2'
+        if hex(ord(msg[4])) == '0x30':
+            return 'PV3'
+        return 'UNKNOWN'
 
     # Extract Destination from msg NOT USED AT THE MOMENT
     def get_destination(self, msg):
@@ -296,15 +296,15 @@ class Resol(SmartPlugin):
 
     # Extract payload from msg
     def get_payload(self, msg):
-        payload = ""
+        payload = ''
         frame_count = self.get_frame_count(msg)
 
         # Check if enough bytes are in message buffer:
         if (15 + ((frame_count - 1) * 6)) > len(msg):
             self.logger.warning(
-                f"get_payload - Not enough data in msg buffer. Expected {15 + ((frame_count - 1) * 6)}, received {len(msg)}"
+                f'get_payload - Not enough data in msg buffer. Expected {15 + ((frame_count - 1) * 6)}, received {len(msg)}'
             )
-            return ""
+            return ''
 
         for i in range(frame_count):
             frame_data = msg[9 + (i * 6) : 15 + (i * 6)]
@@ -316,8 +316,8 @@ class Resol(SmartPlugin):
             #           self.logger.debug(f"frame {i}: isFrameCRC= {hex(isFrameCrc)}, calcFrame_crc={hex(frame_crc)}")
 
             if frame_crc != isFrameCrc:
-                self.logger.warning(f"Wrong frame CRC in frame {i}")
-                return ""
+                self.logger.warning(f'Wrong frame CRC in frame {i}')
+                return ''
 
             # Integrate septett byte into all frames:
             payload += self.integrate_septett(msg[9 + (i * 6) : 15 + (i * 6)])
@@ -335,7 +335,7 @@ class Resol(SmartPlugin):
         logger_debug = self.logger.isEnabledFor(logging.DEBUG)
 
         if not self.check_header_crc(msg):
-            self.logger.warning("Header crc error")
+            self.logger.warning('Header crc error')
             self._last_request_successfull = False
             return
 
@@ -343,16 +343,16 @@ class Resol(SmartPlugin):
         source = self.get_source(msg)
         destination = self.get_destination(msg)
         if logger_debug:
-            self.logger.debug("command: " + str(command))
-            self.logger.debug("source: " + str(source))
-            self.logger.debug("destination: " + str(destination))
+            self.logger.debug('command: ' + str(command))
+            self.logger.debug('source: ' + str(source))
+            self.logger.debug('destination: ' + str(destination))
         # self.logger.warning("Frame count: {0}".format(self.get_frame_count(msg)))
         # self.logger.warning("Length msg: {0}".format(len(msg)))
 
         payload = self.get_payload(msg)
 
-        if payload == "":
-            self.logger.warning("Payload is empty")
+        if payload == '':
+            self.logger.warning('Payload is empty')
             self._last_request_successfull = False
             return
 
@@ -360,50 +360,50 @@ class Resol(SmartPlugin):
 
         for item in self._items:
             parentItem = item.return_parent()
-            if self.has_iattr(parentItem.conf, "resol_source"):
-                resol_source = self.get_iattr_value(parentItem.conf, "resol_source")
+            if self.has_iattr(parentItem.conf, 'resol_source'):
+                resol_source = self.get_iattr_value(parentItem.conf, 'resol_source')
                 if resol_source != self.get_source(msg):
                     if logger_debug:
                         self.logger.debug(
-                            f"Attribute resol source {resol_source} of parent of item {item} does not match msg source {self.get_source(msg)}"
+                            f'Attribute resol source {resol_source} of parent of item {item} does not match msg source {self.get_source(msg)}'
                         )
                     continue
-            if self.has_iattr(parentItem.conf, "resol_destination"):
-                resol_destination = self.get_iattr_value(parentItem.conf, "resol_destination")
+            if self.has_iattr(parentItem.conf, 'resol_destination'):
+                resol_destination = self.get_iattr_value(parentItem.conf, 'resol_destination')
                 if resol_destination != self.get_destination(msg):
                     if logger_debug:
                         self.logger.debug(
-                            f"Attribute destination {resol_destination} of parent of item {item} does not match msg destination {self.get_destination(msg)}"
+                            f'Attribute destination {resol_destination} of parent of item {item} does not match msg destination {self.get_destination(msg)}'
                         )
                     continue
-            if self.has_iattr(parentItem.conf, "resol_command"):
-                resol_command = self.get_iattr_value(parentItem.conf, "resol_command")
+            if self.has_iattr(parentItem.conf, 'resol_command'):
+                resol_command = self.get_iattr_value(parentItem.conf, 'resol_command')
                 if resol_command != self.get_command(msg):
                     if logger_debug:
                         self.logger.debug(
-                            f"Attribute command {resol_command} of parent of item {item} does not match msg command {self.get_command(msg)}"
+                            f'Attribute command {resol_command} of parent of item {item} does not match msg command {self.get_command(msg)}'
                         )
                     continue
             else:
-                self.logger.error(f"resol command not found in parent of item {item}")
+                self.logger.error(f'resol command not found in parent of item {item}')
 
-            if self.has_iattr(item.conf, "resol_offset"):
-                resol_offset = self.get_iattr_value(item.conf, "resol_offset")
+            if self.has_iattr(item.conf, 'resol_offset'):
+                resol_offset = self.get_iattr_value(item.conf, 'resol_offset')
             else:
-                self.logger.error(f"Resol item {item} missing attribute resol_offset")
+                self.logger.error(f'Resol item {item} missing attribute resol_offset')
 
-            if self.has_iattr(item.conf, "resol_bituse"):
-                resol_bituse = self.get_iattr_value(item.conf, "resol_bituse")
+            if self.has_iattr(item.conf, 'resol_bituse'):
+                resol_bituse = self.get_iattr_value(item.conf, 'resol_bituse')
             else:
-                self.logger.error(f"Resol item {item} missing attribute resol_bituse")
+                self.logger.error(f'Resol item {item} missing attribute resol_bituse')
 
             resol_factors = {}
-            if self.has_iattr(item.conf, "resol_factor"):
-                resol_factors = self.get_iattr_value(item.conf, "resol_factor")
+            if self.has_iattr(item.conf, 'resol_factor'):
+                resol_factors = self.get_iattr_value(item.conf, 'resol_factor')
 
             resol_isSigned = {}
-            if self.has_iattr(item.conf, "resol_isSigned"):
-                resol_isSigned = self.get_iattr_value(item.conf, "resol_isSigned")
+            if self.has_iattr(item.conf, 'resol_isSigned'):
+                resol_isSigned = self.get_iattr_value(item.conf, 'resol_isSigned')
 
             # self.logger.warning(f"Debug Start: {resol_offset}, End: {end}")
 
@@ -417,7 +417,7 @@ class Resol(SmartPlugin):
                     factor = resol_factors[count]
                 else:
                     factor = 1
-                    self.logger.warning(f"No attribute resol_factor defined for byte {count}. Using factor=1 instead")
+                    self.logger.warning(f'No attribute resol_factor defined for byte {count}. Using factor=1 instead')
 
                 if len(resol_isSigned) > count:
                     isSigned = resol_isSigned[count]
@@ -426,23 +426,23 @@ class Resol(SmartPlugin):
 
                 if logger_debug:
                     self.logger.debug(
-                        "count {0} Index {1}, bytevalue {2}, factor {3}".format(
+                        'count {0} Index {1}, bytevalue {2}, factor {3}'.format(
                             count, byte_position, byte_value, factor
                         )
                     )
 
                 if isSigned:
-                    byte_value = int.from_bytes(bytes([byte_value]), "little", signed=True)
+                    byte_value = int.from_bytes(bytes([byte_value]), 'little', signed=True)
 
                 value = value + byte_value * float(factor)
                 count = count + 1
             if logger_debug:
-                self.logger.debug(f"Value of item {item} is {value}, Source {source}, Destination {destination}")
+                self.logger.debug(f'Value of item {item} is {value}, Source {source}, Destination {destination}')
 
             item(value, self.get_shortname(), str(source), str(destination))
 
     def integrate_septett(self, frame):
-        data = ""
+        data = ''
         septet = ord(frame[4])
 
         for j in range(4):

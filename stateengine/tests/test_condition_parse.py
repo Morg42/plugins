@@ -28,7 +28,7 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
 import tests.common as common
 
 common.register_shng_log_levels()
@@ -38,11 +38,11 @@ from plugins.stateengine import StateEngineDefaults
 
 
 def _setup():
-    StateEngineDefaults.logger = logging.getLogger("test.se")
+    StateEngineDefaults.logger = logging.getLogger('test.se')
 
 
 class _MockState:
-    id = "mock.state"
+    id = 'mock.state'
 
 
 def _make_cond(abitem, name):
@@ -68,33 +68,33 @@ class TestConditionSetEval(unittest.TestCase):
         self.abitem = MockAbItem()
 
     def _check(self, eval_expr, expected_value):
-        cond = _make_cond(self.abitem, "eval_cond")
-        cond.set("se_eval", eval_expr)
-        cond.set("se_value", expected_value)
+        cond = _make_cond(self.abitem, 'eval_cond')
+        cond.set('se_eval', eval_expr)
+        cond.set('se_value', expected_value)
         return cond.check(None)
 
     def test_eval_true_value_true_matches(self):
         """eval='True', value=True → match."""
-        self.assertTrue(self._check("True", True))
+        self.assertTrue(self._check('True', True))
 
     def test_eval_false_value_true_no_match(self):
         """eval='False', value=True → no match."""
-        self.assertFalse(self._check("False", True))
+        self.assertFalse(self._check('False', True))
 
     def test_eval_sh_available_via_public_api(self):
         """
         eval='sh is not None' configured via set() must still have sh in scope.
         This bridges Tier-3 (public API) and Tier-2 (eval namespace).
         """
-        self.assertTrue(self._check("sh is not None", True))
+        self.assertTrue(self._check('sh is not None', True))
 
     def test_eval_arithmetic_expression(self):
         """eval='1 + 1', value=2 → match."""
-        self.assertTrue(self._check("1 + 1", 2))
+        self.assertTrue(self._check('1 + 1', 2))
 
     def test_eval_arithmetic_mismatch(self):
         """eval='1 + 1', value=3 → no match."""
-        self.assertFalse(self._check("1 + 1", 3))
+        self.assertFalse(self._check('1 + 1', 3))
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -110,23 +110,23 @@ class TestConditionSetNegate(unittest.TestCase):
         self.abitem = MockAbItem()
 
     def _check(self, eval_expr, expected_value, negate):
-        cond = _make_cond(self.abitem, "negate_cond")
-        cond.set("se_eval", eval_expr)
-        cond.set("se_value", expected_value)
-        cond.set("se_negate", negate)
+        cond = _make_cond(self.abitem, 'negate_cond')
+        cond.set('se_eval', eval_expr)
+        cond.set('se_value', expected_value)
+        cond.set('se_negate', negate)
         return cond.check(None)
 
     def test_negate_false_matching(self):
         """negate=False + match → True (unchanged)."""
-        self.assertTrue(self._check("True", True, False))
+        self.assertTrue(self._check('True', True, False))
 
     def test_negate_true_matching(self):
         """negate=True + match → False (inverted)."""
-        self.assertFalse(self._check("True", True, True))
+        self.assertFalse(self._check('True', True, True))
 
     def test_negate_true_no_match(self):
         """negate=True + no-match → True (inverted)."""
-        self.assertTrue(self._check("False", True, True))
+        self.assertTrue(self._check('False', True, True))
 
 
 # ═══════════════════════════════════════════════════════════════════════════
@@ -145,12 +145,12 @@ class TestConditionSetMinMax(unittest.TestCase):
         self.abitem = MockAbItem()
 
     def _check(self, current_val, min_val=None, max_val=None):
-        cond = _make_cond(self.abitem, "range_cond")
-        cond.set("se_eval", str(current_val))  # expression that yields current
+        cond = _make_cond(self.abitem, 'range_cond')
+        cond.set('se_eval', str(current_val))  # expression that yields current
         if min_val is not None:
-            cond.set("se_min", min_val)
+            cond.set('se_min', min_val)
         if max_val is not None:
-            cond.set("se_max", max_val)
+            cond.set('se_max', max_val)
         return cond.check(None)
 
     def test_in_range_full_bounds(self):
@@ -199,26 +199,26 @@ class TestConditionSetItem(unittest.TestCase):
 
     def test_item_found_and_value_checked(self):
         """Item registered in sh, value matches → True."""
-        item = MockItem("room.light")
+        item = MockItem('room.light')
         item.property.value = True
-        self.abitem._sh.items.add_item("room.light", item)
+        self.abitem._sh.items.add_item('room.light', item)
 
-        cond = _make_cond(self.abitem, "light")
-        cond.set("se_item", "room.light")
-        cond.set("se_value", True)
+        cond = _make_cond(self.abitem, 'light')
+        cond.set('se_item', 'room.light')
+        cond.set('se_value', True)
         self.assertTrue(cond.check(None))
 
     def test_item_found_value_mismatch(self):
         """Item registered, value does not match → False."""
-        item = MockItem("room.sensor")
+        item = MockItem('room.sensor')
         item.property.value = 0
-        self.abitem._sh.items.add_item("room.sensor", item)
+        self.abitem._sh.items.add_item('room.sensor', item)
 
-        cond = _make_cond(self.abitem, "sensor")
-        cond.set("se_item", "room.sensor")
-        cond.set("se_value", 100)
+        cond = _make_cond(self.abitem, 'sensor')
+        cond.set('se_item', 'room.sensor')
+        cond.set('se_value', 100)
         self.assertFalse(cond.check(None))
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()

@@ -37,7 +37,7 @@ class Mqtt2(MqttPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = "2.0.6"
+    PLUGIN_VERSION = '2.0.6'
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -64,8 +64,8 @@ class Mqtt2(MqttPlugin):
 
         # needed because self.set_attr_value() can only set but not add attributes
         self.at_instance_name = self.get_instance_name()
-        if self.at_instance_name != "":
-            self.at_instance_name = "@" + self.at_instance_name
+        if self.at_instance_name != '':
+            self.at_instance_name = '@' + self.at_instance_name
 
         self.inittopics = {}
 
@@ -79,7 +79,7 @@ class Mqtt2(MqttPlugin):
         """
         Run method for the plugin
         """
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
 
         self.alive = True
         # if you need to create child threads, do not make them daemon = True!
@@ -94,7 +94,7 @@ class Mqtt2(MqttPlugin):
         """
         Stop method for the plugin
         """
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.alive = False
 
         # stop subscription to all topics
@@ -116,46 +116,46 @@ class Mqtt2(MqttPlugin):
                         can be sent to the knx with a knx write function within the knx plugin.
         """
         # check for topic prefixes
-        topic_prefix_in = ""
-        topic_prefix_out = ""
-        if self.has_iattr(item.conf, "mqtt_topic_prefix"):
-            topic_prefix_in = self.get_iattr_value(item.conf, "mqtt_topic_prefix")
-            topic_prefix_out = self.get_iattr_value(item.conf, "mqtt_topic_prefix")
-        if self.has_iattr(item.conf, "mqtt_topic_prefix_in"):
-            topic_prefix_in = self.get_iattr_value(item.conf, "mqtt_topic_prefix_in")
-        if self.has_iattr(item.conf, "mqtt_topic_prefix_out"):
-            topic_prefix_out = self.get_iattr_value(item.conf, "mqtt_topic_prefix_out")
-        if topic_prefix_in != "" and topic_prefix_in[-1] != "/":
-            topic_prefix_in += "/"
-        if topic_prefix_out != "" and topic_prefix_out[-1] != "/":
-            topic_prefix_out += "/"
+        topic_prefix_in = ''
+        topic_prefix_out = ''
+        if self.has_iattr(item.conf, 'mqtt_topic_prefix'):
+            topic_prefix_in = self.get_iattr_value(item.conf, 'mqtt_topic_prefix')
+            topic_prefix_out = self.get_iattr_value(item.conf, 'mqtt_topic_prefix')
+        if self.has_iattr(item.conf, 'mqtt_topic_prefix_in'):
+            topic_prefix_in = self.get_iattr_value(item.conf, 'mqtt_topic_prefix_in')
+        if self.has_iattr(item.conf, 'mqtt_topic_prefix_out'):
+            topic_prefix_out = self.get_iattr_value(item.conf, 'mqtt_topic_prefix_out')
+        if topic_prefix_in != '' and topic_prefix_in[-1] != '/':
+            topic_prefix_in += '/'
+        if topic_prefix_out != '' and topic_prefix_out[-1] != '/':
+            topic_prefix_out += '/'
 
         # first checking for mqtt-topic attributes 'mqtt_topic', 'mqtt_topic_in' and 'mqtt_topic_out'
-        if self.has_iattr(item.conf, "mqtt_topic"):
-            item.conf["mqtt_topic_in" + self.at_instance_name] = self.get_iattr_value(item.conf, "mqtt_topic")
-            item.conf["mqtt_topic_out" + self.at_instance_name] = self.get_iattr_value(item.conf, "mqtt_topic")
+        if self.has_iattr(item.conf, 'mqtt_topic'):
+            item.conf['mqtt_topic_in' + self.at_instance_name] = self.get_iattr_value(item.conf, 'mqtt_topic')
+            item.conf['mqtt_topic_out' + self.at_instance_name] = self.get_iattr_value(item.conf, 'mqtt_topic')
 
-        if self.has_iattr(item.conf, "mqtt_topic_in"):
-            item.conf["mqtt_topic_in" + self.at_instance_name] = topic_prefix_in + self.get_iattr_value(
-                item.conf, "mqtt_topic_in"
+        if self.has_iattr(item.conf, 'mqtt_topic_in'):
+            item.conf['mqtt_topic_in' + self.at_instance_name] = topic_prefix_in + self.get_iattr_value(
+                item.conf, 'mqtt_topic_in'
             )
-        if self.has_iattr(item.conf, "mqtt_topic_out"):
-            item.conf["mqtt_topic_out" + self.at_instance_name] = topic_prefix_out + self.get_iattr_value(
-                item.conf, "mqtt_topic_out"
+        if self.has_iattr(item.conf, 'mqtt_topic_out'):
+            item.conf['mqtt_topic_out' + self.at_instance_name] = topic_prefix_out + self.get_iattr_value(
+                item.conf, 'mqtt_topic_out'
             )
 
-        if self.has_iattr(item.conf, "mqtt_topic_init"):
-            item.conf["mqtt_topic_out" + self.at_instance_name] = topic_prefix_out + self.get_iattr_value(
-                item.conf, "mqtt_topic_init"
+        if self.has_iattr(item.conf, 'mqtt_topic_init'):
+            item.conf['mqtt_topic_out' + self.at_instance_name] = topic_prefix_out + self.get_iattr_value(
+                item.conf, 'mqtt_topic_init'
             )
 
         # check other mqtt attributes, if a topic attribute has been specified
-        if self.has_iattr(item.conf, "mqtt_topic_in") or self.has_iattr(item.conf, "mqtt_topic_out"):
-            self.logger.debug("parsing item: {0}".format(item.property.path))
+        if self.has_iattr(item.conf, 'mqtt_topic_in') or self.has_iattr(item.conf, 'mqtt_topic_out'):
+            self.logger.debug('parsing item: {0}'.format(item.property.path))
 
-            if item.property.type == "foo":
+            if item.property.type == 'foo':
                 self.logger.warning(
-                    f"item {item.property.path} has item type foo, which will not be processed by the MQTT system"
+                    f'item {item.property.path} has item type foo, which will not be processed by the MQTT system'
                 )
 
             # check if mqtt module has been initialized successfully
@@ -164,16 +164,16 @@ class Mqtt2(MqttPlugin):
                 return
 
             # checking attribute 'mqtt_qos'
-            if self.has_iattr(item.conf, "mqtt_qos"):
+            if self.has_iattr(item.conf, 'mqtt_qos'):
                 self.logger.debug(
                     self.get_loginstance()
                     + "Setting QoS '{}' for item '{}'".format(
-                        str(self.get_iattr_value(item.conf, "mqtt_qos")), str(item)
+                        str(self.get_iattr_value(item.conf, 'mqtt_qos')), str(item)
                     )
                 )
                 qos = -1
-                if Utils.is_int(self.get_iattr_value(item.conf, "mqtt_qos")):
-                    qos = int(self.get_iattr_value(item.conf, "mqtt_qos"))
+                if Utils.is_int(self.get_iattr_value(item.conf, 'mqtt_qos')):
+                    qos = int(self.get_iattr_value(item.conf, 'mqtt_qos'))
                 if qos not in [0, 1, 2]:
                     self.logger.warning(
                         self.get_loginstance()
@@ -182,29 +182,29 @@ class Mqtt2(MqttPlugin):
                         )
                     )
                     qos = self.qos
-                self.set_attr_value(item.conf, "mqtt_qos", str(qos))
+                self.set_attr_value(item.conf, 'mqtt_qos', str(qos))
 
             # checking attribute 'mqtt_retain'
-            if Utils.to_bool(self.get_iattr_value(item.conf, "mqtt_retain"), default=False):
-                self.set_attr_value(item.conf, "mqtt_retain", "True")
+            if Utils.to_bool(self.get_iattr_value(item.conf, 'mqtt_retain'), default=False):
+                self.set_attr_value(item.conf, 'mqtt_retain', 'True')
             else:
-                self.set_attr_value(item.conf, "mqtt_retain", "False")
+                self.set_attr_value(item.conf, 'mqtt_retain', 'False')
 
             self.logger.debug(self.get_loginstance() + "(parsing result): item.conf '{}'".format(str(item.conf)))
 
         # subscribe to configured topics
-        if self.has_iattr(item.conf, "mqtt_topic_in"):
+        if self.has_iattr(item.conf, 'mqtt_topic_in'):
             # add subscription
-            topic = self.get_iattr_value(item.conf, "mqtt_topic_in")
+            topic = self.get_iattr_value(item.conf, 'mqtt_topic_in')
             payload_type = item.property.type
-            bool_values = self.get_iattr_value(item.conf, "mqtt_bool_values")
+            bool_values = self.get_iattr_value(item.conf, 'mqtt_bool_values')
             self.add_subscription(topic, payload_type, bool_values, item)
 
-        if self.has_iattr(item.conf, "mqtt_topic_out"):
+        if self.has_iattr(item.conf, 'mqtt_topic_out'):
             # initialize topics if configured
-            topic = self.get_iattr_value(item.conf, "mqtt_topic_out")
-            if self.has_iattr(item.conf, "mqtt_topic_init"):
-                self.inittopics[self.get_iattr_value(item.conf, "mqtt_topic_init")] = item
+            topic = self.get_iattr_value(item.conf, 'mqtt_topic_out')
+            if self.has_iattr(item.conf, 'mqtt_topic_init'):
+                self.inittopics[self.get_iattr_value(item.conf, 'mqtt_topic_init')] = item
             else:
                 self.logger.info("Publishing topic '{}' (when needed) for item '{}'".format(topic, item.property.path))
 
@@ -214,7 +214,7 @@ class Mqtt2(MqttPlugin):
         """
         Default plugin parse_logic method
         """
-        if "xxx" in logic.conf:
+        if 'xxx' in logic.conf:
             # self.function(logic['name'])
             pass
 
@@ -235,21 +235,21 @@ class Mqtt2(MqttPlugin):
         if self.alive and caller != self.get_shortname():
             # code to execute if the plugin is not stopped
             # and only, if the item has not been changed by this this plugin:
-            self.logger.info("Update item: {}, item has been changed outside this plugin".format(item.property.path))
+            self.logger.info('Update item: {}, item has been changed outside this plugin'.format(item.property.path))
 
-            if self.has_iattr(item.conf, "mqtt_topic_out"):
-                topic = self.get_iattr_value(item.conf, "mqtt_topic_out")
-                retain = self.get_iattr_value(item.conf, "mqtt_retain")
+            if self.has_iattr(item.conf, 'mqtt_topic_out'):
+                topic = self.get_iattr_value(item.conf, 'mqtt_topic_out')
+                retain = self.get_iattr_value(item.conf, 'mqtt_retain')
                 if retain is None:
                     retain = False
                 else:
                     retain = Utils.to_bool(retain)
 
-                bool_values = self.get_iattr_value(item.conf, "mqtt_bool_values")
+                bool_values = self.get_iattr_value(item.conf, 'mqtt_bool_values')
                 if bool_values is None or bool_values == []:
                     bool_values = None
 
-                qos = self.get_iattr_value(item.conf, "mqtt_qos")
+                qos = self.get_iattr_value(item.conf, 'mqtt_qos')
                 if qos:
                     qos = int(qos)
                 self.publish_topic(topic, item(), item, qos, retain, bool_values)
