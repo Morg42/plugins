@@ -738,8 +738,6 @@ class HueApiV2(SmartPlugin):
 
         value = item()
         self.logger.debug(f"update_scene_from_item: config_data = {config_data}")
-        if config_data['transition_time'] is not None:
-
         if config_data['function'] == 'activate':
             self.run_asyncio_coro(self.v2bridge.scenes.recall(id=config_data['id']))
         elif config_data['function'] == 'activate_scene':

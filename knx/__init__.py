@@ -691,7 +691,6 @@ class KNX(SmartPlugin):
 
                 self.logger.info(
                     "Item {} is polled on GA {} every {} seconds".format(item, poll_ga, poll_interval))
-                randomwait = random.randrange(15)
                 self._startup_polling.update({item: {'ga': poll_ga, 'interval': poll_interval}})
             else:
                 self.logger.warning("Ignoring knx_poll for item {}: We need two parameters, one for the GA and one for the polling interval.".format(item))

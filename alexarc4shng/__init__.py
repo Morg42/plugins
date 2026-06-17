@@ -1601,8 +1601,6 @@ class WebInterface(SmartPluginWebIf):
         self.plugin.csrf = value1
         
         
-        myDevices = self.get_device_list()
-        
         '''
         tmpl = self.tplenv.get_template('index.html')
         return tmpl.render(plugin_shortname=self.plugin.get_shortname(), plugin_version=self.plugin.get_version(),

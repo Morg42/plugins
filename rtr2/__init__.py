@@ -443,8 +443,6 @@ class Rtr_object():
                 Kp = controller_settings[0]
             if len(controller_settings) > 1:
                 Ki = controller_settings[1]
-            if len(controller_settings) > 2:
-
         self._mode = Mode()
 
         #                        mode,       comfort_temp,   night_reduction=None, standby_reduction=None,
