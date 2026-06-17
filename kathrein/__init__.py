@@ -39,7 +39,7 @@ class Kathrein(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '1.6.1'
+    PLUGIN_VERSION = "1.6.1"
 
     def __init__(self, sh):
         """
@@ -58,14 +58,15 @@ class Kathrein(SmartPlugin):
         super().__init__()
 
         from bin.smarthome import VERSION
-        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
+
+        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
             self.logger = logging.getLogger(__name__)
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
         self._sh = self.get_sh()
-        self._host = self.get_parameter_value('host')
-        self._port = self.get_parameter_value('port')
-        self._kathreinid = self.get_parameter_value('kathreinid')
+        self._host = self.get_parameter_value("host")
+        self._port = self.get_parameter_value("port")
+        self._kathreinid = self.get_parameter_value("kathreinid")
 
         # if plugin should start even without web interface
         self.init_webinterface()
@@ -101,22 +102,24 @@ class Kathrein(SmartPlugin):
                         with the item, caller, source and dest as arguments and in case of the knx plugin the value
                         can be sent to the knx with a knx write function within the knx plugin.
         """
-        if self.has_iattr(item.conf, 'kathreinid'):
+        if self.has_iattr(item.conf, "kathreinid"):
             self.logger.debug("parse item: {}".format(item))
-            kathreinid = int(self.get_iattr_value(item.conf, 'kathreinid'))
+            kathreinid = int(self.get_iattr_value(item.conf, "kathreinid"))
         else:
             kathreinid = 1
 
         if kathreinid != self._kathreinid:
             return None
 
-        if self.has_iattr(item.conf, 'kathrein'):
-            self.logger.debug("Kathrein Item {0} with value {1} for Kathrein ID {2} found!".format(
-                item, self.get_iattr_value(item.conf,'kathrein'), kathreinid))
+        if self.has_iattr(item.conf, "kathrein"):
+            self.logger.debug(
+                "Kathrein Item {0} with value {1} for Kathrein ID {2} found!".format(
+                    item, self.get_iattr_value(item.conf, "kathrein"), kathreinid
+                )
+            )
             return self.update_item
         else:
             return None
-        
 
     def parse_logic(self, logic):
         """
@@ -143,7 +146,7 @@ class Kathrein(SmartPlugin):
                 self.push(val)
                 return
             if val:
-                keys = self.get_iattr_value(item.conf,'kathrein')
+                keys = self.get_iattr_value(item.conf, "kathrein")
                 if isinstance(keys, str):
                     keys = [keys]
                 for key in keys:
@@ -153,21 +156,20 @@ class Kathrein(SmartPlugin):
         """
         This function does the work to send the key codes to the receiver
         """
-        #urllib.request.urlopen("http://" + self._host + ":" + str(self._port) + "/HandleKey/" + key).read()
-        url = "http://{}:{}/HandleKey/{}".format(self._host, self._port, key )
+        # urllib.request.urlopen("http://" + self._host + ":" + str(self._port) + "/HandleKey/" + key).read()
+        url = "http://{}:{}/HandleKey/{}".format(self._host, self._port, key)
         urllib.request.urlopen(url).read()
         self.logger.debug("Send {0} to Kathrein with IP {1} at Port {2}".format(key, self._host, self._port))
         time.sleep(0.1)
 
     def init_webinterface(self):
-        """"
+        """ "
         Initialize the web interface for this plugin
 
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
@@ -175,28 +177,29 @@ class Kathrein(SmartPlugin):
             return False
 
         import sys
-        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
+
+        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
+        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
         config = {
-            '/': {
-                'tools.staticdir.root': webif_dir,
+            "/": {
+                "tools.staticdir.root": webif_dir,
             },
-            '/static': {
-                'tools.staticdir.on': True,
-                'tools.staticdir.dir': 'static'
-            }
+            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
         }
 
         # Register the web interface as a cherrypy app
-        self.mod_http.register_webif(WebInterface(webif_dir, self),
-                                     self.get_shortname(),
-                                     config,
-                                     self.get_classname(), self.get_instance_name(),
-                                     description='')
+        self.mod_http.register_webif(
+            WebInterface(webif_dir, self),
+            self.get_shortname(),
+            config,
+            self.get_classname(),
+            self.get_instance_name(),
+            description="",
+        )
 
         return True
 
@@ -210,7 +213,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -236,10 +238,9 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])))
-
+        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])))
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -265,4 +266,3 @@ class WebInterface(SmartPluginWebIf):
             # except Exception as e:
             #     self.logger.error("get_data_html exception: {}".format(e))
         return {}
-

@@ -14,8 +14,8 @@ import csv
 import json
 from jinja2 import Environment, FileSystemLoader
 
-class WebInterface(SmartPluginWebIf):
 
+class WebInterface(SmartPluginWebIf):
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -41,12 +41,12 @@ class WebInterface(SmartPluginWebIf):
         :return: contents of the template after beeing rendered
         """
         if mode is not None:
-            if 'control/mode' in self.plugin.get_items():
+            if "control/mode" in self.plugin.get_items():
                 if mode in self.plugin.MODE_TYPES:
-                    self.plugin.get_items()['control/mode'](mode)
-        tmpl = self.tplenv.get_template('index.html')
+                    self.plugin.get_items()["control/mode"](mode)
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])))
+        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])))
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -60,50 +60,50 @@ class WebInterface(SmartPluginWebIf):
         """
         if dataSet is None:
             data = {}
-            data['plugin_status'] = self.plugin.get_status()
-            data['plugin_mode'] = self.plugin.get_mode()
+            data["plugin_status"] = self.plugin.get_status()
+            data["plugin_mode"] = self.plugin.get_mode()
             for key, item in self.plugin.get_items().items():
-                if item.property.type == 'bool':
+                if item.property.type == "bool":
                     data[item.property.path + "_value"] = str(item())
                 else:
                     data[item.property.path + "_value"] = item()
-                data[item.property.path + "_last_update"] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                data[item.property.path + "_last_change"] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
 
             remote_battery_item_dict = dict(self.plugin.get_battery_items(), **self.plugin.get_remote_items())
 
             for key, items in remote_battery_item_dict.items():
                 for item in items:
-                    if item.property.type == 'bool':
+                    if item.property.type == "bool":
                         data[item.property.path + "_value"] = str(item())
                     else:
                         data[item.property.path + "_value"] = item()
-                    data[item.property.path + "_last_update"] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                    data[item.property.path + "_last_change"] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                    data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                    data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
 
             for key, item in self.plugin.get_status_items().items():
-                if item.property.type == 'bool':
+                if item.property.type == "bool":
                     data[item.property.path + "_value"] = str(item())
                 else:
                     data[item.property.path + "_value"] = item()
-                data[item.property.path + "_last_update"] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                data[item.property.path + "_last_change"] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
 
             for key, item in self.plugin.get_motor_items().items():
-                if item.property.type == 'bool':
+                if item.property.type == "bool":
                     data[item.property.path + "_value"] = str(item())
                 else:
                     data[item.property.path + "_value"] = item()
-                data[item.property.path + "_last_update"] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                data[item.property.path + "_last_change"] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
 
             for key, item in self.plugin.get_weather_items().items():
-                if item.property.type == 'bool':
+                if item.property.type == "bool":
                     data[item.property.path + "_value"] = str(item())
                 else:
                     data[item.property.path + "_value"] = item()
-                data[item.property.path + "_last_update"] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                data[item.property.path + "_last_change"] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
 
             return json.dumps(data)
         else:

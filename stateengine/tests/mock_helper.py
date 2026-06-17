@@ -27,7 +27,7 @@ from queue import Queue
 # Bootstrap: add shng base to path so imports work from plugin test dirs
 # ---------------------------------------------------------------------------
 _HERE = os.path.dirname(__file__)
-_SHNG_BASE = os.path.abspath(os.path.join(_HERE, '..', '..', '..'))
+_SHNG_BASE = os.path.abspath(os.path.join(_HERE, "..", "..", ".."))
 if _SHNG_BASE not in sys.path:
     sys.path.insert(0, _SHNG_BASE)
 
@@ -41,6 +41,7 @@ from lib.shtime import Shtime
 # ---------------------------------------------------------------------------
 # Reset helpers
 # ---------------------------------------------------------------------------
+
 
 def reset_items():
     """Clear all item singletons so each test starts clean."""
@@ -64,6 +65,7 @@ def make_sh():
 # Mock items
 # ---------------------------------------------------------------------------
 
+
 class MockItem:
     """Minimal stand-in for a shng Item, usable in stateengine tests."""
 
@@ -86,9 +88,9 @@ class MockItem:
 class _MockItemProperty:
     def __init__(self, path):
         self.path = path
-        self.last_update_by = ''
-        self.last_change_by = ''
-        self.last_trigger_by = ''
+        self.last_update_by = ""
+        self.last_change_by = ""
+        self.last_trigger_by = ""
         self.value = None
 
 
@@ -96,18 +98,18 @@ class _MockItemProperty:
 # Mock stateengine plugin
 # ---------------------------------------------------------------------------
 
+
 class MockSePlugin:
     """Minimal stand-in for the StateEngine SmartPlugin."""
 
     def __init__(self):
         self._scheduled = {}
 
-    def scheduler_add(self, name, callback, cron=None, cycle=None,
-                      value=None, offset=None, next=None, **kwargs):
+    def scheduler_add(self, name, callback, cron=None, cycle=None, value=None, offset=None, next=None, **kwargs):
         self._scheduled[name] = {
-            'callback': callback,
-            'value': value,
-            'next': next,
+            "callback": callback,
+            "value": value,
+            "next": next,
         }
 
     def scheduler_remove(self, name):
@@ -128,18 +130,19 @@ class MockSePlugin:
 
     def scheduler_return_next(self, name):
         entry = self._scheduled.get(name)
-        return entry['next'] if entry else None
+        return entry["next"] if entry else None
 
     def get_fullname(self):
-        return 'StateEngine Plugin'
+        return "StateEngine Plugin"
 
     def get_shortname(self):
-        return 'stateengine'
+        return "stateengine"
 
 
 # ---------------------------------------------------------------------------
 # Mock SeLogger (dummy that captures calls)
 # ---------------------------------------------------------------------------
+
 
 class MockSeLogger:
     """Captures stateengine log calls so tests can assert on them."""
@@ -150,7 +153,7 @@ class MockSeLogger:
         self.log_level_as_num = 0
         self.default_log_level = _ConstValue(0)
         self.startup_log_level = _ConstValue(0)
-        self.log_directory = ''
+        self.log_directory = ""
 
     def _record(self, level, text, args):
         try:
@@ -160,25 +163,25 @@ class MockSeLogger:
         self.records.append((level, msg))
 
     def header(self, text):
-        self._record('header', text, ())
+        self._record("header", text, ())
 
     def info(self, text, *args):
-        self._record('info', text, args)
+        self._record("info", text, args)
 
     def debug(self, text, *args):
-        self._record('debug', text, args)
+        self._record("debug", text, args)
 
     def warning(self, text, *args):
-        self._record('warning', text, args)
+        self._record("warning", text, args)
 
     def error(self, text, *args):
-        self._record('error', text, args)
+        self._record("error", text, args)
 
     def develop(self, text, *args):
-        self._record('develop', text, args)
+        self._record("develop", text, args)
 
     def dbghigh(self, text, *args):
-        self._record('dbghigh', text, args)
+        self._record("dbghigh", text, args)
 
     def increase_indent(self, by=1):
         pass
@@ -198,6 +201,7 @@ class MockSeLogger:
 
 class _ConstValue:
     """Return a constant from .get()."""
+
     def __init__(self, v):
         self._v = v
 
@@ -209,6 +213,7 @@ class _ConstValue:
 # Mock AbItem (the SeItem proxy that SeItemChild / SeCondition / SeValue /
 # SeAction all receive as their first constructor argument)
 # ---------------------------------------------------------------------------
+
 
 class MockAbItem:
     """
@@ -263,11 +268,11 @@ class MockAbItem:
 
     @property
     def id(self):
-        return 'mock.abitem'
+        return "mock.abitem"
 
     @property
     def path(self):
-        return 'mock.abitem'
+        return "mock.abitem"
 
     def set_variable(self, key, value):
         self._variables[key] = value
@@ -349,5 +354,5 @@ class MockAbItem:
 
     # condition-set tracking (SeConditionSet calls this after all conditions match)
     def lastconditionset_set(self, conditionset_id, conditionset_name):
-        self._variables['lastconditionset_id'] = conditionset_id
-        self._variables['lastconditionset_name'] = conditionset_name
+        self._variables["lastconditionset_id"] = conditionset_id
+        self._variables["lastconditionset_name"] = conditionset_name

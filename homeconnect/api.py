@@ -18,20 +18,16 @@ ENDPOINT_TOKEN = "/security/oauth/token"
 ENDPOINT_APPLIANCES = "/api/homeappliances"
 TIMEOUT_S = 120
 
+
 class HomeConnectError(Exception):
     pass
+
 
 class HomeConnect:
     """Connection to the HomeConnect OAuth API."""
 
     def __init__(
-        self,
-        client_id,
-        client_secret="",
-        redirect_uri="",
-        simulate=False,
-        token_cache=None,
-        token_listener=None
+        self, client_id, client_secret="", redirect_uri="", simulate=False, token_cache=None, token_listener=None
     ):
         """Initialize the connection."""
         self.client_id = client_id
@@ -82,7 +78,7 @@ class HomeConnect:
         }
         refresh_url = self.get_uri(ENDPOINT_TOKEN)
         token = self.token_load()
-        #refresh see https://requests-oauthlib.readthedocs.io/en/latest/oauth2_workflow.html#refreshing-tokens
+        # refresh see https://requests-oauthlib.readthedocs.io/en/latest/oauth2_workflow.html#refreshing-tokens
         if token:
             self._oauth = OAuth2Session(
                 self.client_id,
@@ -117,7 +113,7 @@ class HomeConnect:
                 client_secret=self.client_secret,
             )
         except Exception as e:
-            self.logger.error("An error occured in get_token: %s"%e)
+            self.logger.error("An error occured in get_token: %s" % e)
             return
 
         self.token_dump(token)
@@ -217,9 +213,7 @@ class HomeConnectAppliance:
 
     def listen_events(self, callback=None):
         """Spawn a thread with an event listener that updates the status."""
-        uri = self.hc.get_uri(
-            "{}/{}{}".format("/api/homeappliances", self.haId, "/events")
-        )
+        uri = self.hc.get_uri("{}/{}{}".format("/api/homeappliances", self.haId, "/events"))
         from requests.exceptions import HTTPError
 
         sse = None
@@ -263,15 +257,11 @@ class HomeConnectAppliance:
 
     def delete(self, endpoint):
         """Delete endpoint."""
-        return self.hc.delete(
-            "{}/{}{}".format(ENDPOINT_APPLIANCES, self.haId, endpoint)
-        )
+        return self.hc.delete("{}/{}{}".format(ENDPOINT_APPLIANCES, self.haId, endpoint))
 
     def put(self, endpoint, data):
         """Send (PUT) data to an endpoint."""
-        return self.hc.put(
-            "{}/{}{}".format(ENDPOINT_APPLIANCES, self.haId, endpoint), data
-        )
+        return self.hc.put("{}/{}{}".format(ENDPOINT_APPLIANCES, self.haId, endpoint), data)
 
     def get_programs_active(self):
         """Get active programs."""
@@ -298,9 +288,7 @@ class HomeConnectAppliance:
     def start_program(self, program_key, options=None):
         """Start a program."""
         if options is not None:
-            return self.put(
-                "/programs/active", {"data": {"key": program_key, "options": options}}
-            )
+            return self.put("/programs/active", {"data": {"key": program_key, "options": options}})
         return self.put("/programs/active", {"data": {"key": program_key}})
 
     def stop_program(self):
@@ -363,5 +351,6 @@ class HomeConnectAppliance:
     def execute_command(self, command):
         """Execute a command."""
         return self.put(
-            f"/commands/{command}", {"data": {"key": command, "value": True}},
+            f"/commands/{command}",
+            {"data": {"key": command, "value": True}},
         )

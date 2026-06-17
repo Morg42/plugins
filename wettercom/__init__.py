@@ -30,13 +30,13 @@ from lib.tools import Tools
 class wettercom(SmartPlugin):
     ALLOW_MULTIINSTANCE = False
     PLUGIN_VERSION = "1.4.0"
-    _server = 'api.wetter.com'
+    _server = "api.wetter.com"
 
     def __init__(self, smarthome):
-        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
+        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
             self.logger = logging.getLogger(__name__)
-        self._project = self.get_parameter_value('project')
-        self._apikey = self.get_parameter_value('apikey')
+        self._project = self.get_parameter_value("project")
+        self._apikey = self.get_parameter_value("apikey")
         self._tools = Tools()
         self.lock = threading.Lock()
 
@@ -46,10 +46,13 @@ class wettercom(SmartPlugin):
         returns one or more city code(s) for use in forecast function
         """
         retval = {}
-        searchURL = 'http://{}/location/index/search/{}/project/{}/cs/{}'.format(
-            self._server, location, self._project, hashlib.md5(('{}{}{}'.format(
-                self._project, self._apikey, location)).encode('UTF-8')).hexdigest())
-        self.logger.debug('Search URL: {}'.format(searchURL))
+        searchURL = "http://{}/location/index/search/{}/project/{}/cs/{}".format(
+            self._server,
+            location,
+            self._project,
+            hashlib.md5(("{}{}{}".format(self._project, self._apikey, location)).encode("UTF-8")).hexdigest(),
+        )
+        self.logger.debug("Search URL: {}".format(searchURL))
 
         try:
             content = self._tools.fetch_url(searchURL)
@@ -59,12 +62,12 @@ class wettercom(SmartPlugin):
         if content:
             searchXML = xml.etree.cElementTree.fromstring(content)
 
-            for hits in searchXML.iter('hits'):
+            for hits in searchXML.iter("hits"):
                 numhits = int(hits.text)
                 break
 
             if numhits > 0:
-                retval = [ccodes.text for ccodes in searchXML.iter('city_code')]
+                retval = [ccodes.text for ccodes in searchXML.iter("city_code")]
 
         return retval
 
@@ -79,10 +82,13 @@ class wettercom(SmartPlugin):
         wind direction text, weather condition code
         """
         retval = {}
-        forecastURL = 'http://{}/forecast/weather/city/{}/project/{}/cs/{}'.format(
-            self._server, city_code, self._project, hashlib.md5(('{}{}{}'.format(
-                self._project, self._apikey, city_code)).encode('UTF-8')).hexdigest())
-        self.logger.debug('Forecast URL: {}'.format(forecastURL))
+        forecastURL = "http://{}/forecast/weather/city/{}/project/{}/cs/{}".format(
+            self._server,
+            city_code,
+            self._project,
+            hashlib.md5(("{}{}{}".format(self._project, self._apikey, city_code)).encode("UTF-8")).hexdigest(),
+        )
+        self.logger.debug("Forecast URL: {}".format(forecastURL))
 
         try:
             content = self._tools.fetch_url(forecastURL)
@@ -92,34 +98,35 @@ class wettercom(SmartPlugin):
         if content:
             forecastXML = xml.etree.cElementTree.fromstring(content)
 
-            for days in forecastXML.findall('./forecast/date'):
-                year, month, day = days.attrib['value'].split('-')
-                for time in days.iter('time'):
-                    hour, minute = time.attrib['value'].split(':')
-                    d = datetime.datetime(int(year), int(month), int(day),
-                                          int(hour))
-                    items = [time.find('tn'),
-                             time.find('tx'),
-                             time.find('w_txt'),
-                             time.find('pc'),
-                             time.find('ws'),
-                             time.find('wd'),
-                             time.find('wd_txt'),
-                             time.find('w')]
+            for days in forecastXML.findall("./forecast/date"):
+                year, month, day = days.attrib["value"].split("-")
+                for time in days.iter("time"):
+                    hour, minute = time.attrib["value"].split(":")
+                    d = datetime.datetime(int(year), int(month), int(day), int(hour))
+                    items = [
+                        time.find("tn"),
+                        time.find("tx"),
+                        time.find("w_txt"),
+                        time.find("pc"),
+                        time.find("ws"),
+                        time.find("wd"),
+                        time.find("wd_txt"),
+                        time.find("w"),
+                    ]
 
                     retval[d] = []
                     for item in items:
-                      retval[d].append(None if item is None else item.text)
+                        retval[d].append(None if item is None else item.text)
 
             return retval
 
     def run(self):
         self.alive = True
-        self.logger.debug('run method called')
+        self.logger.debug("run method called")
 
     def stop(self):
         self.alive = False
-        self.logger.debug('stop method called')
+        self.logger.debug("stop method called")
 
     def parse_item(self, item):
         return None

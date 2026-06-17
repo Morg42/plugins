@@ -187,6 +187,4 @@ class Account:
         Returns:
             list: A list of `Account` instances.
         """
-        return [
-            a for a in cls.get_accounts().values() if a.service_type == service_type
-        ]
+        return [a for a in cls.get_accounts().values() if a.service_type == service_type]

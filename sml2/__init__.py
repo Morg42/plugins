@@ -43,7 +43,7 @@ from lib.item import Items
 from lib.model.smartplugin import SmartPlugin
 from .webif import WebInterface
 
-SML_SCHEDULER_NAME = 'Sml2'
+SML_SCHEDULER_NAME = "Sml2"
 
 
 class Sml2(SmartPlugin):
@@ -56,7 +56,6 @@ class Sml2(SmartPlugin):
         self.loop.run_forever()
 
     class Reader(asyncio.Protocol):
-
         def __init__(self):
             self.buf = None
             self.smlx = None
@@ -66,16 +65,14 @@ class Sml2(SmartPlugin):
             return self
 
         def connection_made(self, transport):
-            """Store the serial transport and prepare to receive data.
-            """
+            """Store the serial transport and prepare to receive data."""
             self.transport = transport
             self.buf = bytes()
             self.smlx.logger.debug("Reader connection created")
             self.smlx.connected = True
 
         def data_received(self, chunk):
-            """Store characters until a newline is received.
-            """
+            """Store characters until a newline is received."""
             self.smlx.logger.debug(f"Smartmeter is sending {len(chunk)} bytes of data")
             self.buf += chunk
 
@@ -86,7 +83,7 @@ class Sml2(SmartPlugin):
                 self.buf = bytes()
                 self.smlx.parse_data()
             except Exception as e:
-                self.smlx.logger.error(f'Reading data from {self.smlx._target} failed with exception {e}')
+                self.smlx.logger.error(f"Reading data from {self.smlx._target} failed with exception {e}")
             # just in case of many errors, reset buffer
             if len(self.buf) > 100000:
                 self.smlx.logger.error("Buffer got to large, doing buffer reset")
@@ -96,7 +93,7 @@ class Sml2(SmartPlugin):
             self.smlx.logger.error("Connection so serial device was closed")
             self.smlx.connected = False
 
-    PLUGIN_VERSION = '2.0.1'
+    PLUGIN_VERSION = "2.0.1"
 
     def __init__(self, sh):
         """
@@ -106,19 +103,19 @@ class Sml2(SmartPlugin):
         # Call init code of parent class (SmartPlugin)
         super().__init__()
 
-        self.cycle = self.get_parameter_value('cycle')
+        self.cycle = self.get_parameter_value("cycle")
 
-        self.host = self.get_parameter_value('host')  # None
-        self.port = self.get_parameter_value('port')  # 0
-        self.serialport = self.get_parameter_value('serialport')  # None
+        self.host = self.get_parameter_value("host")  # None
+        self.port = self.get_parameter_value("port")  # 0
+        self.serialport = self.get_parameter_value("serialport")  # None
 
-        self.use_polling = self.get_parameter_value('use_polling')  # false
-        self.cycle = self.get_parameter_value('cycle')
+        self.use_polling = self.get_parameter_value("use_polling")  # false
+        self.cycle = self.get_parameter_value("cycle")
 
-        self.device = self.get_parameter_value('device')  # raw
-        self.timeout = self.get_parameter_value('timeout')  # 5
-        self.buffersize = self.get_parameter_value('buffersize')  # 1024
-        self.date_offset = self.get_parameter_value('date_offset')  # 0
+        self.device = self.get_parameter_value("device")  # raw
+        self.timeout = self.get_parameter_value("timeout")  # 5
+        self.buffersize = self.get_parameter_value("buffersize")  # 1024
+        self.date_offset = self.get_parameter_value("date_offset")  # 0
 
         self.connected = False
         self.alive = False
@@ -136,7 +133,7 @@ class Sml2(SmartPlugin):
         self.init_webinterface(WebInterface)
         self.task = None
         self.values = {}
-        self.obis_names = { **smlConst.OBIS_NAMES, **FURTHER_OBIS_NAMES }
+        self.obis_names = {**smlConst.OBIS_NAMES, **FURTHER_OBIS_NAMES}
         self.obis_units = smlConst.UNITS
 
     def run(self):
@@ -154,10 +151,16 @@ class Sml2(SmartPlugin):
 
             self.reader = self.Reader()
             self.reader.smlx = self
-            reader = serial_asyncio.create_serial_connection(self.loop, self.reader, self.serialport, baudrate=9600,
-                                                             bytesize=serial.EIGHTBITS,
-                                                             parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE,
-                                                             timeout=self.timeout)
+            reader = serial_asyncio.create_serial_connection(
+                self.loop,
+                self.reader,
+                self.serialport,
+                baudrate=9600,
+                bytesize=serial.EIGHTBITS,
+                parity=serial.PARITY_NONE,
+                stopbits=serial.STOPBITS_ONE,
+                timeout=self.timeout,
+            )
 
             self.task = asyncio.run_coroutine_threadsafe(reader, self.loop)
 
@@ -185,16 +188,16 @@ class Sml2(SmartPlugin):
         :return:        returns update_item function if changes are to be watched
         """
 
-        if self.has_iattr(item.conf, 'sml_obis'):
-            obis = self.get_iattr_value(item.conf, 'sml_obis')
-            prop = self.get_iattr_value(item.conf, 'sml_prop') if self.has_iattr(item.conf, 'sml_prop') else 'valueReal'
+        if self.has_iattr(item.conf, "sml_obis"):
+            obis = self.get_iattr_value(item.conf, "sml_obis")
+            prop = self.get_iattr_value(item.conf, "sml_prop") if self.has_iattr(item.conf, "sml_prop") else "valueReal"
             if obis not in self._items:
                 self._items[obis] = {}
             if prop not in self._items[obis]:
                 self._items[obis][prop] = []
             self._items[obis][prop].append(item)
             self._item_dict[item] = (obis, prop)
-            self.logger.debug(f'Attach {item.property.path} with {obis=} and {prop=}')
+            self.logger.debug(f"Attach {item.property.path} with {obis=} and {prop=}")
         return None
 
     def parse_logic(self, logic):
@@ -223,22 +226,28 @@ class Sml2(SmartPlugin):
             self._target = None
             try:
                 if self.serialport is not None:
-                    self._target = f'serial://{self.serialport}'
-                    self._serial = serial.Serial(self.serialport, 9600, serial.EIGHTBITS, serial.PARITY_NONE,
-                                                 serial.STOPBITS_ONE, timeout=self.timeout)
+                    self._target = f"serial://{self.serialport}"
+                    self._serial = serial.Serial(
+                        self.serialport,
+                        9600,
+                        serial.EIGHTBITS,
+                        serial.PARITY_NONE,
+                        serial.STOPBITS_ONE,
+                        timeout=self.timeout,
+                    )
 
                 elif self.host is not None:
-                    self._target = f'tcp://{self.host}:{self.port}'
+                    self._target = f"tcp://{self.host}:{self.port}"
                     self._sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                     self._sock.settimeout(2)
                     self._sock.connect((self.host, self.port))
                     self._sock.setblocking(False)
 
             except Exception as e:
-                self.logger.error(f'SML: Could not connect to {self._target}: {e}')
+                self.logger.error(f"SML: Could not connect to {self._target}: {e}")
                 return
 
-            self.logger.info(f'SML: Connected to {self._target}')
+            self.logger.info(f"SML: Connected to {self._target}")
             self.connected = True
 
     def disconnect(self):
@@ -253,23 +262,23 @@ class Sml2(SmartPlugin):
                         self._sock = None
                 except Exception:
                     pass
-                self.logger.info('SML: Disconnected!')
+                self.logger.info("SML: Disconnected!")
                 self.connected = False
                 self._target = None
 
     def _read(self, length):
         total = bytes()
-        self.logger.debug('Start read')
+        self.logger.debug("Start read")
         if self._serial is not None:
             while True:
                 ch = self._serial.read()
                 # self.logger.debug(f"Read {ch=}")
                 if len(ch) == 0:
-                    self.logger.debug('End read')
+                    self.logger.debug("End read")
                     return total
                 total += ch
                 if len(total) >= length:
-                    self.logger.debug('End read')
+                    self.logger.debug("End read")
                     return total
         elif self._sock is not None:
             while True:
@@ -283,8 +292,8 @@ class Sml2(SmartPlugin):
                     else:
                         raise e
 
-            self.logger.debug('End read')
-            return b''.join(total)
+            self.logger.debug("End read")
+            return b"".join(total)
 
     def poll_device(self):
         """
@@ -295,33 +304,34 @@ class Sml2(SmartPlugin):
         successfully_acquired = self._lock.acquire(False)
         if not successfully_acquired:
             self.logger.warning(
-                'Triggered cyclic poll_device, but previous cyclic run is still active. Therefore request will be skipped.')
+                "Triggered cyclic poll_device, but previous cyclic run is still active. Therefore request will be skipped."
+            )
             return
 
         start = time.time()
 
         try:
-            self.logger.debug('Polling Smartmeter now')
+            self.logger.debug("Polling Smartmeter now")
             self.connect()
 
             if not self.connected:
-                self.logger.error('Not connected, no query possible')
+                self.logger.error("Not connected, no query possible")
                 return
             else:
-                self.logger.debug('Connected, try to query')
+                self.logger.debug("Connected, try to query")
 
             start = time.time()
             data = self._read(self.buffersize)
             if len(data) == 0:
-                self.logger.error('Reading data from device returned 0 bytes!')
+                self.logger.error("Reading data from device returned 0 bytes!")
                 return
 
-            self.logger.debug(f'Read {len(data)} bytes')
+            self.logger.debug(f"Read {len(data)} bytes")
             self.stream.add(data)
             self.parse_data()
 
         except Exception as e:
-            self.logger.error(f'Reading data from {self._target} failed with exception {e}')
+            self.logger.error(f"Reading data from {self._target} failed with exception {e}")
             return
 
         finally:
@@ -342,15 +352,15 @@ class Sml2(SmartPlugin):
                     obis_code = sml_entry.obis.obis_code
                     if obis_code not in self.values:
                         self.values[obis_code] = dict()
-                        self.values[obis_code]['name'] = self.obis_names.get(sml_entry.obis)
-                        self.values[obis_code]['unit'] = self.obis_units.get(sml_entry.unit)
+                        self.values[obis_code]["name"] = self.obis_names.get(sml_entry.obis)
+                        self.values[obis_code]["unit"] = self.obis_units.get(sml_entry.unit)
                     if obis_code in self._items:
-                        if 'valueReal' in self._items[obis_code]:
-                            for item in self._items[obis_code]['valueReal']:
+                        if "valueReal" in self._items[obis_code]:
+                            for item in self._items[obis_code]["valueReal"]:
                                 item(sml_entry.get_value(), self.get_shortname())
             except Exception as e:
                 detail = traceback.format_exc()
-                self.logger.warning(f'Preparing and parsing data failed with exception {e}: and detail: {detail}')
+                self.logger.warning(f"Preparing and parsing data failed with exception {e}: and detail: {detail}")
 
     @property
     def item_list(self):

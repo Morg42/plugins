@@ -43,7 +43,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -60,7 +59,6 @@ class WebInterface(SmartPluginWebIf):
 
         self.tplenv = self.init_template_environment()
 
-
     def get_itemsdata(self):
 
         result = {}
@@ -68,31 +66,29 @@ class WebInterface(SmartPluginWebIf):
         for item in self.plugin.get_item_list():
             item_config = self.plugin.get_item_config(item)
             value_dict = {}
-            value_dict['path'] = item.property.path
-            value_dict['type'] = item.type()
-            value_dict['value'] = item()
-            if value_dict['type'] == 'dict':
-                value_dict['value'] = str(item())
-            value_dict['index'] = item_config['index']
-            value_dict['parameter'] = item_config['parameter']
+            value_dict["path"] = item.property.path
+            value_dict["type"] = item.type()
+            value_dict["value"] = item()
+            if value_dict["type"] == "dict":
+                value_dict["value"] = str(item())
+            value_dict["index"] = item_config["index"]
+            value_dict["parameter"] = item_config["parameter"]
 
-            value_dict['last_update'] = item.property.last_update.strftime('%d.%m.%y %H:%M:%S')
-            value_dict['last_change'] = item.property.last_change.strftime('%d.%m.%y %H:%M:%S')
+            value_dict["last_update"] = item.property.last_update.strftime("%d.%m.%y %H:%M:%S")
+            value_dict["last_change"] = item.property.last_change.strftime("%d.%m.%y %H:%M:%S")
 
-            result[value_dict['path']] = value_dict
+            result[value_dict["path"]] = value_dict
         return result
 
-
-    def get_device_parameter(self, device_index, parametername, suffix=''):
-        result = self.plugin._devices[device_index]['parameters'].get(parametername, '-')
+    def get_device_parameter(self, device_index, parametername, suffix=""):
+        result = self.plugin._devices[device_index]["parameters"].get(parametername, "-")
         try:
-            result = str(result.value) + ' (' + result.name + ')'   # get name of enum type
+            result = str(result.value) + " (" + result.name + ")"  # get name of enum type
         except Exception:
             pass
-        if result != '-':
+        if result != "-":
             result = str(result) + suffix
         return result
-
 
     def get_devicesdata(self):
 
@@ -100,32 +96,39 @@ class WebInterface(SmartPluginWebIf):
 
         for device_index in self.plugin._devices:
             value_dict = {}
-            value_dict['name'] = self.plugin._devices[device_index]['name']
-            value_dict['group'] = self.plugin._devices[device_index]['group']
-            value_dict['model'] = self.plugin._devices[device_index]['model']
-            value_dict['id'] = self.plugin._devices[device_index]['id']
+            value_dict["name"] = self.plugin._devices[device_index]["name"]
+            value_dict["group"] = self.plugin._devices[device_index]["group"]
+            value_dict["model"] = self.plugin._devices[device_index]["model"]
+            value_dict["id"] = self.plugin._devices[device_index]["id"]
             #
             try:
-                value_dict['parameters'] = {}
-                value_dict['parameters']['temperatureInside'] = self.get_device_parameter(device_index, 'temperatureInside', '°C')
-                value_dict['parameters']['temperatureOutside'] = self.get_device_parameter(device_index, 'temperatureOutside', '°C')
-                if value_dict['parameters']['temperatureOutside'] == '126°C':
-                    value_dict['parameters']['temperatureOutside'] = '-'
-                value_dict['parameters']['temperature'] = self.get_device_parameter(device_index, 'temperature', '°C')
-                value_dict['parameters']['power'] = self.get_device_parameter(device_index, 'power')
-                value_dict['parameters']['mode'] = self.get_device_parameter(device_index, 'mode')
-                value_dict['parameters']['fanSpeed'] = self.get_device_parameter(device_index, 'fanSpeed')
-                value_dict['parameters']['airSwingHorizontal'] = self.get_device_parameter(device_index, 'airSwingHorizontal')
-                value_dict['parameters']['airSwingVertical'] = self.get_device_parameter(device_index, 'airSwingVertical')
-                value_dict['parameters']['eco'] = self.get_device_parameter(device_index, 'eco')
-                value_dict['parameters']['nanoe'] = self.get_device_parameter(device_index, 'nanoe')
+                value_dict["parameters"] = {}
+                value_dict["parameters"]["temperatureInside"] = self.get_device_parameter(
+                    device_index, "temperatureInside", "°C"
+                )
+                value_dict["parameters"]["temperatureOutside"] = self.get_device_parameter(
+                    device_index, "temperatureOutside", "°C"
+                )
+                if value_dict["parameters"]["temperatureOutside"] == "126°C":
+                    value_dict["parameters"]["temperatureOutside"] = "-"
+                value_dict["parameters"]["temperature"] = self.get_device_parameter(device_index, "temperature", "°C")
+                value_dict["parameters"]["power"] = self.get_device_parameter(device_index, "power")
+                value_dict["parameters"]["mode"] = self.get_device_parameter(device_index, "mode")
+                value_dict["parameters"]["fanSpeed"] = self.get_device_parameter(device_index, "fanSpeed")
+                value_dict["parameters"]["airSwingHorizontal"] = self.get_device_parameter(
+                    device_index, "airSwingHorizontal"
+                )
+                value_dict["parameters"]["airSwingVertical"] = self.get_device_parameter(
+                    device_index, "airSwingVertical"
+                )
+                value_dict["parameters"]["eco"] = self.get_device_parameter(device_index, "eco")
+                value_dict["parameters"]["nanoe"] = self.get_device_parameter(device_index, "nanoe")
             except Exception as ex:
                 self.logger.warning(f"WebIf get_devicesdata(): Exception {ex}")
                 self.logger.warning(f" - Devicedata for index={device_index}: {self.plugin._devices[device_index]}")
                 self.logger.warning(f" - Devices: {self.plugin._devices}")
             result[device_index] = value_dict
         return result
-
 
     @cherrypy.expose
     def index(self, reload=None):
@@ -136,15 +139,15 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after being rendered
         """
-        pagelength = self.plugin.get_parameter_value('webif_pagelength')
-        tmpl = self.tplenv.get_template('index.html')
+        pagelength = self.plugin.get_parameter_value("webif_pagelength")
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin,
-                           webif_pagelength=pagelength,
-                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
-                           item_count=0
-                           )
-
+        return tmpl.render(
+            p=self.plugin,
+            webif_pagelength=pagelength,
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])),
+            item_count=0,
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -158,8 +161,7 @@ class WebInterface(SmartPluginWebIf):
         """
         #        self.plugin.logger.info(f"get_data_html: dataSet={dataSet}")
         item_list = []
-        if dataSet is None :
-
+        if dataSet is None:
             # callect data for items
             items = self.get_itemsdata()
             for item in items:
@@ -173,7 +175,7 @@ class WebInterface(SmartPluginWebIf):
             devices_data = self.get_devicesdata()
 
         # if dataSets are used, define them here
-        if dataSet == 'overview':
+        if dataSet == "overview":
             # get the new data from the plugin variable called _webdata
             data = self.plugin._webdata
             try:
@@ -182,7 +184,7 @@ class WebInterface(SmartPluginWebIf):
             except Exception as e:
                 self.logger.error(f"get_data_html exception: {e}")
 
-        result = {'items': item_list, 'devices': devices_data}
+        result = {"items": item_list, "devices": devices_data}
 
         # send result to wen interface
         try:
@@ -196,4 +198,3 @@ class WebInterface(SmartPluginWebIf):
             self.logger.error(f"- {result}")
 
         return {}
-

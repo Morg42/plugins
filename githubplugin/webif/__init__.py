@@ -41,8 +41,8 @@ ERR_CODE = 500
 #    Webinterface of the plugin
 # ------------------------------------------
 
-class WebInterface(SmartPluginWebIf):
 
+class WebInterface(SmartPluginWebIf):
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -63,10 +63,10 @@ class WebInterface(SmartPluginWebIf):
         # remove object items from repos dict
         repos = deepcopy(self.plugin.repos)
         for repo in repos:
-            if 'repo' in repos[repo]:
-                del repos[repo]['repo']
-            repos[repo]['lc'] = repos[repo]['lcommit'][-8:]
-            repos[repo]['rc'] = repos[repo]['rcommit'][-8:]
+            if "repo" in repos[repo]:
+                del repos[repo]["repo"]
+            repos[repo]["lc"] = repos[repo]["lcommit"][-8:]
+            repos[repo]["rc"] = repos[repo]["rcommit"][-8:]
 
         return repos
 
@@ -81,41 +81,43 @@ class WebInterface(SmartPluginWebIf):
         """
 
         # try to get the webif pagelength from the module.yaml configuration
-        pagelength = self.plugin.get_parameter_value('webif_pagelength')
+        pagelength = self.plugin.get_parameter_value("webif_pagelength")
 
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
 
         """ build current PR data structures for the webif """
         reposbyowner = {}
         for repo in self.plugin.repos:
-            owner = self.plugin.repos[repo]['owner']
+            owner = self.plugin.repos[repo]["owner"]
             if owner not in reposbyowner:
                 reposbyowner[owner] = []
-            reposbyowner[owner].append(self.plugin.repos[repo]['branch'])
+            reposbyowner[owner].append(self.plugin.repos[repo]["branch"])
 
         # collect only PRs which (branches) are not already installed as a worktree
         pulls = {}
         for pr in self.plugin.gh.pulls:
             skip = False
-            if self.plugin.gh.pulls[pr]['owner'] in reposbyowner:
-                if self.plugin.gh.pulls[pr]['branch'] in reposbyowner[self.plugin.gh.pulls[pr]['owner']]:
+            if self.plugin.gh.pulls[pr]["owner"] in reposbyowner:
+                if self.plugin.gh.pulls[pr]["branch"] in reposbyowner[self.plugin.gh.pulls[pr]["owner"]]:
                     skip = True
 
             if not skip:
                 pulls[pr] = {
-                    'title': self.plugin.gh.pulls[pr]['title'],
-                    'owner': self.plugin.gh.pulls[pr]['owner'],
-                    'branch': self.plugin.gh.pulls[pr]['branch']
+                    "title": self.plugin.gh.pulls[pr]["title"],
+                    "owner": self.plugin.gh.pulls[pr]["owner"],
+                    "branch": self.plugin.gh.pulls[pr]["branch"],
                 }
 
-        return tmpl.render(p=self.plugin,
-                           webif_pagelength=pagelength,
-                           repos=self.collect_repos(),
-                           forklist=self.plugin.get_github_forklist_sorted(),
-                           pulls=pulls,
-                           auth=self.plugin.gh_apikey != '',
-                           conn=self.plugin.gh._github is not None,
-                           language=self.plugin.get_sh().get_defaultlanguage())
+        return tmpl.render(
+            p=self.plugin,
+            webif_pagelength=pagelength,
+            repos=self.collect_repos(),
+            forklist=self.plugin.get_github_forklist_sorted(),
+            pulls=pulls,
+            auth=self.plugin.gh_apikey != "",
+            conn=self.plugin.gh._github is not None,
+            language=self.plugin.get_sh().get_defaultlanguage(),
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -127,7 +129,7 @@ class WebInterface(SmartPluginWebIf):
         :param dataSet: Dataset for which the data should be returned (standard: None)
         :return: dict with the data needed to update the web page.
         """
-        if dataSet == 'overview':
+        if dataSet == "overview":
             # get the new data
             data = self.collect_repos()
 
@@ -176,14 +178,14 @@ class WebInterface(SmartPluginWebIf):
     def isRepoClean(self):
         try:
             json = cherrypy.request.json
-            name = json.get('name')
+            name = json.get("name")
 
             if not name or name not in self.plugin.repos:
-                raise Exception(f'Repo {name} ungültig oder nicht gefunden')
+                raise Exception(f"Repo {name} ungültig oder nicht gefunden")
 
             allow, remain, backoff = self.plugin.gh.get_rate_limit()
             if not remain:
-                raise Exception(f'Rate limit aktiv, Vorgang nicht möglich. Bitte {int(backoff)} Sekunden warten...')
+                raise Exception(f"Rate limit aktiv, Vorgang nicht möglich. Bitte {int(backoff)} Sekunden warten...")
             clean = self.plugin.is_repo_clean(name)
             return {"operation": "request", "result": "success", "data": clean}
         except Exception as e:
@@ -196,15 +198,15 @@ class WebInterface(SmartPluginWebIf):
     def pullRepo(self):
         try:
             json = cherrypy.request.json
-            name = json.get('name')
+            name = json.get("name")
 
             if not name or name not in self.plugin.repos:
-                raise Exception(f'Repo {name} ungültig oder nicht vorhanden')
+                raise Exception(f"Repo {name} ungültig oder nicht vorhanden")
 
             if self.plugin.pull_repo(name):
                 return {"operation": "request", "result": "success"}
             else:
-                raise Exception(f'Pull von Repo {name} fehlgeschlagen')
+                raise Exception(f"Pull von Repo {name} fehlgeschlagen")
         except Exception as e:
             cherrypy.response.status = ERR_CODE
             return {"error": str(e)}
@@ -215,14 +217,14 @@ class WebInterface(SmartPluginWebIf):
     def getNameSuggestion(self):
         try:
             json = cherrypy.request.json
-            plugin = json.get('plugin')
+            plugin = json.get("plugin")
 
             if self.plugin.supermode:
                 return {"operation": "request", "result": "success", "name": plugin}
 
-            count = ''
-            while os.path.exists(os.path.join(self.plugin.plg_path, f'priv_{plugin}{count}')) and int('0' + count) < 20:
-                count = str(int('0' + count) + 1)
+            count = ""
+            while os.path.exists(os.path.join(self.plugin.plg_path, f"priv_{plugin}{count}")) and int("0" + count) < 20:
+                count = str(int("0" + count) + 1)
             return {"operation": "request", "result": "success", "name": plugin + count}
         except Exception as e:
             cherrypy.response.status = ERR_CODE
@@ -240,12 +242,12 @@ class WebInterface(SmartPluginWebIf):
                 raise Exception(f'Ungültiger Wert für "pr" in {json}')
             if pr > 0:
                 pull = self.plugin.get_github_pulls(number=pr)
-                b = pull.get('branch')
-                o = pull.get('owner')
+                b = pull.get("branch")
+                o = pull.get("owner")
                 if b and o:
                     return {"operation": "request", "result": "success", "owner": o, "branch": b}
             else:
-                raise Exception(f'Ungültige Daten beim Verarbeiten von PR {pr}')
+                raise Exception(f"Ungültige Daten beim Verarbeiten von PR {pr}")
         except Exception as e:
             cherrypy.response.status = ERR_CODE
             return {"error": str(e)}
@@ -256,7 +258,7 @@ class WebInterface(SmartPluginWebIf):
         try:
             if self.plugin.fetch_github_pulls(fetch=True):
                 prn = list(self.plugin.get_github_pulls().keys())
-                prt = [v['title'] for pr, v in self.plugin.get_github_pulls().items()]
+                prt = [v["title"] for pr, v in self.plugin.get_github_pulls().items()]
                 return {"operation": "request", "result": "success", "prn": prn, "prt": prt}
         except Exception as e:
             cherrypy.response.status = ERR_CODE
@@ -270,7 +272,7 @@ class WebInterface(SmartPluginWebIf):
             json = cherrypy.request.json
             owner = json.get("owner")
             force = json.get("force", False)
-            if owner is not None and owner != '':
+            if owner is not None and owner != "":
                 branches = self.plugin.fetch_github_branches_from(owner=owner, fetch=force)
                 if branches != {}:
                     return {"operation": "request", "result": "success", "data": list(branches.keys())}
@@ -287,7 +289,7 @@ class WebInterface(SmartPluginWebIf):
             force = json.get("force", False)
             owner = json.get("owner")
             branch = json.get("branch")
-            if owner is not None and owner != '' and branch is not None and branch != '':
+            if owner is not None and owner != "" and branch is not None and branch != "":
                 plugins = self.plugin.fetch_github_plugins_from(owner=owner, branch=branch, fetch=force)
                 if plugins != {}:
                     return {"operation": "request", "result": "success", "data": plugins}
@@ -302,8 +304,8 @@ class WebInterface(SmartPluginWebIf):
         try:
             json = cherrypy.request.json
             name = json.get("name")
-            if name is None or name == '' or name not in self.plugin.repos:
-                raise Exception(f'Repo {name} nicht vorhanden.')
+            if name is None or name == "" or name not in self.plugin.repos:
+                raise Exception(f"Repo {name} nicht vorhanden.")
 
             if self.plugin.remove_plugin(name):
                 return {"operation": "request", "result": "success"}
@@ -324,10 +326,10 @@ class WebInterface(SmartPluginWebIf):
             confirm = json.get("confirm")
             rename = json.get("rename")
 
-            if (owner is None or owner == '' or
-                    branch is None or branch == '' or
-                    plugin is None or plugin == ''):
-                raise Exception(f'Fehlerhafte Daten für Repo {owner}/plugins, Branch {branch} oder Plugin {plugin} übergeben.')
+            if owner is None or owner == "" or branch is None or branch == "" or plugin is None or plugin == "":
+                raise Exception(
+                    f"Fehlerhafte Daten für Repo {owner}/plugins, Branch {branch} oder Plugin {plugin} übergeben."
+                )
 
             if confirm:
                 res = self.plugin.create_repo(name, owner, plugin, branch, rename=rename)

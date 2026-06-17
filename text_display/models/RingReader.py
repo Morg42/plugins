@@ -2,7 +2,6 @@ from .MessageSourceModel import MessageSourceModel
 
 
 class RingReader:
-
     def __init__(self, ring_merger):
         self.__current_index = -1
         self.__last_value = None
@@ -14,6 +13,7 @@ class RingReader:
     def __set_merger(self, x):
         self.__ring_merger = x
         self.reset()
+
     merger = property(__get_merger, __set_merger)
 
     def __repr__(self):

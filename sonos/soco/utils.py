@@ -154,9 +154,7 @@ class deprecated:
         def decorated(*args, **kwargs):
             message = "Call to deprecated function {}.".format(deprecated_fn.__name__)
             if self.will_be_removed_in is not None:
-                message += " Will be removed in version {}.".format(
-                    self.will_be_removed_in
-                )
+                message += " Will be removed in version {}.".format(self.will_be_removed_in)
             if self.alternative is not None:
                 message += " Use {} instead.".format(self.alternative)
             warnings.warn(message, stacklevel=2)
@@ -165,9 +163,7 @@ class deprecated:
 
         docs = "\n\n  .. deprecated:: {}\n".format(self.since_version)
         if self.will_be_removed_in is not None:
-            docs += "\n     Will be removed in version {}.".format(
-                self.will_be_removed_in
-            )
+            docs += "\n     Will be removed in version {}.".format(self.will_be_removed_in)
         if self.alternative is not None:
             if self.alternative_not_referable:
                 docs += "\n     Use ``{}`` instead.".format(self.alternative)

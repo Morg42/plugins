@@ -25,6 +25,7 @@ import logging
 from mvg import MvgApi, MvgApiError
 from lib.model.smartplugin import SmartPlugin
 
+
 class MVG_Live(SmartPlugin):
     ALLOW_MULTIINSTANCE = False
     PLUGIN_VERSION = "1.6.1"
@@ -53,8 +54,8 @@ class MVG_Live(SmartPlugin):
         mvg_station = self.get_station(station)
         self.logger.error(mvg_station)
         if mvg_station:
-            mvgapi = MvgApi(mvg_station['id'])
-            mvgapi.station_id = mvg_station['id']
+            mvgapi = MvgApi(mvg_station["id"])
+            mvgapi.station_id = mvg_station["id"]
             return mvgapi.departures()
         else:
-            self.logger.error("Station %s does not exist."%station)
+            self.logger.error("Station %s does not exist." % station)

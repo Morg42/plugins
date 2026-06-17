@@ -1,4 +1,5 @@
 """TR-064 service"""
+
 from io import BytesIO
 import lxml.etree as ET
 import requests
@@ -14,7 +15,18 @@ class Service:
     """TR-064 service."""
 
     # pylint: disable=too-many-arguments
-    def __init__(self, auth, base_url, service_type, service_id, scpdurl, control_url, event_sub_url, verify: bool = False, description_file='tr64desc.xml'):
+    def __init__(
+        self,
+        auth,
+        base_url,
+        service_type,
+        service_id,
+        scpdurl,
+        control_url,
+        event_sub_url,
+        verify: bool = False,
+        description_file="tr64desc.xml",
+    ):
         self.auth = auth
         self.base_url = base_url
         self.service_type = service_type
@@ -25,10 +37,10 @@ class Service:
         self.actions = {}
         self.verify = verify
         self.description_file = description_file
-        self.namespaces = IGD_SERVICE_NAMESPACE if 'igd' in description_file else TR064_SERVICE_NAMESPACE
+        self.namespaces = IGD_SERVICE_NAMESPACE if "igd" in description_file else TR064_SERVICE_NAMESPACE
 
         # added parser with resolve_entities option in response to CVE-2026-41066
-        self._xmlparser = ET.XMLParser(resolve_entities='internal')
+        self._xmlparser = ET.XMLParser(resolve_entities="internal")
 
     def __getattr__(self, name):
         if name not in self.actions:
@@ -41,14 +53,14 @@ class Service:
 
     def _fetch_actions(self, scpdurl):
         """Fetch action description."""
-        request = requests.get('{0}{1}'.format(self.base_url, scpdurl), verify=self.verify)
+        request = requests.get("{0}{1}".format(self.base_url, scpdurl), verify=self.verify)
         if request.status_code == 200:
             # added parser option in response to CVE-2026-41066
             xml = ET.parse(BytesIO(request.content), parser=self._xmlparser)
 
-            for action in xml.findall('./actionList/action', namespaces=self.namespaces):
-                name = action.findtext('name', namespaces=self.namespaces)
-                canonical_name = name.replace('-', '_')
+            for action in xml.findall("./actionList/action", namespaces=self.namespaces):
+                name = action.findtext("name", namespaces=self.namespaces)
+                canonical_name = name.replace("-", "_")
                 self.actions[canonical_name] = Action(
                     action,
                     self.auth,
@@ -58,5 +70,5 @@ class Service:
                     self.service_id,
                     self.control_url,
                     self.verify,
-                    self.description_file
+                    self.description_file,
                 )

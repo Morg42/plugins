@@ -33,16 +33,16 @@ import json
 
 from .webif import WebInterface
 
-'https://creativecommons.tankerkoenig.de/json/'
+"https://creativecommons.tankerkoenig.de/json/"
 
 
 class TankerKoenig(SmartPlugin):
     PLUGIN_VERSION = "2.0.6"
 
-    _base_url = 'https://creativecommons.tankerkoenig.de/json'
-    _detail_url_suffix = 'detail.php'
-    _prices_url_suffix = 'prices.php'
-    _list_url_suffix = 'list.php'
+    _base_url = "https://creativecommons.tankerkoenig.de/json"
+    _detail_url_suffix = "detail.php"
+    _prices_url_suffix = "prices.php"
+    _list_url_suffix = "list.php"
 
     def __init__(self, sh):
         """
@@ -66,12 +66,14 @@ class TankerKoenig(SmartPlugin):
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
         try:
-            self.webif_pagelength = self.get_parameter_value('webif_pagelength')
-            self._apikey = self.get_parameter_value('apikey')
-            self.price_update_cycle = self.get_parameter_value('price_update_cycle')
-            self.details_update_cycle = self.get_parameter_value('details_update_cycle')
+            self.webif_pagelength = self.get_parameter_value("webif_pagelength")
+            self._apikey = self.get_parameter_value("apikey")
+            self.price_update_cycle = self.get_parameter_value("price_update_cycle")
+            self.details_update_cycle = self.get_parameter_value("details_update_cycle")
         except KeyError as e:
-            self.logger.critical(f"Plugin '{self.get_shortname()}': Inconsistent plugin (invalid metadata definition: {e} not defined).")
+            self.logger.critical(
+                f"Plugin '{self.get_shortname()}': Inconsistent plugin (invalid metadata definition: {e} not defined)."
+            )
             self._init_complete = False
             return
 
@@ -86,11 +88,13 @@ class TankerKoenig(SmartPlugin):
         self.logger.debug("Run method called")
 
         # create scheduler for price data updates
-        self.scheduler_add('update_status_data', self.update_status_data, cycle=self.price_update_cycle)
+        self.scheduler_add("update_status_data", self.update_status_data, cycle=self.price_update_cycle)
 
         # create scheduler for detailed data updates
-        _cycle = {'daily': 24*60*60, 'weekly': 7*24*60*60, 'monthly': 30.5*24*60*60}[self.details_update_cycle]
-        self.scheduler_add('update_detail_data', self.update_detail_data, cron='init+30', cycle=_cycle)
+        _cycle = {"daily": 24 * 60 * 60, "weekly": 7 * 24 * 60 * 60, "monthly": 30.5 * 24 * 60 * 60}[
+            self.details_update_cycle
+        ]
+        self.scheduler_add("update_detail_data", self.update_detail_data, cron="init+30", cycle=_cycle)
 
         self.alive = True
 
@@ -100,7 +104,7 @@ class TankerKoenig(SmartPlugin):
         """
 
         self.logger.debug("Stop method called")
-        self.scheduler_remove('update_status_data')
+        self.scheduler_remove("update_status_data")
         self.alive = False
 
     def parse_item(self, item):
@@ -117,22 +121,24 @@ class TankerKoenig(SmartPlugin):
                         can be sent to the knx with a knx write function within the knx plugin.
         """
 
-        if self.has_iattr(item.conf, 'tankerkoenig_id'):
+        if self.has_iattr(item.conf, "tankerkoenig_id"):
             self.logger.debug(f"parse item: {item}")
-            station_id = self.get_iattr_value(item.conf, 'tankerkoenig_id')
-            tankerkoenig_attr = self.get_iattr_value(item.conf, 'tankerkoenig_attr')
+            station_id = self.get_iattr_value(item.conf, "tankerkoenig_id")
+            tankerkoenig_attr = self.get_iattr_value(item.conf, "tankerkoenig_attr")
 
             if station_id and tankerkoenig_attr:
-                self.logger.debug(f"parse_item: tankerkoenig_attr={tankerkoenig_attr} with station_id={station_id} detected, item added")
-                self.item_dict[item] = {'station_id': station_id, 'tankerkoenig_attr': tankerkoenig_attr.lower()}
+                self.logger.debug(
+                    f"parse_item: tankerkoenig_attr={tankerkoenig_attr} with station_id={station_id} detected, item added"
+                )
+                self.item_dict[item] = {"station_id": station_id, "tankerkoenig_attr": tankerkoenig_attr.lower()}
 
                 if station_id not in self.station_ids:
                     self.station_ids.append(station_id)
 
-        if self.has_iattr(item.conf, 'tankerkoenig_admin'):
+        if self.has_iattr(item.conf, "tankerkoenig_admin"):
             self.logger.debug(f"parse item: {item.property.path}")
-            tankerkoenig_admin = self.get_iattr_value(item.conf, 'tankerkoenig_admin')
-            if tankerkoenig_admin == 'update':
+            tankerkoenig_admin = self.get_iattr_value(item.conf, "tankerkoenig_admin")
+            if tankerkoenig_admin == "update":
                 return self.update_item
 
     def update_item(self, item, caller=None, source=None, dest=None):
@@ -152,17 +158,19 @@ class TankerKoenig(SmartPlugin):
         if self.alive and caller != self.get_shortname():
             self.logger.info(f"Update item: {item.property.path}, item has been changed outside this plugin")
 
-            if self.get_iattr_value(item.conf, 'tankerkoenig_admin').lower() == 'update' and item():
+            if self.get_iattr_value(item.conf, "tankerkoenig_admin").lower() == "update" and item():
                 self.logger.debug("Data update has been initiated.")
                 self.update_status_data()
                 item(False)
             return None
 
-###################################################
-#  Public Functions
-###################################################
+    ###################################################
+    #  Public Functions
+    ###################################################
 
-    def get_petrol_stations(self, lat: float = None, lon: float = None, price: str = 'diesel', sort: str = 'price', rad: float = 4) -> list:
+    def get_petrol_stations(
+        self, lat: float = None, lon: float = None, price: str = "diesel", sort: str = "price", rad: float = 4
+    ) -> list:
         """
         Returns a list of information for petrol stations around a specific location and radius
         Should not be used extensively, due to performance issues on tankerkoenig side.
@@ -181,28 +189,47 @@ class TankerKoenig(SmartPlugin):
             lon = self._lon
 
         # check if value for price
-        if price not in ['e5', 'e10', 'diesel', 'all']:
-            self.logger.notice(f"Plugin '{self.get_fullname()}': Used value={price} for 'price' at 'get_petrol_stations' not allowed. Set to default 'all'.")
-            price = 'all'
+        if price not in ["e5", "e10", "diesel", "all"]:
+            self.logger.notice(
+                f"Plugin '{self.get_fullname()}': Used value={price} for 'price' at 'get_petrol_stations' not allowed. Set to default 'all'."
+            )
+            price = "all"
 
         # check if value for sort
-        if sort not in ['price']:
-            self.logger.notice(f"Plugin '{self.get_fullname()}': Used value={sort} for 'sort' at 'get_petrol_stations' not allowed. Set to default 'price'.")
-            sort = 'price'
+        if sort not in ["price"]:
+            self.logger.notice(
+                f"Plugin '{self.get_fullname()}': Used value={sort} for 'sort' at 'get_petrol_stations' not allowed. Set to default 'price'."
+            )
+            sort = "price"
 
         # limit radius to 25km
         if float(rad) > 25:
-            self.logger.notice(f"Plugin '{self.get_fullname()}': Used value={rad} for 'rad' at 'get_petrol_stations' not allowed. Set to max allowed value '25km'.")
+            self.logger.notice(
+                f"Plugin '{self.get_fullname()}': Used value={rad} for 'rad' at 'get_petrol_stations' not allowed. Set to max allowed value '25km'."
+            )
             rad = 25
 
         result_stations = []
         json_obj = self._request_stations(lat=lat, lon=lon, price=price, sort=sort, rad=rad)
 
-        keys = ['place', 'brand', 'houseNumber', 'street', 'id', 'lng', 'name', 'lat', 'price', 'dist', 'isOpen', 'postCode']
-        if json_obj is None or json_obj.get('stations', None) is None:
+        keys = [
+            "place",
+            "brand",
+            "houseNumber",
+            "street",
+            "id",
+            "lng",
+            "name",
+            "lat",
+            "price",
+            "dist",
+            "isOpen",
+            "postCode",
+        ]
+        if json_obj is None or json_obj.get("stations", None) is None:
             self.logger.warning(f"Plugin '{self.get_fullname()}': Tankerkönig didn't return any station")
         else:
-            for i in json_obj['stations']:
+            for i in json_obj["stations"]:
                 result_station = {}
                 for key in keys:
                     result_station[key] = i[key]
@@ -220,11 +247,25 @@ class TankerKoenig(SmartPlugin):
 
         json_obj = self._request_station_detail(station_id)
 
-        keys = ['e5', 'e10', 'diesel', 'street', 'houseNumber', 'postCode', 'place', 'brand', 'id', 'lng', 'name', 'lat', 'isOpen']
+        keys = [
+            "e5",
+            "e10",
+            "diesel",
+            "street",
+            "houseNumber",
+            "postCode",
+            "place",
+            "brand",
+            "id",
+            "lng",
+            "name",
+            "lat",
+            "isOpen",
+        ]
         result_station = {}
 
         try:
-            i = json_obj['station']
+            i = json_obj["station"]
             for key in keys:
                 result_station[key] = i[key]
         except Exception:
@@ -243,17 +284,17 @@ class TankerKoenig(SmartPlugin):
         station_details = self.get_petrol_station_detail(station_id)
 
         # clean dict
-        keys_to_be_deleted = ['e5', 'e10', 'diesel', 'isOpen']
+        keys_to_be_deleted = ["e5", "e10", "diesel", "isOpen"]
         for item in keys_to_be_deleted:
             if item in station_details:
                 del station_details[item]
 
         # add address
-        _street = station_details.get('street', None)
-        _housenumber = station_details.get('houseNumber', None)
-        _postcode = station_details.get('postCode', None)
-        _place = station_details.get('place', None)
-        station_details['address'] = f"{_street} {_housenumber}\n{_postcode} {_place}"
+        _street = station_details.get("street", None)
+        _housenumber = station_details.get("houseNumber", None)
+        _postcode = station_details.get("postCode", None)
+        _place = station_details.get("place", None)
+        station_details["address"] = f"{_street} {_housenumber}\n{_postcode} {_place}"
 
         return station_details
 
@@ -267,23 +308,29 @@ class TankerKoenig(SmartPlugin):
         """
         _station_id_prices = self._request_station_prices(station_ids)
         if _station_id_prices is None:
-            self.logger.notice("get_petrol_station_prices: self._request_station_prices(station_ids) returned invalid result")
+            self.logger.notice(
+                "get_petrol_station_prices: self._request_station_prices(station_ids) returned invalid result"
+            )
             return {}
-        _price_dict = _station_id_prices.get('prices', None)
+        _price_dict = _station_id_prices.get("prices", None)
         for station_id in station_ids:
             if _price_dict and isinstance(_price_dict, dict) and (station_id not in _price_dict):
-                self.logger.notice(f"Plugin '{self.get_fullname()}': No result for station with id {station_id}. Check manually!")
+                self.logger.notice(
+                    f"Plugin '{self.get_fullname()}': No result for station with id {station_id}. Check manually!"
+                )
 
         if _price_dict and isinstance(_price_dict, dict):
             for station_id in _price_dict:
-                if 'status' in _price_dict[station_id]:
-                    _price_dict[station_id]['open'] = True if _price_dict[station_id]['status'].lower() == 'open' else False
+                if "status" in _price_dict[station_id]:
+                    _price_dict[station_id]["open"] = (
+                        True if _price_dict[station_id]["status"].lower() == "open" else False
+                    )
 
         return _price_dict
 
-###################################################
-#  Plugin Functions
-###################################################
+    ###################################################
+    #  Plugin Functions
+    ###################################################
 
     def update_status_data(self):
         """
@@ -321,16 +368,20 @@ class TankerKoenig(SmartPlugin):
 
         for item in self.item_dict:
             self.logger.debug(f"set_item_status_values: handle item {item} type {item.type()}")
-            station_id = self.item_dict[item]['station_id']
-            tankerkoenig_attr = self.item_dict[item]['tankerkoenig_attr']
+            station_id = self.item_dict[item]["station_id"]
+            tankerkoenig_attr = self.item_dict[item]["tankerkoenig_attr"]
 
             if self.station_prices is not None and self.station_prices.get(station_id, None) is not None:
                 value = self.station_prices.get(station_id, None).get(tankerkoenig_attr, None)
             else:
-                self.logger.notice(f"set_item_status_values: station_id with {station_id} does not exist in station_prices.")
+                self.logger.notice(
+                    f"set_item_status_values: station_id with {station_id} does not exist in station_prices."
+                )
                 continue
 
-            self.logger.debug(f"set_item_status_values: station_id={station_id}, tankerkoenig_attr={tankerkoenig_attr}, value={value}")
+            self.logger.debug(
+                f"set_item_status_values: station_id={station_id}, tankerkoenig_attr={tankerkoenig_attr}, value={value}"
+            )
             if value:
                 item(value, self.get_shortname())
 
@@ -340,19 +391,25 @@ class TankerKoenig(SmartPlugin):
         """
 
         for item in self.item_dict:
-            station_id = self.item_dict[item]['station_id']
-            tankerkoenig_attr = self.item_dict[item]['tankerkoenig_attr']
+            station_id = self.item_dict[item]["station_id"]
+            tankerkoenig_attr = self.item_dict[item]["tankerkoenig_attr"]
             if self.station_details.get(station_id, None) is not None:
                 value = self.station_details.get(station_id, None).get(tankerkoenig_attr, None)
             else:
-                self.logger.notice(f"set_item_status_values: station_id with {station_id} does not exist in station_details.")
+                self.logger.notice(
+                    f"set_item_status_values: station_id with {station_id} does not exist in station_details."
+                )
                 continue
-                
-            self.logger.debug(f"set_item_detail_values: station_id={station_id}, tankerkoenig_attr={tankerkoenig_attr}, value={value}")
+
+            self.logger.debug(
+                f"set_item_detail_values: station_id={station_id}, tankerkoenig_attr={tankerkoenig_attr}, value={value}"
+            )
             if value:
                 item(value, self.get_shortname())
 
-    def _request_stations(self, lat: float = None, lon: float = None, price: str = 'diesel', sort: str = 'price', rad: float = 4) -> dict:
+    def _request_stations(
+        self, lat: float = None, lon: float = None, price: str = "diesel", sort: str = "price", rad: float = 4
+    ) -> dict:
         """
         Returns a dict of information for petrol stations around a specific location and radius
 
@@ -391,17 +448,23 @@ class TankerKoenig(SmartPlugin):
         @param rad: radius in kilometers
         """
 
-        url = self._build_url(f"{self._list_url_suffix}?lat={lat}&lng={lon}&rad={rad}&sort={sort}&type={price}&apikey={self._apikey}")
+        url = self._build_url(
+            f"{self._list_url_suffix}?lat={lat}&lng={lon}&rad={rad}&sort={sort}&type={price}&apikey={self._apikey}"
+        )
         try:
             response = self._session.get(url)
         except Exception as e:
-            self.logger.notice(f"Plugin '{self.get_fullname()}': Exception when sending GET request for _request_petrol_stations: {e}")
+            self.logger.notice(
+                f"Plugin '{self.get_fullname()}': Exception when sending GET request for _request_petrol_stations: {e}"
+            )
             return {}
 
         try:
             return response.json()
         except Exception as e:
-            self.logger.notice(f"Plugin '{self.get_fullname()}': Exception when handling GET response to JSON for _request_petrol_stations: {e}")
+            self.logger.notice(
+                f"Plugin '{self.get_fullname()}': Exception when handling GET response to JSON for _request_petrol_stations: {e}"
+            )
             return {}
 
     def _request_station_detail(self, station_id: str) -> dict:
@@ -465,15 +528,19 @@ class TankerKoenig(SmartPlugin):
         try:
             response = self._session.get(url)
         except Exception as e:
-            self.logger.notice(f"Plugin '{self.get_fullname()}': Exception when sending GET request for get_petrol_station_detail: {e}, response was {response}")
+            self.logger.notice(
+                f"Plugin '{self.get_fullname()}': Exception when sending GET request for get_petrol_station_detail: {e}, response was {response}"
+            )
             return {}
-        
+
         self.logger.debug(f"{response=}")
 
         try:
             return response.json()
         except Exception as e:
-            self.logger.notice(f"Plugin '{self.get_fullname()}': Exception when handling GET response to JSON for get_petrol_station_detail: {e}")
+            self.logger.notice(
+                f"Plugin '{self.get_fullname()}': Exception when handling GET response to JSON for get_petrol_station_detail: {e}"
+            )
             return {}
 
     def _request_station_prices(self, station_ids: list):
@@ -521,18 +588,22 @@ class TankerKoenig(SmartPlugin):
         try:
             response = self._session.get(url)
         except Exception as e:
-            self.logger.notice(f"Plugin '{self.get_fullname()}': Exception when sending GET request for _request_station_prices: {e}")
+            self.logger.notice(
+                f"Plugin '{self.get_fullname()}': Exception when sending GET request for _request_station_prices: {e}"
+            )
             return
 
         try:
             return response.json()
         except Exception as e:
-            self.logger.notice(f"Plugin '{self.get_fullname()}': Exception when handling GET response to JSON for _request_station_prices: {e}")
+            self.logger.notice(
+                f"Plugin '{self.get_fullname()}': Exception when handling GET response to JSON for _request_station_prices: {e}"
+            )
             return
 
-###################################################
-#  Helper Functions
-###################################################
+    ###################################################
+    #  Helper Functions
+    ###################################################
 
     def _build_url(self, suffix):
         """

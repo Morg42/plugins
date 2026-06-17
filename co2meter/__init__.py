@@ -42,7 +42,7 @@ class CO2Meter(SmartPlugin):
     CO2METER_HUM = 0x44
     HIDIOCSFEATURE_9 = 0xC0094806
 
-    _key = [0xc4, 0xc6, 0xc0, 0x92, 0x40, 0x23, 0xdc, 0x96]
+    _key = [0xC4, 0xC6, 0xC0, 0x92, 0x40, 0x23, 0xDC, 0x96]
     _device = ""
     _values = {}
     _file = ""
@@ -60,10 +60,10 @@ class CO2Meter(SmartPlugin):
         super().__init__()
 
         self._items = {}
-        self._time_sleep = self.get_parameter_value('time_sleep')
+        self._time_sleep = self.get_parameter_value("time_sleep")
 
-        self._device = self.get_parameter_value('device')
-        self._file = open(self.get_parameter_value('device'), "a+b", 0)
+        self._device = self.get_parameter_value("device")
+        self._file = open(self.get_parameter_value("device"), "a+b", 0)
 
         set_report = [0] + self._key
         fcntl.ioctl(self._file, self.HIDIOCSFEATURE_9, bytearray(set_report))
@@ -81,12 +81,12 @@ class CO2Meter(SmartPlugin):
         while self.alive:
             data = self.get_data()
             self.logger.debug(data)
-            if 'temperature' in self._items and 'temperature' in data:
-                self._items['temperature'](data['temperature'])
-            if 'co2' in self._items and 'co2' in data:
-                self._items['co2'](data['co2'])
-            if 'humidity' in self._items and 'humidity' in data:
-                self._items['humidity'](data['humidity'])
+            if "temperature" in self._items and "temperature" in data:
+                self._items["temperature"](data["temperature"])
+            if "co2" in self._items and "co2" in data:
+                self._items["co2"](data["co2"])
+            if "humidity" in self._items and "humidity" in data:
+                self._items["humidity"](data["humidity"])
             time.sleep(self._time_sleep)
 
     def stop(self):
@@ -103,9 +103,9 @@ class CO2Meter(SmartPlugin):
 
         :param item: The item to process.
         """
-        if self.has_iattr(item.conf, 'co2meter_data_type'):
-            self._items[self.get_iattr_value(item.conf, 'co2meter_data_type')] = item
-    
+        if self.has_iattr(item.conf, "co2meter_data_type"):
+            self._items[self.get_iattr_value(item.conf, "co2meter_data_type")] = item
+
     def _co2_worker(self, weak_self):
         while True:
             self = weak_self()
@@ -123,7 +123,7 @@ class CO2Meter(SmartPlugin):
             data = list(result)
 
             decrypted = self._decrypt(data)
-            if decrypted[4] != 0x0d or (sum(decrypted[:3]) & 0xff) != decrypted[3]:
+            if decrypted[4] != 0x0D or (sum(decrypted[:3]) & 0xFF) != decrypted[3]:
                 self.logger.debug(self._hd(data), " => ", self._hd(decrypted), "Checksum error")
             else:
                 operation = decrypted[0]
@@ -131,7 +131,6 @@ class CO2Meter(SmartPlugin):
                 self._values[operation] = val
         except Exception:
             self._running = False
-
 
     def _decrypt(self, data):
         cstate = [0x48, 0x74, 0x65, 0x6D, 0x70, 0x39, 0x39, 0x65]
@@ -147,15 +146,15 @@ class CO2Meter(SmartPlugin):
 
         phase3 = [0] * 8
         for i in range(8):
-            phase3[i] = ((phase2[i] >> 3) | (phase2[(i-1+8)%8] << 5)) & 0xff
+            phase3[i] = ((phase2[i] >> 3) | (phase2[(i - 1 + 8) % 8] << 5)) & 0xFF
 
         ctmp = [0] * 8
         for i in range(8):
-            ctmp[i] = ((cstate[i] >> 4) | (cstate[i]<<4)) & 0xff
+            ctmp[i] = ((cstate[i] >> 4) | (cstate[i] << 4)) & 0xFF
 
         out = [0] * 8
         for i in range(8):
-            out[i] = (0x100 + phase3[i] - ctmp[i]) & 0xff
+            out[i] = (0x100 + phase3[i] - ctmp[i]) & 0xFF
 
         return out
 
@@ -163,35 +162,31 @@ class CO2Meter(SmartPlugin):
     def _hd(data):
         return " ".join("%02X" % e for e in data)
 
-
     def get_co2(self):
         if not self._running:
             raise IOError("worker thread couldn't read data")
         result = {}
         if self.CO2METER_CO2 in self._values:
-            result = {'co2': self._values[self.CO2METER_CO2]}
+            result = {"co2": self._values[self.CO2METER_CO2]}
 
         return result
-
 
     def get_temperature(self):
         if not self._running:
             raise IOError("worker thread couldn't read data")
         result = {}
         if self.CO2METER_TEMP in self._values:
-            result = {'temperature': (self._values[self.CO2METER_TEMP]/16.0-273.15)}
+            result = {"temperature": (self._values[self.CO2METER_TEMP] / 16.0 - 273.15)}
 
         return result
 
-
-    def get_humidity(self): # not implemented by all devices
+    def get_humidity(self):  # not implemented by all devices
         if not self._running:
             raise IOError("worker thread couldn't read data")
         result = {}
         if self.CO2METER_HUM in self._values:
-            result = {'humidity': (self._values[self.CO2METER_HUM]/100.0)}
+            result = {"humidity": (self._values[self.CO2METER_HUM] / 100.0)}
         return result
-
 
     def get_data(self):
         result = {}

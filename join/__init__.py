@@ -27,24 +27,23 @@ from lib.model.smartplugin import SmartPlugin
 
 
 class Join(SmartPlugin):
-    URL_PREFIX = 'https://joinjoaomgcd.appspot.com/_ah/api/'
-    SEND_URL = URL_PREFIX+'messaging/v1/sendPush?apikey='
-    LIST_URL = URL_PREFIX+'registration/v1/listDevices?apikey='
+    URL_PREFIX = "https://joinjoaomgcd.appspot.com/_ah/api/"
+    SEND_URL = URL_PREFIX + "messaging/v1/sendPush?apikey="
+    LIST_URL = URL_PREFIX + "registration/v1/listDevices?apikey="
 
     PLUGIN_VERSION = "1.4.4"
-
 
     def __init__(self, sh):
         # Call init code of parent class (SmartPlugin)
         super().__init__()
 
         from bin.smarthome import VERSION
-        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
+
+        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
             self.logger = logging.getLogger(__name__)
 
-
-        self._api_key = self.get_parameter_value('api_key')
-        self._device_id = self.get_parameter_value('device_id')
+        self._api_key = self.get_parameter_value("api_key")
+        self._device_id = self.get_parameter_value("device_id")
 
     def run(self):
         self.alive = True
@@ -52,10 +51,35 @@ class Join(SmartPlugin):
     def stop(self):
         self.alive = False
 
-    def send(self, title=None, text=None, icon=None, find=None, smallicon=None, device_id=None, device_ids=None,
-             device_names=None, url=None, image=None, sound=None, group=None, clipboard=None, file=None,
-             callnumber=None, smsnumber=None, smstext=None, mmsfile=None, wallpaper=None, lockWallpaper=None,
-             interruptionFilter=None, mediaVolume=None, ringVolume=None, alarmVolume=None, say=None, language=None):
+    def send(
+        self,
+        title=None,
+        text=None,
+        icon=None,
+        find=None,
+        smallicon=None,
+        device_id=None,
+        device_ids=None,
+        device_names=None,
+        url=None,
+        image=None,
+        sound=None,
+        group=None,
+        clipboard=None,
+        file=None,
+        callnumber=None,
+        smsnumber=None,
+        smstext=None,
+        mmsfile=None,
+        wallpaper=None,
+        lockWallpaper=None,
+        interruptionFilter=None,
+        mediaVolume=None,
+        ringVolume=None,
+        alarmVolume=None,
+        say=None,
+        language=None,
+    ):
         req_url = self.SEND_URL + self._api_key
         if title:
             req_url += "&title=" + title
@@ -116,7 +140,8 @@ class Join(SmartPlugin):
             requests.get(req_url)
         except Exception as e:
             self.logger.error(
-                "Exception when sending GET request towards https://joinjoaomgcd.appspot.com: %s" % str(e))
+                "Exception when sending GET request towards https://joinjoaomgcd.appspot.com: %s" % str(e)
+            )
             return
         return
 
@@ -124,6 +149,6 @@ class Join(SmartPlugin):
         req_url = self.LIST_URL + self._api_key
         response = requests.get(req_url).json()
 
-        if response.get('success') and not response.get('userAuthError'):
-            return [(r['deviceName'], r['deviceId']) for r in response['records']]
+        if response.get("success") and not response.get("userAuthError"):
+            return [(r["deviceName"], r["deviceId"]) for r in response["records"]]
         return False

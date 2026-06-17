@@ -13,9 +13,8 @@ class PrioritizedRingMerger:
 
     def traverse(self, liste, start_index, count, selector):
         result = []
-        if(count > 1):
-            higher_prios = self.traverse(
-                liste, start_index + 1, count - 1, selector)
+        if count > 1:
+            higher_prios = self.traverse(liste, start_index + 1, count - 1, selector)
             this_level = selector(liste[start_index])
             for this_level_item in this_level:
                 result.extend(higher_prios)
@@ -33,8 +32,7 @@ class PrioritizedRingMerger:
             return self.__slots_cache
 
         reversed_rings = list(reversed(self.__rings))
-        temp = self.traverse(reversed_rings, 0, len(
-            reversed_rings), lambda ring_model: ring_model.get_slots())
+        temp = self.traverse(reversed_rings, 0, len(reversed_rings), lambda ring_model: ring_model.get_slots())
         self.__slots_cache = temp
         return temp
 

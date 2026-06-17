@@ -44,7 +44,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -61,7 +60,6 @@ class WebInterface(SmartPluginWebIf):
 
         self.tplenv = self.init_template_environment()
 
-
     @cherrypy.expose
     def index(self, reload=None, action=None, email=None, hashInput=None, code=None, tokenInput=None):
         """
@@ -71,7 +69,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        
+
         generateURLSuccessfull = None
         tokenRequestCompleted = None
 
@@ -83,9 +81,9 @@ class WebInterface(SmartPluginWebIf):
                 generateURLSuccessfull = self.plugin.generate_request_url()
             elif action == "requestToken":
                 self.logger.info("Request token triggered via webinterface")
-                if (code is not None) and (not code == ''):
+                if (code is not None) and (not code == ""):
                     tokenRequestCompleted = self.plugin.retrieve_accessToken(code)
-                elif (code is None) or (code == ''):
+                elif (code is None) or (code == ""):
                     self.logger.error("Token request not possible: Code missing in field above.")
                     tokenRequestCompleted = False
                 else:
@@ -94,12 +92,11 @@ class WebInterface(SmartPluginWebIf):
             else:
                 self.logger.error("Unknown command received via webinterface")
 
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin, 
-                           generateURLSuccessfull=generateURLSuccessfull,
-                           tokenRequestCompleted=tokenRequestCompleted )
-
+        return tmpl.render(
+            p=self.plugin, generateURLSuccessfull=generateURLSuccessfull, tokenRequestCompleted=tokenRequestCompleted
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -112,7 +109,7 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         # if dataSets are used, define them here
-        if dataSet == 'overview':
+        if dataSet == "overview":
             # get the new data from the plugin variable called _webdata
             data = self.plugin._webdata
             try:

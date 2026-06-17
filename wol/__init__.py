@@ -29,7 +29,7 @@ from lib.item import Items
 
 from .webif import WebInterface
 
-ITEM_TAG = ['wol_mac', 'wol_ip']
+ITEM_TAG = ["wol_mac", "wol_ip"]
 
 
 class WakeOnLan(SmartPlugin):
@@ -51,7 +51,6 @@ class WakeOnLan(SmartPlugin):
         # if plugin should start even without web interface
         self.init_webinterface(WebInterface)
 
-
     def __call__(self, mac_adr):
         self.wake_on_lan(mac_adr)
 
@@ -68,7 +67,6 @@ class WakeOnLan(SmartPlugin):
         """
         self.logger.debug("Stop method called")
         self.alive = False
-
 
     def parse_item(self, item):
         """
@@ -108,8 +106,9 @@ class WakeOnLan(SmartPlugin):
         if self.alive and item():
             if self.has_iattr(item.conf, ITEM_TAG[0]):
                 if self.has_iattr(item.conf, ITEM_TAG[1]):
-                    self.wake_on_lan(self.get_iattr_value(item.conf, ITEM_TAG[0]),
-                                     self.get_iattr_value(item.conf, ITEM_TAG[1]))
+                    self.wake_on_lan(
+                        self.get_iattr_value(item.conf, ITEM_TAG[0]), self.get_iattr_value(item.conf, ITEM_TAG[1])
+                    )
                 else:
                     self.wake_on_lan(self.get_iattr_value(item.conf, ITEM_TAG[0]))
 
@@ -123,23 +122,23 @@ class WakeOnLan(SmartPlugin):
         :type ip_adr: ip4
         """
         self.logger.debug(f"WakeOnLan: send magic paket to {mac_adr}")
-        # check length and format 
+        # check length and format
         if not self.is_mac(mac_adr):
             self.logger.warning(f"WakeOnLan: invalid mac address {mac_adr}!")
             return
         if len(mac_adr) == 12 + 5:
             sep = mac_adr[2]
-            mac_adr = mac_adr.replace(sep, '')
-        # create magic packet 
-        data = ''.join(['FF' * 6, mac_adr * 20])
+            mac_adr = mac_adr.replace(sep, "")
+        # create magic packet
+        data = "".join(["FF" * 6, mac_adr * 20])
 
         # Broadcast
         if isinstance(ip_adr, str):
             if ip_adr.strip() == "":
                 ip_adr = None
-        
+
         if ip_adr is None:
-            ip_adr = '<broadcast>'
+            ip_adr = "<broadcast>"
 
         if ip_adr:
             self.logger.debug(f"WakeOnLan: send magic paket {data} to ip/mac {ip_adr}/{mac_adr}")

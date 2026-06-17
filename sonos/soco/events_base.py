@@ -65,17 +65,11 @@ def parse_event_xml(xml_event):
                 # whether we are looking at an avTransport event, a
                 # renderingControl event, or a Queue event
                 # (there, it is named QueueID)
-                instance = last_change_tree.find(
-                    "{urn:schemas-upnp-org:metadata-1-0/AVT/}InstanceID"
-                )
+                instance = last_change_tree.find("{urn:schemas-upnp-org:metadata-1-0/AVT/}InstanceID")
                 if instance is None:
-                    instance = last_change_tree.find(
-                        "{urn:schemas-upnp-org:metadata-1-0/RCS/}InstanceID"
-                    )
+                    instance = last_change_tree.find("{urn:schemas-upnp-org:metadata-1-0/RCS/}InstanceID")
                 if instance is None:
-                    instance = last_change_tree.find(
-                        "{urn:schemas-sonos-com:metadata-1-0/Queue/}QueueID"
-                    )
+                    instance = last_change_tree.find("{urn:schemas-sonos-com:metadata-1-0/Queue/}QueueID")
                 # Look at each variable within the LastChange event
                 for last_change_var in instance:
                     tag = last_change_var.tag
@@ -110,9 +104,7 @@ def parse_event_xml(xml_event):
                                 tag,
                                 str(original_exception),
                             )
-                            event_parse_exception = EventParseException(
-                                tag, value, original_exception
-                            )
+                            event_parse_exception = EventParseException(tag, value, original_exception)
                             value = SoCoFault(event_parse_exception)
                     channel = last_change_var.get("channel")
                     if channel is not None:
@@ -391,14 +383,9 @@ class SubscriptionBase:
         # to be allocated
         self.requested_timeout = requested_timeout
         if self.is_subscribed:
-            raise SoCoException(
-                "Cannot subscribe Subscription instance more than once. "
-                + "Use renew instead"
-            )
+            raise SoCoException("Cannot subscribe Subscription instance more than once. " + "Use renew instead")
         if self._has_been_unsubscribed:
-            raise SoCoException(
-                "Cannot resubscribe Subscription instance once unsubscribed"
-            )
+            raise SoCoException("Cannot resubscribe Subscription instance once unsubscribed")
         service = self.service
         # The Event Listener must be running, so start it if not
         # pylint: disable=no-member

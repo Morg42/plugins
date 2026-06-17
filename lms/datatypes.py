@@ -17,6 +17,7 @@ class DT_LMSRescan(DT.Datatype):
 class DT_LMSWipecache(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
         return True if data == "wipecache" else False
+
     def get_send_data(self, data, type=None, **kwargs):
         return "wipecache" if data is True else ""
 
@@ -36,13 +37,13 @@ class DT_LMSPlay(DT.Datatype):
 
 class DT_LMSSyncnames(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
-        pattern=r"sync_member_names:([^s]+(?: [^s]+)*)(?= sync_members|$)"
+        pattern = r"sync_member_names:([^s]+(?: [^s]+)*)(?= sync_members|$)"
         return re.findall(pattern, data)
 
 
 class DT_LMSSyncmembers(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
-        pattern=r"sync_members:([^s]+(?: [^s]+)*)(?= sync_member_names|$)"
+        pattern = r"sync_members:([^s]+(?: [^s]+)*)(?= sync_member_names|$)"
         return re.findall(pattern, data)
 
 
@@ -62,14 +63,14 @@ class DT_LMSAlarms(DT.Datatype):
         _id = None
         res = data.split()
         for i in res:
-            key, value = i.split(':')
+            key, value = i.split(":")
             if key == "id":
                 _id = value
                 dic[_id] = {}
             elif _id:
-              dic[_id][key] = value
+                dic[_id][key] = value
             else:
-              dic[key] = value
+                dic[key] = value
         return dic
 
 
@@ -100,6 +101,7 @@ class DT_LMSonoff(DT.Datatype):
 class DT_LMSConvertSpaces(DT.Datatype):
     def get_send_data(self, data, type=None, **kwargs):
         return data.replace(" ", "%20")
+
     def get_shng_data(self, data, type=None, **kwargs):
         return data.replace("%20", " ")
 
@@ -114,10 +116,10 @@ class DT_LMSPlayers(DT.Datatype):
             player_info = player[1].strip()
             info_pairs = re.findall(r"(\w+):([\w\.\-:]+)", player_info)
             player_data = {key: value for key, value in info_pairs}
-            player_id = player_data.pop('playerid', None)
+            player_id = player_data.pop("playerid", None)
             if player_id:
                 players_dict[player_id] = player_data
-        players_dict['-'] = {'ip:': None, 'name': 'NONE', 'model': None, 'firmware': None}
+        players_dict["-"] = {"ip:": None, "name": "NONE", "model": None, "firmware": None}
         return players_dict
 
 
@@ -139,12 +141,13 @@ class DT_LMSPlaylists(DT.Datatype):
 
 class DT_LMSPlaylistrename(DT.Datatype):
     def get_send_data(self, data, type=None, **kwargs):
-        values = data.split(' ')
+        values = data.split(" ")
         try:
-            data = f'playlist_id:{values[0]} newname:{values[1]}'
+            data = f"playlist_id:{values[0]} newname:{values[1]}"
         except Exception:
             pass
         return data
+
     def get_shng_data(self, data, type=None, **kwargs):
         match = re.search(r"playlist_id:(\d+)\s+newname:(.*)", data)
         if match:
@@ -158,20 +161,22 @@ class DT_LMSPlaylistrename(DT.Datatype):
 
 class DT_LMSSubscribe(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
-        if data == '-':
+        if data == "-":
             return False
         else:
             return True
+
     def get_send_data(self, data, type=None, **kwargs):
         if data is True:
-            return '0'
+            return "0"
         else:
-            return '-'
+            return "-"
 
 
 class DT_LMSClear(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
         return True if data == "clear" else False
+
     def get_send_data(self, data, type=None, **kwargs):
         return "clear" if data is True else "playlistsinfo"
 
@@ -183,6 +188,7 @@ class DT_LMSDeletePlaylist(DT.Datatype):
             return True
         except ValueError:
             return False
+
     def get_send_data(self, data, type=None, **kwargs):
         return True
 
@@ -193,4 +199,4 @@ class DT_LMSTime(DT.Datatype):
             return data
         epoch_seconds = data / 1000
         time = datetime.fromtimestamp(epoch_seconds, tz=Shtime.get_instance().tzinfo())
-        return time.strftime('%H:%M:%S')
+        return time.strftime("%H:%M:%S")

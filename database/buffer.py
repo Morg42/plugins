@@ -125,8 +125,7 @@ class BufferManager:
         """
         # Close any currently-open valid entry first.
         self.close_open(item, start_ts)
-        self.push(item, BufferEntry(time=start_ts, duration=None,
-                                    value=None, quality=QUALITY_NO_DATA))
+        self.push(item, BufferEntry(time=start_ts, duration=None, value=None, quality=QUALITY_NO_DATA))
 
     # ── reading / introspection ────────────────────────────────────────────────
 
@@ -143,7 +142,7 @@ class BufferManager:
             buf = self._buffer.get(item, [])
             return bool(buf) and buf[-1].duration is None
 
-    def last_entry(self, item) -> 'BufferEntry | None':
+    def last_entry(self, item) -> "BufferEntry | None":
         """Return the last buffered entry for *item*, or ``None``.
 
         :param item: SmartHomeNG item.
@@ -186,7 +185,7 @@ class BufferManager:
         with self._lock:
             entries = list(self._buffer.get(item, []))
             if item in self._buffer:
-                del self._buffer[item][:len(entries)]
+                del self._buffer[item][: len(entries)]
             return entries
 
     def restore(self, item, entries: List[BufferEntry]) -> None:

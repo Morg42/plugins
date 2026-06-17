@@ -3,7 +3,7 @@
 #########################################################################
 #  Copyright 2019 Thomas Hengsberg <thomas@thomash.eu>
 #########################################################################
-#  This file is part of SmartHomeNG.   
+#  This file is part of SmartHomeNG.
 #
 #  SmartHomeNG is free software: you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@ from .robot import Robot
 
 
 class Neato(SmartPlugin):
-    PLUGIN_VERSION = '1.6.9'
-    robot = 'None'
+    PLUGIN_VERSION = "1.6.9"
+    robot = "None"
 
     def __init__(self, sh):
         """
@@ -42,7 +42,12 @@ class Neato(SmartPlugin):
         # Call init code of parent class (SmartPlugin)
         super().__init__()
 
-        self.robot = Robot(self.get_parameter_value("account_email"), self.get_parameter_value("account_pass"), self.get_parameter_value("robot_vendor"), token=self.get_parameter_value("token"))
+        self.robot = Robot(
+            self.get_parameter_value("account_email"),
+            self.get_parameter_value("account_pass"),
+            self.get_parameter_value("robot_vendor"),
+            token=self.get_parameter_value("token"),
+        )
         self._sh = sh
         self._cycle = 60
         self.logger.debug("Init completed.")
@@ -67,72 +72,72 @@ class Neato(SmartPlugin):
 
     def run(self):
         self.logger.debug("Run method called")
-        self.scheduler_add('poll_device', self.poll_device, prio=5, cycle=self._cycle)
+        self.scheduler_add("poll_device", self.poll_device, prio=5, cycle=self._cycle)
         self.alive = True
 
     def stop(self):
-        self.scheduler_remove('poll_device')
+        self.scheduler_remove("poll_device")
         self.logger.debug("Stop method called")
         self.alive = False
         self.robot._backendOnline = False
 
     def parse_item(self, item):
-        
         """
         Default plugin parse_item method. Is called when the plugin is initialized. Selects each item corresponding to
         the neato_attribute and adds it to an internal array
 
         :param item: The item to process.
         """
-        if self.get_iattr_value(item.conf, 'neato_attribute'):
-            if self.get_iattr_value(item.conf, 'neato_attribute') not in self._items:
-                self._items[self.get_iattr_value(item.conf, 'neato_attribute')] = []
-            self._items[self.get_iattr_value(item.conf, 'neato_attribute')].append(item)
+        if self.get_iattr_value(item.conf, "neato_attribute"):
+            if self.get_iattr_value(item.conf, "neato_attribute") not in self._items:
+                self._items[self.get_iattr_value(item.conf, "neato_attribute")] = []
+            self._items[self.get_iattr_value(item.conf, "neato_attribute")].append(item)
 
         # Register items for event handling via smarthomeNG core. Needed for sending control actions:
         # Command items can be changed outside the plugin context:
-        if self.get_iattr_value(item.conf, 'neato_attribute') == 'command':
+        if self.get_iattr_value(item.conf, "neato_attribute") == "command":
             return self.update_item
-        elif self.get_iattr_value(item.conf, 'neato_attribute') == 'is_schedule_enabled':
+        elif self.get_iattr_value(item.conf, "neato_attribute") == "is_schedule_enabled":
             return self.update_item
-        elif self.get_iattr_value(item.conf, 'neato_attribute') == 'clean_room':
+        elif self.get_iattr_value(item.conf, "neato_attribute") == "clean_room":
             return self.update_item
-
-
 
     def parse_logic(self, logic):
-            pass
+        pass
 
     def update_item(self, item, caller=None, source=None, dest=None):
-        self.logger.debug("Update neato item: Caller: {0}, pluginname: {1}".format(caller,self.get_shortname() ))
+        self.logger.debug("Update neato item: Caller: {0}, pluginname: {1}".format(caller, self.get_shortname()))
         if caller != self.get_shortname():
             val_to_command = {
-                61: 'start',
-                62: 'stop',
-                63: 'pause',
-                64: 'resume',
-                65: 'findme',
-                66: 'sendToBase',
-                67: 'enableSchedule',
-                68: 'disableSchedule',
-                69: 'dismiss_current_alert'}
+                61: "start",
+                62: "stop",
+                63: "pause",
+                64: "resume",
+                65: "findme",
+                66: "sendToBase",
+                67: "enableSchedule",
+                68: "disableSchedule",
+                69: "dismiss_current_alert",
+            }
 
-            if self.get_iattr_value(item.conf, 'neato_attribute') == 'command':
+            if self.get_iattr_value(item.conf, "neato_attribute") == "command":
                 if item._value in val_to_command:
                     self.robot.robot_command(val_to_command[item._value])
                 else:
-                    self.logger.warning("Update item: {}, item has no command equivalent for value '{}'".format(item.id(),item() ))
+                    self.logger.warning(
+                        "Update item: {}, item has no command equivalent for value '{}'".format(item.id(), item())
+                    )
 
-            elif self.get_iattr_value(item.conf, 'neato_attribute') == 'is_schedule_enabled':
+            elif self.get_iattr_value(item.conf, "neato_attribute") == "is_schedule_enabled":
                 if item._value:
                     self.robot.robot_command("enableSchedule")
                     self.logger.debug("enabling neato scheduler")
                 else:
                     self.robot.robot_command("disableSchedule")
                     self.logger.debug("disabling neato scheduler")
-            elif self.get_iattr_value(item.conf, 'neato_attribute') == 'clean_room':
+            elif self.get_iattr_value(item.conf, "neato_attribute") == "clean_room":
                 self.robot.robot_command("start", item._value, None)
-                #self.robot.robot_command("start", item._value, '2020-03-09T07:52:21Z')
+                # self.robot.robot_command("start", item._value, '2020-03-09T07:52:21Z')
             pass
 
     def start_robot(self, boundary_id=None, map_id=None):
@@ -167,8 +172,8 @@ class Neato(SmartPlugin):
         if not response:
             return False
         responseJson = response.json()
-        if 'result' in responseJson:
-            if str(responseJson['result']) == 'ok':
+        if "result" in responseJson:
+            if str(responseJson["result"]) == "ok":
                 return True
             else:
                 return False
@@ -178,113 +183,108 @@ class Neato(SmartPlugin):
     def poll_device(self):
         returnValue = self.robot.update_robot()
 
-        if returnValue == 'error':
+        if returnValue == "error":
             return
 
         for attribute, matchStringItems in self._items.items():
-
             if not self.alive:
                 return
 
-            #self.logger.warning('DEBUG: attribute: {0}, matchStringItems: {1}".format(attribute, matchStringItems))
+            # self.logger.warning('DEBUG: attribute: {0}, matchStringItems: {1}".format(attribute, matchStringItems))
 
             value = None
 
-            if attribute == 'name':
+            if attribute == "name":
                 value = self.robot.name
-            elif attribute == 'charge_percentage':
+            elif attribute == "charge_percentage":
                 value = str(self.robot.chargePercentage)
-            elif attribute == 'is_docked':
+            elif attribute == "is_docked":
                 value = str(self.robot.isDocked)
-            elif attribute == 'is_charging':
+            elif attribute == "is_charging":
                 value = self.robot.isCharging
-            elif attribute == 'state':
+            elif attribute == "state":
                 value = str(self.__get_state_string(self.robot.state))
-            elif attribute == 'state_action':
+            elif attribute == "state_action":
                 value = str(self.__get_state_action_string(self.robot.state_action))
-            elif attribute == 'alert':
+            elif attribute == "alert":
                 value = str(self.robot.alert)
-            elif attribute == 'is_schedule_enabled':
-                value = self.robot.isScheduleEnabled 
-            elif attribute == 'command_goToBaseAvailable':
+            elif attribute == "is_schedule_enabled":
+                value = self.robot.isScheduleEnabled
+            elif attribute == "command_goToBaseAvailable":
                 value = self.robot.dockHasBeenSeen
-            elif attribute == 'command_startAvailable':
+            elif attribute == "command_startAvailable":
                 value = self.robot.commandStartAvailable
-            elif attribute == 'online_status':
+            elif attribute == "online_status":
                 value = self.robot._backendOnline
 
             # if a value was found, store it to item
             if value is not None:
                 for sameMatchStringItem in matchStringItems:
-                    sameMatchStringItem(value, self.get_shortname() )
-                    #self.logger.debug('_update: Value "{0}" written to item {1}'.format(value, sameMatchStringItem))
+                    sameMatchStringItem(value, self.get_shortname())
+                    # self.logger.debug('_update: Value "{0}" written to item {1}'.format(value, sameMatchStringItem))
 
         pass
 
-    def __get_state_string(self,state):
-        if state == '0':
-            return 'invalid'
-        elif  state == '1':
-            return 'idle'
-        elif state == '2':
-            return 'busy'
-        elif state == '3':
-            return 'paused'
-        elif state == '4':
-            return 'error'
+    def __get_state_string(self, state):
+        if state == "0":
+            return "invalid"
+        elif state == "1":
+            return "idle"
+        elif state == "2":
+            return "busy"
+        elif state == "3":
+            return "paused"
+        elif state == "4":
+            return "error"
 
-    def __get_state_action_string(self,state_action):
-        if state_action == '0':
-            return 'invalid'
-        elif  state_action == '1':
-            return 'House Cleaning'
-        elif state_action == '2':
-            return 'Spot Cleaning'
-        elif state_action == '3':
-            return 'Manual Cleaning'
-        elif state_action == '4':
-            return 'Docking'
-        elif state_action == '5':
-            return 'User Menu Active'
-        elif state_action == '6':
-            return 'Suspended Cleaning'
-        elif state_action == '7':
-            return 'Updating'
-        elif state_action == '8':
-            return 'Copying Logs'
-        elif state_action == '9':
-            return 'Recovering Location'
-        elif state_action == '10':
-            return 'IEC test'
-        elif state_action == '11':
-            return 'Map cleaning'
-        elif state_action == '12':
-            return 'Exploring map (creating a persistent map)'
-        elif state_action == '13':
-            return 'Acquiring Persistent Map IDs'
-        elif state_action == '14':
-            return 'Creating & Uploading Map'
-        elif state_action == '15':
-            return 'Suspended Exploration'
-
+    def __get_state_action_string(self, state_action):
+        if state_action == "0":
+            return "invalid"
+        elif state_action == "1":
+            return "House Cleaning"
+        elif state_action == "2":
+            return "Spot Cleaning"
+        elif state_action == "3":
+            return "Manual Cleaning"
+        elif state_action == "4":
+            return "Docking"
+        elif state_action == "5":
+            return "User Menu Active"
+        elif state_action == "6":
+            return "Suspended Cleaning"
+        elif state_action == "7":
+            return "Updating"
+        elif state_action == "8":
+            return "Copying Logs"
+        elif state_action == "9":
+            return "Recovering Location"
+        elif state_action == "10":
+            return "IEC test"
+        elif state_action == "11":
+            return "Map cleaning"
+        elif state_action == "12":
+            return "Exploring map (creating a persistent map)"
+        elif state_action == "13":
+            return "Acquiring Persistent Map IDs"
+        elif state_action == "14":
+            return "Creating & Uploading Map"
+        elif state_action == "15":
+            return "Suspended Exploration"
 
     # Oauth2 functions for new login feature with Vorwerk's myKobold APP
-    
+
     # Generate 16 byte random hex hash as string:
     def generateRandomHash(self):
-        hash = binascii.hexlify(os.urandom(16)).decode('utf8')
+        hash = binascii.hexlify(os.urandom(16)).decode("utf8")
         self.robot.setClientIDHash(hash)
         return hash
 
     # Requesting authentication code to be send to email account:
     def request_oauth2_code(self, hash):
         success = self.robot.request_oauth2_code(hash)
-        return success 
+        return success
 
     # Requesting authentication token to be send to email account:
     def request_oauth2_token(self, code, hash):
         token = self.robot.request_oauth2_token(code, hash)
         return token
-
-
-

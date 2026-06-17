@@ -25,17 +25,16 @@ from lib.model.smartplugin import SmartPlugin
 
 
 class ROOMBA_980(SmartPlugin):
-
     ALLOW_MULTIINSTANCE = False
     PLUGIN_VERSION = "1.0.2"
 
     myroomba = None
 
     def __init__(self, sh, **kwargs):
-        self._address = self.get_parameter_value('adress')
-        self._blid = self.get_parameter_value('blid')
-        self._roombaPassword = self.get_parameter_value('roombaPassword')
-        self._cycle = self.get_parameter_value('cycle')
+        self._address = self.get_parameter_value("adress")
+        self._blid = self.get_parameter_value("blid")
+        self._roombaPassword = self.get_parameter_value("roombaPassword")
+        self._cycle = self.get_parameter_value("cycle")
 
         self._status_batterie = None
         self._status_items = {}
@@ -47,21 +46,21 @@ class ROOMBA_980(SmartPlugin):
         pass
 
     def parse_item(self, item):
-        if self.has_iattr(item.conf, 'roomba_980'):
-            item_type = self.get_iattr_value(item.conf, 'roomba_980')
+        if self.has_iattr(item.conf, "roomba_980"):
+            item_type = self.get_iattr_value(item.conf, "roomba_980")
             if item_type == "start" or item_type == "stop" or item_type == "dock":
                 return self.update_item
 
             self._status_items[item_type] = item
 
-            self.logger.debug('found item {} with function {}'.format(item, item_type))
+            self.logger.debug("found item {} with function {}".format(item, item_type))
 
     def run(self):
-        self.scheduler_add('get_status', self.get_status, prio=5, cycle=self._cycle, offset=2)
+        self.scheduler_add("get_status", self.get_status, prio=5, cycle=self._cycle, offset=2)
         self.alive = True
 
     def stop(self):
-        self.scheduler_remove('get_status')
+        self.scheduler_remove("get_status")
         self.myroomba.disconnect()
         self.alive = False
 
@@ -70,14 +69,14 @@ class ROOMBA_980(SmartPlugin):
 
     def update_item(self, item, caller=None, source=None, dest=None):
         if caller != __name__ and self.alive:
-            self.logger.debug('item_update {} '.format(item))
-            if self.get_iattr_value(item.conf, 'roomba_980') == "start":
+            self.logger.debug("item_update {} ".format(item))
+            if self.get_iattr_value(item.conf, "roomba_980") == "start":
                 if item() is True:
                     self.send_command("start")
-            elif self.get_iattr_value(item.conf, 'roomba_980') == "stop":
+            elif self.get_iattr_value(item.conf, "roomba_980") == "stop":
                 if item() is True:
                     self.send_command("stop")
-            elif self.get_iattr_value(item.conf, 'roomba_980') == "dock":
+            elif self.get_iattr_value(item.conf, "roomba_980") == "dock":
                 if item() is True:
                     self.send_command("dock")
 
@@ -86,18 +85,17 @@ class ROOMBA_980(SmartPlugin):
 
         for status_item in self._status_items:
             if status_item == "status_batterie":
-                self._status_items[status_item](status['state']['reported']['batPct'], __name__)
+                self._status_items[status_item](status["state"]["reported"]["batPct"], __name__)
             elif status_item == "status_bin_full":
-                self._status_items[status_item](status['state']['reported']['bin']['full'], __name__)
+                self._status_items[status_item](status["state"]["reported"]["bin"]["full"], __name__)
             elif status_item == "status_cleanMissionStatus_phase":
-                self._status_items[status_item](status['state']['reported']['cleanMissionStatus']['phase'], __name__)
+                self._status_items[status_item](status["state"]["reported"]["cleanMissionStatus"]["phase"], __name__)
             elif status_item == "status_cleanMissionStatus_error":
-                self._status_items[status_item](status['state']['reported']['cleanMissionStatus']['error'], __name__)
+                self._status_items[status_item](status["state"]["reported"]["cleanMissionStatus"]["error"], __name__)
 
-        self.logger.debug('Status update')
+        self.logger.debug("Status update")
 
     def send_command(self, command):
         if self.myroomba is not None:
             self.myroomba.send_command(command)
-            self.logger.debug('send command: {} to Roomba'.format(command))
-
+            self.logger.debug("send command: {} to Roomba".format(command))

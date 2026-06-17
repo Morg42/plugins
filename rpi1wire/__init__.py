@@ -40,10 +40,10 @@ class Rpi1Wire(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '1.8.1'
+    PLUGIN_VERSION = "1.8.1"
 
     def __init__(self, sh):
-        """"
+        """ "
         Initalizes the plugin.
 
         If you need the sh object at all, use the method self.get_sh() to get it. There should be almost no need for
@@ -55,13 +55,13 @@ class Rpi1Wire(SmartPlugin):
         returns the value in the datatype that is defined in the metadata.
         """
 
-        self.logger.info(f'Init of Plugin {self.get_shortname()} started')
+        self.logger.info(f"Init of Plugin {self.get_shortname()} started")
 
         # Call init code of parent class (SmartPlugin or MqttPlugin)
         super().__init__()
         if not self._init_complete:
             return
-            
+
         # check if shNG is running on Raspberry Pi
         if not self._is_raspberrypi():
             self.logger.error(f"Plugin '{self.get_shortname()}': Plugin just works with Raspberry Pi or equivalent.")
@@ -70,20 +70,22 @@ class Rpi1Wire(SmartPlugin):
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
         try:
-            self.dirname = self.get_parameter_value('dirname')
-            if self.get_parameter_value('cycle') is not None:
-                self.cycle = self.get_parameter_value('cycle')
+            self.dirname = self.get_parameter_value("dirname")
+            if self.get_parameter_value("cycle") is not None:
+                self.cycle = self.get_parameter_value("cycle")
             else:
                 self.cycle = 120
         except KeyError as e:
-            self.logger.critical(f"Plugin '{self.get_shortname()}': Inconsistent plugin (invalid metadata definition: {e} not defined)")
+            self.logger.critical(
+                f"Plugin '{self.get_shortname()}': Inconsistent plugin (invalid metadata definition: {e} not defined)"
+            )
             self._init_complete = False
             return
 
         # Initialization code goes here
-        self._sensordata = {}                  # dict to hold all 1w information read from given directory
-        self.sysitems = {}                     # dict to hold Plugin system items
-        self.sensoritems = {}                  # dict to hold Plugin sensor items
+        self._sensordata = {}  # dict to hold all 1w information read from given directory
+        self.sysitems = {}  # dict to hold Plugin system items
+        self.sensoritems = {}  # dict to hold Plugin sensor items
 
         self.update = False
 
@@ -103,7 +105,7 @@ class Rpi1Wire(SmartPlugin):
         Run method for the plugin
         """
         self.logger.debug("Run method called")
-        self.scheduler_add('rpi1wire', self.update_sensors, prio=3, cycle=self.cycle)
+        self.scheduler_add("rpi1wire", self.update_sensors, prio=3, cycle=self.cycle)
         self.alive = True
         # Update sensors and items
         self.get_sensors()
@@ -114,12 +116,12 @@ class Rpi1Wire(SmartPlugin):
         Method to update basic information of plugin like count of sensors and sensor list
         """
 
-        count_item = self.sysitems.get('count')
+        count_item = self.sysitems.get("count")
         if count_item is not None:
             count_item(int(len(self._sensordata)), self.get_shortname())
             self.logger.debug(f"Item <{count_item.property.path}> set to <{int(len(self._sensordata))}>.")
 
-        list_item = self.sysitems.get('list')
+        list_item = self.sysitems.get("list")
         if list_item is not None:
             sensor_list = ", ".join(list(self._sensordata.keys()))
             list_item(sensor_list, self.get_shortname())
@@ -146,16 +148,16 @@ class Rpi1Wire(SmartPlugin):
                         can be sent to the knx with a knx write function within the knx plugin.
         """
 
-        if self.has_iattr(item.conf, 'rpi1wire_sys'):
+        if self.has_iattr(item.conf, "rpi1wire_sys"):
             self.logger.info(f"parse item: {item.property.path}")
-            rpi1wire_sys = self.get_iattr_value(item.conf, 'rpi1wire_sys')
+            rpi1wire_sys = self.get_iattr_value(item.conf, "rpi1wire_sys")
             self.sysitems[rpi1wire_sys] = item
-            if rpi1wire_sys == 'update':
+            if rpi1wire_sys == "update":
                 return self.update_item
 
-        elif self.has_iattr(item.conf, 'rpi1wire_id'):
+        elif self.has_iattr(item.conf, "rpi1wire_id"):
             self.logger.info(f"parse item: {item.property.path}")
-            addr = self.get_iattr_value(item.conf, 'rpi1wire_id')
+            addr = self.get_iattr_value(item.conf, "rpi1wire_id")
             self.sensoritems[addr] = item
 
     def parse_logic(self, logic):
@@ -193,13 +195,17 @@ class Rpi1Wire(SmartPlugin):
             item = self.sensoritems[sensor]
             value_dict = self._sensordata.get(sensor)
             if value_dict is not None:
-                value = value_dict.get('value')
-                sensortype = value_dict.get('sensortype')
-                self.logger.debug(f"For Item <{item.property.path}> the value <{value}> for sensortype <{sensortype}> will be set.")
+                value = value_dict.get("value")
+                sensortype = value_dict.get("sensortype")
+                self.logger.debug(
+                    f"For Item <{item.property.path}> the value <{value}> for sensortype <{sensortype}> will be set."
+                )
                 if item is not None:
                     item(value, self.get_shortname())
             else:
-                self.logger.warning(f"For Item <{item.property.path}> no sensordata are available. Sensor probably not connected.")
+                self.logger.warning(
+                    f"For Item <{item.property.path}> no sensordata are available. Sensor probably not connected."
+                )
 
     def get_sensors(self):
         """
@@ -210,16 +216,16 @@ class Rpi1Wire(SmartPlugin):
         if objects:
             # walking through the path objects
             for sensor in objects:
-                if 'w1_bus' in sensor:
+                if "w1_bus" in sensor:
                     continue
                 typ = sensor.rsplit("-", 1)
                 # only proceed if filename starts with known sensor ID
-                if typ[0] in ['10', '22', '28']:
+                if typ[0] in ["10", "22", "28"]:
                     value = self.get_value(sensor)
                     if value == 99999:
                         self.logger.warning(f"1wire sensor {sensor} - has no value")
                     else:
-                        self._sensordata[sensor] = {'sensortype': "temp", 'value': round(value / float(1000), 1)}
+                        self._sensordata[sensor] = {"sensortype": "temp", "value": round(value / float(1000), 1)}
             self.logger.debug(f"{self.get_shortname()} plugin found <{len(self._sensordata)}> sensors.")
 
             # set item values
@@ -233,19 +239,19 @@ class Rpi1Wire(SmartPlugin):
         Search in given directory for sensors and return them as a list of objects
         If successful returns a list of sensors starting at given param dirname
         """
-        if (os.path.exists(dirname) is False or
-            os.path.isdir(dirname) is False or
-            os.access(dirname, os.R_OK) is False):
+        if os.path.exists(dirname) is False or os.path.isdir(dirname) is False or os.access(dirname, os.R_OK) is False:
             return None
         else:
             objects = os.listdir(dirname)
             result = []
             for objectname in objects:
                 objectpath = dirname + "/" + objectname
-                if (otype == "all" or
-                    (otype == "dir" and os.path.isdir(objectpath) is True) or
-                    (otype == "file" and os.path.isfile(objectpath) is True) or
-                    (otype == "link" and os.path.islink(objectpath) is True)):
+                if (
+                    otype == "all"
+                    or (otype == "dir" and os.path.isdir(objectpath) is True)
+                    or (otype == "file" and os.path.isfile(objectpath) is True)
+                    or (otype == "link" and os.path.islink(objectpath) is True)
+                ):
                     result.append(objectname)
             result.sort()
             return result
@@ -256,17 +262,17 @@ class Rpi1Wire(SmartPlugin):
         Source like here https://www.raspberrypi-spy.co.uk/2013/03/raspberry-pi-1-wire-digital-thermometer-sensor/
         """
         try:
-            filename = 'w1_slave'
-            f = open('/' + self.dirname + '/' + owid + '/' + filename, 'r')
+            filename = "w1_slave"
+            f = open("/" + self.dirname + "/" + owid + "/" + filename, "r")
             line = f.readline()  # read 1st line
-            crc = line.rsplit(' ', 1)
-            crc = crc[1].replace('\n', '')
-            if crc == 'YES':
+            crc = line.rsplit(" ", 1)
+            crc = crc[1].replace("\n", "")
+            if crc == "YES":
                 line = f.readline()  # read 2nd line
-                mytemp = line.rsplit('t=', 1)
+                mytemp = line.rsplit("t=", 1)
             else:
                 self.logger.warning(f"{owid} - return no value")
-                mytemp = '99999'
+                mytemp = "99999"
             f.close()
             return int(mytemp[1])
         except Exception:
@@ -281,16 +287,16 @@ class Rpi1Wire(SmartPlugin):
         self.get_sensors()
         self.update_system()
 
-        update_item = self.sysitems.get('update')
+        update_item = self.sysitems.get("update")
         if update_item is not None:
             update_item(False, self.get_shortname())
             self.logger.debug(f"Update of data and items done; Item <{update_item.property.path}> set to <False>")
         self.update = False
-        
+
     def _is_raspberrypi(self):
         try:
-            with io.open('/sys/firmware/devicetree/base/model', 'r') as m:
-                if 'raspberry pi' in m.read().lower():
+            with io.open("/sys/firmware/devicetree/base/model", "r") as m:
+                if "raspberry pi" in m.read().lower():
                     return True
         except Exception:
             pass

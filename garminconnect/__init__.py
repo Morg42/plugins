@@ -35,10 +35,12 @@ from garminconnect import (
 from enum import Enum, auto
 from lib.model.smartplugin import Modules, Shtime, SmartPlugin, SmartPluginWebIf
 
+
 class GarminConnect(SmartPlugin):
     """
     Retrieves Garmin Connect Stats and Heart Rates.
     """
+
     PLUGIN_VERSION = "1.2.0"
 
     def __init__(self, sh, *args, **kwargs):
@@ -51,12 +53,10 @@ class GarminConnect(SmartPlugin):
         self._is_cn = self.get_parameter_value("is_cn")
         self._api = None
 
-
         self.init_webinterface()
 
     def run(self):
         self.alive = True
-
 
     def stop(self):
         """
@@ -80,9 +80,9 @@ class GarminConnect(SmartPlugin):
             self.logger.info(self._api.get_full_name())
             self.logger.info(self._api.get_unit_system())
         except (
-                GarminConnectConnectionError,
-                GarminConnectAuthenticationError,
-                GarminConnectTooManyRequestsError,
+            GarminConnectConnectionError,
+            GarminConnectAuthenticationError,
+            GarminConnectTooManyRequestsError,
         ) as err:
             self._api = Garmin(self._username, self._password, is_cn=self._is_cn)
             self._api.login()
@@ -91,13 +91,13 @@ class GarminConnect(SmartPlugin):
     def get_stats(self, date_str=None):
         date = self._get_date(date_str)
         self.login()
-        stats = self._api.get_stats(date.strftime('%Y-%m-%d'))
+        stats = self._api.get_stats(date.strftime("%Y-%m-%d"))
         return stats
 
     def get_heart_rates(self, date_str=None):
         date = self._get_date(date_str)
         self.login()
-        heart_rates = self._api.get_heart_rates(date.strftime('%Y-%m-%d'))
+        heart_rates = self._api.get_heart_rates(date.strftime("%Y-%m-%d"))
         return heart_rates
 
     def _get_date(self, date_str):
@@ -114,8 +114,7 @@ class GarminConnect(SmartPlugin):
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
@@ -123,23 +122,23 @@ class GarminConnect(SmartPlugin):
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
+        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
         config = {
-            '/': {
-                'tools.staticdir.root': webif_dir,
+            "/": {
+                "tools.staticdir.root": webif_dir,
             },
-            '/static': {
-                'tools.staticdir.on': True,
-                'tools.staticdir.dir': 'static'
-            }
+            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
         }
 
         # Register the web interface as a cherrypy app
-        self.mod_http.register_webif(WebInterface(webif_dir, self),
-                                     self.get_shortname(),
-                                     config,
-                                     self.get_classname(), self.get_instance_name(),
-                                     description='')
+        self.mod_http.register_webif(
+            WebInterface(webif_dir, self),
+            self.get_shortname(),
+            config,
+            self.get_classname(),
+            self.get_instance_name(),
+            description="",
+        )
 
         return True
 
@@ -153,7 +152,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -177,7 +175,16 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('index.html')
-        return tmpl.render(plugin_shortname=self.plugin.get_shortname(), plugin_version=self.plugin.get_version(),
-                           interface=None, plugin_info=self.plugin.get_info(), tabcount=3, now=self.plugin.shtime.now(),
-                           day=day, month=month, year=year, p=self.plugin)
+        tmpl = self.tplenv.get_template("index.html")
+        return tmpl.render(
+            plugin_shortname=self.plugin.get_shortname(),
+            plugin_version=self.plugin.get_version(),
+            interface=None,
+            plugin_info=self.plugin.get_info(),
+            tabcount=3,
+            now=self.plugin.shtime.now(),
+            day=day,
+            month=month,
+            year=year,
+            p=self.plugin,
+        )

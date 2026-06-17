@@ -129,10 +129,7 @@ class ZoneGroupState:
 
     def add_subscription(self, subscription: SubscriptionBase):
         """Start tracking a ZoneGroupTopology subscription."""
-        if (
-            subscription.service.service_type == "ZoneGroupTopology"
-            and subscription not in self._subscriptions
-        ):
+        if subscription.service.service_type == "ZoneGroupTopology" and subscription not in self._subscriptions:
             self._subscriptions.add(subscription)
             _LOG.debug(
                 "Monitoring ZoneGroupTopology subscription %s on %s",
@@ -216,8 +213,7 @@ class ZoneGroupState:
             if config.ZGT_EVENT_FALLBACK is False:
                 _LOG.debug("ZGT event fallback disabled (config.ZGT_EVENT_FALLBACK)")
                 raise NotSupportedException(
-                    "'GetZoneGroupState()' call fails on large Sonos systems "
-                    "and event fallback is disabled"
+                    "'GetZoneGroupState()' call fails on large Sonos systems and event fallback is disabled"
                 ) from soco_upnp_exception
 
             _LOG.debug("Falling back to using a ZGT event")
@@ -248,17 +244,11 @@ class ZoneGroupState:
 
         elif config.EVENTS_MODULE.__name__ == "soco.events_twisted":
             # Future: Insert code here to handle the 'events_twisted' case
-            raise SoCoException(
-                "ZGT event fallback not yet implemented when using the "
-                "'events_twisted' module"
-            )
+            raise SoCoException("ZGT event fallback not yet implemented when using the 'events_twisted' module")
 
         else:
             # In case any additional events frameworks come along ...
-            raise SoCoException(
-                "ZGT event fallback not implemented for "
-                f"'{config.EVENTS_MODULE.__name__}' module"
-            )
+            raise SoCoException(f"ZGT event fallback not implemented for '{config.EVENTS_MODULE.__name__}' module")
 
     def update_zgs_by_event_default(self, speaker):
         """
@@ -294,9 +284,7 @@ class ZoneGroupState:
         tree = normalize_zgs_xml(payload)
         normalized_zgs = str(tree)
         if normalized_zgs == self._last_zgs:
-            _LOG.debug(
-                "Duplicate ZGS received from %s (%s), ignoring", source_ip, source
-            )
+            _LOG.debug("Duplicate ZGS received from %s (%s), ignoring", source_ip, source)
             return
 
         self.processed_count += 1
@@ -334,9 +322,7 @@ class ZoneGroupState:
         #   RINCON_001XXX1400:LF,LF;RINCON_002XXX1400:RF,RF
         # Example HTSatChanMapSet (home theater) contents:
         #   RINCON_001XXX1400:LF,RF;RINCON_002XXX1400:LR;RINCON_003XXX1400:RR
-        for channel_map in list(
-            filter(None, [zone._channel_map, zone._ht_sat_chan_map])
-        ):
+        for channel_map in list(filter(None, [zone._channel_map, zone._ht_sat_chan_map])):
             for channel in channel_map.split(";"):
                 if channel.startswith(zone._uid):
                     zone._channel = channel.split(":")[-1]
@@ -395,7 +381,7 @@ class ZoneGroupState:
 
 def normalize_zgs_xml(xml):
     """Normalize the ZoneGroupState payload and return an lxml ElementTree instance."""
-    # added resolve_entities in response to CVE-2026-41066 
-    parser = LXML.XMLParser(remove_blank_text=True, resolve_entities='internal')  # pylint:disable=I1101
+    # added resolve_entities in response to CVE-2026-41066
+    parser = LXML.XMLParser(remove_blank_text=True, resolve_entities="internal")  # pylint:disable=I1101
     tree = LXML.fromstring(xml, parser)  # pylint:disable=I1101
     return ZGS_TRANSFORM(tree)

@@ -40,7 +40,7 @@ from ..constants import (
     COL_LOG_VAL_BOOL,
     COL_LOG_VAL_NUM,
     COL_LOG_VAL_STR,
-    )
+)
 
 # ------------------------------------------
 #    Webinterface of the plugin
@@ -52,7 +52,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -70,8 +69,19 @@ class WebInterface(SmartPluginWebIf):
         self.tplenv = self.init_template_environment()
 
     @cherrypy.expose
-    def index(self, reload=None, action=None, item_id=None, item_path=None, time_end=None, day=None, month=None, year=None,
-              time_orig=None, changed_orig=None):
+    def index(
+        self,
+        reload=None,
+        action=None,
+        item_id=None,
+        item_path=None,
+        time_end=None,
+        day=None,
+        month=None,
+        year=None,
+        time_orig=None,
+        changed_orig=None,
+    ):
         """
         Build index.html for cherrypy
 
@@ -80,7 +90,7 @@ class WebInterface(SmartPluginWebIf):
         :return: contents of the template after beeing rendered
         """
         # try to get the webif pagelength from the module.yaml configuration
-        pagelength = self.plugin.get_parameter_value('webif_pagelength')
+        pagelength = self.plugin.get_parameter_value("webif_pagelength")
         if item_path is not None:
             item = self.plugin.items.return_item(item_path)
         delete_triggered = False
@@ -94,14 +104,22 @@ class WebInterface(SmartPluginWebIf):
                 delete_triggered = True
             if action == "item_details" and item_id is not None:
                 if day is not None and month is not None and year is not None:
-                    time_start = time.mktime(datetime.datetime.strptime("%s/%s/%s" % (month, day, year),
-                                                                        "%m/%d/%Y").timetuple()) * 1000
+                    time_start = (
+                        time.mktime(datetime.datetime.strptime("%s/%s/%s" % (month, day, year), "%m/%d/%Y").timetuple())
+                        * 1000
+                    )
                 else:
                     now = self.plugin.shtime.now()
-                    time_start = time.mktime(datetime.datetime.strptime("%s/%s/%s" % (now.month, now.day, now.year),
-                                                                        "%m/%d/%Y").timetuple()) * 1000
+                    time_start = (
+                        time.mktime(
+                            datetime.datetime.strptime(
+                                "%s/%s/%s" % (now.month, now.day, now.year), "%m/%d/%Y"
+                            ).timetuple()
+                        )
+                        * 1000
+                    )
                 time_end = time_start + 24 * 60 * 60 * 1000
-                tmpl = self.tplenv.get_template('item_details.html')
+                tmpl = self.tplenv.get_template("item_details.html")
 
                 rows = self.plugin.readLogs(item_id, time_start=time_start, time_end=time_end)
                 log_array = []
@@ -110,37 +128,59 @@ class WebInterface(SmartPluginWebIf):
                 else:
                     for row in rows:
                         value_dict = {}
-                        for key in [COL_LOG_TIME, COL_LOG_ITEM_ID, COL_LOG_DURATION, COL_LOG_VAL_STR, COL_LOG_VAL_NUM,
-                                    COL_LOG_VAL_BOOL, COL_LOG_CHANGED]:
+                        for key in [
+                            COL_LOG_TIME,
+                            COL_LOG_ITEM_ID,
+                            COL_LOG_DURATION,
+                            COL_LOG_VAL_STR,
+                            COL_LOG_VAL_NUM,
+                            COL_LOG_VAL_BOOL,
+                            COL_LOG_CHANGED,
+                        ]:
                             if key not in [COL_LOG_TIME, COL_LOG_CHANGED]:
                                 value_dict[key] = row[key]
                             else:
-                                value_dict[key] = datetime.datetime.fromtimestamp(row[key] / 1000,
-                                                                                  tz=self.plugin.shtime.tzinfo())
+                                value_dict[key] = datetime.datetime.fromtimestamp(
+                                    row[key] / 1000, tz=self.plugin.shtime.tzinfo()
+                                )
                                 value_dict["%s_orig" % key] = row[key]
 
                         log_array.append(value_dict)
                     reversed_arr = log_array[::-1]
-                return tmpl.render(p=self.plugin,
-                                   webif_pagelength=pagelength,
-                                   items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path']),
-                                                reverse=False), item=item,
-                                   tabcount=2, action=action, item_id=item_id, item_path=item_path,
-                                   language=self.plugin.get_sh().get_defaultlanguage(), now=self.plugin.shtime.now(),
-                                   log_array=reversed_arr, day=day, month=month, year=year,
-                                   delete_triggered=delete_triggered)
+                return tmpl.render(
+                    p=self.plugin,
+                    webif_pagelength=pagelength,
+                    items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"]), reverse=False),
+                    item=item,
+                    tabcount=2,
+                    action=action,
+                    item_id=item_id,
+                    item_path=item_path,
+                    language=self.plugin.get_sh().get_defaultlanguage(),
+                    now=self.plugin.shtime.now(),
+                    log_array=reversed_arr,
+                    day=day,
+                    month=month,
+                    year=year,
+                    delete_triggered=delete_triggered,
+                )
 
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
 
-        return tmpl.render(p=self.plugin,
-                           webif_pagelength=pagelength,
-                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path']), reverse=False),
-                           tabcount=2, action=action, item_id=item_id, delete_triggered=delete_triggered,
-                           language=self.plugin.get_sh().get_defaultlanguage())
+        return tmpl.render(
+            p=self.plugin,
+            webif_pagelength=pagelength,
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"]), reverse=False),
+            tabcount=2,
+            action=action,
+            item_id=item_id,
+            delete_triggered=delete_triggered,
+            language=self.plugin.get_sh().get_defaultlanguage(),
+        )
 
     @cherrypy.expose
     def reassign(self):
-        cl = cherrypy.request.headers['Content-Length']
+        cl = cherrypy.request.headers["Content-Length"]
         if not cl:
             return
         try:
@@ -152,13 +192,13 @@ class WebInterface(SmartPluginWebIf):
         new_id = data.get("new_id")
         result = {"operation": "request", "result": "success"}
         if orphan_id is not None and new_id is not None and orphan_id != new_id:
-            self.logger.info(f'reassigning orphaned id {orphan_id} to new id {new_id}')
+            self.logger.info(f"reassigning orphaned id {orphan_id} to new id {new_id}")
             err = self.plugin.reassign_orphaned_id(orphan_id, to=new_id)
             if err:
                 return
             return json.dumps(result)
         else:
-            self.logger.warning(f'reassigning orphaned id {orphan_id} to new id {new_id} failed')
+            self.logger.warning(f"reassigning orphaned id {orphan_id} to new id {new_id} failed")
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None, params=None):
@@ -170,7 +210,7 @@ class WebInterface(SmartPluginWebIf):
         :param dataSet: Dataset for which the data should be returned (standard: None)
         :return: dict with the data needed to update the web page.
         """
-        if dataSet == 'overview':
+        if dataSet == "overview":
             # get the new data
             data = self.plugin._webdata
             try:
@@ -181,8 +221,12 @@ class WebInterface(SmartPluginWebIf):
         if dataSet == "item_details":
             item_id = params
             now = self.plugin.shtime.now()
-            time_start = time.mktime(datetime.datetime.strptime("%s/%s/%s" % (now.month, now.day, now.year),
-                                                                "%m/%d/%Y").timetuple()) * 1000
+            time_start = (
+                time.mktime(
+                    datetime.datetime.strptime("%s/%s/%s" % (now.month, now.day, now.year), "%m/%d/%Y").timetuple()
+                )
+                * 1000
+            )
             time_end = time_start + 24 * 60 * 60 * 1000
             if item_id is not None:
                 rows = self.plugin.readLogs(item_id, time_start=time_start, time_end=time_end)
@@ -194,13 +238,21 @@ class WebInterface(SmartPluginWebIf):
             else:
                 for row in rows:
                     value_dict = {}
-                    for key in [COL_LOG_TIME, COL_LOG_ITEM_ID, COL_LOG_DURATION, COL_LOG_VAL_STR, COL_LOG_VAL_NUM,
-                                COL_LOG_VAL_BOOL, COL_LOG_CHANGED]:
+                    for key in [
+                        COL_LOG_TIME,
+                        COL_LOG_ITEM_ID,
+                        COL_LOG_DURATION,
+                        COL_LOG_VAL_STR,
+                        COL_LOG_VAL_NUM,
+                        COL_LOG_VAL_BOOL,
+                        COL_LOG_CHANGED,
+                    ]:
                         if key not in [COL_LOG_TIME, COL_LOG_CHANGED]:
                             value_dict[key] = row[key]
                         else:
-                            value_dict[key] = datetime.datetime.fromtimestamp(row[key] / 1000,
-                                                                              tz=self.plugin.shtime.tzinfo()).isoformat()
+                            value_dict[key] = datetime.datetime.fromtimestamp(
+                                row[key] / 1000, tz=self.plugin.shtime.tzinfo()
+                            ).isoformat()
                             value_dict["%s_orig" % key] = row[key]
 
                     log_array.append(value_dict)
@@ -233,28 +285,32 @@ class WebInterface(SmartPluginWebIf):
             else:
                 for row in rows:
                     value_dict = {}
-                    for key in [COL_LOG_TIME, COL_LOG_ITEM_ID, COL_LOG_DURATION, COL_LOG_VAL_STR, COL_LOG_VAL_NUM,
-                                COL_LOG_VAL_BOOL, COL_LOG_CHANGED]:
+                    for key in [
+                        COL_LOG_TIME,
+                        COL_LOG_ITEM_ID,
+                        COL_LOG_DURATION,
+                        COL_LOG_VAL_STR,
+                        COL_LOG_VAL_NUM,
+                        COL_LOG_VAL_BOOL,
+                        COL_LOG_CHANGED,
+                    ]:
                         value_dict[key] = row[key]
                     log_array.append(value_dict)
                 reversed_arr = log_array[::-1]
-            csv_file_path = f'{self.plugin._sh.base_dir}/var/db/{self.plugin.get_instance_name()}_item_{item_id}.csv'
+            csv_file_path = f"{self.plugin._sh.base_dir}/var/db/{self.plugin.get_instance_name()}_item_{item_id}.csv"
 
-            with open(csv_file_path, 'w', encoding='utf-8') as f:
+            with open(csv_file_path, "w", encoding="utf-8") as f:
                 writer = csv.writer(f, dialect="excel")
-                writer.writerow(['time', 'item_id', 'duration', 'val_str', 'val_num', 'val_bool', 'changed'])
+                writer.writerow(["time", "item_id", "duration", "val_str", "val_num", "val_bool", "changed"])
                 for data in reversed_arr:
-                    writer.writerow(
-                        [data[0], data[1], data[2], data[3], data[4], data[5], data[6]])
+                    writer.writerow([data[0], data[1], data[2], data[3], data[4], data[5], data[6]])
 
             cherrypy.request.fileName = csv_file_path
-            cherrypy.request.hooks.attach('on_end_request', self.download_complete)
+            cherrypy.request.hooks.attach("on_end_request", self.download_complete)
             return cherrypy.lib.static.serve_download(csv_file_path)
-
 
     def download_complete(self):
         os.unlink(cherrypy.request.fileName)
-
 
     @cherrypy.expose
     def db_csvdump(self):
@@ -262,22 +318,22 @@ class WebInterface(SmartPluginWebIf):
         returns the smarthomeNG database as download in csv format
         """
 
-        filename = 'smarthomeng'
-        extension = '_dump.csv'
-        if self.plugin.get_instance_name() == '':
+        filename = "smarthomeng"
+        extension = "_dump.csv"
+        if self.plugin.get_instance_name() == "":
             filename += extension
         else:
-            filename += '_' + self.plugin.get_instance_name() + extension
-        pathname = os.path.join(self.plugin.get_sh().base_dir, 'var', 'db', filename)
+            filename += "_" + self.plugin.get_instance_name() + extension
+        pathname = os.path.join(self.plugin.get_sh().base_dir, "var", "db", filename)
 
         self.plugin.dump(pathname)
-        #self.plugin.dump(
+        # self.plugin.dump(
         #    '%s/var/db/smarthomedb_%s.dump' % (self.plugin.get_sh().base_dir, self.plugin.get_instance_name()))
 
-        mime = 'application/octet-stream'
+        mime = "application/octet-stream"
         # disposition should bie 'attachment' or 'inline'
-        return cherrypy.lib.static.serve_file(pathname, mime, disposition='attachment', name=filename)
-        #return cherrypy.lib.static.serve_file(
+        return cherrypy.lib.static.serve_file(pathname, mime, disposition="attachment", name=filename)
+        # return cherrypy.lib.static.serve_file(
         #    "%s/var/db/smarthomedb_%s.dump" % (self.plugin.get_sh().base_dir, self.plugin.get_instance_name()),
         #    mime, "%s/var/db/" % self.plugin.get_sh().base_dir)
 
@@ -286,18 +342,18 @@ class WebInterface(SmartPluginWebIf):
         """
         returns the smarthomeNG sqlite database as download of a complete sql dump
         """
-        filename = 'smarthomeng'
-        extension = '_dump.sql'
-        if self.plugin.get_instance_name() == '':
+        filename = "smarthomeng"
+        extension = "_dump.sql"
+        if self.plugin.get_instance_name() == "":
             filename += extension
         else:
-            filename += '_' + self.plugin.get_instance_name() + extension
-        pathname = os.path.join(self.plugin.get_sh().base_dir, 'var', 'db', filename)
+            filename += "_" + self.plugin.get_instance_name() + extension
+        pathname = os.path.join(self.plugin.get_sh().base_dir, "var", "db", filename)
 
         if self.plugin.sqlite_dump(pathname):
-            mime = 'application/octet-stream'
+            mime = "application/octet-stream"
             # disposition should bie 'attachment' or 'inline'
-            return cherrypy.lib.static.serve_file(pathname, mime, disposition='attachment', name=filename)
+            return cherrypy.lib.static.serve_file(pathname, mime, disposition="attachment", name=filename)
 
         return
 
@@ -305,13 +361,12 @@ class WebInterface(SmartPluginWebIf):
     def cleanup(self):
         self.plugin.cleanup()
 
-
     @cherrypy.expose
     @cherrypy.tools.json_out()
     def countall(self, item_path):
         if item_path is not None:
             item = self.plugin.items.return_item(item_path)
-            count = item.db('countall', 0)
+            count = item.db("countall", 0)
             if count is not None:
                 return int(count)
             else:

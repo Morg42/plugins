@@ -4,7 +4,7 @@
 # Copyright 2012-2013 KNX-User-Forum e.V.       http://knx-user-forum.de/
 # Copyright 2019 Bernd Meiners                      Bernd.Meiners@mail.de
 #########################################################################
-#  This file is part of SmartHomeNG.   
+#  This file is part of SmartHomeNG.
 #
 #  Sample plugin for new plugins to run with SmartHomeNG version 1.4 and
 #  upwards.
@@ -40,7 +40,7 @@ class Volkszaehler(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '1.6.1'
+    PLUGIN_VERSION = "1.6.1"
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -57,21 +57,21 @@ class Volkszaehler(SmartPlugin):
         returns the value in the datatype that is defined in the metadata.
         """
         from bin.smarthome import VERSION
-        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
+
+        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
             self.logger = logging.getLogger(__name__)
 
-        self.logger.info('Init Volkszaehler Plugin')
+        self.logger.info("Init Volkszaehler Plugin")
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
-        self._host = self.get_parameter_value('host')
-        self._url = self.get_parameter_value('url')
+        self._host = self.get_parameter_value("host")
+        self._url = self.get_parameter_value("url")
 
         # none of the parameters may be left out
         if not self._host or not self._url:
             self._init_complete = False
 
         return
-
 
     def run(self):
         """
@@ -98,7 +98,7 @@ class Volkszaehler(SmartPlugin):
                         like the function update_item down below.
         """
 
-        if self.has_iattr(item.conf, 'vz_uuid'):
+        if self.has_iattr(item.conf, "vz_uuid"):
             self.logger.debug("parse item: {}".format(item))
             return self.update_item
         else:
@@ -117,15 +117,19 @@ class Volkszaehler(SmartPlugin):
         :param source: if given it represents the source
         :param dest: if given it represents the dest
         """
-    
+
         if caller != self.get_shortname():
             # code to execute, only if the item has not been changed by this plugin:
             self.logger.info("Update item: {}, item has been changed outside this plugin".format(item.property.path))
 
-            if self.has_iattr(item.conf, 'vz_uuid'):
-                self.logger.debug("update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(item, caller, source, dest))
+            if self.has_iattr(item.conf, "vz_uuid"):
+                self.logger.debug(
+                    "update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(
+                        item, caller, source, dest
+                    )
+                )
 
-                vz_uuid = self.get_iattr_value(item.conf, 'vz_uuid')
+                vz_uuid = self.get_iattr_value(item.conf, "vz_uuid")
                 value = item()
 
                 # check if the value is float (i.e. temperature, humidity...)
@@ -133,16 +137,18 @@ class Volkszaehler(SmartPlugin):
                 if isinstance(value, float):
                     vz_value = value
                 else:
-                    vz_value = '1'
+                    vz_value = "1"
 
                 url = self._url.format(vz_uuid)
 
-                self.logger.info("Try to sent '{0}' to host at '{1}' using UUID '{2}'".format(vz_value, self._host, vz_uuid))
+                self.logger.info(
+                    "Try to sent '{0}' to host at '{1}' using UUID '{2}'".format(vz_value, self._host, vz_uuid)
+                )
 
                 data = {}
-                headers = {'User-Agent': "SmartHomeNG", 'Content-Type': "application/x-www-form-urlencoded"}
-                data['operation'] = 'add' 
-                data['value'] = vz_value 
+                headers = {"User-Agent": "SmartHomeNG", "Content-Type": "application/x-www-form-urlencoded"}
+                data["operation"] = "add"
+                data["value"] = vz_value
 
                 try:
                     conn = http.client.HTTPConnection(self._host, timeout=4)

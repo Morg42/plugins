@@ -43,7 +43,7 @@ class Raumfeld_ng(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '1.5.2'
+    PLUGIN_VERSION = "1.5.2"
 
     def __init__(self, sh):
         """
@@ -62,20 +62,21 @@ class Raumfeld_ng(SmartPlugin):
         super().__init__()
 
         from bin.smarthome import VERSION
-        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
+
+        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
             self.logger = logging.getLogger(__name__)
 
         # get parameter used throughout the plugin from metadata:
 
-        self._Host = self.get_parameter_value('host')
-        self._Port = self.get_parameter_value('port')
-        self._baseURL = 'http://{}:{}/raumserver'.format(self._Host, self._Port)
-        self.logger.warning('self._baseURL= {}'.format(self._baseURL))
+        self._Host = self.get_parameter_value("host")
+        self._Port = self.get_parameter_value("port")
+        self._baseURL = "http://{}:{}/raumserver".format(self._Host, self._Port)
+        self.logger.warning("self._baseURL= {}".format(self._baseURL))
 
         # cycle time in seconds, only needed, if hardware/interface needs to be
         # polled for value changes by adding a scheduler entry in the run method of this plugin
         # (maybe you want to make it a plugin parameter?)
-        self._cycle = self.get_parameter_value('cycle')
+        self._cycle = self.get_parameter_value("cycle")
 
         # Initialization code goes here
         self.Zones = []
@@ -129,14 +130,17 @@ class Raumfeld_ng(SmartPlugin):
                         can be sent to the knx with a knx write function within the knx plugin.
         """
         # retrieves all Zones present in any "power state" item - from previous attempts, not used currently
-        if self.has_iattr(item.conf, 'rf_renderer_name') and self.get_iattr_value(item.conf,
-                    'rf_attr') == "power_state" and self.get_iattr_value(item.conf, 'rf_scope') == "zone":
+        if (
+            self.has_iattr(item.conf, "rf_renderer_name")
+            and self.get_iattr_value(item.conf, "rf_attr") == "power_state"
+            and self.get_iattr_value(item.conf, "rf_scope") == "zone"
+        ):
             ZoneObject = {"Name": item.conf["rf_renderer_name"]}
             self.logger.info("Zonenitem found :{}".format(ZoneObject["Name"]))
             self.Zones.append(ZoneObject)
 
         # check for raumfeld related items and updates 'em .
-        if self.has_iattr(item.conf, 'rf_attr'):
+        if self.has_iattr(item.conf, "rf_attr"):
             return self.update_item
 
     def parse_logic(self, logic):
@@ -164,17 +168,19 @@ class Raumfeld_ng(SmartPlugin):
             self.logger.info("Update item: {}, item has been changed outside this plugin".format(item.property.path))
             urlaction = []
             # all items which interact with this plugin have to have the "rf_attr"
-            if self.has_iattr(item.conf, 'rf_attr'):
+            if self.has_iattr(item.conf, "rf_attr"):
                 self.logger.debug(
                     "Plugin '{}': update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(
-                        self.get_fullname(), item, caller, source, dest))
+                        self.get_fullname(), item, caller, source, dest
+                    )
+                )
                 # get info of item
-                renderer = self.get_iattr_value(item.conf, 'rf_renderer_name')
+                renderer = self.get_iattr_value(item.conf, "rf_renderer_name")
                 value = item()
 
                 # Power_state item is bool. If it is set to true,power has to be switched on. If not -> switched off.
-                if self.get_iattr_value(item.conf, 'rf_attr') == "power_state":
-                    scope = self.get_iattr_value(item.conf, 'rf_scope')
+                if self.get_iattr_value(item.conf, "rf_attr") == "power_state":
+                    scope = self.get_iattr_value(item.conf, "rf_scope")
                     if value:
                         action = "leaveStandby"
                     else:
@@ -182,7 +188,7 @@ class Raumfeld_ng(SmartPlugin):
                     urlaction = [self._baseURL + "/controller/" + action + "?id=" + renderer + "&scope=" + scope]
 
                 # all case-insensitive parameter-less actions can be done here:
-                if self.get_iattr_value(item.conf, 'rf_attr') == 'play_state':
+                if self.get_iattr_value(item.conf, "rf_attr") == "play_state":
                     if value.lower() in ("stop", "play", "pause", "next", "prev"):
                         action = value.lower()
                         # play state actionsalways act on zone level
@@ -191,7 +197,7 @@ class Raumfeld_ng(SmartPlugin):
                         self.logger.debug("Status nicht erkannt:" + value)
 
                 # mute-related actions are case sensitive and scope dependend, therefore own check:
-                if self.get_iattr_value(item.conf, 'rf_attr') == 'set_mute':
+                if self.get_iattr_value(item.conf, "rf_attr") == "set_mute":
                     if value.lower() in ("mute", "unmute", "togglemute"):
                         if value.lower() in ("mute"):
                             action = "mute"
@@ -202,7 +208,7 @@ class Raumfeld_ng(SmartPlugin):
                         else:
                             self.logger.debug("mute action nicht erkannt")
 
-                        scope = self.get_iattr_value(item.conf, 'rf_scope')
+                        scope = self.get_iattr_value(item.conf, "rf_scope")
                         urlaction = [self._baseURL + "/controller/" + action + "?id=" + renderer + "&scope=" + scope]
                     else:
                         self.logger.debug("Status nicht erkannt:" + value)
@@ -210,7 +216,7 @@ class Raumfeld_ng(SmartPlugin):
                 # loads the playlist, jumps to a tracknumber and starts. playlist name is always a string, track number an integer.
                 # Both can be packed in a list: ["plname",4]. Without track number always 1st track is played.
                 # For call w/o tracknumber playlist name can be a single element list or simple string : ["plname"] or "plname"
-                if self.get_iattr_value(item.conf, 'rf_attr') == 'load_playlist':
+                if self.get_iattr_value(item.conf, "rf_attr") == "load_playlist":
                     action = "loadPlaylist"
                     if isinstance(value, list):
                         pl = self.urlencode(value[0])
@@ -220,27 +226,38 @@ class Raumfeld_ng(SmartPlugin):
                             tracknum = str(value[1])
                             self.logger.info("Track im Playlist item gefunden: {}".format(tracknum))
                             urlaction.append(
-                                self._baseURL + "/controller/seekToTrack?id=" + renderer + "&TrackNumber=" + tracknum)
+                                self._baseURL + "/controller/seekToTrack?id=" + renderer + "&TrackNumber=" + tracknum
+                            )
                     else:
                         pl = self.urlencode(value)
                         urlaction = [self._baseURL + "/controller/" + action + "?id=" + renderer + "&value=" + pl]
 
                 # change track item...
-                if self.get_iattr_value(item.conf, 'rf_attr') == 'load_track':
+                if self.get_iattr_value(item.conf, "rf_attr") == "load_track":
                     tracknum = str(value)
                     action = "seekToTrack"
                     urlaction = [
-                        self._baseURL + "/controller/" + action + "?id=" + renderer + "&TrackNumber=" + tracknum]
+                        self._baseURL + "/controller/" + action + "?id=" + renderer + "&TrackNumber=" + tracknum
+                    ]
 
                 # Volume...rf_mode can be used to make volume change relative.
-                if self.get_iattr_value(item.conf, 'rf_attr') == 'set_volume':
-                    scope = self.get_iattr_value(item.conf, 'rf_scope')
+                if self.get_iattr_value(item.conf, "rf_attr") == "set_volume":
+                    scope = self.get_iattr_value(item.conf, "rf_scope")
                     action = "setVolume"
-                    url = self._baseURL + "/controller/" + action + "?value=" + str(
-                        value) + "&id=" + renderer + "&scope=" + scope
-                    if self.has_iattr(item.conf, 'rf_mode'):
-                        setmode = self.get_iattr_value(item.conf, 'rf_mode')
-                        if setmode == 'relative':
+                    url = (
+                        self._baseURL
+                        + "/controller/"
+                        + action
+                        + "?value="
+                        + str(value)
+                        + "&id="
+                        + renderer
+                        + "&scope="
+                        + scope
+                    )
+                    if self.has_iattr(item.conf, "rf_mode"):
+                        setmode = self.get_iattr_value(item.conf, "rf_mode")
+                        if setmode == "relative":
                             url += "&relative=1"
                     urlaction = [url]
 
@@ -248,10 +265,10 @@ class Raumfeld_ng(SmartPlugin):
                 # this loop can be used if items are created which need multiple calls of the server (example: load playlist,set volume,...)
                 # was used before to combine load playlist and seek to track -> no combined within one item.
                 for taskindex, task in enumerate(urlaction):
-                    if task != '':
+                    if task != "":
                         urlobj = httplib2.Http(".cache")
                         (resp_headers, content) = urlobj.request(task, "GET")
-                        response = json.loads(content.decode('utf-8'))
+                        response = json.loads(content.decode("utf-8"))
                         self.logger.info(json.dumps(response, sort_keys=True, indent=3, ensure_ascii=False))
                         if response["error"]:
                             self.logger.error(response["data"]["errorMessage"])
@@ -262,7 +279,6 @@ class Raumfeld_ng(SmartPlugin):
 
                 # finally: update Zone Config Information after action.
                 self.ZoneConfig = self.getZoneConfig()
-
 
     def poll_device(self):
         """
@@ -276,9 +292,9 @@ class Raumfeld_ng(SmartPlugin):
         self.ZoneConfig = self.getZoneConfig()
 
         # now we update a couple of rf items
-        items = self.get_sh().find_items('rf_attr')  # all raumfeld related items
+        items = self.get_sh().find_items("rf_attr")  # all raumfeld related items
         try:
-            for i in items:     # check each item...
+            for i in items:  # check each item...
                 renderer = i.conf["rf_renderer_name"]  # which somehow has a renderer-relation
                 for Zone in self.ZoneConfig["Zones"]:
                     if renderer in Zone["Name"]:
@@ -323,8 +339,12 @@ class Raumfeld_ng(SmartPlugin):
                                 TrackNum = int(Zone["PlayMedia"]["CurrentTrack"])
                             else:
                                 TrackNum = None
-                            ps = [Zone["PlayMedia"]["Album"], Zone["PlayMedia"]["Artist"], Zone["PlayMedia"]["Title"],
-                                  TrackNum]
+                            ps = [
+                                Zone["PlayMedia"]["Album"],
+                                Zone["PlayMedia"]["Artist"],
+                                Zone["PlayMedia"]["Title"],
+                                TrackNum,
+                            ]
                             self.logger.info("Current Media Info: {}".format(ps))
                             i(ps, self.get_shortname())
 
@@ -341,12 +361,16 @@ class Raumfeld_ng(SmartPlugin):
             self.logger.error("Beim Powerraumupdate geht was schief")
             self.logger.error(err.args)
 
-    def urlencode(self, plain):  #if playlist names are not URL-encoded this hand-made translation. maybe not needed?
-        urltext = plain.replace(' ', '%20').replace('ä', '%C3%A4').replace('ö', '%C3%B6').replace('ü',
-                                                                                                  '%C3%BC').replace('Ä',
-                                                                                                                    '%C3%84').replace(
-            'Ö',
-            '%C3%96').replace('Ü', '%C3%9C')
+    def urlencode(self, plain):  # if playlist names are not URL-encoded this hand-made translation. maybe not needed?
+        urltext = (
+            plain.replace(" ", "%20")
+            .replace("ä", "%C3%A4")
+            .replace("ö", "%C3%B6")
+            .replace("ü", "%C3%BC")
+            .replace("Ä", "%C3%84")
+            .replace("Ö", "%C3%96")
+            .replace("Ü", "%C3%9C")
+        )
         # %C3%A4=ä
         # %C3%B6=ö
         # %C3%BC=ü
@@ -360,9 +384,9 @@ class Raumfeld_ng(SmartPlugin):
         # build central Config Object
         urlobj = httplib2.Http(".cache")
         (resp_headers, content) = urlobj.request(self._baseURL + "/data/getZoneConfig", "GET")
-        response = json.loads(content.decode('utf-8'))
+        response = json.loads(content.decode("utf-8"))
         try:
-            info = response['data']['zoneConfig']['zones']
+            info = response["data"]["zoneConfig"]["zones"]
         except Exception:
             self.logger.error(response["errorMsg"])
             return None
@@ -370,21 +394,30 @@ class Raumfeld_ng(SmartPlugin):
         Config = {"NumOfZones": 0, "Zones": []}
         for zoneListNum, zoneList in enumerate(info):
             # Seems to be always an one-element list...but to be save
-            for ZoneNum, zone in enumerate(zoneList['zone']):
+            for ZoneNum, zone in enumerate(zoneList["zone"]):
                 if zone not in ZoneCheckList:
-                    ZoneCheckList.append(zone['$']['udn'])
+                    ZoneCheckList.append(zone["$"]["udn"])
                     Config["NumOfZones"] += 1
-                    ZoneObject = {"Name": zone['$']['udn'], "PowerState": "Off", "PlayState": "unknown",
-                                  "PlayMedia": {"Title": "", "Artist": "", "Album": ""}, "Rooms": []}
+                    ZoneObject = {
+                        "Name": zone["$"]["udn"],
+                        "PowerState": "Off",
+                        "PlayState": "unknown",
+                        "PlayMedia": {"Title": "", "Artist": "", "Album": ""},
+                        "Rooms": [],
+                    }
                     RoomObjectList = []
                     PowerState = []
-                    for roomNum, room in enumerate(zone['room']):
-                        if room['$']['name'] not in RoomObjectList:
-                            RoomObject = {"Name": room['$']['name'], "PowerState": room['$']['powerState'], "Mute": 0,
-                                          "Volume": 0}
-                            RoomObjectList.append(room['$']['name'])
+                    for roomNum, room in enumerate(zone["room"]):
+                        if room["$"]["name"] not in RoomObjectList:
+                            RoomObject = {
+                                "Name": room["$"]["name"],
+                                "PowerState": room["$"]["powerState"],
+                                "Mute": 0,
+                                "Volume": 0,
+                            }
+                            RoomObjectList.append(room["$"]["name"])
                             ZoneObject["Rooms"].append(RoomObject)
-                            PowerState.append(room['$']['powerState'] in "ACTIVE")
+                            PowerState.append(room["$"]["powerState"] in "ACTIVE")
                     if all(PowerState):
                         ZoneObject["PowerState"] = "On"
                     elif any(PowerState):
@@ -402,8 +435,9 @@ class Raumfeld_ng(SmartPlugin):
         # asking for one room yields data for whole zone-> take first room
         (resp_headers, content) = urlobj.request(
             self._baseURL + "/data/getRendererState?id=" + zone["Rooms"][0]["Name"] + "&scope=zone&onlyVirtual=true",
-            "GET")
-        response = json.loads(content.decode('utf-8'))
+            "GET",
+        )
+        response = json.loads(content.decode("utf-8"))
         try:
             zs = response["data"][0]
         except Exception:
@@ -451,14 +485,13 @@ class Raumfeld_ng(SmartPlugin):
         pass
 
     def init_webinterface(self):
-        """"
+        """ "
         Initialize the web interface for this plugin
 
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
@@ -466,28 +499,29 @@ class Raumfeld_ng(SmartPlugin):
             return False
 
         import sys
-        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
+
+        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
+        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
         config = {
-            '/': {
-                'tools.staticdir.root': webif_dir,
+            "/": {
+                "tools.staticdir.root": webif_dir,
             },
-            '/static': {
-                'tools.staticdir.on': True,
-                'tools.staticdir.dir': 'static'
-            }
+            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
         }
 
         # Register the web interface as a cherrypy app
-        self.mod_http.register_webif(WebInterface(webif_dir, self),
-                                     self.get_shortname(),
-                                     config,
-                                     self.get_classname(), self.get_instance_name(),
-                                     description='')
+        self.mod_http.register_webif(
+            WebInterface(webif_dir, self),
+            self.get_shortname(),
+            config,
+            self.get_classname(),
+            self.get_instance_name(),
+            description="",
+        )
 
         return True
 
@@ -501,7 +535,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -527,10 +560,9 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])))
-
+        return tmpl.render(p=self.plugin, items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])))
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -556,4 +588,3 @@ class WebInterface(SmartPluginWebIf):
             # except Exception as e:
             #     self.logger.error("get_data_html exception: {}".format(e))
         return {}
-

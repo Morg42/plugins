@@ -64,9 +64,9 @@ class SeCondition(StateEngineTools.SeItemChild):
         self.__itemClass = Item
 
     def __repr__(self):
-        return "SeCondition 'item': {}, 'status': {}, 'eval': {}, " \
-               "'status_eval': {}, 'value': {}".format(self.__item, self.__status, self.__eval,
-                                                       self.__status_eval, self.__value)
+        return "SeCondition 'item': {}, 'status': {}, 'eval': {}, 'status_eval': {}, 'value': {}".format(
+            self.__item, self.__status, self.__eval, self.__status_eval, self.__value
+        )
 
     def check_items(self, check, value=None, state=None, use=None):
         item_issue, status_issue, eval_issue, status_eval_issue = None, None, None, None
@@ -81,14 +81,18 @@ class SeCondition(StateEngineTools.SeItemChild):
             if value is None:
                 value = StateEngineTools.find_attribute(self._sh, state, "se_item_" + self.__name, 0, use)
             if isinstance(value, str):
-                match = re.match(r'^(.*):', value)
+                match = re.match(r"^(.*):", value)
                 if value.startswith("eval:"):
                     _, _, value = value.partition(":")
                     self.__eval = value
                     self.__item = None
                 elif match:
-                    self._log_warning("Your item configuration '{0}' is wrong! Define a plain (relative) "
-                                      "item without {1} at the beginning!", value, match.group(1))
+                    self._log_warning(
+                        "Your item configuration '{0}' is wrong! Define a plain (relative) "
+                        "item without {1} at the beginning!",
+                        value,
+                        match.group(1),
+                    )
                     item_issue = "Your eval configuration '{0}' is wrong, remove {1}".format(value, match.group(1))
                     self.__item = None
                 else:
@@ -101,14 +105,18 @@ class SeCondition(StateEngineTools.SeItemChild):
             if value is None:
                 value = StateEngineTools.find_attribute(self._sh, state, "se_status_" + self.__name, 0, use)
             if isinstance(value, str):
-                match = re.match(r'^(.*):', value)
+                match = re.match(r"^(.*):", value)
                 if isinstance(value, str) and value.startswith("eval:"):
                     _, _, value = value.partition(":")
                     self.__status_eval = value
                     self.__status = None
                 elif match:
-                    self._log_warning("Your item configuration '{0}' is wrong! Define a plain (relative) "
-                                      "item without {1} at the beginning!", value, match.group(1))
+                    self._log_warning(
+                        "Your item configuration '{0}' is wrong! Define a plain (relative) "
+                        "item without {1} at the beginning!",
+                        value,
+                        match.group(1),
+                    )
                     status_issue = "Your eval configuration '{0}' is wrong, remove {1}".format(value, match.group(1))
                     self.__status = None
                     value = None
@@ -120,12 +128,13 @@ class SeCondition(StateEngineTools.SeItemChild):
             if value is None:
                 value = StateEngineTools.find_attribute(self._sh, state, "se_eval_" + self.__name, 0, use)
             if isinstance(value, str):
-                match = re.match(r'^(.*):', value)
+                match = re.match(r"^(.*):", value)
                 if value.startswith("eval:"):
                     _, _, value = value.partition("eval:")
                 elif match:
-                    self._log_warning("Your eval configuration '{0}' is wrong! You have to define "
-                                      "a plain eval expression", value)
+                    self._log_warning(
+                        "Your eval configuration '{0}' is wrong! You have to define a plain eval expression", value
+                    )
                     eval_issue = "Your eval configuration '{0}' is wrong!".format(value)
                     value = None
                 self.__eval = value
@@ -136,17 +145,28 @@ class SeCondition(StateEngineTools.SeItemChild):
             if value is None:
                 value = StateEngineTools.find_attribute(self._sh, state, "se_status_eval_" + self.__name, 0, use)
             if isinstance(value, str):
-                match = re.match(r'^(.*):', value)
+                match = re.match(r"^(.*):", value)
                 if value.startswith("eval:"):
                     _, _, value = value.partition("eval:")
                 elif match:
-                    self._log_warning("Your status eval configuration '{0}' is wrong! You have to define "
-                                      "a plain eval expression", value)
+                    self._log_warning(
+                        "Your status eval configuration '{0}' is wrong! You have to define a plain eval expression",
+                        value,
+                    )
                     status_eval_issue = "Your status eval configuration '{0}' is wrong!".format(value)
                     value = None
                 self.__status_eval = value
             status_eval_value = value
-        return item_value, status_value, eval_value, status_eval_value, item_issue, status_issue, eval_issue, status_eval_issue
+        return (
+            item_value,
+            status_value,
+            eval_value,
+            status_eval_value,
+            item_issue,
+            status_issue,
+            eval_issue,
+            status_eval_issue,
+        )
 
     # set a certain function to a given value
     # func: Function to set ('item', 'eval', 'status_eval', 'value', 'min', 'max', 'negate', 'changedby', 'updatedby',
@@ -199,14 +219,14 @@ class SeCondition(StateEngineTools.SeItemChild):
     def get(self):
         _eval_result = str(self.__eval)
         _status_eval_result = str(self.__status_eval)
-        if 'SeItem' in _eval_result:
-            _eval_result = _eval_result.split('SeItem.')[1].split(' ')[0]
-        if 'SeCurrent' in _eval_result:
-            _eval_result = _eval_result.split('SeCurrent.')[1].split(' ')[0]
-        if 'SeItem' in _status_eval_result:
-            _status_eval_result = _status_eval_result.split('SeItem.')[1].split(' ')[0]
-        if 'SeCurrent' in _status_eval_result:
-            _status_eval_result = _status_eval_result.split('SeCurrent.')[1].split(' ')[0]
+        if "SeItem" in _eval_result:
+            _eval_result = _eval_result.split("SeItem.")[1].split(" ")[0]
+        if "SeCurrent" in _eval_result:
+            _eval_result = _eval_result.split("SeCurrent.")[1].split(" ")[0]
+        if "SeItem" in _status_eval_result:
+            _status_eval_result = _status_eval_result.split("SeItem.")[1].split(" ")[0]
+        if "SeCurrent" in _status_eval_result:
+            _status_eval_result = _status_eval_result.split("SeCurrent.")[1].split(" ")[0]
         _value_result = self.__value.get_for_webif()
         try:
             _item = self.__item.property.path
@@ -216,16 +236,28 @@ class SeCondition(StateEngineTools.SeItemChild):
             _status = self.__status.property.path
         except Exception:
             _status = self.__status
-        result = {'item': _item, 'status': _status, 'eval': _eval_result, 'status_eval': _status_eval_result,
-                  'value': _value_result,
-                  'min': str(self.__min), 'ignore': str(self.__ignore),
-                  'max': str(self.__max), 'agemin': str(self.__agemin), 'agemax': str(self.__agemax),
-                  'negate': str(self.__negate), 'agenegate': str(self.__agenegate),
-                  'changedby': str(self.__changedby), 'updatedby': str(self.__updatedby),
-                  'triggeredby': str(self.__triggeredby), 'triggeredbynegate': str(self.__triggeredbynegate),
-                  'changedbynegate': str(self.__changedbynegate),
-                  'updatedbynegate': str(self.__updatedbynegate),
-                  'current': {}, 'match': {}}
+        result = {
+            "item": _item,
+            "status": _status,
+            "eval": _eval_result,
+            "status_eval": _status_eval_result,
+            "value": _value_result,
+            "min": str(self.__min),
+            "ignore": str(self.__ignore),
+            "max": str(self.__max),
+            "agemin": str(self.__agemin),
+            "agemax": str(self.__agemax),
+            "negate": str(self.__negate),
+            "agenegate": str(self.__agenegate),
+            "changedby": str(self.__changedby),
+            "updatedby": str(self.__updatedby),
+            "triggeredby": str(self.__triggeredby),
+            "triggeredbynegate": str(self.__triggeredbynegate),
+            "changedbynegate": str(self.__changedbynegate),
+            "updatedbynegate": str(self.__updatedbynegate),
+            "current": {},
+            "match": {},
+        }
         return result
 
     # Complete condition (do some checks, cast value, min and max based on item or eval data types)
@@ -234,9 +266,16 @@ class SeCondition(StateEngineTools.SeItemChild):
     def complete(self, state, use):
         self.__state = state
         # check if it is possible to complete this condition
-        if self.__min.is_empty() and self.__max.is_empty() and self.__value.is_empty() \
-                and self.__agemin.is_empty() and self.__agemax.is_empty() \
-                and self.__changedby.is_empty() and self.__updatedby.is_empty() and self.__triggeredby.is_empty():
+        if (
+            self.__min.is_empty()
+            and self.__max.is_empty()
+            and self.__value.is_empty()
+            and self.__agemin.is_empty()
+            and self.__agemax.is_empty()
+            and self.__changedby.is_empty()
+            and self.__updatedby.is_empty()
+            and self.__triggeredby.is_empty()
+        ):
             return False
 
         # set 'eval' for some known conditions if item and eval are not set, yet
@@ -297,14 +336,23 @@ class SeCondition(StateEngineTools.SeItemChild):
         if all(item is None for item in [self.__item, self.__status, self.__eval, self.__status_eval]):
             raise ValueError("Neither 'item' nor 'status' nor '(status)eval' given!")
 
-        if any(item is not None for item in [self.__item, self.__status, self.__eval, self.__status_eval]) \
-                and not self.__changedby.is_empty() and self.__changedbynegate is None:
+        if (
+            any(item is not None for item in [self.__item, self.__status, self.__eval, self.__status_eval])
+            and not self.__changedby.is_empty()
+            and self.__changedbynegate is None
+        ):
             self.__changedbynegate = False
-        if any(item is not None for item in [self.__item, self.__status, self.__eval, self.__status_eval]) \
-                and not self.__updatedby.is_empty() and self.__updatedbynegate is None:
+        if (
+            any(item is not None for item in [self.__item, self.__status, self.__eval, self.__status_eval])
+            and not self.__updatedby.is_empty()
+            and self.__updatedbynegate is None
+        ):
             self.__updatedbynegate = False
-        if any(item is not None for item in [self.__item, self.__status, self.__eval, self.__status_eval]) \
-                and not self.__triggeredby.is_empty() and self.__triggeredbynegate is None:
+        if (
+            any(item is not None for item in [self.__item, self.__status, self.__eval, self.__status_eval])
+            and not self.__triggeredby.is_empty()
+            and self.__triggeredbynegate is None
+        ):
             self.__triggeredbynegate = False
 
         # cast stuff
@@ -316,12 +364,29 @@ class SeCondition(StateEngineTools.SeItemChild):
             elif self.__name in ("weekday", "sun_azimut", "sun_altitude", "age", "delay", "random", "month"):
                 self.__cast_all(StateEngineTools.cast_num)
             elif self.__name in (
-                    "laststate", "laststate_id", "laststate_name", "lastconditionset", "lastconditionset_id",
-                    "lastconditionset_name", "previousstate", "previousstate_name", "previousstate_id",
-                    "previousconditionset", "previousconditionset_id", "previousconditionset_name",
-                    "previousstate_conditionset", "previousstate_conditionset_id", "previousstate_conditionset_name",
-                    "trigger_item", "trigger_caller", "trigger_source", "trigger_dest", "original_item",
-                    "original_caller", "original_source"):
+                "laststate",
+                "laststate_id",
+                "laststate_name",
+                "lastconditionset",
+                "lastconditionset_id",
+                "lastconditionset_name",
+                "previousstate",
+                "previousstate_name",
+                "previousstate_id",
+                "previousconditionset",
+                "previousconditionset_id",
+                "previousconditionset_name",
+                "previousstate_conditionset",
+                "previousstate_conditionset_id",
+                "previousstate_conditionset_name",
+                "trigger_item",
+                "trigger_caller",
+                "trigger_source",
+                "trigger_dest",
+                "original_item",
+                "original_caller",
+                "original_source",
+            ):
                 self.__cast_all(StateEngineTools.cast_str)
             elif self.__name == "time":
                 self.__cast_all(StateEngineTools.cast_time)
@@ -335,12 +400,18 @@ class SeCondition(StateEngineTools.SeItemChild):
         except Exception:
             cond_evalitem = False
         try:
-            cond_status_evalitem = self.__status_eval and \
-                                   ("get_relative_item(" in self.__status_eval or "return_item(" in self.__status_eval)
+            cond_status_evalitem = self.__status_eval and (
+                "get_relative_item(" in self.__status_eval or "return_item(" in self.__status_eval
+            )
         except Exception:
             cond_status_evalitem = False
-        if self.__item is None and self.__status is None and \
-                not cond_min_max and not cond_evalitem and not cond_status_evalitem:
+        if (
+            self.__item is None
+            and self.__status is None
+            and not cond_min_max
+            and not cond_evalitem
+            and not cond_status_evalitem
+        ):
             raise ValueError("Condition {}: 'agemin'/'agemax' can not be used for eval!".format(self.__name))
         return True
 
@@ -348,18 +419,20 @@ class SeCondition(StateEngineTools.SeItemChild):
     def check(self, state):
         # Ignore if no current value can be determined (should not happen as we check this earlier, but to be sure ...)
         if all(item is None for item in [self.__item, self.__status, self.__eval, self.__status_eval]):
-            self._log_info("Condition '{0}': No item, status or (status)eval found! "
-                           "Considering condition as matching!", self.__name)
+            self._log_info(
+                "Condition '{0}': No item, status or (status)eval found! Considering condition as matching!",
+                self.__name,
+            )
             return True
         self._log_debug("Condition '{0}': Checking all relevant stuff", self.__name)
         self._log_increase_indent()
         if self.__ignore is True:
             self._log_info(f"Condition '{self.__name}' gets ignored because se_ignore is set")
-            self._abitem.update_webif(self.__webif_key('ignore'), str(self.__ignore))
+            self._abitem.update_webif(self.__webif_key("ignore"), str(self.__ignore))
             self._log_decrease_indent()
             return True
         else:
-            self._abitem.update_webif(self.__webif_key('ignore'), str(self.__ignore))
+            self._abitem.update_webif(self.__webif_key("ignore"), str(self.__ignore))
         if not self.__check_value():
             self._log_decrease_indent()
             return False
@@ -449,13 +522,30 @@ class SeCondition(StateEngineTools.SeItemChild):
         triggeredby = self.__triggeredby.write_to_logger()
         if self.__updatedbynegate is not None and not self.__triggeredby.is_empty():
             self._log_info("triggeredby negate: {0}", self.__triggeredbynegate)
-        return {self.name: {'item': item, 'status': status, 'eval': eval_result, 'status_eval': status_eval_result,
-                            'value': value_result, 'ignore': str(self.__ignore), 'min': str(min_result), 'max': str(max_result), 'agemin': str(agemin),
-                            'agemax': str(agemax), 'negate': str(self.__negate), 'agenegate': str(self.__agenegate),
-                            'changedby': str(changedby), 'updatedby': str(updatedby),
-                            'triggeredby': str(triggeredby), 'triggeredbynegate': str(self.__triggeredbynegate),
-                            'changedbynegate': str(self.__changedbynegate),
-                            'updatedbynegate': str(self.__updatedbynegate), 'current': {}, 'match': {}}}
+        return {
+            self.name: {
+                "item": item,
+                "status": status,
+                "eval": eval_result,
+                "status_eval": status_eval_result,
+                "value": value_result,
+                "ignore": str(self.__ignore),
+                "min": str(min_result),
+                "max": str(max_result),
+                "agemin": str(agemin),
+                "agemax": str(agemax),
+                "negate": str(self.__negate),
+                "agenegate": str(self.__agenegate),
+                "changedby": str(changedby),
+                "updatedby": str(updatedby),
+                "triggeredby": str(triggeredby),
+                "triggeredbynegate": str(self.__triggeredbynegate),
+                "changedbynegate": str(self.__changedbynegate),
+                "updatedbynegate": str(self.__updatedbynegate),
+                "current": {},
+                "match": {},
+            }
+        }
 
     # Cast 'value', 'min' and 'max' using given cast function
     # cast_func: cast function to use
@@ -484,10 +574,10 @@ class SeCondition(StateEngineTools.SeItemChild):
     def __webif_key(self, *args):
         return [
             str(self.__state.id),
-            'conditionsets',
-            str(self._abitem.get_variable('current.conditionset_name')),
+            "conditionsets",
+            str(self._abitem.get_variable("current.conditionset_name")),
             str(self.__name),
-            *map(str, args)
+            *map(str, args),
         ]
 
     def __change_update_value(self, value, valuetype):
@@ -518,22 +608,36 @@ class SeCondition(StateEngineTools.SeItemChild):
                 convert_value = StateEngineTools.cast_str(convert_value)
                 convert_current = StateEngineTools.cast_str(convert_current)
             if type(_oldvalue) is not type(convert_value):
-                self._log_debug("Value {} was type {} and therefore not the same"
-                                " type as item value {}. It got converted to {}.",
-                                _oldvalue, type(_oldvalue), convert_current, type(convert_value))
+                self._log_debug(
+                    "Value {} was type {} and therefore not the same type as item value {}. It got converted to {}.",
+                    _oldvalue,
+                    type(_oldvalue),
+                    convert_current,
+                    type(convert_value),
+                )
             return convert_value, convert_current
 
-        current = self.__get_current(eval_type='changedby') if valuetype == "changedby" else \
-            self.__get_current(eval_type='updatedby') if valuetype == "updatedby" else \
-            self.__get_current(eval_type='triggeredby') if valuetype == "triggeredby" else \
-            self.__get_current(eval_type='value')
-        negate = self.__changedbynegate if valuetype == "changedby" else \
-            self.__updatedbynegate if valuetype == "updatedby" else \
-            self.__triggeredbynegate if valuetype == "triggeredby" else \
-            self.__negate
+        current = (
+            self.__get_current(eval_type="changedby")
+            if valuetype == "changedby"
+            else self.__get_current(eval_type="updatedby")
+            if valuetype == "updatedby"
+            else self.__get_current(eval_type="triggeredby")
+            if valuetype == "triggeredby"
+            else self.__get_current(eval_type="value")
+        )
+        negate = (
+            self.__changedbynegate
+            if valuetype == "changedby"
+            else self.__updatedbynegate
+            if valuetype == "updatedby"
+            else self.__triggeredbynegate
+            if valuetype == "triggeredby"
+            else self.__negate
+        )
         if isinstance(value, list):
             text = "Condition '{0}': {1}={2} negate={3} current={4}"
-            self._abitem.update_webif(self.__webif_key('current', valuetype), str(current))
+            self._abitem.update_webif(self.__webif_key("current", valuetype), str(current))
             self._abitem.update_webif(self.__webif_key(valuetype), str(value))
             self._log_info(text, self.__name, valuetype, value, negate, current)
             self._log_increase_indent()
@@ -546,27 +650,29 @@ class SeCondition(StateEngineTools.SeItemChild):
                     regex_result = element.fullmatch(str(current))
                     regex_check = True
                 if negate:
-                    if (regex_result is not None and regex_check is True) \
-                            or (current == element and regex_check is False):
+                    if (regex_result is not None and regex_check is True) or (
+                        current == element and regex_check is False
+                    ):
                         self._log_debug("{0} found but negated -> not matching", element)
-                        self._abitem.update_webif(self.__webif_key('match', valuetype), 'no')
+                        self._abitem.update_webif(self.__webif_key("match", valuetype), "no")
                         return False
                 else:
-                    if (regex_result is not None and regex_check is True) \
-                            or (current == element and regex_check is False):
+                    if (regex_result is not None and regex_check is True) or (
+                        current == element and regex_check is False
+                    ):
                         self._log_debug("{0} found -> matching", element)
-                        self._abitem.update_webif(self.__webif_key('match', valuetype), 'yes')
+                        self._abitem.update_webif(self.__webif_key("match", valuetype), "yes")
                         return True
                 if regex_check is True:
                     self._log_debug("Regex '{0}' result: {1}.", element, regex_result)
 
             if negate:
                 self._log_debug("{0} not in list -> matching", current)
-                self._abitem.update_webif(self.__webif_key('match', valuetype), 'yes')
+                self._abitem.update_webif(self.__webif_key("match", valuetype), "yes")
                 return True
             else:
                 self._log_debug("{0} not in list -> not matching", current)
-                self._abitem.update_webif(self.__webif_key('match', valuetype), 'no')
+                self._abitem.update_webif(self.__webif_key("match", valuetype), "no")
                 return False
         else:
             regex_result = None
@@ -575,7 +681,7 @@ class SeCondition(StateEngineTools.SeItemChild):
             if valuetype == "value" and type(value) is not type(current) and current is not None:
                 value, current = __convert(value, current)
             text = "Condition '{0}': {1}={2} negate={3} current={4}"
-            self._abitem.update_webif(self.__webif_key('current', valuetype), str(current))
+            self._abitem.update_webif(self.__webif_key("current", valuetype), str(current))
             self._abitem.update_webif(self.__webif_key(valuetype), str(value))
             self._log_info(text, self.__name, valuetype, value, negate, current)
             self._log_increase_indent()
@@ -583,19 +689,17 @@ class SeCondition(StateEngineTools.SeItemChild):
                 regex_result = value.fullmatch(str(current))
                 regex_check = True
             if negate:
-                if (regex_result is None and regex_check is True) \
-                        or (current != value and regex_check is False):
+                if (regex_result is None and regex_check is True) or (current != value and regex_check is False):
                     self._log_debug("not OK but negated -> matching")
-                    self._abitem.update_webif(self.__webif_key('match', valuetype), 'yes')
+                    self._abitem.update_webif(self.__webif_key("match", valuetype), "yes")
                     return True
             else:
-                if (regex_result is not None and regex_check is True) \
-                        or (current == value and regex_check is False):
+                if (regex_result is not None and regex_check is True) or (current == value and regex_check is False):
                     self._log_debug("OK -> matching")
-                    self._abitem.update_webif(self.__webif_key('match', valuetype), 'yes')
+                    self._abitem.update_webif(self.__webif_key("match", valuetype), "yes")
                     return True
             self._log_debug("not OK -> not matching")
-            self._abitem.update_webif(self.__webif_key('match', valuetype), 'no')
+            self._abitem.update_webif(self.__webif_key("match", valuetype), "no")
             return False
 
     # Check if value conditions match
@@ -606,7 +710,7 @@ class SeCondition(StateEngineTools.SeItemChild):
                 # 'value' is given. We ignore 'min' and 'max' and check only for the given value
                 value = self.__value.get()
                 value = StateEngineTools.flatten_list(value)
-                self._abitem.update_webif(self.__webif_key('value'), str(value))
+                self._abitem.update_webif(self.__webif_key("value"), str(value))
                 return self.__change_update_value(value, "value")
 
             elif not cond_min_max:
@@ -616,7 +720,9 @@ class SeCondition(StateEngineTools.SeItemChild):
 
                 if isinstance(min_get_value, re.Pattern) or isinstance(max_get_value, re.Pattern):
                     self._log_warning("You can not use regular expression with min/max -> ignoring")
-                    self._abitem.update_webif(self.__webif_key('match', 'value'), 'You can not use regular expression with min or max')
+                    self._abitem.update_webif(
+                        self.__webif_key("match", "value"), "You can not use regular expression with min or max"
+                    )
                     return True
                 min_value = [min_get_value] if not isinstance(min_get_value, list) else min_get_value
                 max_value = [max_get_value] if not isinstance(max_get_value, list) else max_get_value
@@ -626,29 +732,42 @@ class SeCondition(StateEngineTools.SeItemChild):
                 min_value = min_value + [None] * abs(diff_len) if diff_len < 0 else min_value
                 max_value = max_value + [None] * diff_len if diff_len > 0 else max_value
                 text = "Condition '{0}': min={1} max={2} negate={3} current={4}"
-                self._abitem.update_webif(self.__webif_key('current', 'value'), str(current))
-                self._abitem.update_webif(self.__webif_key('min'), str(min_value))
-                self._abitem.update_webif(self.__webif_key('max'), str(max_value))
+                self._abitem.update_webif(self.__webif_key("current", "value"), str(current))
+                self._abitem.update_webif(self.__webif_key("min"), str(min_value))
+                self._abitem.update_webif(self.__webif_key("max"), str(max_value))
                 self._log_info(text, self.__name, min_value, max_value, self.__negate, current)
                 if diff_len != 0:
-                    self._log_debug("Min and max are always evaluated as valuepairs. "
-                                    "If needed you can also provide 'novalue' as a list value. "
-                                    "Current min: {min_value}, current max: {max_value}")
+                    self._log_debug(
+                        "Min and max are always evaluated as valuepairs. "
+                        "If needed you can also provide 'novalue' as a list value. "
+                        "Current min: {min_value}, current max: {max_value}"
+                    )
                 self._log_increase_indent()
                 _notmatching = 0
                 for i, _ in enumerate(min_value):
-                    _min = None if min_value[i] == 'novalue' else min_value[i]
-                    _max = None if max_value[i] == 'novalue' else max_value[i]
-                    self._log_debug("Checking minvalue {} ({}) and maxvalue {} ({}) against current {} ({})",
-                                    _min, type(_min), _max, type(_max), current, type(current))
+                    _min = None if min_value[i] == "novalue" else min_value[i]
+                    _max = None if max_value[i] == "novalue" else max_value[i]
+                    self._log_debug(
+                        "Checking minvalue {} ({}) and maxvalue {} ({}) against current {} ({})",
+                        _min,
+                        type(_min),
+                        _max,
+                        type(_max),
+                        current,
+                        type(current),
+                    )
                     if _min is not None and _max is not None and _min > _max:
                         _min, _max = _max, _min
-                        self._log_warning("Condition {}: min must not be greater than max! "
-                                          "Values got switched: min is now {}, max is now {}",
-                                          self.__name, _min, _max)
+                        self._log_warning(
+                            "Condition {}: min must not be greater than max! "
+                            "Values got switched: min is now {}, max is now {}",
+                            self.__name,
+                            _min,
+                            _max,
+                        )
                     if _min is None and _max is None:
                         self._log_debug("no limit given -> matching")
-                        self._abitem.update_webif(self.__webif_key('match', 'value'), 'yes')
+                        self._abitem.update_webif(self.__webif_key("match", "value"), "yes")
                         return True
 
                     if not self.__negate:
@@ -662,7 +781,7 @@ class SeCondition(StateEngineTools.SeItemChild):
 
                         else:
                             self._log_debug("given limits ok -> matching")
-                            self._abitem.update_webif(self.__webif_key('match', 'value'), 'yes')
+                            self._abitem.update_webif(self.__webif_key("match", "value"), "yes")
                             return True
                     else:
                         if _min is not None and current > _min and (_max is None or current < _max):
@@ -675,32 +794,37 @@ class SeCondition(StateEngineTools.SeItemChild):
 
                         else:
                             self._log_debug("given limits ok -> matching")
-                            self._abitem.update_webif(self.__webif_key('match', 'value'), 'yes')
+                            self._abitem.update_webif(self.__webif_key("match", "value"), "yes")
                             return True
 
                 if _notmatching == len(min_value):
-                    self._abitem.update_webif(self.__webif_key('match', 'value'), 'no')
+                    self._abitem.update_webif(self.__webif_key("match", "value"), "no")
                     return False
                 else:
                     self._log_debug("given limits ok -> matching")
-                    self._abitem.update_webif(self.__webif_key('match', 'value'), 'yes')
+                    self._abitem.update_webif(self.__webif_key("match", "value"), "yes")
                     return True
 
             elif self.__value.is_empty() and cond_min_max:
-                self._log_warning("Condition {}: Neither value nor min/max given."
-                                  " This might result in unexpected"
-                                  " evalutions. Min {}, max {}, value {}", self.__name,
-                                  self.__min.get(), self.__max.get(), self.__value.get())
+                self._log_warning(
+                    "Condition {}: Neither value nor min/max given."
+                    " This might result in unexpected"
+                    " evalutions. Min {}, max {}, value {}",
+                    self.__name,
+                    self.__min.get(),
+                    self.__max.get(),
+                    self.__value.get(),
+                )
                 self._log_increase_indent()
-                self._abitem.update_webif(self.__webif_key('value'), '-')
-                self._abitem.update_webif(self.__webif_key('min'), '-')
-                self._abitem.update_webif(self.__webif_key('max'), '-')
-                self._abitem.update_webif(self.__webif_key('match', 'value'), 'Neither value nor min/max given.')
+                self._abitem.update_webif(self.__webif_key("value"), "-")
+                self._abitem.update_webif(self.__webif_key("min"), "-")
+                self._abitem.update_webif(self.__webif_key("max"), "-")
+                self._abitem.update_webif(self.__webif_key("match", "value"), "Neither value nor min/max given.")
                 return True
 
         except Exception as ex:
             self._log_warning("Problem checking value: {}", ex)
-            self._abitem.update_webif(self.__webif_key('match', 'value'), 'Problem checking value: {}'.format(ex))
+            self._abitem.update_webif(self.__webif_key("match", "value"), "Problem checking value: {}".format(ex))
         finally:
             self._log_decrease_indent()
 
@@ -773,23 +897,38 @@ class SeCondition(StateEngineTools.SeItemChild):
         except Exception:
             cond_evalitem = False
         try:
-            cond_status_evalitem = self.__status_eval and \
-                                   ("get_relative_item(" in self.__status_eval or "return_item(" in self.__status_eval)
+            cond_status_evalitem = self.__status_eval and (
+                "get_relative_item(" in self.__status_eval or "return_item(" in self.__status_eval
+            )
         except Exception:
             cond_status_evalitem = False
         if self.__item is None and cond_evalitem is False:
-            self._log_warning("Make sure your se_eval/se_item: eval:<..> '{}' really returns an item and not an ID. "
-                              "If the age condition does not work, please check your eval!", self.__eval)
+            self._log_warning(
+                "Make sure your se_eval/se_item: eval:<..> '{}' really returns an item and not an ID. "
+                "If the age condition does not work, please check your eval!",
+                self.__eval,
+            )
         if self.__status is None and cond_status_evalitem is False:
-            self._log_warning("Make sure your se_status: eval:<..> '{}' really returns an item and not an ID. "
-                              "If the age condition does not work, please check your eval!", self.__status_eval)
+            self._log_warning(
+                "Make sure your se_status: eval:<..> '{}' really returns an item and not an ID. "
+                "If the age condition does not work, please check your eval!",
+                self.__status_eval,
+            )
         try:
-            current = self.__get_current(eval_type='age')
+            current = self.__get_current(eval_type="age")
         except Exception as ex:
-            self._abitem.update_webif(self.__webif_key('match', 'age'), 'Not possible to get age from eval {} '
-                'or status_eval {}'.format(self.__eval, self.__status_eval))
-            self._log_warning("Age of '{0}': Not possible to get age from eval {1} or status_eval {2}! "
-                              "Considering condition as matching: {3}", self.__name, self.__eval, self.__status_eval, ex)
+            self._abitem.update_webif(
+                self.__webif_key("match", "age"),
+                "Not possible to get age from eval {} or status_eval {}".format(self.__eval, self.__status_eval),
+            )
+            self._log_warning(
+                "Age of '{0}': Not possible to get age from eval {1} or status_eval {2}! "
+                "Considering condition as matching: {3}",
+                self.__name,
+                self.__eval,
+                self.__status_eval,
+                ex,
+            )
 
             return True
         agemin = None if self.__agemin.is_empty() else self.__agemin.get()
@@ -804,20 +943,22 @@ class SeCondition(StateEngineTools.SeItemChild):
             agemin = agemin + [None] * abs(diff_len) if diff_len < 0 else agemin
             agemax = agemax + [None] * diff_len if diff_len > 0 else agemax
             text = "Age of '{0}': min={1} max={2} negate={3} current={4}"
-            self._abitem.update_webif(self.__webif_key('current', 'age'), str(current))
+            self._abitem.update_webif(self.__webif_key("current", "age"), str(current))
             _min = str(agemin[0]) if isinstance(agemin, list) and len(agemin) == 1 else agemin
             _max = str(agemax[0]) if isinstance(agemax, list) and len(agemax) == 1 else agemax
-            self._abitem.update_webif(self.__webif_key('agemin'), _min)
-            self._abitem.update_webif(self.__webif_key('agemax'), _max)
+            self._abitem.update_webif(self.__webif_key("agemin"), _min)
+            self._abitem.update_webif(self.__webif_key("agemax"), _max)
             self._log_info(text, self.__name, agemin, agemax, self.__agenegate, current)
             if diff_len != 0:
-                self._log_warning("Min and max age are always evaluated as valuepairs."
-                                  " If needed you can also provide 'novalue' as a list value")
+                self._log_warning(
+                    "Min and max age are always evaluated as valuepairs."
+                    " If needed you can also provide 'novalue' as a list value"
+                )
             self._log_increase_indent()
             _notmatching = 0
             for i, _ in enumerate(agemin):
-                _min = None if agemin[i] == 'novalue' else agemin[i]
-                _max = None if agemax[i] == 'novalue' else agemax[i]
+                _min = None if agemin[i] == "novalue" else agemin[i]
+                _max = None if agemax[i] == "novalue" else agemax[i]
                 self._log_debug("Testing valuepair min {} and max {}", _min, _max)
                 if not self.__agenegate:
                     if _min is not None and current < _min:
@@ -830,7 +971,7 @@ class SeCondition(StateEngineTools.SeItemChild):
 
                     else:
                         self._log_debug("given limits ok -> matching")
-                        self._abitem.update_webif(self.__webif_key('match', 'age'), 'yes')
+                        self._abitem.update_webif(self.__webif_key("match", "age"), "yes")
                         return True
                 else:
                     if _min is not None and current > _min and (_max is None or current < _max):
@@ -843,34 +984,40 @@ class SeCondition(StateEngineTools.SeItemChild):
 
                     else:
                         self._log_debug("given limits ok -> matching")
-                        self._abitem.update_webif(self.__webif_key('match', 'age'), 'yes')
+                        self._abitem.update_webif(self.__webif_key("match", "age"), "yes")
                         return True
 
             if _notmatching == len(agemin):
-                self._abitem.update_webif(self.__webif_key('match', 'age'), 'no')
+                self._abitem.update_webif(self.__webif_key("match", "age"), "no")
                 return False
             else:
                 self._log_debug("given limits ok -> matching")
-                self._abitem.update_webif(self.__webif_key('match', 'age'), 'yes')
+                self._abitem.update_webif(self.__webif_key("match", "age"), "yes")
                 return True
         finally:
             self._log_decrease_indent()
 
     # Current value of condition (based on item or eval)
-    def __get_current(self, eval_type='value'):
+    def __get_current(self, eval_type="value"):
         def check_eval(eval_or_status_eval):
             if isinstance(eval_or_status_eval, str):
-                _eval_ns = {'sh': self._sh, 'shtime': self._shtime, '__builtins__': __builtins__}
+                _eval_ns = {"sh": self._sh, "shtime": self._shtime, "__builtins__": __builtins__}
                 if "stateengine_eval" in eval_or_status_eval or "se_eval" in eval_or_status_eval:
-                    _eval_ns['stateengine_eval'] = _eval_ns['se_eval'] = StateEngineEval.SeEval(self._abitem)
+                    _eval_ns["stateengine_eval"] = _eval_ns["se_eval"] = StateEngineEval.SeEval(self._abitem)
                 try:
                     eval_result = eval(eval_or_status_eval, _eval_ns)
                     if isinstance(eval_result, self.__itemClass):
-                        value = eval_result.property.last_change_age if eval_type == 'age' else \
-                            eval_result.property.last_change_by if eval_type == 'changedby' else \
-                            eval_result.property.last_update_by if eval_type == 'updatedby' else \
-                            eval_result.property.last_trigger_by if eval_type == 'triggeredby' else \
-                            eval_result.property.value
+                        value = (
+                            eval_result.property.last_change_age
+                            if eval_type == "age"
+                            else eval_result.property.last_change_by
+                            if eval_type == "changedby"
+                            else eval_result.property.last_update_by
+                            if eval_type == "updatedby"
+                            else eval_result.property.last_trigger_by
+                            if eval_type == "triggeredby"
+                            else eval_result.property.value
+                        )
                     else:
                         value = eval_result
                 except Exception as ex:
@@ -884,11 +1031,17 @@ class SeCondition(StateEngineTools.SeItemChild):
         if self.__status is not None:
             # noinspection PyUnusedLocal
             self._log_debug("Trying to get {} of status item {}", eval_type, self.__status.property.path)
-            return self.__status.property.last_change_age if eval_type == 'age' else \
-                self.__status.property.last_change_by if eval_type == 'changedby' else \
-                self.__status.property.last_update_by if eval_type == 'updatedby' else \
-                self.__status.property.last_trigger_by if eval_type == 'triggeredby' else \
-                self.__status.property.value
+            return (
+                self.__status.property.last_change_age
+                if eval_type == "age"
+                else self.__status.property.last_change_by
+                if eval_type == "changedby"
+                else self.__status.property.last_update_by
+                if eval_type == "updatedby"
+                else self.__status.property.last_trigger_by
+                if eval_type == "triggeredby"
+                else self.__status.property.value
+            )
         elif self.__status_eval is not None:
             self._log_debug("Trying to get {} of statuseval {}", eval_type, self.__status_eval)
             return_value = check_eval(self.__status_eval)
@@ -896,11 +1049,17 @@ class SeCondition(StateEngineTools.SeItemChild):
         elif self.__item is not None:
             # noinspection PyUnusedLocal
             self._log_debug("Trying to get {} of item {}", eval_type, self.__item.property.path)
-            return self.__item.property.last_change_age if eval_type == 'age' else \
-                self.__item.property.last_change_by if eval_type == 'changedby' else \
-                self.__item.property.last_update_by if eval_type == 'updatedby' else \
-                self.__item.property.last_trigger_by if eval_type == 'triggeredby' else \
-                self.__item.property.value
+            return (
+                self.__item.property.last_change_age
+                if eval_type == "age"
+                else self.__item.property.last_change_by
+                if eval_type == "changedby"
+                else self.__item.property.last_update_by
+                if eval_type == "updatedby"
+                else self.__item.property.last_trigger_by
+                if eval_type == "triggeredby"
+                else self.__item.property.value
+            )
         elif self.__eval is not None:
             self._log_debug("Trying to get {} of eval {}", eval_type, self.__eval)
             return_value = check_eval(self.__eval)

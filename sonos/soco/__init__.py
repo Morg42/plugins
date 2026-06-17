@@ -6,7 +6,6 @@
 # https://github.com/SoCo/SoCo/issues/98
 #
 
-
 import logging
 
 from .core import SoCo

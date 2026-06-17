@@ -39,19 +39,20 @@ class Ucast(socket.socket):
     """
     This class sets up a UDP unicast socket listener on local_port
     """
+
     def __init__(self, local_port):
-        socket.socket.__init__(self, socket.AF_INET,
-                               socket.SOCK_DGRAM, socket.IPPROTO_UDP)
+        socket.socket.__init__(self, socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         if hasattr(socket, "SO_REUSEPORT"):
             self.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEPORT, 1)
-        self.bind(('0.0.0.0', local_port))
+        self.bind(("0.0.0.0", local_port))
 
 
 class YamahaYXC(SmartPlugin):
     """
     This is the main plugin class YamahaYXC to control YXC-compatible devices.
     """
+
     PLUGIN_VERSION = "1.0.7"
     ALLOW_MULTIINSTANCE = False
 
@@ -68,14 +69,30 @@ class YamahaYXC(SmartPlugin):
         self.logger.info("Init YamahaYXC")
 
         # valid commands for use in item configuration 'yamahayxc_cmd = ...'
-        self._yamaha_cmds = ['state', 'power', 'input', 'playback', 'preset',
-                             'volume', 'mute', 'track', 'artist', 'sleep',
-                             'total_time', 'play_time', 'pos', 'albumart',
-                             'alarm_on', 'alarm_time', 'alarm_beep', 'passthru']
+        self._yamaha_cmds = [
+            "state",
+            "power",
+            "input",
+            "playback",
+            "preset",
+            "volume",
+            "mute",
+            "track",
+            "artist",
+            "sleep",
+            "total_time",
+            "play_time",
+            "pos",
+            "albumart",
+            "alarm_on",
+            "alarm_time",
+            "alarm_beep",
+            "passthru",
+        ]
 
         # commands to ignore when checking for return values
         # these commands don't get / can't process (simple) return values
-        self._yamaha_ignore_cmds_upd = ['state', 'preset', 'alarm_on', 'alarm_time', 'alarm_beep']
+        self._yamaha_ignore_cmds_upd = ["state", "preset", "alarm_on", "alarm_time", "alarm_beep"]
 
         # store items in 2D-array:
         # _yamaha_dev [host] [cmd] = item
@@ -97,7 +114,7 @@ class YamahaYXC(SmartPlugin):
         Main loop receives notifications and dispatches item updates
         based on notifications and triggers status updates.
         """
-        self._sh.trigger('YamahaYXC', self._initialize)
+        self._sh.trigger("YamahaYXC", self._initialize)
         self.logger.info("YamahaYXC starting listener")
         self.alive = True
         self.sock = Ucast(self.srv_port)
@@ -106,19 +123,17 @@ class YamahaYXC(SmartPlugin):
             try:
                 host, port = addr
             except Exception as e:
-                self.logger.warn(
-                    f"Error receiving data - host/port not readable: {e}")
+                self.logger.warn(f"Error receiving data - host/port not readable: {e}")
                 return
             if host not in list(self._yamaha_dev.keys()):
-                self.logger.debug(
-                    f"Received notify from unknown host {host}")
+                self.logger.debug(f"Received notify from unknown host {host}")
             else:
                 # connected device sends updates every second for
                 # about 10 minutes without further interaction
                 # self.logger.debug(
                 #     "Yamaha unicast received {} bytes from {}: {}".format(
                 #     len(data), host, data))
-                data = json.loads(data.decode('utf-8'))
+                data = json.loads(data.decode("utf-8"))
 
                 # need to find lowest-level cmds in nested dicts
                 # nesting is done by current zone and player
@@ -126,11 +141,11 @@ class YamahaYXC(SmartPlugin):
                 # in non-nested dict. this is quite a kludge as of now...
                 data_flat = {}
                 try:
-                    data_flat.update(data['main'])
+                    data_flat.update(data["main"])
                 except Exception:
                     pass
                 try:
-                    data_flat.update(data['netusb'])
+                    data_flat.update(data["netusb"])
                 except Exception:
                     pass
 
@@ -148,16 +163,14 @@ class YamahaYXC(SmartPlugin):
                             pass
 
                 # device told us new info is available?
-                if 'status_updated' in data_flat or 'play_info_updated' in data_flat:
+                if "status_updated" in data_flat or "play_info_updated" in data_flat:
                     # pull (full) status update from device
                     self._update_state(host)
 
                 # log possible play errors
-                if 'play_error' in data_flat:
-                    if data_flat['play_error'] > 0:
-                        self.logger.info(
-                            "Received netusb error {} from host {}".format(
-                                data_flat['play_error'], host))
+                if "play_error" in data_flat:
+                    if data_flat["play_error"] > 0:
+                        self.logger.info("Received netusb error {} from host {}".format(data_flat["play_error"], host))
         else:
             self.sock.close()
 
@@ -182,15 +195,14 @@ class YamahaYXC(SmartPlugin):
         with associated host and zone.
         Returns update function for the item (update_item())
         """
-        if 'yamahayxc_cmd' in item.conf:
+        if "yamahayxc_cmd" in item.conf:
             yamaha_host = self._lookup_host(item)
             self._add_host_info(yamaha_host)
             yamaha_zone = self._lookup_zone(item)
             self._yamaha_zone = yamaha_zone
-            yamaha_cmd = item.conf['yamahayxc_cmd'].lower()
+            yamaha_cmd = item.conf["yamahayxc_cmd"].lower()
             if yamaha_cmd not in self._yamaha_cmds:
-                self.logger.warn("{} not in valid commands: {}".format(
-                    yamaha_cmd, self._yamaha_cmds))
+                self.logger.warn("{} not in valid commands: {}".format(yamaha_cmd, self._yamaha_cmds))
                 return None
             else:
                 try:
@@ -210,21 +222,21 @@ class YamahaYXC(SmartPlugin):
         In any case _update_state is called afterwards to update sh.py items
         """
         if caller != "YamahaYXC" and self.alive:
-            yamaha_cmd = item.conf['yamahayxc_cmd']
+            yamaha_cmd = item.conf["yamahayxc_cmd"]
             yamaha_host = self._lookup_host(item)
             yamaha_payload = None
 
-            if yamaha_cmd == 'power':
+            if yamaha_cmd == "power":
                 yamaha_payload = self._build_cmd_power(item())
-            elif yamaha_cmd == 'volume':
+            elif yamaha_cmd == "volume":
                 yamaha_payload = self._build_cmd_volume(item())
-            elif yamaha_cmd == 'mute':
+            elif yamaha_cmd == "mute":
                 yamaha_payload = self._build_cmd_mute(item())
-            elif yamaha_cmd == 'input':
+            elif yamaha_cmd == "input":
                 yamaha_payload = self._build_cmd_input(item())
-            elif yamaha_cmd == 'playback':
+            elif yamaha_cmd == "playback":
                 yamaha_payload = self._build_cmd_playback(item())
-            elif yamaha_cmd == 'preset':
+            elif yamaha_cmd == "preset":
                 yamaha_payload = self._build_cmd_preset(item())
             elif yamaha_cmd == "sleep":
                 yamaha_payload = self._build_cmd_sleep(item())
@@ -255,8 +267,7 @@ class YamahaYXC(SmartPlugin):
         """
         self.logger.info("YamahaYXC now initializing current state")
         for yamaha_host in list(self._yamaha_hosts):
-            self.logger.info(
-                "Initializing items for host: {}".format(yamaha_host))
+            self.logger.info("Initializing items for host: {}".format(yamaha_host))
             self._update_state(yamaha_host, False)
 
     def _lookup_host(self, item):
@@ -266,7 +277,7 @@ class YamahaYXC(SmartPlugin):
         this does not work with nested items in item config, so don't nest items!
         """
         parent = item.return_parent()
-        yamaha_host = socket.gethostbyname(parent.conf['yamahayxc_host'])
+        yamaha_host = socket.gethostbyname(parent.conf["yamahayxc_host"])
         return yamaha_host
 
     def _lookup_zone(self, item):
@@ -279,7 +290,7 @@ class YamahaYXC(SmartPlugin):
         might become necessary -> rethink this approach then
         """
         parent = item.return_parent()
-        yamaha_zone = parent.conf['yamahayxc_zone']
+        yamaha_zone = parent.conf["yamahayxc_zone"]
         return yamaha_zone
 
     def _add_host_info(self, host):
@@ -400,43 +411,43 @@ class YamahaYXC(SmartPlugin):
         Needs valid cmd and value, no checking for None value
         called by self._return_value and self.run (push notify loop)
         """
-        if cmd == 'input':
+        if cmd == "input":
             return value
-        elif cmd == 'volume':
+        elif cmd == "volume":
             return int(value)
-        elif cmd == 'mute':
-            return value == 'true'
-        elif cmd == 'power':
-            if value == 'standby':
+        elif cmd == "mute":
+            return value == "true"
+        elif cmd == "power":
+            if value == "standby":
                 return False
-            elif value == 'on':
+            elif value == "on":
                 return True
             return value
-        elif cmd == 'playback':
+        elif cmd == "playback":
             return value
         elif cmd == "sleep":
             return value
-        elif cmd == 'track':
+        elif cmd == "track":
             return value
-        elif cmd == 'artist':
+        elif cmd == "artist":
             return value
-        elif cmd == 'play_time':
+        elif cmd == "play_time":
             if self.last_total == 0:
-                return (-1)
+                return -1
             else:
                 return int(100 * value / self.last_total)
-        elif cmd == 'total_time':
+        elif cmd == "total_time":
             self.last_total = int(value)
             return int(value)
-        elif cmd == 'albumart_url':
-            value = 'http://{}{}'.format(host, value)
+        elif cmd == "albumart_url":
+            value = "http://{}{}".format(host, value)
             return value
-        elif cmd == 'alarm_on':
-            return value == 'true'
-        elif cmd == 'alarm_time':
+        elif cmd == "alarm_on":
+            return value == "true"
+        elif cmd == "alarm_time":
             return value
-        elif cmd == 'alarm_beep':
-            if value == 'true':
+        elif cmd == "alarm_beep":
+            if value == "true":
                 return True
             else:
                 return False
@@ -465,12 +476,12 @@ class YamahaYXC(SmartPlugin):
         return data is None or a dict with json response data
         """
         if payload:
-
             if type(payload) is str:
                 url = "http://{}/YamahaExtendedControl/{}".format(host, payload)
                 headers = {
-                    'X-AppName': 'MusicCast/{}'.format(self.PLUGIN_VERSION),
-                    'X-AppPort': '{}'.format(self.srv_port)}
+                    "X-AppName": "MusicCast/{}".format(self.PLUGIN_VERSION),
+                    "X-AppPort": "{}".format(self.srv_port),
+                }
                 try:
                     res = requests.get(url, headers=headers)
                     response = res.text
@@ -485,8 +496,9 @@ class YamahaYXC(SmartPlugin):
                 else:
                     url = "http://{}/YamahaExtendedControl/{}".format(host, payload[0])
                     headers = {
-                        'X-AppName': 'MusicCast/{}'.format(self.PLUGIN_VERSION),
-                        'X-AppPort': '{}'.format(self.srv_port)}
+                        "X-AppName": "MusicCast/{}".format(self.PLUGIN_VERSION),
+                        "X-AppPort": "{}".format(self.srv_port),
+                    }
                     try:
                         res = requests.post(url, data=payload[1], headers=headers)
                         response = res.text
@@ -509,7 +521,7 @@ class YamahaYXC(SmartPlugin):
     # functions to create network commands
     #
 
-    def _build_cmd_power(self, value, cmd='PUT'):
+    def _build_cmd_power(self, value, cmd="PUT"):
         """
         return cmd string for "set power"
 
@@ -518,13 +530,13 @@ class YamahaYXC(SmartPlugin):
             False means "standby"
         """
         if value is True:
-            cmdarg = 'on'
+            cmdarg = "on"
         elif value is False:
-            cmdarg = 'standby'
+            cmdarg = "standby"
         cmd = "v1/{}/setPower?power={}".format(self._yamaha_zone, cmdarg)
         return cmd
 
-    def _build_cmd_input(self, value, cmd='PUT'):
+    def _build_cmd_input(self, value, cmd="PUT"):
         """
         return cmd string for "set input"
 
@@ -538,7 +550,7 @@ class YamahaYXC(SmartPlugin):
         cmd = "v1/{}/setInput?input={}".format(self._yamaha_zone, value)
         return cmd
 
-    def _build_cmd_volume(self, value, cmd='PUT'):
+    def _build_cmd_volume(self, value, cmd="PUT"):
         """
         return cmd string for "set volume"
 
@@ -547,14 +559,14 @@ class YamahaYXC(SmartPlugin):
         cmd = "v1/{}/setVolume?volume={}".format(self._yamaha_zone, value)
         return cmd
 
-    def _build_cmd_mute(self, value, cmd='PUT'):
+    def _build_cmd_mute(self, value, cmd="PUT"):
         """
         return cmd string for "set mute"
         """
         if value is True:
-            cmdarg = 'true'
+            cmdarg = "true"
         elif value is False:
-            cmdarg = 'false'
+            cmdarg = "false"
         cmd = "v1/{}/setMute?enable={}".format(self._yamaha_zone, cmdarg)
         return cmd
 
@@ -613,7 +625,7 @@ class YamahaYXC(SmartPlugin):
         cmd = "v1/netusb/recallPreset?zone=main&num={}".format(value)
         return cmd
 
-    def _build_cmd_sleep(self, value, cmd='PUT'):
+    def _build_cmd_sleep(self, value, cmd="PUT"):
         """
         return cmd string for "set sleep"
 
@@ -622,7 +634,7 @@ class YamahaYXC(SmartPlugin):
         cmd = "v1/{}/setSleep?sleep={}".format(self._yamaha_zone, value)
         return cmd
 
-    def _build_cmd_alarm_on(self, value, cmd='PUT'):
+    def _build_cmd_alarm_on(self, value, cmd="PUT"):
         """
         return cmd string for "switch alarm on/off"
 
@@ -630,9 +642,9 @@ class YamahaYXC(SmartPlugin):
         """
         cmd = "v1/clock/setAlarmSettings"
         data = json.dumps({"alarm_on": "true" if value else "false"})
-        return ([cmd, data])
+        return [cmd, data]
 
-    def _build_cmd_alarm_time(self, value, cmd='PUT'):
+    def _build_cmd_alarm_time(self, value, cmd="PUT"):
         """
         return cmd string for "set alarm_time"
 
@@ -640,9 +652,9 @@ class YamahaYXC(SmartPlugin):
         """
         cmd = "v1/clock/setAlarmSettings"
         data = json.dumps({"detail": {"day": "oneday", "time": value}})
-        return ([cmd, data])
+        return [cmd, data]
 
-    def _build_cmd_alarm_beep(self, value, cmd='PUT'):
+    def _build_cmd_alarm_beep(self, value, cmd="PUT"):
         """
         return cmd string for "set alarm beep"
 
@@ -650,4 +662,4 @@ class YamahaYXC(SmartPlugin):
         """
         cmd = "v1/clock/setAlarmSettings"
         data = json.dumps({"detail": {"day": "oneday", "beep": "true" if value else "false"}})
-        return ([cmd, data])
+        return [cmd, data]

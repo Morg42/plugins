@@ -406,9 +406,7 @@ class MusicLibrary:
         # pylint: disable=star-args
         return SearchResult(item_list, **metadata)
 
-    def browse_by_idstring(
-        self, search_type, idstring, start=0, max_items=100, full_album_art_uri=False
-    ):
+    def browse_by_idstring(self, search_type, idstring, start=0, max_items=100, full_album_art_uri=False):
         """Browse (get sub-elements from) a given music library item,
         specified by a string.
 
@@ -445,9 +443,7 @@ class MusicLibrary:
         search_uri = "#" + search_item_id
         # Not sure about the res protocol. But this seems to work
         res = [DidlResource(uri=search_uri, protocol_info="x-rincon-playlist:*:*:*")]
-        search_item = DidlObject(
-            resources=res, title="", parent_id="", item_id=search_item_id
-        )
+        search_item = DidlObject(resources=res, title="", parent_id="", item_id=search_item_id)
 
         # Call the base version
         return self.browse(search_item, start, max_items, full_album_art_uri)

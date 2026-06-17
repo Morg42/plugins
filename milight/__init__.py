@@ -22,7 +22,8 @@
 #########################################################################
 
 import logging
-#import threading
+
+# import threading
 import socket
 import time
 import colorsys
@@ -30,14 +31,14 @@ import colorsys
 from lib.module import Modules
 from lib.model.smartplugin import SmartPlugin, SmartPluginWebIf
 
-MILIGHT_SW          = 'milight_sw'
-MILIGHT_DIM         = 'milight_dim'
-MILIGHT_COL         = 'milight_col'
-MILIGHT_WHITE       = 'milight_white'
-MILIGHT_DISCO       = 'milight_disco'
-MILIGHT_DISCO_UP    = 'milight_disco_up'
-MILIGHT_DISCO_DOWN  = 'milight_disco_down'
-MILIGHT_RGB         = 'milight_rgb'
+MILIGHT_SW = "milight_sw"
+MILIGHT_DIM = "milight_dim"
+MILIGHT_COL = "milight_col"
+MILIGHT_WHITE = "milight_white"
+MILIGHT_DISCO = "milight_disco"
+MILIGHT_DISCO_UP = "milight_disco_up"
+MILIGHT_DISCO_DOWN = "milight_disco_down"
+MILIGHT_RGB = "milight_rgb"
 
 
 class Milight(SmartPlugin):
@@ -46,10 +47,19 @@ class Milight(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '1.6.1'
-    
+    PLUGIN_VERSION = "1.6.1"
+
     # tags this plugin handles
-    ITEM_TAGS = [MILIGHT_SW,MILIGHT_DIM,MILIGHT_COL, MILIGHT_WHITE, MILIGHT_DISCO, MILIGHT_DISCO_UP, MILIGHT_DISCO_DOWN, MILIGHT_RGB]
+    ITEM_TAGS = [
+        MILIGHT_SW,
+        MILIGHT_DIM,
+        MILIGHT_COL,
+        MILIGHT_WHITE,
+        MILIGHT_DISCO,
+        MILIGHT_DISCO_UP,
+        MILIGHT_DISCO_DOWN,
+        MILIGHT_RGB,
+    ]
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -64,42 +74,43 @@ class Milight(SmartPlugin):
 
         """
         from bin.smarthome import VERSION
-        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
+
+        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
             self.logger = logging.getLogger(__name__)
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
         #   self.param1 = self.get_parameter_value('param1')
-        self.udp_ip = self.get_parameter_value('udp_ip')
-        self.udp_port = self.get_parameter_value('udp_port')
+        self.udp_ip = self.get_parameter_value("udp_ip")
+        self.udp_port = self.get_parameter_value("udp_port")
 
-        self.hue_calibrate = self.get_parameter_value('hue_calibrate')
-        self.white_calibrate = self.get_parameter_value('white_calibrate')
-        
+        self.hue_calibrate = self.get_parameter_value("hue_calibrate")
+        self.white_calibrate = self.get_parameter_value("white_calibrate")
+
         # old:  True will change color and brightness --> 'HUE_AND_LUM' (default)
         #       False will change only color --> 'HUE'
-        self.bricontrol = False if self.get_parameter_value('bricontrol') == 'HUE' else True
-        
-        self.cutoff = self.get_parameter_value('cutoff')
+        self.bricontrol = False if self.get_parameter_value("bricontrol") == "HUE" else True
+
+        self.cutoff = self.get_parameter_value("cutoff")
 
         # Initialization code goes here
 
-        self.color_map = {             # for reference and future use
-            'violet': 0x00,
-            'royal_blue': 0x10,
-            'baby_blue': 0x20,
-            'aqua': 0x30,
-            'mint': 0x40,
-            'seafoam_green': 0x50,
-            'green': 0x60,
-            'lime_green': 0x70,
-            'yellow': 0x80,
-            'yellow_orange': 0x90,
-            'orange': 0xA0,
-            'red': 0xB0,
-            'pink': 0xC0,
-            'fusia': 0xD0,
-            'lilac': 0xE0,
-            'lavendar': 0xF0
+        self.color_map = {  # for reference and future use
+            "violet": 0x00,
+            "royal_blue": 0x10,
+            "baby_blue": 0x20,
+            "aqua": 0x30,
+            "mint": 0x40,
+            "seafoam_green": 0x50,
+            "green": 0x60,
+            "lime_green": 0x70,
+            "yellow": 0x80,
+            "yellow_orange": 0x90,
+            "orange": 0xA0,
+            "red": 0xB0,
+            "pink": 0xC0,
+            "fusia": 0xD0,
+            "lilac": 0xE0,
+            "lavendar": 0xF0,
         }
 
         self.on_all = bytearray([0x42, 0x00, 0x55])
@@ -143,26 +154,23 @@ class Milight(SmartPlugin):
         """
         self.logger.debug("use UDP {}:{} to send data {}".format(self.udp_ip, self.udp_port, data_s))
         try:
-            family, type, proto, canonname, sockaddr = socket.getaddrinfo(
-                self.udp_ip, self.udp_port)[0]
+            family, type, proto, canonname, sockaddr = socket.getaddrinfo(self.udp_ip, self.udp_port)[0]
             sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            if self.udp_ip == '255.255.255.255':
+            if self.udp_ip == "255.255.255.255":
                 sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
             sock.sendto(data_s, (sockaddr[0], sockaddr[1]))
             sock.close()
-            del(sock)
+            del sock
         except Exception as e:
-            self.logger.warning(
-                "miLight UDP: Problem '{}' sending data to {}:{}".format(e, self.udp_ip, self.udp_port))
+            self.logger.warning("miLight UDP: Problem '{}' sending data to {}:{}".format(e, self.udp_ip, self.udp_port))
             pass
         else:
-            self.logger.debug("miLight UDP: Sending data to {}:{}:{} ".format(
-                self.udp_ip, self.udp_port, data_s))
+            self.logger.debug("miLight UDP: Sending data to {}:{}:{} ".format(self.udp_ip, self.udp_port, data_s))
 
     # on/off switch function  - to switch on off anused before update  brightness / color / disco
     def switch(self, group, value):
 
-        if group == 0:             # group 0 represents all groups
+        if group == 0:  # group 0 represents all groups
             if value == 0:
                 data_s = self.off_all
             else:
@@ -192,23 +200,23 @@ class Milight(SmartPlugin):
             else:
                 data_s = self.on_ch4
 
-        self.send(data_s)           # call UDP send
-        
+        self.send(data_s)  # call UDP send
+
     # dimmer function  - 2nd command after switch (on)
     def dim(self, group, value):
 
-        time.sleep(0.1)             # wait 100 ms
+        time.sleep(0.1)  # wait 100 ms
         self.logger.info(value)
-        value = int(value / 8.0)    # for compliance with KNX DPT5
+        value = int(value / 8.0)  # for compliance with KNX DPT5
         self.logger.info(value)
         data_s = self.brightness
-        data_s[1] = value           # set Brightness
-        self.send(data_s)           # call UDP to send WHITE if switched on
-        
-    # color function  
+        data_s[1] = value  # set Brightness
+        self.send(data_s)  # call UDP to send WHITE if switched on
+
+    # color function
     def col(self, group, value):
 
-        if group == 0:              # group 0 represents all groups
+        if group == 0:  # group 0 represents all groups
             data_s = self.on_all
 
         if group == 1:
@@ -223,18 +231,18 @@ class Milight(SmartPlugin):
         if group == 4:
             data_s = self.on_ch4
 
-        self.send(data_s)           # call UDP send   to switch on/off
+        self.send(data_s)  # call UDP send   to switch on/off
 
-        time.sleep(0.1)             # wait 100 ms
+        time.sleep(0.1)  # wait 100 ms
 
         data_s = self.color
-        data_s[1] = value           # set Color
-        self.send(data_s)           # call UDP to send WHITE if switched on
-        
+        data_s[1] = value  # set Color
+        self.send(data_s)  # call UDP to send WHITE if switched on
+
     # white function  - 2nd command after switch (on)
     def white(self, group, value):
 
-        time.sleep(0.1)               # wait 100 ms
+        time.sleep(0.1)  # wait 100 ms
 
         if value == 1:
             if group == 1:
@@ -245,31 +253,31 @@ class Milight(SmartPlugin):
                 data_s = self.white_ch3
             if group == 4:
                 data_s = self.white_ch4
-            self.send(data_s)        # call UDP to send WHITE if switched on
+            self.send(data_s)  # call UDP to send WHITE if switched on
 
     # disco function  - 2nd command after switch (on)
     def disco(self, group, value):
         self.logger.info("disco")
-        time.sleep(0.1)               # wait 100 ms
+        time.sleep(0.1)  # wait 100 ms
 
         data_s = self.discoon
         self.logger.info(data_s)
         self.send(data_s)
-        
+
     # disco speed up  - 2nd command after switch (on)
     def disco_up(self, group, value):
         self.logger.info("disco up")
-        time.sleep(0.1)               # wait 100 ms
+        time.sleep(0.1)  # wait 100 ms
 
         data_s = self.discoup
         self.logger.info(data_s)
-        self.send(data_s) 
-        
+        self.send(data_s)
+
     # disco speed down - 2nd command after switch (on)
     def disco_down(self, group, value):
-        self.logger.info("disco down")      # Avoid switch off
+        self.logger.info("disco down")  # Avoid switch off
 
-        time.sleep(0.1)               # wait 100 ms
+        time.sleep(0.1)  # wait 100 ms
 
         data_s = self.discodown
         self.logger.info(data_s)
@@ -279,22 +287,21 @@ class Milight(SmartPlugin):
     def huecalc(self, value):
         offset = 0.3 + float(self.hue_calibrate)
 
-        re= value[0] / (255.0)
-        gn= value[1] / (255.0)
-        bl= value[2] / (255.0)
-
+        re = value[0] / (255.0)
+        gn = value[1] / (255.0)
+        bl = value[2] / (255.0)
 
         # trying HLS model for brightnes optimization
-        hls =  colorsys.rgb_to_hls(re, gn, bl)
-        self.hue =  hls[0]+offset
+        hls = colorsys.rgb_to_hls(re, gn, bl)
+        self.hue = hls[0] + offset
         if self.hue > 1:
             self.hue = self.hue - 1
-           
-        self.hue = ((1-self.hue)*255)
+
+        self.hue = (1 - self.hue) * 255
         if re != gn:
-            self.hue =self.hue+0.001
-        self.lum = hls[1] *255
-        self.sat =  hls[1]
+            self.hue = self.hue + 0.001
+        self.lum = hls[1] * 255
+        self.sat = hls[1]
 
     def stop(self):
         """
@@ -316,7 +323,16 @@ class Milight(SmartPlugin):
                         with the item, caller, source and dest as arguments and in case of the knx plugin the value
                         can be sent to the knx with a knx write function within the knx plugin.
         """
-        for elem in [MILIGHT_SW, MILIGHT_DIM, MILIGHT_COL, MILIGHT_WHITE, MILIGHT_DISCO, MILIGHT_DISCO_UP, MILIGHT_DISCO_DOWN, MILIGHT_RGB]:
+        for elem in [
+            MILIGHT_SW,
+            MILIGHT_DIM,
+            MILIGHT_COL,
+            MILIGHT_WHITE,
+            MILIGHT_DISCO,
+            MILIGHT_DISCO_UP,
+            MILIGHT_DISCO_DOWN,
+            MILIGHT_RGB,
+        ]:
             if self.has_iattr(item.conf, elem):
                 return self.update_item
 
@@ -338,83 +354,83 @@ class Milight(SmartPlugin):
             self.logger.info("Update item: {}, item has been changed outside this plugin".format(item.property.path))
 
             if self.has_iattr(item.conf, MILIGHT_SW):
-                channels=self.get_iattr_value(item.conf, MILIGHT_SW)
+                channels = self.get_iattr_value(item.conf, MILIGHT_SW)
                 for channel in channels:
                     self.logger.info("miLight switching channel: {0}".format(channel))
                     group = int(channel)
-                    #logger.info(item())
+                    # logger.info(item())
                     self.switch(group, item())
 
             if self.has_iattr(item.conf, MILIGHT_DIM):
-                channels=self.get_iattr_value(item.conf, MILIGHT_DIM)
+                channels = self.get_iattr_value(item.conf, MILIGHT_DIM)
                 for channel in channels:
                     self.logger.info("miLight dimming channel: {0}".format(channel))
                     group = int(channel)
-                    #logger.info(item())
+                    # logger.info(item())
                     self.switch(group, item())
                     self.dim(group, item())
 
             if self.has_iattr(item.conf, MILIGHT_COL):
-                channels=self.get_iattr_value(item.conf, MILIGHT_COL)
+                channels = self.get_iattr_value(item.conf, MILIGHT_COL)
                 for channel in channels:
                     self.logger.info("miLight HUE channel: {0}".format(channel))
                     group = int(channel)
-                    #logger.info(item())
+                    # logger.info(item())
                     self.col(group, item())
 
             if self.has_iattr(item.conf, MILIGHT_WHITE):
-                channels=self.get_iattr_value(item.conf, MILIGHT_WHITE)
+                channels = self.get_iattr_value(item.conf, MILIGHT_WHITE)
                 for channel in channels:
                     self.logger.info("miLight set white channel: {0}".format(channel))
                     group = int(channel)
-                    #logger.info(item())
+                    # logger.info(item())
                     self.switch(group, item())
                     self.white(group, item())
 
             if self.has_iattr(item.conf, MILIGHT_DISCO):
-                channels=self.get_iattr_value(item.conf, MILIGHT_DISCO)
+                channels = self.get_iattr_value(item.conf, MILIGHT_DISCO)
                 for channel in channels:
                     self.logger.info("miLight disco channel: {0}".format(channel))
                     group = int(channel)
-                    #logger.info(item())
+                    # logger.info(item())
                     self.switch(group, item())
                     self.disco(group, item())
 
             if self.has_iattr(item.conf, MILIGHT_DISCO_UP):
-                channels=self.get_iattr_value(item.conf, MILIGHT_DISCO_UP)
+                channels = self.get_iattr_value(item.conf, MILIGHT_DISCO_UP)
                 for channel in channels:
                     self.logger.info("miLight increase disco speed channel: {0}".format(channel))
                     group = int(channel)
-                    #logger.info(item())
+                    # logger.info(item())
                     self.switch(group, item())
                     self.disco_up(group, item())
 
             if self.has_iattr(item.conf, MILIGHT_DISCO_DOWN):
-                channels=self.get_iattr_value(item.conf, MILIGHT_DISCO_DOWN)
+                channels = self.get_iattr_value(item.conf, MILIGHT_DISCO_DOWN)
                 for channel in channels:
                     self.logger.info("miLight decrease disco speed channel: {0}".format(channel))
                     group = int(channel)
-                    #logger.info(item())
+                    # logger.info(item())
                     self.switch(group, item())
                     self.disco_down(group, item())
 
             if self.has_iattr(item.conf, MILIGHT_RGB):
-                channels=self.get_iattr_value(item.conf, MILIGHT_RGB)
+                channels = self.get_iattr_value(item.conf, MILIGHT_RGB)
                 for channel in channels:
                     self.logger.info("miLight RGB input for  channel: {0}".format(channel))
                     group = int(channel)
-                    #logger.info(item())
+                    # logger.info(item())
 
                     self.switch(group, 1)
-                    self.huecalc (item())
+                    self.huecalc(item())
                     self.logger.info("miLight HUE: {0}".format(self.hue))
                     self.logger.info("miLight LUM: {0}".format(self.lum))
                     calibrate = 178.5 + int(self.white_calibrate)
                     if self.hue == calibrate:
-                            self.white (group,1)
-                    else: 
-                            self.hue=int(self.hue)
-                            self.col(group, self.hue)
+                        self.white(group, 1)
+                    else:
+                        self.hue = int(self.hue)
+                        self.col(group, self.hue)
                     if self.bricontrol:
                         if self.lum <= float(self.cutoff):
                             self.switch(group, 0)
@@ -422,16 +438,14 @@ class Milight(SmartPlugin):
                             self.switch(group, 1)
                             self.dim(group, self.lum)
 
-
     def init_webinterface(self):
-        """"
+        """ "
         Initialize the web interface for this plugin
 
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
@@ -439,28 +453,29 @@ class Milight(SmartPlugin):
             return False
 
         import sys
-        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
+
+        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
+        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
         config = {
-            '/': {
-                'tools.staticdir.root': webif_dir,
+            "/": {
+                "tools.staticdir.root": webif_dir,
             },
-            '/static': {
-                'tools.staticdir.on': True,
-                'tools.staticdir.dir': 'static'
-            }
+            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
         }
 
         # Register the web interface as a cherrypy app
-        self.mod_http.register_webif(WebInterface(webif_dir, self),
-                                     self.get_shortname(),
-                                     config,
-                                     self.get_classname(), self.get_instance_name(),
-                                     description='')
+        self.mod_http.register_webif(
+            WebInterface(webif_dir, self),
+            self.get_shortname(),
+            config,
+            self.get_classname(),
+            self.get_instance_name(),
+            description="",
+        )
 
         return True
 
@@ -474,7 +489,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -498,10 +512,9 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
         return tmpl.render(p=self.plugin)
-
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -515,9 +528,9 @@ class WebInterface(SmartPluginWebIf):
         """
         if dataSet is None:
             # get the new data
-            #self.plugin.beodevices.update_devices_info()
+            # self.plugin.beodevices.update_devices_info()
 
             # return it as json the the web page
-            #return json.dumps(self.plugin.beodevices.beodeviceinfo)
+            # return json.dumps(self.plugin.beodevices.beodeviceinfo)
             pass
         return

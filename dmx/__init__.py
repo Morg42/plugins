@@ -29,12 +29,13 @@ import threading
 
 try:
     import serial
+
     REQUIRED_PACKAGE_IMPORTED = True
 except Exception:
     REQUIRED_PACKAGE_IMPORTED = False
 
 # _dim = 10^((n-1)/(253/3)-1) by JNK from KNX UF
-#_dim = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 12, 12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25, 26, 26, 27, 28, 29, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48, 50, 51, 52, 54, 55, 57, 58, 60, 62, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 86, 88, 90, 93, 95, 98, 101, 104, 106, 109, 112, 115, 119, 122, 125, 129, 132, 136, 140, 144, 148, 152, 156, 160, 165, 169, 174, 179, 184, 189, 194, 199, 205, 211, 216, 222, 228, 235, 241, 248, 255 ]
+# _dim = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 8, 8, 8, 8, 8, 9, 9, 9, 9, 10, 10, 10, 10, 11, 11, 11, 12, 12, 12, 13, 13, 13, 14, 14, 14, 15, 15, 16, 16, 17, 17, 18, 18, 19, 19, 20, 20, 21, 21, 22, 22, 23, 24, 24, 25, 26, 26, 27, 28, 29, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 46, 47, 48, 50, 51, 52, 54, 55, 57, 58, 60, 62, 63, 65, 67, 69, 71, 73, 75, 77, 79, 81, 83, 86, 88, 90, 93, 95, 98, 101, 104, 106, 109, 112, 115, 119, 122, 125, 129, 132, 136, 140, 144, 148, 152, 156, 160, 165, 169, 174, 179, 184, 189, 194, 199, 205, 211, 216, 222, 228, 235, 241, 248, 255 ]
 
 
 class DMX(SmartPlugin):
@@ -43,7 +44,7 @@ class DMX(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '1.6.0'
+    PLUGIN_VERSION = "1.6.0"
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -75,15 +76,15 @@ class DMX(SmartPlugin):
             return
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
-        self._serialport = self.get_parameter_value('serialport')
-        self._interface = self.get_parameter_value('interface')
+        self._serialport = self.get_parameter_value("serialport")
+        self._interface = self.get_parameter_value("interface")
 
         # Initialization code goes here
         self._dmx_items = []
         self._is_connected = False
         self._lock = threading.Lock()
 
-        if self._interface == 'development_only':
+        if self._interface == "development_only":
             self._is_connected = True
             self.send = self._send_development_only
         else:
@@ -96,18 +97,16 @@ class DMX(SmartPlugin):
             else:
                 self._is_connected = True
 
-
-            if self._interface == 'nanodmx':
+            if self._interface == "nanodmx":
                 self.send = self.send_nanodmx
                 if not self._send_nanodmx("C?"):
                     self.logger.warning("Could not communicate with dmx adapter.")
                     self._is_connected = False
-            elif self._interface == 'enttec':
+            elif self._interface == "enttec":
                 self._enttec_data = bytearray(512)
                 self.send = self.send_enttec
             else:
                 self.logger.error("Unknown interface: {0}".format(self._interface))
-
 
         # The following part of the __init__ method is only needed, if a webinterface is being implemented:
 
@@ -129,7 +128,7 @@ class DMX(SmartPlugin):
             ret = False
         finally:
             self._lock.release()
-        if ret == b'G':
+        if ret == b"G":
             return True
         else:
             return False
@@ -150,12 +149,12 @@ class DMX(SmartPlugin):
         END_VAL = 0xE7
 
         LABELS = {
-           'GET_WIDGET_PARAMETERS' :3,  #unused
-           'SET_WIDGET_PARAMETERS' :4,  #unused
-           'RX_DMX_PACKET'         :5,  #unused
-           'TX_DMX_PACKET'         :6,
-           'TX_RDM_PACKET_REQUEST' :7,  #unused
-           'RX_DMX_ON_CHANGE'      :8,  #unused
+            "GET_WIDGET_PARAMETERS": 3,  # unused
+            "SET_WIDGET_PARAMETERS": 4,  # unused
+            "RX_DMX_PACKET": 5,  # unused
+            "TX_DMX_PACKET": 6,
+            "TX_RDM_PACKET_REQUEST": 7,  # unused
+            "RX_DMX_ON_CHANGE": 8,  # unused
         }
 
         START_DATA = 0x00
@@ -164,7 +163,7 @@ class DMX(SmartPlugin):
 
         packet = bytearray()
         packet.append(START_VAL)
-        packet.append(LABELS['TX_DMX_PACKET'])
+        packet.append(LABELS["TX_DMX_PACKET"])
         packet.append(len(self._enttec_data) & 0xFF)
         packet.append((len(self._enttec_data) >> 8) & 0xFF)
         packet.append(START_DATA)
@@ -172,7 +171,6 @@ class DMX(SmartPlugin):
         packet.append(END_VAL)
 
         self._send_enttec(packet)
-
 
     def run(self):
         """
@@ -203,14 +201,16 @@ class DMX(SmartPlugin):
                         with the item, caller, source and dest as arguments and in case of the knx plugin the value
                         can be sent to the knx with a knx write function within the knx plugin.
         """
-        if self.has_iattr(item.conf, 'dmx_ch'):
+        if self.has_iattr(item.conf, "dmx_ch"):
             self.logger.debug("parse item found item: {}".format(item))
             self._dmx_items.append(item)
-            channels = self.get_iattr_value(item.conf, 'dmx_ch')
+            channels = self.get_iattr_value(item.conf, "dmx_ch")
             if isinstance(channels, str):
-                channels = [channels, ]
+                channels = [
+                    channels,
+                ]
             channels = list(map(int, channels))
-            item.conf['dmx_ch'] = channels
+            item.conf["dmx_ch"] = channels
             return self.update_item
         else:
             return None
@@ -232,26 +232,24 @@ class DMX(SmartPlugin):
             # code to execute, only if the item has not been changed by this plugin:
             self.logger.info("Update item: {}, item has been changed outside this plugin".format(item.property.path))
 
-            if self.has_iattr(item.conf, 'dmx_ch'):
+            if self.has_iattr(item.conf, "dmx_ch"):
                 self.logger.debug(
-                    "update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(item,
-                                                                                                               caller,
-                                                                                                               source,
-                                                                                                               dest))
-                channels = self.get_iattr_value(item.conf, 'dmx_ch')
+                    "update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(
+                        item, caller, source, dest
+                    )
+                )
+                channels = self.get_iattr_value(item.conf, "dmx_ch")
                 for channel in channels:
                     self.send(channel, int(item()))
 
-
     def init_webinterface(self):
-        """"
+        """ "
         Initialize the web interface for this plugin
 
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
@@ -259,28 +257,29 @@ class DMX(SmartPlugin):
             return False
 
         import sys
-        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
+
+        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.5 and up. Not initializing the web interface")
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
+        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
         config = {
-            '/': {
-                'tools.staticdir.root': webif_dir,
+            "/": {
+                "tools.staticdir.root": webif_dir,
             },
-            '/static': {
-                'tools.staticdir.on': True,
-                'tools.staticdir.dir': 'static'
-            }
+            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
         }
 
         # Register the web interface as a cherrypy app
-        self.mod_http.register_webif(WebInterface(webif_dir, self),
-                                     self.get_shortname(),
-                                     config,
-                                     self.get_classname(), self.get_instance_name(),
-                                     description='')
+        self.mod_http.register_webif(
+            WebInterface(webif_dir, self),
+            self.get_shortname(),
+            config,
+            self.get_classname(),
+            self.get_instance_name(),
+            description="",
+        )
 
         return True
 
@@ -292,8 +291,8 @@ class DMX(SmartPlugin):
 import cherrypy
 from jinja2 import Environment, FileSystemLoader
 
-class WebInterface(SmartPluginWebIf):
 
+class WebInterface(SmartPluginWebIf):
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -317,10 +316,15 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin, serialport=self.plugin._serialport, interface = self.plugin._interface, item_count = len(self.plugin._dmx_items), items = self.plugin._dmx_items)
-
+        return tmpl.render(
+            p=self.plugin,
+            serialport=self.plugin._serialport,
+            interface=self.plugin._interface,
+            item_count=len(self.plugin._dmx_items),
+            items=self.plugin._dmx_items,
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -334,9 +338,9 @@ class WebInterface(SmartPluginWebIf):
         """
         if dataSet is None:
             # get the new data
-            #self.plugin.beodevices.update_devices_info()
+            # self.plugin.beodevices.update_devices_info()
 
             # return it as json the the web page
-            #return json.dumps(self.plugin.beodevices.beodeviceinfo)
+            # return json.dumps(self.plugin.beodevices.beodeviceinfo)
             pass
         return

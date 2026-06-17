@@ -3,7 +3,7 @@
 #########################################################################
 #  Copyright 2020-2021 Bernd Meiners                Bernd.Meiners@mail.de
 #########################################################################
-#  This file is part of SmartHomeNG.py.  
+#  This file is part of SmartHomeNG.py.
 #  Visit:  https://github.com/smarthomeNG/
 #          https://knx-user-forum.de/forum/supportforen/smarthome-py
 #
@@ -30,11 +30,13 @@ import xmltodict
 
 logger = logging.getLogger("knxproject")
 
+
 def int_to_lvl3_groupaddress(ga):
-    """ converts an given integer into a string representing a three level group address """
+    """converts an given integer into a string representing a three level group address"""
     if ga <= 0 or ga > 32767:
         raise ValueError("Given Integer not in range for a valid group address")
-    return "{0}/{1}/{2}".format((ga >> 11) & 0x1f, (ga >> 8) & 0x07, (ga) & 0xff)
+    return "{0}/{1}/{2}".format((ga >> 11) & 0x1F, (ga >> 8) & 0x07, (ga) & 0xFF)
+
 
 def is_knxproject(filename):
     """
@@ -43,13 +45,14 @@ def is_knxproject(filename):
     if not zipfile.is_zipfile(filename):
         return False
 
-    knxproj = zipfile.ZipFile(filename, 'r')
+    knxproj = zipfile.ZipFile(filename, "r")
     for file in knxproj.filelist:
         if file.filename == "knx_master.xml":
             break
     else:
         return False
     return True
+
 
 def parse_projectfile(filename, password=None):
     """
@@ -64,16 +67,17 @@ def parse_projectfile(filename, password=None):
 
     return _parse_esfproject(filename)
 
+
 def _parse_esfproject(filename):
     """
     Parses the content from a esf file which is a result of an export from ETS
-    
+
     File structure is like the following:
     ```
     Projectname
     main.middle.ga       \t    name        \t   type description        \t priority  \t    listen to
     ```
-    example 
+    example
     ```
     central.lights.0/0/1            \t lights hallway                   \t EIS 1 'Switching' (1 Bit)            \t Low  \t
     central.dimming.1/2/40          \t main lights parents              \t EIS 2 'Dimming - control' (4 Bit)    \t Low  \t
@@ -103,30 +107,32 @@ def _parse_esfproject(filename):
     14          EIS 15 'Zeichenkette' (14 Byte)
     15          Unbekannt
     """
-    f = open(filename, 'r', encoding="iso-8859-15")
+    f = open(filename, "r", encoding="iso-8859-15")
     projectname = f.readline()
     logger.debug("Start parsing Project '{0}' from file {1}".format(projectname, filename))
     GAs = {}
 
     for line in f.readlines():
-        columns = line.split('\t')
+        columns = line.split("\t")
 
         # now in the first column there is a compound object main.middle.ga
         # unfortunately we can not be sure that within main or middle there are no more  . or /
         # thus we need to find the rightmost . and separate the main and middle from the ga
-        subcolumn = columns[0].split('.')
+        subcolumn = columns[0].split(".")
         if len(subcolumn) == 3 and len(columns) >= 4:
             ga = subcolumn[2]
-            GAs[ga] = { "Id":"", 
-                "HG" : subcolumn[0], 
-                "MG" : subcolumn[1], 
-                "Name": columns[1], 
-                "Description": "", 
-                "Comment": "", 
-                "DatapointType": columns[2], 
+            GAs[ga] = {
+                "Id": "",
+                "HG": subcolumn[0],
+                "MG": subcolumn[1],
+                "Name": columns[1],
+                "Description": "",
+                "Comment": "",
+                "DatapointType": columns[2],
                 "Puid": "",
                 "Priority": columns[3],
-                "Listen": columns[4] }      # keep as string if present
+                "Listen": columns[4],
+            }  # keep as string if present
         else:
             logger.debug("Codierungsfehler in {} gefunden --> ignoriert!".format(columns[0]))
     f.close()
@@ -180,29 +186,29 @@ def _parse_knxproject(filename, password=None):
     </Project>
     </KNX>
     ```
-    
-    
+
+
     """
     # Zipfiles can have an empty password though it does not make sense except for confusion
-    if password is None: 
-        password = ''
+    if password is None:
+        password = ""
 
     if isinstance(password, str):
         password = password.encode()
 
     xmldict = {}
 
-    knxproj = zipfile.ZipFile(filename, 'r')
+    knxproj = zipfile.ZipFile(filename, "r")
 
     # see which project files can be found
     subprojects = []
     for file in knxproj.filelist:
         logger.debug(f"File: {file}")
-        if file.filename[0] != 'P':
+        if file.filename[0] != "P":
             continue
 
         # According to Project Schema Description, page 41 future files can be named [0...16].xml
-        if file.filename.split("/")[-1] != '0.xml':
+        if file.filename.split("/")[-1] != "0.xml":
             continue
         subprojects.append(file)
         logger.debug("Subfile '{}' found".format(file))
@@ -210,11 +216,11 @@ def _parse_knxproject(filename, password=None):
     zipped_subprojects = []
     for file in knxproj.filelist:
         print(file)
-        if file.filename[0] != 'P':
+        if file.filename[0] != "P":
             continue
 
         # According to Project Schema Description, page 41 future files can be named [0...16].xml
-        if not file.filename.endswith('.zip'):
+        if not file.filename.endswith(".zip"):
             continue
         zipped_subprojects.append(file)
         logger.debug("Zipped Subfile '{}' found".format(file))
@@ -229,14 +235,14 @@ def _parse_knxproject(filename, password=None):
         return None
 
     xmlfile = None
-    
-    if (len(subprojects) == 0):
+
+    if len(subprojects) == 0:
         zipped_subproject = knxproj.open(zipped_subprojects[0].filename)
-        subproject = zipfile.ZipFile(zipped_subproject, 'r')
+        subproject = zipfile.ZipFile(zipped_subproject, "r")
         logger.debug(f"subproject is {subproject}")
         for file in subproject.filelist:
             # According to Project Schema Description, page 41 future files can be named [0...16].xml
-            if file.filename.split("/")[-1] != '0.xml':
+            if file.filename.split("/")[-1] != "0.xml":
                 continue
             try:
                 xmlfile = subproject.open(file.filename, pwd=password)
@@ -258,10 +264,12 @@ def _parse_knxproject(filename, password=None):
     try:
         ga_dict = xmldict["KNX"]["Project"]["Installations"]["Installation"]["GroupAddresses"]["GroupRanges"]
         if ga_dict is None:
-            logger.warning("No Group Ranges found. Please forward this info along with knxproj file to the author for problem search")
+            logger.warning(
+                "No Group Ranges found. Please forward this info along with knxproj file to the author for problem search"
+            )
             return GAs
 
-        top = ga_dict.get('GroupRange',None)
+        top = ga_dict.get("GroupRange", None)
         if top is None:
             return GAs
 
@@ -274,42 +282,42 @@ def _parse_knxproject(filename, password=None):
             main_ga = top
 
         for middle in main_ga:
-            middle_dict = middle.get('GroupRange',None)
+            middle_dict = middle.get("GroupRange", None)
             if middle_dict is None:
                 continue
 
-            if not isinstance( middle_dict, list):
+            if not isinstance(middle_dict, list):
                 # same as above
                 middle_ga = [middle_dict]
             else:
                 middle_ga = middle_dict
 
             for last in middle_ga:
-                last_dict = last.get('GroupAddress', None)
+                last_dict = last.get("GroupAddress", None)
 
                 if last_dict is None:
                     continue
 
-                if not isinstance( last_dict, list):
+                if not isinstance(last_dict, list):
                     # same as above
                     last_ga = [last_dict]
                 else:
                     last_ga = last_dict
 
                 for ga_dict in last_ga:
-                        ga = ga_dict.get("@Address")
-                        if ga:
-                            ga = int_to_lvl3_groupaddress(int(ga))
-                            GAs[ga] = {"Id": ga_dict.get("@Id"), 
-                                "HG": middle.get("@Name"), 
-                                "MG": last.get("@Name"), 
-                                "Name": ga_dict.get("@Name"), 
-                                "Description": ga_dict.get("@Description"), 
-                                "Comment": ga_dict.get("@Comment"), 
-                                "DatapointType": ga_dict.get("@DatapointType"), 
-                                "Puid": ga_dict.get("@Puid")}
-    except Exception as e: 
+                    ga = ga_dict.get("@Address")
+                    if ga:
+                        ga = int_to_lvl3_groupaddress(int(ga))
+                        GAs[ga] = {
+                            "Id": ga_dict.get("@Id"),
+                            "HG": middle.get("@Name"),
+                            "MG": last.get("@Name"),
+                            "Name": ga_dict.get("@Name"),
+                            "Description": ga_dict.get("@Description"),
+                            "Comment": ga_dict.get("@Comment"),
+                            "DatapointType": ga_dict.get("@DatapointType"),
+                            "Puid": ga_dict.get("@Puid"),
+                        }
+    except Exception as e:
         print("Error {} occurred".format(e))
     return GAs
-
-

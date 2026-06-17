@@ -70,12 +70,14 @@ import asyncio
 try:
     from aiohttp import ClientSession, ClientTimeout, web
 except ImportError as error:
-    print("""ImportError: {}:
+    print(
+        """ImportError: {}:
     Use of the SoCo events_asyncio module requires the 'aiohttp'
     package and its dependencies to be installed. aiohttp is not
     installed with SoCo by default due to potential issues installing
     the dependencies 'multidict' and 'yarl' on some platforms.
-    See: https://github.com/SoCo/SoCo/issues/819""".format(error))
+    See: https://github.com/SoCo/SoCo/issues/819""".format(error)
+    )
     sys.exit(1)
 
 # Event is imported for compatibility with events.py
@@ -127,9 +129,7 @@ class EventNotifyHandler(EventNotifyHandlerBase):
             if "x-sonos-http" in content:
                 # parse_event_xml will generate I/O if
                 # x-sonos-http is in the content
-                variables = await asyncio.get_event_loop().run_in_executor(
-                    None, parse_event_xml, content
-                )
+                variables = await asyncio.get_event_loop().run_in_executor(None, parse_event_xml, content)
             else:
                 variables = parse_event_xml(content)
 
@@ -239,9 +239,7 @@ class EventListener(EventListenerBase):
             The port on which the event listener listens is configurable.
             See `config.EVENT_LISTENER_PORT`
         """
-        for port_number in range(
-            self.requested_port_number, self.requested_port_number + 100
-        ):
+        for port_number in range(self.requested_port_number, self.requested_port_number + 100):
             try:
                 if port_number > self.requested_port_number:
                     log.debug("Trying next port (%d)", port_number)
@@ -388,16 +386,12 @@ class Subscription(SubscriptionBase):
         """Log an exception during subscription."""
         msg = (
             "An Exception occurred: {}.".format(exc)
-            + " Subscription to {},".format(
-                self.service.base_url + self.service.event_subscription_url
-            )
+            + " Subscription to {},".format(self.service.base_url + self.service.event_subscription_url)
             + " sid: {} has been cancelled".format(self.sid)
         )
         log.exception(msg)
 
-    async def renew(
-        self, requested_timeout=None, is_autorenew=False, strict=True
-    ):  # pylint: disable=invalid-overridden-method
+    async def renew(self, requested_timeout=None, is_autorenew=False, strict=True):  # pylint: disable=invalid-overridden-method
         """renew(requested_timeout=None)
         Renew the event subscription.
         You should not try to renew a subscription which has been
@@ -424,9 +418,7 @@ class Subscription(SubscriptionBase):
             return await super().renew(requested_timeout, is_autorenew)
         except Exception as exc:  # pylint: disable=broad-except
             self._cancel_subscription(exc)
-            if self.auto_renew_fail is not None and hasattr(
-                self.auto_renew_fail, "__call__"
-            ):
+            if self.auto_renew_fail is not None and hasattr(self.auto_renew_fail, "__call__"):
                 # pylint: disable=not-callable
                 self.auto_renew_fail(exc)
             else:
@@ -435,9 +427,7 @@ class Subscription(SubscriptionBase):
                 raise
             return self
 
-    async def unsubscribe(
-        self, strict=True
-    ):  # pylint: disable=invalid-overridden-method
+    async def unsubscribe(self, strict=True):  # pylint: disable=invalid-overridden-method
         """unsubscribe()
         Unsubscribe from the service's events.
         Once unsubscribed, a Subscription instance should not be reused
@@ -467,9 +457,7 @@ class Subscription(SubscriptionBase):
 
     def _auto_renew_start(self, interval):
         """Starts the auto_renew loop."""
-        self._auto_renew_task = asyncio.get_event_loop().call_later(
-            interval, self._auto_renew_run, interval
-        )
+        self._auto_renew_task = asyncio.get_event_loop().call_later(interval, self._auto_renew_run, interval)
 
     def _auto_renew_run(self, interval):
         asyncio.ensure_future(self.renew(is_autorenew=True, strict=False))
@@ -500,9 +488,7 @@ class Subscription(SubscriptionBase):
         """
 
         async def _async_make_request():
-            response = await self.event_listener.session.request(
-                method, url, headers=headers
-            )
+            response = await self.event_listener.session.request(method, url, headers=headers)
             if response.ok:
                 success(response.headers)
             if unconditional:

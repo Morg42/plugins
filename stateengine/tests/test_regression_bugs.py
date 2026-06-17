@@ -43,8 +43,9 @@ import os
 import sys
 import unittest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', '..', '..'))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "..", ".."))
 import tests.common as common
+
 common.register_shng_log_levels()
 
 from plugins.stateengine.tests.mock_helper import make_sh, MockAbItem, MockItem
@@ -52,17 +53,18 @@ from plugins.stateengine import StateEngineDefaults
 
 
 def _setup():
-    StateEngineDefaults.logger = logging.getLogger('test.se')
+    StateEngineDefaults.logger = logging.getLogger("test.se")
 
 
 class _MockState:
-    id = 'mock.state'
-    name = 'Mock State'
+    id = "mock.state"
+    name = "Mock State"
 
 
 # ═══════════════════════════════════════════════════════════════════════════
 # Bug #1: _delayed_execute queue arity
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 class TestDelayedExecuteQueueArity(unittest.TestCase):
     """
@@ -74,9 +76,10 @@ class TestDelayedExecuteQueueArity(unittest.TestCase):
         _setup()
         self.abitem = MockAbItem()
         from plugins.stateengine.StateEngineAction import SeActionRun
-        self.action = SeActionRun(self.abitem, 'test_action')
+
+        self.action = SeActionRun(self.abitem, "test_action")
         self.action._state = _MockState()
-        self.action._action_type = 'actions_enter'
+        self.action._action_type = "actions_enter"
 
     def _drain_queue(self):
         """Remove and return all current queue items."""
@@ -90,13 +93,12 @@ class TestDelayedExecuteQueueArity(unittest.TestCase):
         """Truthy state → 11 items already in current code."""
         self.action._delayed_execute(
             actionname="Action 'test_action'",
-            namevar='test_action',
+            namevar="test_action",
             state=_MockState(),
         )
         jobs = self._drain_queue()
         self.assertEqual(len(jobs), 1, "Expected exactly one job in queue")
-        self.assertEqual(len(jobs[0]), 11,
-                         "Job must have 11 elements for run_queue to unpack")
+        self.assertEqual(len(jobs[0]), 11, "Job must have 11 elements for run_queue to unpack")
 
     @unittest.expectedFailure
     def test_with_state_none_puts_11_items(self):
@@ -107,35 +109,36 @@ class TestDelayedExecuteQueueArity(unittest.TestCase):
         """
         self.action._delayed_execute(
             actionname="Action 'test_action'",
-            namevar='test_action',
+            namevar="test_action",
             state=None,
         )
         jobs = self._drain_queue()
         self.assertEqual(len(jobs), 1, "Expected exactly one job in queue")
         self.assertEqual(
-            len(jobs[0]), 11,
+            len(jobs[0]),
+            11,
             "Job must have 11 elements regardless of state truthiness so "
             "run_queue can unpack it: "
             "(_, action, actionname, namevar, repeat_text, value, "
             "current_condition, previous_condition, "
-            "previousstate_condition, next_condition, state)"
+            "previousstate_condition, next_condition, state)",
         )
 
     def test_job_tag_is_delayedaction(self):
         """First element of the job must be 'delayedaction'."""
         self.action._delayed_execute(
             actionname="Action 'test_action'",
-            namevar='test_action',
+            namevar="test_action",
             state=_MockState(),
         )
         jobs = self._drain_queue()
-        self.assertEqual(jobs[0][0], 'delayedaction')
+        self.assertEqual(jobs[0][0], "delayedaction")
 
     def test_job_second_element_is_action(self):
         """Second element must be the action itself."""
         self.action._delayed_execute(
             actionname="Action 'test_action'",
-            namevar='test_action',
+            namevar="test_action",
             state=_MockState(),
         )
         jobs = self._drain_queue()
@@ -146,7 +149,7 @@ class TestDelayedExecuteQueueArity(unittest.TestCase):
         mock_state = _MockState()
         self.action._delayed_execute(
             actionname="Action 'test_action'",
-            namevar='test_action',
+            namevar="test_action",
             state=mock_state,
         )
         jobs = self._drain_queue()
@@ -156,6 +159,7 @@ class TestDelayedExecuteQueueArity(unittest.TestCase):
 # ═══════════════════════════════════════════════════════════════════════════
 # Bug #2: remove_scheduler_entry guard
 # ═══════════════════════════════════════════════════════════════════════════
+
 
 class TestRemoveSchedulerEntryGuard(unittest.TestCase):
     """
@@ -172,38 +176,38 @@ class TestRemoveSchedulerEntryGuard(unittest.TestCase):
         Demonstrate that a bare list.remove() raises ValueError — the bug
         that the guard prevents.
         """
-        schedulers = ['job-a', 'job-b']
+        schedulers = ["job-a", "job-b"]
         with self.assertRaises(ValueError):
-            schedulers.remove('job-unknown')
+            schedulers.remove("job-unknown")
 
     def test_guarded_remove_does_not_raise(self):
         """
         The guard pattern used by remove_scheduler_entry() is safe.
         """
-        schedulers = ['job-a', 'job-b']
-        name = 'job-unknown'
+        schedulers = ["job-a", "job-b"]
+        name = "job-unknown"
         # This is exactly the guard in SeItem.remove_scheduler_entry()
         if name in schedulers:
             schedulers.remove(name)
         # No exception — guard worked
-        self.assertEqual(schedulers, ['job-a', 'job-b'])
+        self.assertEqual(schedulers, ["job-a", "job-b"])
 
     def test_guarded_remove_does_remove_when_present(self):
         """The guard does not prevent removal of entries that ARE present."""
-        schedulers = ['job-a', 'job-b']
-        name = 'job-a'
+        schedulers = ["job-a", "job-b"]
+        name = "job-a"
         if name in schedulers:
             schedulers.remove(name)
-        self.assertEqual(schedulers, ['job-b'])
+        self.assertEqual(schedulers, ["job-b"])
 
     def test_empty_scheduler_list_safe(self):
         """Removing from empty list with guard is safe."""
         schedulers = []
-        name = 'anything'
+        name = "anything"
         if name in schedulers:
             schedulers.remove(name)
         self.assertEqual(schedulers, [])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

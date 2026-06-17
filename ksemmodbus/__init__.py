@@ -4,7 +4,7 @@
 #  Copyright 2019 Thomas Hengsberg <thomas@thomash.eu>
 #  Copyright 2022 Ronny Schulz
 #########################################################################
-#  This file is part of SmartHomeNG.   
+#  This file is part of SmartHomeNG.
 #
 #  Sample plugin for new plugins to run with SmartHomeNG version 1.4 and
 #  upwards.
@@ -28,19 +28,20 @@ from lib.model.smartplugin import SmartPlugin
 
 from .ksem import Ksem
 
+
 class Ksemmodbus(SmartPlugin):
-    PLUGIN_VERSION = '1.6.3'
-    ksem = 'None'
+    PLUGIN_VERSION = "1.6.3"
+    ksem = "None"
     _items = []
 
     def __init__(self, sh, *args, **kwargs):
-        self.ksem = Ksem(self.get_parameter_value("ksem_ip"),self.get_parameter_value("modbus_port"))
+        self.ksem = Ksem(self.get_parameter_value("ksem_ip"), self.get_parameter_value("modbus_port"))
         self._cycle = int(self.get_parameter_value("update_cycle"))
         return
 
     def run(self):
         self.logger.debug("Run method called")
-        self.scheduler_add('poll_device', self.poll_device, cycle=self._cycle)
+        self.scheduler_add("poll_device", self.poll_device, cycle=self._cycle)
         self.alive = True
 
     def stop(self):
@@ -49,14 +50,14 @@ class Ksemmodbus(SmartPlugin):
 
     def parse_item(self, item):
         for i in self.ksem.decRow:
-            s = 'ksem_' + str(i)
+            s = "ksem_" + str(i)
             if self.has_iattr(item.conf, s):
                 self._items.append(item)
 
     def poll_device(self):
         ksem_data = self.ksem.get_data()
         for item in self._items:
-            for i in range (0,len(ksem_data)):
-                s = 'ksem_' + str(ksem_data[i].adrDec)
+            for i in range(0, len(ksem_data)):
+                s = "ksem_" + str(ksem_data[i].adrDec)
                 if self.has_iattr(item.conf, s):
                     item(self.ksem.registers[i].value)

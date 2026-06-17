@@ -117,10 +117,7 @@ def parse_response(service, response, search_type):
     elif "getMetadataResult" in response:
         response = response["getMetadataResult"]
     else:
-        raise ValueError(
-            '"response" should contain either the key '
-            '"searchResult" or "getMetadataResult"'
-        )
+        raise ValueError('"response" should contain either the key "searchResult" or "getMetadataResult"')
 
     # Form the search metadata
     search_metadata = {
@@ -216,9 +213,7 @@ class MetadataDictBase:
             return self.metadata[key]
         except KeyError as error:
             message = 'Class {} has no attribute "{}"'
-            raise AttributeError(
-                message.format(self.__class__.__name__, key)
-            ) from error
+            raise AttributeError(message.format(self.__class__.__name__, key)) from error
 
 
 class MusicServiceItem(MetadataDictBase):
@@ -249,8 +244,7 @@ class MusicServiceItem(MetadataDictBase):
                 originates from
         """
         _LOG.debug(
-            "%s.__init__ with item_id=%s, desc=%s, resources=%s, "
-            "uri=%s, metadata_dict=..., music_service=%s",
+            "%s.__init__ with item_id=%s, desc=%s, resources=%s, uri=%s, metadata_dict=..., music_service=%s",
             self.__class__.__name__,
             item_id,
             desc,
@@ -289,9 +283,7 @@ class MusicServiceItem(MetadataDictBase):
         # Form resources and get desc
         resources = [DidlResource(uri=uri, protocol_info="DUMMY")]
         desc = music_service.desc
-        return cls(
-            item_id, desc, resources, uri, content_dict, music_service=music_service
-        )
+        return cls(item_id, desc, resources, uri, content_dict, music_service=music_service)
 
     def __str__(self):
         """Return custom string representation"""

@@ -27,8 +27,12 @@ from typing import List, Optional
 
 from .constants import (
     BufferEntry,
-    COL_ITEM, COL_ITEM_ID, COL_ITEM_NAME,
-    COL_LOG, COL_LOG_TIME, COL_LOG_ITEM_ID,
+    COL_ITEM,
+    COL_ITEM_ID,
+    COL_ITEM_NAME,
+    COL_LOG,
+    COL_LOG_TIME,
+    COL_LOG_ITEM_ID,
     QUALITY_VALID,
 )
 from .utils import encode_value, apply_table_names, build_where_clause
@@ -85,16 +89,17 @@ class ItemStore:
         """
         self._execute(
             "INSERT INTO {item}(name) VALUES(:name);",
-            {'name': name}, cur=cur,
+            {"name": name},
+            cur=cur,
         )
         row = self._fetchone(
             "SELECT id FROM {item} WHERE name = :name;",
-            {'name': name}, cur=cur,
+            {"name": name},
+            cur=cur,
         )
         return int(row[0])
 
-    def update(self, item_id: int, time: int, val, item_type: str,
-               changed: int, cur=None) -> None:
+    def update(self, item_id: int, time: int, val, item_type: str, changed: int, cur=None) -> None:
         """Update the latest-value row for *item_id*.
 
         :param item_id:   Database item ID.
@@ -104,12 +109,13 @@ class ItemStore:
         :param changed:   Current time (milliseconds) — when the row was written.
         :param cur:       Optional cursor.
         """
-        params = {'id': item_id, 'time': time, 'changed': changed}
+        params = {"id": item_id, "time": time, "changed": changed}
         params.update(encode_value(item_type, val))
         self._execute(
             "UPDATE {item} SET time=:time, val_str=:val_str, val_num=:val_num,"
             " val_bool=:val_bool, changed=:changed WHERE id=:id;",
-            params, cur=cur,
+            params,
+            cur=cur,
         )
 
     def delete(self, item_id: int, cur=None) -> None:
@@ -121,7 +127,8 @@ class ItemStore:
         LogStore(self._db, self._tn, self.logger).delete_range(item_id, cur=cur)
         self._execute(
             "DELETE FROM {item} WHERE id=:id;",
-            {'id': item_id}, cur=cur,
+            {"id": item_id},
+            cur=cur,
         )
 
     # ── read ─────────────────────────────────────────────────────────────────
@@ -135,15 +142,17 @@ class ItemStore:
         :param cur:        Optional cursor.
         :returns:          Row tuple or ``None``.
         """
-        params = {'id': id_or_name}
+        params = {"id": id_or_name}
         if isinstance(id_or_name, str):
             return self._fetchone(
                 "SELECT {item_columns} FROM {item} WHERE name=:id;",
-                params, cur=cur,
+                params,
+                cur=cur,
             )
         return self._fetchone(
             "SELECT {item_columns} FROM {item} WHERE id=:id;",
-            params, cur=cur,
+            params,
+            cur=cur,
         )
 
     def find_all(self, cur=None) -> list:
@@ -201,8 +210,7 @@ class LogStore:
 
     # ── write ────────────────────────────────────────────────────────────────
 
-    def insert(self, item_id: int, entry: BufferEntry, item_type: str,
-               changed: int, cur=None) -> None:
+    def insert(self, item_id: int, entry: BufferEntry, item_type: str, changed: int, cur=None) -> None:
         """Insert a new log row from a :class:`~constants.BufferEntry`.
 
         For entries with ``quality=QUALITY_NO_DATA`` all value columns are
@@ -216,11 +224,11 @@ class LogStore:
         :param cur:       Optional cursor.
         """
         params = {
-            'id': item_id,
-            'time': entry.time,
-            'duration': entry.duration,
-            'changed': changed,
-            'quality': entry.quality,
+            "id": item_id,
+            "time": entry.time,
+            "duration": entry.duration,
+            "changed": changed,
+            "quality": entry.quality,
         }
         params.update(encode_value(item_type, entry.value))
         self._execute(
@@ -228,11 +236,11 @@ class LogStore:
             " duration, changed, val_quality)"
             " VALUES(:id, :time, :val_str, :val_num, :val_bool,"
             "        :duration, :changed, :quality);",
-            params, cur=cur,
+            params,
+            cur=cur,
         )
 
-    def update(self, item_id: int, entry: BufferEntry, item_type: str,
-               changed: int, cur=None) -> None:
+    def update(self, item_id: int, entry: BufferEntry, item_type: str, changed: int, cur=None) -> None:
         """Update an existing log row matching ``(item_id, time)``.
 
         :param item_id:   Database item ID.
@@ -242,11 +250,11 @@ class LogStore:
         :param cur:       Optional cursor.
         """
         params = {
-            'id': item_id,
-            'time': entry.time,
-            'duration': entry.duration,
-            'changed': changed,
-            'quality': entry.quality,
+            "id": item_id,
+            "time": entry.time,
+            "duration": entry.duration,
+            "changed": changed,
+            "quality": entry.quality,
         }
         params.update(encode_value(item_type, entry.value))
         self._execute(
@@ -254,11 +262,11 @@ class LogStore:
             " val_num=:val_num, val_bool=:val_bool, changed=:changed,"
             " val_quality=:quality"
             " WHERE item_id=:id AND time=:time;",
-            params, cur=cur,
+            params,
+            cur=cur,
         )
 
-    def upsert(self, item_id: int, entry: BufferEntry, item_type: str,
-               changed: int, cur=None) -> None:
+    def upsert(self, item_id: int, entry: BufferEntry, item_type: str, changed: int, cur=None) -> None:
         """Insert *or* update a log row depending on whether it already exists.
 
         Replaces the ``if len(readLog(...)): updateLog else insertLog``
@@ -276,9 +284,19 @@ class LogStore:
         else:
             self.insert(item_id, entry, item_type, changed, cur=cur)
 
-    def delete_range(self, item_id: int, *, time=None, time_start=None,
-                     time_end=None, changed=None, changed_start=None,
-                     changed_end=None, cur=None, commit=True) -> None:
+    def delete_range(
+        self,
+        item_id: int,
+        *,
+        time=None,
+        time_start=None,
+        time_end=None,
+        changed=None,
+        changed_start=None,
+        changed_end=None,
+        cur=None,
+        commit=True,
+    ) -> None:
         """Delete log rows matching the given criteria.
 
         All criteria are optional; if none are given, *all* rows for
@@ -296,14 +314,18 @@ class LogStore:
         """
         where, params = build_where_clause(
             item_id,
-            time=time, time_start=time_start, time_end=time_end,
-            changed=changed, changed_start=changed_start,
+            time=time,
+            time_start=time_start,
+            time_end=time_end,
+            changed=changed,
+            changed_start=changed_start,
             changed_end=changed_end,
         )
         try:
             self._execute(
                 "DELETE FROM {log} WHERE " + where + ";",
-                params, cur=cur,
+                params,
+                cur=cur,
             )
             if commit:
                 self._db.commit()
@@ -322,14 +344,23 @@ class LogStore:
         :rtype:         list
         """
         return self._fetchall(
-            "SELECT {log_columns} FROM {log}"
-            " WHERE item_id=:id AND time=:time;",
-            {'id': item_id, 'time': time}, cur=cur,
+            "SELECT {log_columns} FROM {log} WHERE item_id=:id AND time=:time;",
+            {"id": item_id, "time": time},
+            cur=cur,
         )
 
-    def find_range(self, item_id: int, *, time=None, time_start=None,
-                   time_end=None, changed=None, changed_start=None,
-                   changed_end=None, cur=None) -> list:
+    def find_range(
+        self,
+        item_id: int,
+        *,
+        time=None,
+        time_start=None,
+        time_end=None,
+        changed=None,
+        changed_start=None,
+        changed_end=None,
+        cur=None,
+    ) -> list:
         """Return log rows matching the given criteria.
 
         :param item_id:       Database item ID.
@@ -344,17 +375,20 @@ class LogStore:
         """
         where, params = build_where_clause(
             item_id,
-            time=time, time_start=time_start, time_end=time_end,
-            changed=changed, changed_start=changed_start,
+            time=time,
+            time_start=time_start,
+            time_end=time_end,
+            changed=changed,
+            changed_start=changed_start,
             changed_end=changed_end,
         )
         return self._fetchall(
             "SELECT {log_columns} FROM {log} WHERE " + where + ";",
-            params, cur=cur,
+            params,
+            cur=cur,
         )
 
-    def count(self, item_id: int, *, time_start=None, time_end=None,
-              cur=None) -> int:
+    def count(self, item_id: int, *, time_start=None, time_end=None, cur=None) -> int:
         """Return the number of log rows for *item_id* in the given range.
 
         :param item_id:    Database item ID.
@@ -364,11 +398,14 @@ class LogStore:
         :rtype:            int
         """
         where, params = build_where_clause(
-            item_id, time_start=time_start, time_end=time_end,
+            item_id,
+            time_start=time_start,
+            time_end=time_end,
         )
         result = self._fetchall(
             "SELECT count(*) FROM {log} WHERE " + where + ";",
-            params, cur=cur,
+            params,
+            cur=cur,
         )
         if not result:
             return 0
@@ -387,7 +424,7 @@ class LogStore:
         result = self._fetchall("SELECT count(*) FROM {log};", cur=cur)
         return result[0][0] if result else 0
 
-    def oldest_time(self, item_id: int, cur=None) -> 'int | None':
+    def oldest_time(self, item_id: int, cur=None) -> "int | None":
         """Return the earliest ``time`` value for *item_id*, or ``None``.
 
         :param item_id: Database item ID.
@@ -396,12 +433,12 @@ class LogStore:
         """
         rows = self._fetchall(
             "SELECT min(time) FROM {log} WHERE item_id=:id;",
-            {'id': item_id}, cur=cur,
+            {"id": item_id},
+            cur=cur,
         )
         return rows[0][0] if rows else None
 
-    def latest_time(self, item_id: int, before: 'int | None' = None,
-                    cur=None) -> 'int | None':
+    def latest_time(self, item_id: int, before: "int | None" = None, cur=None) -> "int | None":
         """Return the most recent ``time`` value for *item_id*, or ``None``.
 
         :param item_id: Database item ID.
@@ -412,12 +449,13 @@ class LogStore:
         if before is None:
             rows = self._fetchall(
                 "SELECT max(time) FROM {log} WHERE item_id=:id;",
-                {'id': item_id}, cur=cur,
+                {"id": item_id},
+                cur=cur,
             )
         else:
             rows = self._fetchall(
-                "SELECT max(time) FROM {log}"
-                " WHERE item_id=:id AND time<=:before;",
-                {'id': item_id, 'before': before}, cur=cur,
+                "SELECT max(time) FROM {log} WHERE item_id=:id AND time<=:before;",
+                {"id": item_id, "before": before},
+                cur=cur,
             )
         return rows[0][0] if rows else None

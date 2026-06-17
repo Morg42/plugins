@@ -27,6 +27,7 @@ import os
 import collections
 from collections import OrderedDict
 
+
 def remove_prefix(string, prefix):
     """
     Remove prefix from a string
@@ -40,12 +41,12 @@ def remove_prefix(string, prefix):
     :rtype: str
     """
     if string.startswith(prefix):
-        return string[len(prefix):]
+        return string[len(prefix) :]
     return string
 
 
 def html_escape(str):
-    str = str.rstrip().replace('<', '&lt;').replace('>', '&gt;')
-    str = str.rstrip().replace('(', '&#40;').replace(')', '&#41;')
-    html = str.rstrip().replace("'", '&#39;').replace('"', '&quot;')
+    str = str.rstrip().replace("<", "&lt;").replace(">", "&gt;")
+    str = str.rstrip().replace("(", "&#40;").replace(")", "&#41;")
+    html = str.rstrip().replace("'", "&#39;").replace('"', "&quot;")
     return html

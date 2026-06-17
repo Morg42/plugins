@@ -27,7 +27,7 @@ class DT_DenonCustominput(DT.Datatype):
         self._custom_inputnames = {}
 
     def get_shng_data(self, data, type=None, **kwargs):
-        tmp = data.split(' ', 1)
+        tmp = data.split(" ", 1)
         self._custom_inputnames[tmp[0]] = tmp[1]
         return self._custom_inputnames
 
@@ -37,10 +37,10 @@ class DT_DenonVol(DT.Datatype):
     def get_send_data(self, data, **kwargs):
         if int(data) == data:
             # "real" integer
-            return f'{int(data):02}'
+            return f"{int(data):02}"
         else:
             # float with fractional value
-            return f'{int(data):02}5'
+            return f"{int(data):02}5"
 
     def get_shng_data(self, data, type=None, **kwargs):
         if len(data) == 3:
@@ -65,54 +65,55 @@ class DT_DenonFrequency(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
         return int(data) / 100
 
+
 class DT_DenonStandby(DT.Datatype):
     def get_send_data(self, data, **kwargs):
-        return 'OFF' if data == 0 else f"{data:01}H"
+        return "OFF" if data == 0 else f"{data:01}H"
 
     def get_shng_data(self, data, type=None, **kwargs):
-        return 0 if data == 'OFF' else data.split('H')[0]
+        return 0 if data == "OFF" else data.split("H")[0]
 
 
 class DT_DenonStandby1(DT.Datatype):
     def get_send_data(self, data, **kwargs):
-        return 'OFF' if data == 0 else f"{data:02}M"
+        return "OFF" if data == 0 else f"{data:02}M"
 
     def get_shng_data(self, data, type=None, **kwargs):
-        return 0 if data == 'OFF' else data.split('M')[0]
+        return 0 if data == "OFF" else data.split("M")[0]
 
 
 class DT_onoff(DT.Datatype):
     def get_send_data(self, data, **kwargs):
-        return 'ON' if data else 'OFF'
+        return "ON" if data else "OFF"
 
     def get_shng_data(self, data, type=None, **kwargs):
-        return False if data == 'OFF' else True
+        return False if data == "OFF" else True
 
 
 class DT_convert0(DT.Datatype):
     def get_send_data(self, data, **kwargs):
-        return 'OFF' if data == 0 else f"{data:03}"
+        return "OFF" if data == 0 else f"{data:03}"
 
     def get_shng_data(self, data, type=None, **kwargs):
-        return 0 if data in ['OFF', 'NON'] else data
+        return 0 if data in ["OFF", "NON"] else data
 
 
 class DT_convertAuto(DT.Datatype):
     def get_send_data(self, data, **kwargs):
-        return 'AUTO' if data == 0 else data
+        return "AUTO" if data == 0 else data
 
     def get_shng_data(self, data, type=None, **kwargs):
-        return 0 if data == 'AUTO' else data
+        return 0 if data == "AUTO" else data
 
 
 class DT_remap50to0(DT.Datatype):
     def get_send_data(self, data, **kwargs):
         if int(data) == data:
             # "real" integer
-            return f'{(int(data)+50):02}'
+            return f"{(int(data) + 50):02}"
         else:
             # float with fractional value
-            return f'{(int(data)+50):02}5'
+            return f"{(int(data) + 50):02}5"
 
     def get_shng_data(self, data, type=None, **kwargs):
         if len(data) == 3:

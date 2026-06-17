@@ -7,14 +7,15 @@ Copyright (c) 2016 Benjamin Knight / MIT License.
 
 modifications by SH for zigbee2mqtt plugin in smarthomeNG
 """
+
 import math
 import random
 from collections import namedtuple
 
-__version__ = '0.5.1a'
+__version__ = "0.5.1a"
 
 # Represents a CIE 1931 XY coordinate pair.
-XYPoint = namedtuple('XYPoint', ['x', 'y'])
+XYPoint = namedtuple("XYPoint", ["x", "y"])
 
 # LivingColors Iris, Bloom, Aura, LightStrips
 GamutA = (
@@ -42,11 +43,11 @@ def get_light_gamut(modelId):
     """Gets the correct color gamut for the provided model id.
     Docs: https://developers.meethue.com/develop/hue-api/supported-devices/
     """
-    if modelId in ('LST001', 'LLC005', 'LLC006', 'LLC007', 'LLC010', 'LLC011', 'LLC012', 'LLC013', 'LLC014'):
+    if modelId in ("LST001", "LLC005", "LLC006", "LLC007", "LLC010", "LLC011", "LLC012", "LLC013", "LLC014"):
         return GamutA
-    elif modelId in ('LCT001', 'LCT007', 'LCT002', 'LCT003', 'LLM001'):
+    elif modelId in ("LCT001", "LCT007", "LCT002", "LCT003", "LLM001"):
         return GamutB
-    elif modelId in ('LCT010', 'LCT011', 'LCT012', 'LCT014', 'LCT015', 'LCT016', 'LLC020', 'LST002'):
+    elif modelId in ("LCT010", "LCT011", "LCT012", "LCT014", "LCT015", "LCT016", "LLC020", "LST002"):
         return GamutC
     else:
         raise ValueError
@@ -54,7 +55,6 @@ def get_light_gamut(modelId):
 
 
 class ColorHelper:
-
     def __init__(self, gamut=GamutB):
         self.Red = gamut[0]
         self.Lime = gamut[1]
@@ -79,7 +79,7 @@ class ColorHelper:
 
     def rgb_to_hex(self, r, g, b):
         """Converts RGB to hex."""
-        return '%02x%02x%02x' % (r, g, b)
+        return "%02x%02x%02x" % (r, g, b)
 
     def random_rgb_value(self):
         """Return a random Integer in the range of 0 to 255, representing an RGB color value."""
@@ -87,7 +87,7 @@ class ColorHelper:
 
     def cross_product(self, p1, p2):
         """Returns the cross product of two XYPoints."""
-        return (p1.x * p2.y - p1.y * p2.x)
+        return p1.x * p2.y - p1.y * p2.x
 
     def check_point_in_lamps_reach(self, p):
         """Check if the provided XYPoint can be recreated by a Hue lamp."""
@@ -129,11 +129,11 @@ class ColorHelper:
         lowest = dAB
         closest_point = pAB
 
-        if (dAC < lowest):
+        if dAC < lowest:
             lowest = dAC
             closest_point = pAC
 
-        if (dBC < lowest):
+        if dBC < lowest:
             lowest = dBC
             closest_point = pBC
 
@@ -164,9 +164,9 @@ class ColorHelper:
         green = green_i / 255.0
         blue = blue_i / 255.0
 
-        r = ((red + 0.055) / (1.0 + 0.055))**2.4 if (red > 0.04045) else (red / 12.92)
-        g = ((green + 0.055) / (1.0 + 0.055))**2.4 if (green > 0.04045) else (green / 12.92)
-        b = ((blue + 0.055) / (1.0 + 0.055))**2.4 if (blue > 0.04045) else (blue / 12.92)
+        r = ((red + 0.055) / (1.0 + 0.055)) ** 2.4 if (red > 0.04045) else (red / 12.92)
+        g = ((green + 0.055) / (1.0 + 0.055)) ** 2.4 if (green > 0.04045) else (green / 12.92)
+        b = ((blue + 0.055) / (1.0 + 0.055)) ** 2.4 if (blue > 0.04045) else (blue / 12.92)
 
         X = r * 0.664511 + g * 0.154324 + b * 0.162028
         Y = r * 0.283881 + g * 0.668433 + b * 0.047685
@@ -216,8 +216,7 @@ class ColorHelper:
 
         # Apply reverse gamma correction
         r, g, b = map(
-            lambda x: (12.92 * x) if (x <= 0.0031308) else ((1.0 + 0.055) * pow(x, (1.0 / 2.4)) - 0.055),
-            [r, g, b]
+            lambda x: (12.92 * x) if (x <= 0.0031308) else ((1.0 + 0.055) * pow(x, (1.0 / 2.4)) - 0.055), [r, g, b]
         )
 
         # Bring all negative components to zero
@@ -235,7 +234,6 @@ class ColorHelper:
 
 
 class Converter:
-
     def __init__(self, gamut=GamutB):
         self.color = ColorHelper(gamut)
 

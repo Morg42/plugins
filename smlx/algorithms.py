@@ -45,10 +45,12 @@ This is an example use of the different algorithms:
     print("{0:#x}".format(crc.table_driven("123456789")))
 """
 
+
 class Crc(object):
     """
     A base class for CRC routines.
     """
+
     # pylint: disable=too-many-instance-attributes
 
     def __init__(self, width, poly, reflect_in, xor_in, reflect_out, xor_out, table_idx_width=None, slice_by=1):
@@ -88,7 +90,6 @@ class Crc(object):
         else:
             self.crc_shift = 0
 
-
     def __get_nondirect_init(self, init):
         """
         return the non-direct init if the direct algorithm has been selected.
@@ -103,7 +104,6 @@ class Crc(object):
                 crc |= self.msb_mask
         return crc & self.mask
 
-
     def reflect(self, data, width):
         """
         reflect a data word, i.e. reverts the bit order.
@@ -116,7 +116,6 @@ class Crc(object):
             res = (res << 1) | (data & 0x01)
         return res
 
-
     def bit_by_bit(self, in_data):
         """
         Classic simple and slow CRC implementation.  This function iterates bit
@@ -125,7 +124,7 @@ class Crc(object):
         """
         # If the input data is a string, convert to bytes.
         if isinstance(in_data, str):
-            in_data = bytearray(in_data, 'utf-8')
+            in_data = bytearray(in_data, "utf-8")
 
         reg = self.nondirect_init
         for octet in in_data:
@@ -139,14 +138,13 @@ class Crc(object):
 
         for i in range(self.width):
             topbit = reg & self.msb_mask
-            reg = ((reg << 1) & self.mask)
+            reg = (reg << 1) & self.mask
             if topbit:
                 reg ^= self.poly
 
         if self.reflect_out:
             reg = self.reflect(reg, self.width)
         return (reg ^ self.xor_out) & self.mask
-
 
     def bit_by_bit_fast(self, in_data):
         """
@@ -156,7 +154,7 @@ class Crc(object):
         """
         # If the input data is a string, convert to bytes.
         if isinstance(in_data, str):
-            in_data = bytearray(in_data, 'utf-8')
+            in_data = bytearray(in_data, "utf-8")
 
         reg = self.direct_init
         for octet in in_data:
@@ -173,7 +171,6 @@ class Crc(object):
         if self.reflect_out:
             reg = self.reflect(reg, self.width)
         return reg ^ self.xor_out
-
 
     def gen_table(self):
         """
@@ -193,16 +190,15 @@ class Crc(object):
                 if reg & (self.msb_mask << self.crc_shift) != 0:
                     reg = (reg << 1) ^ (self.poly << self.crc_shift)
                 else:
-                    reg = (reg << 1)
+                    reg = reg << 1
             if self.reflect_in:
                 reg = self.reflect(reg >> self.crc_shift, self.width) << self.crc_shift
             tbl[0][i] = (reg >> self.crc_shift) & self.mask
 
         for j in range(1, self.slice_by):
             for i in range(table_length):
-                tbl[j][i] = (tbl[j - 1][i] >> 8) ^ tbl[0][tbl[j - 1][i] & 0xff]
+                tbl[j][i] = (tbl[j - 1][i] >> 8) ^ tbl[0][tbl[j - 1][i] & 0xFF]
         return tbl
-
 
     def table_driven(self, in_data):
         """
@@ -212,24 +208,25 @@ class Crc(object):
 
         # If the input data is a string, convert to bytes.
         if isinstance(in_data, str):
-            in_data = bytearray(in_data, 'utf-8')
+            in_data = bytearray(in_data, "utf-8")
 
         tbl = self.gen_table()
 
         if not self.reflect_in:
             reg = self.direct_init << self.crc_shift
             for octet in in_data:
-                tblidx = ((reg >> (self.width - self.tbl_idx_width + self.crc_shift)) ^ octet) & 0xff
-                reg = ((reg << (self.tbl_idx_width - self.crc_shift)) ^ (tbl[0][tblidx] << self.crc_shift)) & (self.mask << self.crc_shift)
+                tblidx = ((reg >> (self.width - self.tbl_idx_width + self.crc_shift)) ^ octet) & 0xFF
+                reg = ((reg << (self.tbl_idx_width - self.crc_shift)) ^ (tbl[0][tblidx] << self.crc_shift)) & (
+                    self.mask << self.crc_shift
+                )
             reg = reg >> self.crc_shift
         else:
             reg = self.reflect(self.direct_init, self.width)
             for octet in in_data:
-                tblidx = (reg ^ octet) & 0xff
+                tblidx = (reg ^ octet) & 0xFF
                 reg = ((reg >> self.tbl_idx_width) ^ tbl[0][tblidx]) & self.mask
             reg = self.reflect(reg, self.width) & self.mask
 
         if self.reflect_out:
             reg = self.reflect(reg, self.width)
         return reg ^ self.xor_out
-

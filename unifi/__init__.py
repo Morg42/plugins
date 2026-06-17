@@ -39,31 +39,31 @@ import traceback
 
 
 class UniFiConst(object):
-    PARAMETER_URL = 'unifi_controller_url'
-    PARAMETER_TYPE = 'unifi_controller_type'
-    PARAMETER_USER = 'unifi_user'
-    PARAMETER_PWD = 'unifi_password'
-    PARAMETER_SITE_ID = 'unifi_site_id'
-    PARAMETER_CYCLE_TIME = 'poll_cycle_time'
+    PARAMETER_URL = "unifi_controller_url"
+    PARAMETER_TYPE = "unifi_controller_type"
+    PARAMETER_USER = "unifi_user"
+    PARAMETER_PWD = "unifi_password"
+    PARAMETER_SITE_ID = "unifi_site_id"
+    PARAMETER_CYCLE_TIME = "poll_cycle_time"
 
-    ATTR_TYPE = 'unifi_type'
-    TYPE_CL_PRESENT = 'client_present'
-    TYPE_CL_IP = 'client_ip'
-    TYPE_CL_HOSTNAME = 'client_hostname'
-    TYPE_CL_AT_AP = 'client_present_at_ap'
-    TYPE_SW_PORT_ENABLED = 'switch_port_enabled'
-    TYPE_SW_PORT_PROFILE = 'switch_port_profile'
-    TYPE_AP_ENABLED = 'ap_enabled'
-    TYPE_DV_IP = 'device_ip'
-    TYPE_DV_NAME = 'device_name'
+    ATTR_TYPE = "unifi_type"
+    TYPE_CL_PRESENT = "client_present"
+    TYPE_CL_IP = "client_ip"
+    TYPE_CL_HOSTNAME = "client_hostname"
+    TYPE_CL_AT_AP = "client_present_at_ap"
+    TYPE_SW_PORT_ENABLED = "switch_port_enabled"
+    TYPE_SW_PORT_PROFILE = "switch_port_profile"
+    TYPE_AP_ENABLED = "ap_enabled"
+    TYPE_DV_IP = "device_ip"
+    TYPE_DV_NAME = "device_name"
 
-    ATTR_MAC = 'unifi_client_mac'
-    ATTR_SW_MAC = 'unifi_switch_mac'
-    ATTR_DV_MAC = 'unifi_device_mac'
-    ATTR_AP_MAC = 'unifi_ap_mac'
-    ATTR_SW_PORT_NO = 'unifi_switch_port_no'
-    ATTR_SW_PORT_PROF_ON = 'unifi_switch_port_profile_on'
-    ATTR_SW_PORT_PROF_OFF = 'unifi_switch_port_profile_off'
+    ATTR_MAC = "unifi_client_mac"
+    ATTR_SW_MAC = "unifi_switch_mac"
+    ATTR_DV_MAC = "unifi_device_mac"
+    ATTR_AP_MAC = "unifi_ap_mac"
+    ATTR_SW_PORT_NO = "unifi_switch_port_no"
+    ATTR_SW_PORT_PROF_ON = "unifi_switch_port_profile_on"
+    ATTR_SW_PORT_PROF_OFF = "unifi_switch_port_profile_off"
 
 
 class UniFiItemIssue(object):
@@ -86,8 +86,7 @@ class UniFiItemIssue(object):
         return self.worst_level
 
 
-class UniFiControllerClientModel():
-
+class UniFiControllerClientModel:
     def __init__(self, api: UniFiAPI):
         self._items = []
         self._items_with_issues = {}
@@ -136,62 +135,62 @@ class UniFiControllerClientModel():
                 to_ret.append(i)
         return to_ret
 
-    def _generate_item_key(self, source:str):
-        step1 = source.lower().replace(' ', '_')
-        step2 = re.sub('[^0-9a-z_]+', '_', step1)
+    def _generate_item_key(self, source: str):
+        step1 = source.lower().replace(" ", "_")
+        step2 = re.sub("[^0-9a-z_]+", "_", step1)
         step3 = step2.replace("___", "_").replace("__", "_")
         step4 = step3.strip("_")
         return step4
 
     def _get_device_node_item(self, node_data, parent_type=""):
-        n = node_data['node']
-        node_key = self._generate_item_key(n['key'])
+        n = node_data["node"]
+        node_key = self._generate_item_key(n["key"])
         node_body = {}
 
-        if n['type'] == "wired_client":
+        if n["type"] == "wired_client":
             node_body[UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_PRESENT
-            node_body[UniFiConst.ATTR_MAC] = n['mac']
-            node_body['type'] = 'bool'
-            node_body['hostname'] = {}
-            node_body['hostname'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_HOSTNAME
-            node_body['hostname']['type'] = 'str'
-            node_body['ip'] = {}
-            node_body['ip'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_IP
-            node_body['ip']['type'] = 'str'
-        elif n['type'] == 'uap':
+            node_body[UniFiConst.ATTR_MAC] = n["mac"]
+            node_body["type"] = "bool"
+            node_body["hostname"] = {}
+            node_body["hostname"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_HOSTNAME
+            node_body["hostname"]["type"] = "str"
+            node_body["ip"] = {}
+            node_body["ip"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_IP
+            node_body["ip"]["type"] = "str"
+        elif n["type"] == "uap":
             node_body[UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_AP_ENABLED
-            node_body[UniFiConst.ATTR_AP_MAC] = n['mac']
-            node_body['type'] = 'bool'
-            node_body['ap_name'] = {}
-            node_body['ap_name']['unifi_type'] = UniFiConst.TYPE_DV_NAME
-            node_body['ap_name']['type'] = 'str'
-            node_body['ip'] = {}
-            node_body['ip'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_DV_IP
-            node_body['ip']['type'] = 'str'
-        elif n['type'] == 'ugw':
-            node_body[UniFiConst.ATTR_DV_MAC] = n['mac']
-            node_body['type'] = 'foo'
-            node_body['ip'] = {}
-            node_body['ip'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_DV_IP
-            node_body['ip']['type'] = 'str'
-        elif n['type'] == 'usw':
-            node_body[UniFiConst.ATTR_SW_MAC] = n['mac']
-            node_body['type'] = 'foo'
-            node_body['switch_name'] = {}
-            node_body['switch_name'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_DV_NAME
-            node_body['switch_name']['type'] = 'str'
-            node_body['ip'] = {}
-            node_body['ip'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_DV_IP
-            node_body['ip']['type'] = 'str'
+            node_body[UniFiConst.ATTR_AP_MAC] = n["mac"]
+            node_body["type"] = "bool"
+            node_body["ap_name"] = {}
+            node_body["ap_name"]["unifi_type"] = UniFiConst.TYPE_DV_NAME
+            node_body["ap_name"]["type"] = "str"
+            node_body["ip"] = {}
+            node_body["ip"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_DV_IP
+            node_body["ip"]["type"] = "str"
+        elif n["type"] == "ugw":
+            node_body[UniFiConst.ATTR_DV_MAC] = n["mac"]
+            node_body["type"] = "foo"
+            node_body["ip"] = {}
+            node_body["ip"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_DV_IP
+            node_body["ip"]["type"] = "str"
+        elif n["type"] == "usw":
+            node_body[UniFiConst.ATTR_SW_MAC] = n["mac"]
+            node_body["type"] = "foo"
+            node_body["switch_name"] = {}
+            node_body["switch_name"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_DV_NAME
+            node_body["switch_name"]["type"] = "str"
+            node_body["ip"] = {}
+            node_body["ip"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_DV_IP
+            node_body["ip"]["type"] = "str"
 
-        if parent_type == 'usw':
-            node_body[UniFiConst.ATTR_SW_PORT_NO] = n['uplink_remote_port']
+        if parent_type == "usw":
+            node_body[UniFiConst.ATTR_SW_PORT_NO] = n["uplink_remote_port"]
 
-        if n['type'] == 'usw':
+        if n["type"] == "usw":
             portmap = {}
 
-            for child in node_data['children']:
-                child_data = self._get_device_node_item(child, n['type'])
+            for child in node_data["children"]:
+                child_data = self._get_device_node_item(child, n["type"])
                 port_no = child_data[1][UniFiConst.ATTR_SW_PORT_NO]
                 if not portmap.__contains__(port_no):
                     portmap[port_no] = []
@@ -201,14 +200,15 @@ class UniFiControllerClientModel():
                 if len(portmap[port_no]) == 1:
                     single_dev_key = portmap[port_no][0][0]
                     node_body[single_dev_key] = portmap[port_no][0][1]
-                    node_body[single_dev_key]['port_enabled'] = {}
-                    node_body[single_dev_key]['port_enabled']['type'] = 'bool'
-                    node_body[single_dev_key]['port_enabled'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_SW_PORT_ENABLED
+                    node_body[single_dev_key]["port_enabled"] = {}
+                    node_body[single_dev_key]["port_enabled"]["type"] = "bool"
+                    node_body[single_dev_key]["port_enabled"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_SW_PORT_ENABLED
                     # Removed Port-Prof-Off as the default will be considered during run-time.
                     # node_body[single_dev_key]['port_enabled'][UniFiConst.ATTR_SW_PORT_PROF_OFF] = 'Disabled'
                     try:
-                        node_body[single_dev_key]['port_enabled'][UniFiConst.ATTR_SW_PORT_PROF_ON] = self._api.get_port_profile_for(
-                            n['mac'], port_no)
+                        node_body[single_dev_key]["port_enabled"][UniFiConst.ATTR_SW_PORT_PROF_ON] = (
+                            self._api.get_port_profile_for(n["mac"], port_no)
+                        )
                     except Exception:
                         pass
                 else:
@@ -218,20 +218,21 @@ class UniFiControllerClientModel():
                         attached_clnts[ch[0]] = ch[1]
 
                     attached_clnts[UniFiConst.ATTR_SW_PORT_NO] = port_no
-                    attached_clnts['port_enabled'] = {}
-                    attached_clnts['port_enabled']['type'] = 'bool'
-                    attached_clnts['port_enabled'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_SW_PORT_ENABLED
+                    attached_clnts["port_enabled"] = {}
+                    attached_clnts["port_enabled"]["type"] = "bool"
+                    attached_clnts["port_enabled"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_SW_PORT_ENABLED
                     # Removed Port-Prof-Off as the default will be considered during run-time.
-                    #attached_clnts['port_enabled'][UniFiConst.ATTR_SW_PORT_PROF_OFF] = 'Disabled'
+                    # attached_clnts['port_enabled'][UniFiConst.ATTR_SW_PORT_PROF_OFF] = 'Disabled'
                     try:
-                        attached_clnts['port_enabled'][UniFiConst.ATTR_SW_PORT_PROF_ON] = self._api.get_port_profile_for(
-                            n['mac'], port_no)
+                        attached_clnts["port_enabled"][UniFiConst.ATTR_SW_PORT_PROF_ON] = (
+                            self._api.get_port_profile_for(n["mac"], port_no)
+                        )
                     except Exception:
                         pass
                     node_body["non_unifi_switch_at_port_{}".format(port_no)] = attached_clnts
         else:
-            for child in node_data['children']:
-                child_data = self._get_device_node_item(child, n['type'])
+            for child in node_data["children"]:
+                child_data = self._get_device_node_item(child, n["type"])
                 node_body[child_data[0]] = child_data[1]
 
         return (node_key, node_body)
@@ -245,28 +246,30 @@ class UniFiControllerClientModel():
 
         try:
             model = {}
-            model['unifi_network'] = {}
-            model['unifi_network']['wifi_clients'] = {}
-            for wlc_data in hr['wireless_clients']:
-                wlc_key = "client_" + self._generate_item_key(wlc_data['name'])
+            model["unifi_network"] = {}
+            model["unifi_network"]["wifi_clients"] = {}
+            for wlc_data in hr["wireless_clients"]:
+                wlc_key = "client_" + self._generate_item_key(wlc_data["name"])
                 wlc_body = {}
-                wlc_body['hostname'] = {}
-                wlc_body['hostname']['type'] = 'str'
-                wlc_body['hostname'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_HOSTNAME
-                wlc_body['ip'] = {}
-                wlc_body['ip']['type'] = 'str'
-                wlc_body['ip'][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_IP
+                wlc_body["hostname"] = {}
+                wlc_body["hostname"]["type"] = "str"
+                wlc_body["hostname"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_HOSTNAME
+                wlc_body["ip"] = {}
+                wlc_body["ip"]["type"] = "str"
+                wlc_body["ip"][UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_IP
                 wlc_body[UniFiConst.ATTR_TYPE] = UniFiConst.TYPE_CL_PRESENT
-                wlc_body[UniFiConst.ATTR_MAC] = wlc_data['mac']
-                wlc_body['type'] = 'bool'
-                model['unifi_network']['wifi_clients'][wlc_key] = wlc_body
+                wlc_body[UniFiConst.ATTR_MAC] = wlc_data["mac"]
+                wlc_body["type"] = "bool"
+                model["unifi_network"]["wifi_clients"][wlc_key] = wlc_body
 
-            model['unifi_network']['devices'] = {}
-            for dev in hr['devices']:
+            model["unifi_network"]["devices"] = {}
+            for dev in hr["devices"]:
                 child_data = self._get_device_node_item(dev)
-                model['unifi_network']['devices'][child_data[0]] = child_data[1]
+                model["unifi_network"]["devices"][child_data[0]] = child_data[1]
 
-            return yaml.dump(model, Dumper=yaml.SafeDumper, indent=4, width=768, allow_unicode=True, default_flow_style=False)
+            return yaml.dump(
+                model, Dumper=yaml.SafeDumper, indent=4, width=768, allow_unicode=True, default_flow_style=False
+            )
         except Exception:
             return "{}\n\nRaw data:\n{}".format(traceback.format_exc(), json.dumps(hr, indent=4))
 
@@ -277,13 +280,13 @@ class UniFiControllerClientModel():
             return -1
 
     def get_controller_url(self):
-        return self._api.get_connection_data()['url']
+        return self._api.get_connection_data()["url"]
 
     def get_controller_user(self):
-        return self._api.get_connection_data()['user']
+        return self._api.get_connection_data()["user"]
 
     def get_controller_site(self):
-        return self._api.get_connection_data()['site']
+        return self._api.get_connection_data()["site"]
 
 
 class UniFiControllerClient(SmartPlugin):
@@ -292,7 +295,7 @@ class UniFiControllerClient(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '1.6.4'
+    PLUGIN_VERSION = "1.6.4"
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -300,7 +303,8 @@ class UniFiControllerClient(SmartPlugin):
         """
         super().__init__()
         from bin.smarthome import VERSION
-        if '.'.join(VERSION.split('.', 2)[:2]) <= '1.5':
+
+        if ".".join(VERSION.split(".", 2)[:2]) <= "1.5":
             self.logger = logging.getLogger(__name__)
         self._pollfailed = 0
 
@@ -311,12 +315,16 @@ class UniFiControllerClient(SmartPlugin):
         self._unifi_password = self.get_parameter_value(UniFiConst.PARAMETER_PWD)
         self._unifi_site_id = self.get_parameter_value(UniFiConst.PARAMETER_SITE_ID)
 
-        self._model = UniFiControllerClientModel(UniFiAPI(username=self._unifi_user,
-                                                          password=self._unifi_password,
-                                                          site=self._unifi_site_id,
-                                                          baseurl=self._unifi_controller_url,
-                                                          unifitype=self._unifi_controller_type,
-                                                          verify_ssl=False))
+        self._model = UniFiControllerClientModel(
+            UniFiAPI(
+                username=self._unifi_user,
+                password=self._unifi_password,
+                site=self._unifi_site_id,
+                baseurl=self._unifi_controller_url,
+                unifitype=self._unifi_controller_type,
+                verify_ssl=False,
+            )
+        )
 
         # cycle time in seconds, only needed, if hardware/interface needs to be
         # polled for value changes by adding a scheduler entry in the run method of this plugin
@@ -334,7 +342,7 @@ class UniFiControllerClient(SmartPlugin):
         """
         self.logger.debug("Run method called")
         # setup scheduler for device poll loop   (disable the following line, if you don't need to poll the device. Rember to comment the self_cycle statement in __init__ as well
-        self.scheduler_add('poll_unifi', self.poll_device, cycle=self._cycle)
+        self.scheduler_add("poll_unifi", self.poll_device, cycle=self._cycle)
 
         self.alive = True
         # if you need to create child threads, do not make them daemon = True!
@@ -372,7 +380,7 @@ class UniFiControllerClient(SmartPlugin):
             self.logger.info(msg + " in item " + item.property.path)
 
     def _log_item_warning(self, item, msg: str, enable_logging=True):
-        self._model.append_item_issue(item, "3: "+msg, 3)
+        self._model.append_item_issue(item, "3: " + msg, 3)
         if enable_logging:
             self.logger.warning(msg + " in item " + item.property.path)
 
@@ -400,8 +408,9 @@ class UniFiControllerClient(SmartPlugin):
                     if not check(item, item_type, leaf_item):
                         return None
                 if not (item.property.path == leaf_item.property.path):
-                    self._log_item_info(leaf_item, "{} attribute provided from {}".format(
-                        item_type, item.property.path), enable_logging)
+                    self._log_item_info(
+                        leaf_item, "{} attribute provided from {}".format(item_type, item.property.path), enable_logging
+                    )
                 return self.get_iattr_value(item.conf, item_type)
         except AttributeError:
             self._log_item_warning(leaf_item, "No {} attribute provided".format(item_type), enable_logging)
@@ -422,8 +431,11 @@ class UniFiControllerClient(SmartPlugin):
                         if not check(item, item_type, leaf_item):
                             return None
                     if not (item.property.path == leaf_item.property.path):
-                        self._log_item_info(leaf_item, "{} attribute provided from {} ".format(
-                            item_type, item.property.path), enable_logging)
+                        self._log_item_info(
+                            leaf_item,
+                            "{} attribute provided from {} ".format(item_type, item.property.path),
+                            enable_logging,
+                        )
 
                     return self.get_iattr_value(item.conf, item_type)
             except AttributeError:
@@ -448,7 +460,12 @@ class UniFiControllerClient(SmartPlugin):
             return
 
         i_attr = self.get_iattr_value(item.conf, UniFiConst.ATTR_TYPE)
-        if i_attr in [UniFiConst.TYPE_CL_PRESENT, UniFiConst.TYPE_CL_IP, UniFiConst.TYPE_CL_AT_AP, UniFiConst.TYPE_CL_HOSTNAME]:
+        if i_attr in [
+            UniFiConst.TYPE_CL_PRESENT,
+            UniFiConst.TYPE_CL_IP,
+            UniFiConst.TYPE_CL_AT_AP,
+            UniFiConst.TYPE_CL_HOSTNAME,
+        ]:
             cl_mac = self._get_attribute_recursive(item, UniFiConst.ATTR_MAC, check=self._mac_check)
             if cl_mac is None:
                 return
@@ -463,7 +480,8 @@ class UniFiControllerClient(SmartPlugin):
 
         elif i_attr in [UniFiConst.TYPE_DV_IP, UniFiConst.TYPE_DV_NAME]:
             dv_mac = self._get_one_of_attr_recursive(
-                item, [UniFiConst.ATTR_AP_MAC, UniFiConst.ATTR_SW_MAC, UniFiConst.ATTR_DV_MAC], check=self._mac_check)
+                item, [UniFiConst.ATTR_AP_MAC, UniFiConst.ATTR_SW_MAC, UniFiConst.ATTR_DV_MAC], check=self._mac_check
+            )
             if dv_mac is None:
                 return
             self._model.append_item(item)
@@ -483,11 +501,17 @@ class UniFiControllerClient(SmartPlugin):
             prof_on = self._get_attribute_recursive(item, UniFiConst.ATTR_SW_PORT_PROF_ON)
             if prof_on is None:
                 self._log_item_info(
-                    item, "Will use 'All' as port profile for on (https://help.ubnt.com/hc/en-us/articles/219654087-UniFi-Using-VLANs-with-UniFi-Wireless-Routing-Switching-Hardware#USW)", defaulting=True)
+                    item,
+                    "Will use 'All' as port profile for on (https://help.ubnt.com/hc/en-us/articles/219654087-UniFi-Using-VLANs-with-UniFi-Wireless-Routing-Switching-Hardware#USW)",
+                    defaulting=True,
+                )
             prof_off = self._get_attribute_recursive(item, UniFiConst.ATTR_SW_PORT_PROF_OFF)
             if prof_off is None:
                 self._log_item_info(
-                    item, "Will use 'Disabled' as port profile for off (https://help.ubnt.com/hc/en-us/articles/219654087-UniFi-Using-VLANs-with-UniFi-Wireless-Routing-Switching-Hardware#USW)", defaulting=True)
+                    item,
+                    "Will use 'Disabled' as port profile for off (https://help.ubnt.com/hc/en-us/articles/219654087-UniFi-Using-VLANs-with-UniFi-Wireless-Routing-Switching-Hardware#USW)",
+                    defaulting=True,
+                )
             self._model.append_item(item)
             return self.update_item
 
@@ -522,24 +546,44 @@ class UniFiControllerClient(SmartPlugin):
         :param dest: if given it represents the dest
         """
         if caller != self.get_shortname():
-
-            self._update_unifi_with_item(item, UniFiConst.TYPE_AP_ENABLED, lambda i: self._model._api.set_device_disabled(
-                device_mac=self._get_attribute_recursive(
-                    i, UniFiConst.ATTR_AP_MAC, check=self._mac_check, enable_logging=self._logging),
-                disabled=not i())
+            self._update_unifi_with_item(
+                item,
+                UniFiConst.TYPE_AP_ENABLED,
+                lambda i: self._model._api.set_device_disabled(
+                    device_mac=self._get_attribute_recursive(
+                        i, UniFiConst.ATTR_AP_MAC, check=self._mac_check, enable_logging=self._logging
+                    ),
+                    disabled=not i(),
+                ),
             )
 
-            self._update_unifi_with_item(item, UniFiConst.TYPE_SW_PORT_ENABLED, lambda i: self._model._api.set_port_profile_for(
-                switch_mac=self._get_attribute_recursive(
-                    i, UniFiConst.ATTR_SW_MAC, check=self._mac_check, enable_logging=self._logging),
-                port_number=int(self._get_attribute_recursive(
-                    i, UniFiConst.ATTR_SW_PORT_NO, enable_logging=self._logging)),
-                profile_name=self._get_attribute_recursive(
-                    i, UniFiConst.ATTR_SW_PORT_PROF_ON, enable_logging=self._logging) or "All" if i() else self._get_attribute_recursive(i, UniFiConst.ATTR_SW_PORT_PROF_OFF, enable_logging=self._logging) or "Disabled")
+            self._update_unifi_with_item(
+                item,
+                UniFiConst.TYPE_SW_PORT_ENABLED,
+                lambda i: self._model._api.set_port_profile_for(
+                    switch_mac=self._get_attribute_recursive(
+                        i, UniFiConst.ATTR_SW_MAC, check=self._mac_check, enable_logging=self._logging
+                    ),
+                    port_number=int(
+                        self._get_attribute_recursive(i, UniFiConst.ATTR_SW_PORT_NO, enable_logging=self._logging)
+                    ),
+                    profile_name=self._get_attribute_recursive(
+                        i, UniFiConst.ATTR_SW_PORT_PROF_ON, enable_logging=self._logging
+                    )
+                    or "All"
+                    if i()
+                    else self._get_attribute_recursive(
+                        i, UniFiConst.ATTR_SW_PORT_PROF_OFF, enable_logging=self._logging
+                    )
+                    or "Disabled",
+                ),
             )
 
             self.logger.debug(
-                "update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(item, caller, source, dest))
+                "update_item was called with item '{}' from caller '{}', source '{}' and dest '{}'".format(
+                    item, caller, source, dest
+                )
+            )
 
     def _item_filter(self, item, attr_type, attr_val):
         if not self.has_iattr(item.conf, attr_type):
@@ -550,28 +594,32 @@ class UniFiControllerClient(SmartPlugin):
 
     def _check_client_at_ap(self, i):
         ap_mac = self._get_attribute_recursive(
-            i, UniFiConst.ATTR_AP_MAC, check=self._mac_check, enable_logging=self._logging)
+            i, UniFiConst.ATTR_AP_MAC, check=self._mac_check, enable_logging=self._logging
+        )
         if ap_mac is None:
             return False
         client_mac = self._get_attribute_recursive(
-            i, UniFiConst.ATTR_MAC, check=self._mac_check, enable_logging=self._logging)
+            i, UniFiConst.ATTR_MAC, check=self._mac_check, enable_logging=self._logging
+        )
         client_present = self._model._api.get_client_presence(client_mac)
         if not client_present:
             return False
 
-        ap_of_client_mac = self._model._api.get_client_info(client_mac, 'ap_mac')
+        ap_of_client_mac = self._model._api.get_client_info(client_mac, "ap_mac")
         if ap_of_client_mac is None:
-            self._log_item_warning(i,  "Unable to get MAC of access-point for client %s" %
-                                   (client_mac), enable_logging=self._logging)
+            self._log_item_warning(
+                i, "Unable to get MAC of access-point for client %s" % (client_mac), enable_logging=self._logging
+            )
 
         return ap_of_client_mac == ap_mac
 
     def _check_ap_enabled(self, item):
         ap_mac = self._get_attribute_recursive(
-            item, UniFiConst.ATTR_AP_MAC, check=self._mac_check, enable_logging=self._logging)
+            item, UniFiConst.ATTR_AP_MAC, check=self._mac_check, enable_logging=self._logging
+        )
         if ap_mac is None:
             return False
-        rsl = self._model._api.get_device_info(ap_mac, 'disabled', if_no_prop=False)
+        rsl = self._model._api.get_device_info(ap_mac, "disabled", if_no_prop=False)
         if rsl is None:
             self._log_item_warning(item, "No device %s found" % (ap_mac), enable_logging=self._logging)
             return False
@@ -579,7 +627,11 @@ class UniFiControllerClient(SmartPlugin):
 
     def _get_device_info(self, item, info_type):
         mac = self._get_one_of_attr_recursive(
-            item, [UniFiConst.ATTR_DV_MAC, UniFiConst.ATTR_AP_MAC, UniFiConst.ATTR_SW_MAC], check=self._mac_check, enable_logging=self._logging)
+            item,
+            [UniFiConst.ATTR_DV_MAC, UniFiConst.ATTR_AP_MAC, UniFiConst.ATTR_SW_MAC],
+            check=self._mac_check,
+            enable_logging=self._logging,
+        )
         if mac is None:
             return False
         rsl = self._model._api.get_device_info(mac, info_type)
@@ -590,25 +642,26 @@ class UniFiControllerClient(SmartPlugin):
 
     def _get_sw_port_profile(self, i):
         sw_mac = self._get_attribute_recursive(
-            i, UniFiConst.ATTR_SW_MAC, check=self._mac_check, enable_logging=self._logging)
+            i, UniFiConst.ATTR_SW_MAC, check=self._mac_check, enable_logging=self._logging
+        )
         try:
-            sw_port = int(self._get_attribute_recursive(i, UniFiConst.ATTR_SW_PORT_NO,
-                                                        enable_logging=self._logging))
+            sw_port = int(self._get_attribute_recursive(i, UniFiConst.ATTR_SW_PORT_NO, enable_logging=self._logging))
             return self._model._api.get_port_profile_for(sw_mac, sw_port)
         except TypeError:
             return None
         except UniFiDataException as e:
             self._log_item_warning(
-                i, "Unable to determine current switch-profile for switch {}, error: {}".format(sw_mac, e),  enable_logging=self._logging)
+                i,
+                "Unable to determine current switch-profile for switch {}, error: {}".format(sw_mac, e),
+                enable_logging=self._logging,
+            )
             return None
 
     def _check_sw_port_enabled(self, item):
         rslt = self._get_sw_port_profile(item)
 
-        pp_on = self._get_attribute_recursive(
-            item, UniFiConst.ATTR_SW_PORT_PROF_ON, enable_logging=self._logging)
-        pp_off = self._get_attribute_recursive(
-            item, UniFiConst.ATTR_SW_PORT_PROF_OFF, enable_logging=self._logging)
+        pp_on = self._get_attribute_recursive(item, UniFiConst.ATTR_SW_PORT_PROF_ON, enable_logging=self._logging)
+        pp_off = self._get_attribute_recursive(item, UniFiConst.ATTR_SW_PORT_PROF_OFF, enable_logging=self._logging)
 
         if rslt == pp_off:
             return False
@@ -617,18 +670,25 @@ class UniFiControllerClient(SmartPlugin):
         elif rslt is None:
             return None
         else:
-            self._log_item_warning(item, "Current port profile \"{}\" doesn't match \"{}\" (on) or \"{}\" (off) (https://help.ubnt.com/hc/en-us/articles/219654087-UniFi-Using-VLANs-with-UniFi-Wireless-Routing-Switching-Hardware#USW)".format(
-                rslt, pp_on, pp_off), enable_logging=self._logging)
+            self._log_item_warning(
+                item,
+                'Current port profile "{}" doesn\'t match "{}" (on) or "{}" (off) (https://help.ubnt.com/hc/en-us/articles/219654087-UniFi-Using-VLANs-with-UniFi-Wireless-Routing-Switching-Hardware#USW)'.format(
+                    rslt, pp_on, pp_off
+                ),
+                enable_logging=self._logging,
+            )
             return None
 
     def _get_client_info(self, item, info_type):
         client_mac = self._get_attribute_recursive(
-            item, UniFiConst.ATTR_MAC, check=self._mac_check, enable_logging=self._logging)
+            item, UniFiConst.ATTR_MAC, check=self._mac_check, enable_logging=self._logging
+        )
         return self._model._api.get_client_info(client_mac, info_type)
 
     def _get_client_presence(self, item):
         client_mac = self._get_attribute_recursive(
-            item, UniFiConst.ATTR_MAC, check=self._mac_check, enable_logging=self._logging)
+            item, UniFiConst.ATTR_MAC, check=self._mac_check, enable_logging=self._logging
+        )
         return self._model._api.get_client_presence(client_mac)
 
     def _poll_with_unifi_type(self, unifi_type, func):
@@ -652,12 +712,12 @@ class UniFiControllerClient(SmartPlugin):
             self._poll_with_unifi_type(UniFiConst.TYPE_SW_PORT_ENABLED, lambda i: self._check_sw_port_enabled(i))
             self._poll_with_unifi_type(UniFiConst.TYPE_SW_PORT_PROFILE, lambda i: self._get_sw_port_profile(i))
             self._poll_with_unifi_type(UniFiConst.TYPE_CL_PRESENT, lambda i: self._get_client_presence(i))
-            self._poll_with_unifi_type(UniFiConst.TYPE_CL_IP, lambda i: self._get_client_info(i, 'ip'))
-            self._poll_with_unifi_type(UniFiConst.TYPE_CL_HOSTNAME, lambda i: self._get_client_info(i, 'hostname'))
+            self._poll_with_unifi_type(UniFiConst.TYPE_CL_IP, lambda i: self._get_client_info(i, "ip"))
+            self._poll_with_unifi_type(UniFiConst.TYPE_CL_HOSTNAME, lambda i: self._get_client_info(i, "hostname"))
             self._poll_with_unifi_type(UniFiConst.TYPE_CL_AT_AP, lambda i: self._check_client_at_ap(i))
             self._poll_with_unifi_type(UniFiConst.TYPE_AP_ENABLED, lambda i: self._check_ap_enabled(i))
-            self._poll_with_unifi_type(UniFiConst.TYPE_DV_IP, lambda i: self._get_device_info(i, 'ip'))
-            self._poll_with_unifi_type(UniFiConst.TYPE_DV_NAME, lambda i: self._get_device_info(i, 'name'))
+            self._poll_with_unifi_type(UniFiConst.TYPE_DV_IP, lambda i: self._get_device_info(i, "ip"))
+            self._poll_with_unifi_type(UniFiConst.TYPE_DV_NAME, lambda i: self._get_device_info(i, "name"))
             self._pollfailed = 0
         except ConnectionError as ex:
             self._pollfailed += 1

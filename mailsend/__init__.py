@@ -34,21 +34,20 @@ from lib.module import Modules
 from lib.model.smartplugin import SmartPlugin, os
 from lib.item import Items
 
-class SMTP(SmartPlugin):
 
+class SMTP(SmartPlugin):
     PLUGIN_VERSION = "1.4.2"
 
     def __init__(self, sh):
         # Call init code of parent class (SmartPlugin)
         super().__init__()
 
-        self._tls = self.get_parameter_value('tls')
-        self._host = self.get_parameter_value('host')
-        self._port = self.get_parameter_value('port')
-        self._from = self.get_parameter_value('mail_from')
-        self._username = self.get_parameter_value('username')
-        self._password = self.get_parameter_value('password')
-
+        self._tls = self.get_parameter_value("tls")
+        self._host = self.get_parameter_value("host")
+        self._port = self.get_parameter_value("port")
+        self._from = self.get_parameter_value("mail_from")
+        self._username = self.get_parameter_value("username")
+        self._password = self.get_parameter_value("password")
 
     def send(self, to, sub, msg, caller=None, source=None):
         self.__call__(to, sub, msg, caller, source)
@@ -60,13 +59,13 @@ class SMTP(SmartPlugin):
             self.logger.warning(f"Could not connect to {self._host}: {e}")
             return
         try:
-            msg = MIMEText(msg, 'plain', 'utf-8')
-            msg['Subject'] = Header(sub, 'utf-8')
-            msg['From'] = self._from
-            msg['Date'] = email.utils.formatdate()
-            msg['To'] = to
-            msg['Message-ID'] = email.utils.make_msgid('SmartHomeNG')
-            to = [x.strip() for x in to.split(',')]
+            msg = MIMEText(msg, "plain", "utf-8")
+            msg["Subject"] = Header(sub, "utf-8")
+            msg["From"] = self._from
+            msg["Date"] = email.utils.formatdate()
+            msg["To"] = to
+            msg["Message-ID"] = email.utils.make_msgid("SmartHomeNG")
+            to = [x.strip() for x in to.split(",")]
             self.logger.debug("email prepared for sending")
             smtp.sendmail(self._from, to, msg.as_string())
         except Exception as e:
@@ -74,12 +73,14 @@ class SMTP(SmartPlugin):
         finally:
             try:
                 smtp.quit()
-                del (smtp)
+                del smtp
             except Exception:
                 pass
             self.logger.debug("email was sent")
 
-    def extended(self, to, sub, msg, sender_name: str, img_list: list=None, attachments: list=None, caller=None, source=None):
+    def extended(
+        self, to, sub, msg, sender_name: str, img_list: list = None, attachments: list = None, caller=None, source=None
+    ):
         if img_list is None:
             img_list = []
         if attachments is None:
@@ -90,24 +91,24 @@ class SMTP(SmartPlugin):
             self.logger.warning(f"Could not connect to {self._host}: {e}")
             return
         try:
-            sender_name = Header(sender_name, 'utf-8').encode()
-            msg_root = MIMEMultipart('mixed')
-            msg_root['Subject'] = Header(sub, 'utf-8')
-            msg_root['From'] = email.utils.formataddr((sender_name, self._from))
-            msg_root['Date'] = email.utils.formatdate(localtime=1)
+            sender_name = Header(sender_name, "utf-8").encode()
+            msg_root = MIMEMultipart("mixed")
+            msg_root["Subject"] = Header(sub, "utf-8")
+            msg_root["From"] = email.utils.formataddr((sender_name, self._from))
+            msg_root["Date"] = email.utils.formatdate(localtime=1)
             if not isinstance(to, list):
                 to = [to]
-            msg_root['To'] = email.utils.COMMASPACE.join(to)
+            msg_root["To"] = email.utils.COMMASPACE.join(to)
 
-            msg_root.preamble = 'This is a multi-part message in MIME format.'
+            msg_root.preamble = "This is a multi-part message in MIME format."
 
-            msg_related = MIMEMultipart('related')
+            msg_related = MIMEMultipart("related")
             msg_root.attach(msg_related)
 
-            msg_alternative = MIMEMultipart('alternative')
+            msg_alternative = MIMEMultipart("alternative")
             msg_related.attach(msg_alternative)
 
-            msg_text = MIMEText(msg.encode('utf-8'), 'plain', 'utf-8')
+            msg_text = MIMEText(msg.encode("utf-8"), "plain", "utf-8")
             msg_alternative.attach(msg_text)
 
             html = """
@@ -122,30 +123,29 @@ class SMTP(SmartPlugin):
                 </html>
                 """.format(msg)  # template
 
-            msg_html = MIMEText(html.encode('utf-8'), 'html', 'utf-8')
+            msg_html = MIMEText(html.encode("utf-8"), "html", "utf-8")
             msg_alternative.attach(msg_html)
 
             for i, img in enumerate(img_list):
-                if img.startswith('http://'):
+                if img.startswith("http://"):
                     fp = urllib.request.urlopen(img)
                 else:
-                    fp = open(img, 'rb')
+                    fp = open(img, "rb")
                 msg_image = MIMEImage(fp.read())
-                msg_image.add_header('Content-ID', '<image{}>'.format(i))
+                msg_image.add_header("Content-ID", "<image{}>".format(i))
                 msg_related.attach(msg_image)
 
             for attachment in attachments:
                 fname = os.path.basename(attachment)
 
-                if attachment.startswith('http://'):
+                if attachment.startswith("http://"):
                     f = urllib.request.urlopen(attachment)
                 else:
-                    f = open(attachment, 'rb')
-                msg_attach = MIMEBase('application', 'octet-stream')
+                    f = open(attachment, "rb")
+                msg_attach = MIMEBase("application", "octet-stream")
                 msg_attach.set_payload(f.read())
                 encoders.encode_base64(msg_attach)
-                msg_attach.add_header('Content-Disposition', 'attachment',
-                                      filename=(Header(fname, 'utf-8').encode()))
+                msg_attach.add_header("Content-Disposition", "attachment", filename=(Header(fname, "utf-8").encode()))
                 msg_root.attach(msg_attach)
 
             smtp.send_message(msg_root)
@@ -154,7 +154,7 @@ class SMTP(SmartPlugin):
         finally:
             try:
                 smtp.quit()
-                del(smtp)
+                del smtp
             except Exception:
                 pass
 
@@ -162,7 +162,7 @@ class SMTP(SmartPlugin):
         smtp = smtplib.SMTP(self._host, self._port)
         if self._tls:
             smtp.starttls()
-        if self._username != '':
+        if self._username != "":
             smtp.login(self._username, self._password)
         return smtp
 

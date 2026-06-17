@@ -44,7 +44,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -61,10 +60,18 @@ class WebInterface(SmartPluginWebIf):
 
         self.tplenv = self.init_template_environment()
 
-
     @cherrypy.expose
-    def index(self, reload=None, action=None, item_id=None, item_path=None, device_id=None, device_offset=None,
-              time_orig=None, changed_orig=None):
+    def index(
+        self,
+        reload=None,
+        action=None,
+        item_id=None,
+        item_path=None,
+        device_id=None,
+        device_offset=None,
+        time_orig=None,
+        changed_orig=None,
+    ):
         """
         Build index.html for cherrypy
 
@@ -83,19 +90,31 @@ class WebInterface(SmartPluginWebIf):
             elif action == "toggle_log_unknown":
                 self.plugin.toggle_log_unknown_msg()
                 self.logger.info("Toogle state of log unknown messages triggered via webinterface")
-            elif action == "send_learn" and (device_id is not None) and not (device_id=="") and (device_offset is not None) and not(device_offset==""):
-                self.logger.warning(f"Learn telegram triggered via webinterface (ID:{device_id} Offset:{device_offset})")
+            elif (
+                action == "send_learn"
+                and (device_id is not None)
+                and not (device_id == "")
+                and (device_offset is not None)
+                and not (device_offset == "")
+            ):
+                self.logger.warning(
+                    f"Learn telegram triggered via webinterface (ID:{device_id} Offset:{device_offset})"
+                )
                 ret = self.plugin.send_learn_protocol(int(device_offset), int(device_id))
                 if ret:
                     learn_triggered = True
             else:
                 self.logger.error("Unknown comman received via webinterface")
 
-        tmpl = self.tplenv.get_template('index.html')
-        return tmpl.render(p=self.plugin,
-                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path']), reverse=False),
-                           tabcount=1, item_id=item_id, learn_triggered=learn_triggered, action='')
-
+        tmpl = self.tplenv.get_template("index.html")
+        return tmpl.render(
+            p=self.plugin,
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"]), reverse=False),
+            tabcount=1,
+            item_id=item_id,
+            learn_triggered=learn_triggered,
+            action="",
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -108,7 +127,7 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         # if dataSets are used, define them here
-        if dataSet == 'overview':
+        if dataSet == "overview":
             # get the new data from the plugin variable called _webdata
             data = self.plugin._webdata
             try:

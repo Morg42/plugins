@@ -47,7 +47,6 @@ import socket
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -67,7 +66,6 @@ class WebInterface(SmartPluginWebIf):
         # try to get API handles
         self.items = Items.get_instance()
         self.logics = Logics.get_instance()
-
 
     @cherrypy.expose
     def index(self, reload=None):
@@ -90,47 +88,49 @@ class WebInterface(SmartPluginWebIf):
 
         for clientinfo in self.plugin.return_clients():
             client = dict()
-            client['ip'] = clientinfo.get('ip', '')
-            client['port'] = clientinfo.get('port', '')
+            client["ip"] = clientinfo.get("ip", "")
+            client["port"] = clientinfo.get("port", "")
             try:
-                client['name'] = socket.gethostbyaddr(client['ip'])[0]
+                client["name"] = socket.gethostbyaddr(client["ip"])[0]
             except Exception:
-                client['name'] = client['ip']
+                client["name"] = client["ip"]
 
-            client['proto'] = clientinfo.get('proto', '')
-            client['sw'] = clientinfo.get('sw', '')
-            client['swversion'] = clientinfo.get('swversion', '')
-            client['protocol'] = clientinfo.get('protocol', '')
-            client['hostname'] = clientinfo.get('hostname', '')
-            client['browser'] = clientinfo.get('browser', '')
-            client['browserversion'] = clientinfo.get('browserversion', '')
+            client["proto"] = clientinfo.get("proto", "")
+            client["sw"] = clientinfo.get("sw", "")
+            client["swversion"] = clientinfo.get("swversion", "")
+            client["protocol"] = clientinfo.get("protocol", "")
+            client["hostname"] = clientinfo.get("hostname", "")
+            client["browser"] = clientinfo.get("browser", "")
+            client["browserversion"] = clientinfo.get("browserversion", "")
 
-            client['osname'] = clientinfo.get('os_name', '')
-            client['osversion'] = clientinfo.get('os_vers', '')
-            client['osversionname'] = clientinfo.get('os_vname', '')
-            client['platformtype'] = clientinfo.get('pl_type', '')
-            client['platformvendor'] = clientinfo.get('pl_vendor', '')
+            client["osname"] = clientinfo.get("os_name", "")
+            client["osversion"] = clientinfo.get("os_vers", "")
+            client["osversionname"] = clientinfo.get("os_vname", "")
+            client["platformtype"] = clientinfo.get("pl_type", "")
+            client["platformvendor"] = clientinfo.get("pl_vendor", "")
             clients.append(client)
 
-        clients_sorted = sorted(clients, key=lambda k: k['name'])
+        clients_sorted = sorted(clients, key=lambda k: k["name"])
 
         plgitems = []
         for item in self.items.return_items():
-            if ('visu_acl' in item.conf):
+            if "visu_acl" in item.conf:
                 plgitems.append(item)
 
         plglogics = []
         if self.logics:
             for logic in self.logics.return_logics():
                 plglogics.append(self.logics.get_logic_info(logic))
-        pagelength = self.plugin.get_parameter_value('webif_pagelength')
-        tmpl = self.tplenv.get_template('index.html')
-        return tmpl.render(p=self.plugin,
-                           webif_pagelength=pagelength,
-                           items=sorted(plgitems, key=lambda k: str.lower(k['_path'])),
-                           logics=sorted(plglogics, key=lambda k: str.lower(k['name'])),
-                           clients=clients_sorted, client_count=len(clients_sorted))
-
+        pagelength = self.plugin.get_parameter_value("webif_pagelength")
+        tmpl = self.tplenv.get_template("index.html")
+        return tmpl.render(
+            p=self.plugin,
+            webif_pagelength=pagelength,
+            items=sorted(plgitems, key=lambda k: str.lower(k["_path"])),
+            logics=sorted(plglogics, key=lambda k: str.lower(k["name"])),
+            clients=clients_sorted,
+            client_count=len(clients_sorted),
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -147,37 +147,37 @@ class WebInterface(SmartPluginWebIf):
             item_dict = {}
             for item in self.plugin.get_item_list():
                 value_dict = {}
-                value_dict['type'] = item.property.type
-                if ('visu_acl' in item.conf):
-                    value_dict['acl'] = item.conf.get('visu_acl')
-                value_dict['value'] = str(item.property.value)
-                value_dict['last_update'] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                value_dict['last_change'] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                value_dict["type"] = item.property.type
+                if "visu_acl" in item.conf:
+                    value_dict["acl"] = item.conf.get("visu_acl")
+                value_dict["value"] = str(item.property.value)
+                value_dict["last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                value_dict["last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
                 item_dict[item.property.path] = value_dict
 
             # callect data for 'clients' tab
             client_list = []
             for clientinfo in self.plugin.return_clients():
                 value_dict = {}
-                value_dict['ip'] = clientinfo.get('ip', '')
-                value_dict['port'] = clientinfo.get('port', '')
+                value_dict["ip"] = clientinfo.get("ip", "")
+                value_dict["port"] = clientinfo.get("port", "")
                 try:
-                    value_dict['name'] = socket.gethostbyaddr(value_dict['ip'])[0]
+                    value_dict["name"] = socket.gethostbyaddr(value_dict["ip"])[0]
                 except Exception:
-                    value_dict['name'] = value_dict['ip']
-                value_dict['proto'] = clientinfo.get('proto', '')
-                value_dict['sw'] = clientinfo.get('sw', '')
-                value_dict['swversion'] = clientinfo.get('swversion', '')
-                value_dict['protocol'] = clientinfo.get('protocol', '')
-                value_dict['hostname'] = clientinfo.get('hostname', '')
-                value_dict['browser'] = clientinfo.get('browser', '')
-                value_dict['browserversion'] = clientinfo.get('browserversion', '')
+                    value_dict["name"] = value_dict["ip"]
+                value_dict["proto"] = clientinfo.get("proto", "")
+                value_dict["sw"] = clientinfo.get("sw", "")
+                value_dict["swversion"] = clientinfo.get("swversion", "")
+                value_dict["protocol"] = clientinfo.get("protocol", "")
+                value_dict["hostname"] = clientinfo.get("hostname", "")
+                value_dict["browser"] = clientinfo.get("browser", "")
+                value_dict["browserversion"] = clientinfo.get("browserversion", "")
 
-                value_dict['osname'] = clientinfo.get('os_name', '')
-                value_dict['osversion'] = clientinfo.get('os_vers', '')
-                value_dict['osversionname'] = clientinfo.get('os_vname', '')
-                value_dict['platformtype'] = clientinfo.get('pl_type', '')
-                value_dict['platformvendor'] = clientinfo.get('pl_vendor', '')
+                value_dict["osname"] = clientinfo.get("os_name", "")
+                value_dict["osversion"] = clientinfo.get("os_vers", "")
+                value_dict["osversionname"] = clientinfo.get("os_vname", "")
+                value_dict["platformtype"] = clientinfo.get("pl_type", "")
+                value_dict["platformvendor"] = clientinfo.get("pl_vendor", "")
                 client_list.append(value_dict)
 
             plglogics = []
@@ -185,8 +185,8 @@ class WebInterface(SmartPluginWebIf):
                 for logic in self.logics.return_logics():
                     plglogics.append(self.logics.get_logic_info(logic))
 
-            result = {'items': item_dict, 'clients': client_list, 'logics': plglogics}
-            #self.logger.error(result)
+            result = {"items": item_dict, "clients": client_list, "logics": plglogics}
+            # self.logger.error(result)
             # send result to web interface
             try:
                 data = json.dumps(result)

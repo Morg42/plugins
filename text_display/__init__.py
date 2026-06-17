@@ -35,6 +35,7 @@ from .models.TextDisplayModel import TextDisplayModel
 # If a needed package is imported, which might be not installed in the Python environment,
 # add it to a requirements.txt file within the plugin's directory
 
+
 class TextDisplay(SmartPlugin):
     """
     Main class of the Plugin. Does all plugin specific stuff and provides
@@ -42,7 +43,7 @@ class TextDisplay(SmartPlugin):
     """
 
     # (must match the version specified in plugin.yaml), use '1.0.0' for your initial plugin Release
-    PLUGIN_VERSION = '1.8.1'
+    PLUGIN_VERSION = "1.8.1"
 
     def __init__(self, sh):
         """
@@ -59,7 +60,7 @@ class TextDisplay(SmartPlugin):
 
         # Call init code of parent class (SmartPlugin)
         super().__init__()
-        
+
         self.logger.debug("Init method called")
 
         self._model = TextDisplayModel()
@@ -111,57 +112,48 @@ class TextDisplay(SmartPlugin):
                         with the item, caller, source and dest as arguments and in case of the knx plugin the value
                         can be sent to the knx with a knx write function within the knx plugin.
         """
-        if self.has_iattr(item.conf, 'text_display_target_ring'):
-            target_ring = self.get_iattr_value(
-                item.conf, 'text_display_target_ring')
+        if self.has_iattr(item.conf, "text_display_target_ring"):
+            target_ring = self.get_iattr_value(item.conf, "text_display_target_ring")
 
-            item.expand_relativepathes(
-                'text_display_content_source_item', '', '')
-            content_source_path = self.get_iattr_value(
-                item.conf, 'text_display_content_source_item')
+            item.expand_relativepathes("text_display_content_source_item", "", "")
+            content_source_path = self.get_iattr_value(item.conf, "text_display_content_source_item")
 
-            self.logger.debug(
-                f"trigger from {item}, content-src: {content_source_path}, to msg-ring {target_ring}")
+            self.logger.debug(f"trigger from {item}, content-src: {content_source_path}, to msg-ring {target_ring}")
 
             self._model.append_message_source_to_ring(
                 ring=target_ring,
                 content_source_path=content_source_path,
-                content_source=lambda: self._shng_items.return_item(
-                    content_source_path)(),
+                content_source=lambda: self._shng_items.return_item(content_source_path)(),
                 is_relevant_path=item.property.path,
-                is_relevant=lambda: item()
+                is_relevant=lambda: item(),
             )
             return self.update_item_message_source_relevance
 
-        if self.has_iattr(item.conf, 'text_display_sink_for_rings'):
-            source_rings = self.get_iattr_value(
-                item.conf, 'text_display_sink_for_rings')
-            default_value = self.get_iattr_value(
-                item.conf, 'text_display_default_message')
-            overruling_rings = self.get_iattr_value(
-                item.conf, 'text_display_sink_rings_with_prio')
-            cycle_time = self.get_iattr_value(
-                item.conf, 'text_display_cycle_time')
+        if self.has_iattr(item.conf, "text_display_sink_for_rings"):
+            source_rings = self.get_iattr_value(item.conf, "text_display_sink_for_rings")
+            default_value = self.get_iattr_value(item.conf, "text_display_default_message")
+            overruling_rings = self.get_iattr_value(item.conf, "text_display_sink_rings_with_prio")
+            cycle_time = self.get_iattr_value(item.conf, "text_display_cycle_time")
             if cycle_time is None:
                 cycle_time = 3
             sink_item_path = item.property.path
 
             self.logger.debug(
-                f"{sink_item_path} shall be sink for rings {source_rings}, with default {default_value}, cycle-time {cycle_time}s")
+                f"{sink_item_path} shall be sink for rings {source_rings}, with default {default_value}, cycle-time {cycle_time}s"
+            )
 
             self._model.append_message_sink_to_rings(
-                sink_item_path, source_rings, default_value, tick_time_hint=cycle_time)
+                sink_item_path, source_rings, default_value, tick_time_hint=cycle_time
+            )
 
             if overruling_rings is None:
                 self.logger.debug("No overruling-rings")
             else:
                 self.logger.debug(f"Overruling rings: {overruling_rings}")
-                self._model.append_message_sink_to_overruling_rings(
-                    sink_item_path, overruling_rings)
+                self._model.append_message_sink_to_overruling_rings(sink_item_path, overruling_rings)
 
             scheduler_name = f"msg_sink-{sink_item_path}"
-            self.scheduler_add(
-                scheduler_name, lambda: self.tick_sink(sink_item_path), cycle=cycle_time, offset=.2)
+            self.scheduler_add(scheduler_name, lambda: self.tick_sink(sink_item_path), cycle=cycle_time, offset=0.2)
             self.__sink_scheduler_names.append(scheduler_name)
 
     def parse_logic(self, logic):
@@ -172,9 +164,10 @@ class TextDisplay(SmartPlugin):
 
     def tick_sink(self, sink_item_path):
         sink_item = self._shng_items.return_item(sink_item_path)
-        if sink_item.property.type == 'bool':
-            sink_item(self._model.sink_has_messages_present(
-                sink_item_path), self.get_shortname(), "sink_has_messages_present")
+        if sink_item.property.type == "bool":
+            sink_item(
+                self._model.sink_has_messages_present(sink_item_path), self.get_shortname(), "sink_has_messages_present"
+            )
         else:
             value = self._model.tick_sink(sink_item_path)
             if value is not None:
@@ -201,9 +194,7 @@ class TextDisplay(SmartPlugin):
         if self.alive and caller != self.get_shortname():
             if item.property.value and item.property.value != item.property.last_value:
                 self._model.update_source_relevance(item.property.path)
-                ring_name = self._model.get_ring_for_relevance_item(
-                    item.property.path)
-                sink_items = self._model.get_sink_item_paths_for_ring(
-                    ring_name)
+                ring_name = self._model.get_ring_for_relevance_item(item.property.path)
+                sink_items = self._model.get_sink_item_paths_for_ring(ring_name)
                 for sink_item_path in sink_items:
                     self.retrigger_item_message_sink_cycle(sink_item_path)

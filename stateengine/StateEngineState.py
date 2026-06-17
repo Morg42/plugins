@@ -152,7 +152,7 @@ class SeState(StateEngineTools.SeItemChild):
             webif_id = value.id
         else:
             webif_id = None
-        _key_copy = ['{}'.format(self.id), 'is_copy_for']
+        _key_copy = ["{}".format(self.id), "is_copy_for"]
         self._abitem.update_webif(_key_copy, webif_id)
         self.__is_copy_for.set(value, "", True, False)
 
@@ -177,7 +177,7 @@ class SeState(StateEngineTools.SeItemChild):
         self.__can_release = StateEngineValue.SeValue(self._abitem, "State can release")
         self.__has_released = StateEngineValue.SeValue(self._abitem, "State has released")
         self.__was_releasedby = StateEngineValue.SeValue(self._abitem, "State was released by")
-        self.__name = ''
+        self.__name = ""
         self.__unused_attributes = {}
         self.__used_attributes = {}
         self.__action_status = {"enter": {}, "enter_or_stay": {}, "stay": {}, "pass": {}, "leave": {}}
@@ -235,15 +235,24 @@ class SeState(StateEngineTools.SeItemChild):
 
         self._log_info("Updating Web Interface...")
         self._log_increase_indent()
-        self._abitem.update_webif(self.id, {'name': self.name,
-                                            'conditionsets': {},
-                                            'actions_enter': {},
-                                            'actions_enter_or_stay': {},
-                                            'actions_stay': {},
-                                            'actions_leave': {},
-                                            'actions_pass': {},
-                                            'leave': False, 'enter': False, 'stay': False, 'pass': False,
-                                            'is_copy_for': None, 'releasedby': None})
+        self._abitem.update_webif(
+            self.id,
+            {
+                "name": self.name,
+                "conditionsets": {},
+                "actions_enter": {},
+                "actions_enter_or_stay": {},
+                "actions_stay": {},
+                "actions_leave": {},
+                "actions_pass": {},
+                "leave": False,
+                "enter": False,
+                "stay": False,
+                "pass": False,
+                "is_copy_for": None,
+                "releasedby": None,
+            },
+        )
         self._log_decrease_indent()
         self._log_info("Finished Web Interface Update")
 
@@ -291,8 +300,12 @@ class SeState(StateEngineTools.SeItemChild):
         if isinstance(value, list):
             if len(value) > 1:
                 _default_value = self.__order.get()
-                self._log_warning("se_stateorder for item {} can not be defined as a list"
-                                  " ({}). Using default value {}.", self.id, value, _default_value)
+                self._log_warning(
+                    "se_stateorder for item {} can not be defined as a list ({}). Using default value {}.",
+                    self.id,
+                    value,
+                    _default_value,
+                )
                 value = _default_value
             elif len(value) == 1:
                 value = value[0]
@@ -309,10 +322,10 @@ class SeState(StateEngineTools.SeItemChild):
     # item_allow_repeat: Is repeating actions generally allowed for the item?
     def run_enter(self, allow_item_repeat: bool):
         self._log_increase_indent()
-        _key_leave = ['{}'.format(self.id), 'leave']
-        _key_stay = ['{}'.format(self.id), 'stay']
-        _key_enter = ['{}'.format(self.id), 'enter']
-        _key_pass = ['{}'.format(self.id), 'pass']
+        _key_leave = ["{}".format(self.id), "leave"]
+        _key_stay = ["{}".format(self.id), "stay"]
+        _key_enter = ["{}".format(self.id), "enter"]
+        _key_pass = ["{}".format(self.id), "pass"]
         self._abitem.update_webif(_key_leave, False)
         self._abitem.update_webif(_key_stay, False)
         self._abitem.update_webif(_key_enter, True)
@@ -324,10 +337,10 @@ class SeState(StateEngineTools.SeItemChild):
     # item_allow_repeat: Is repeating actions generally allowed for the item?
     def run_stay(self, allow_item_repeat: bool):
         self._log_increase_indent()
-        _key_leave = ['{}'.format(self.id), 'leave']
-        _key_stay = ['{}'.format(self.id), 'stay']
-        _key_enter = ['{}'.format(self.id), 'enter']
-        _key_pass = ['{}'.format(self.id), 'pass']
+        _key_leave = ["{}".format(self.id), "leave"]
+        _key_stay = ["{}".format(self.id), "stay"]
+        _key_enter = ["{}".format(self.id), "enter"]
+        _key_pass = ["{}".format(self.id), "pass"]
         self._abitem.update_webif(_key_leave, False)
         self._abitem.update_webif(_key_stay, True)
         self._abitem.update_webif(_key_enter, False)
@@ -340,10 +353,10 @@ class SeState(StateEngineTools.SeItemChild):
     def run_pass(self, is_repeat: bool, allow_item_repeat: bool):
         self._log_info("Passing state {}, running pass actions.", self.id)
         self._log_increase_indent()
-        _key_leave = ['{}'.format(self.id), 'leave']
-        _key_stay = ['{}'.format(self.id), 'stay']
-        _key_enter = ['{}'.format(self.id), 'enter']
-        _key_pass = ['{}'.format(self.id), 'pass']
+        _key_leave = ["{}".format(self.id), "leave"]
+        _key_stay = ["{}".format(self.id), "stay"]
+        _key_enter = ["{}".format(self.id), "enter"]
+        _key_pass = ["{}".format(self.id), "pass"]
         self._abitem.update_webif(_key_leave, False)
         self._abitem.update_webif(_key_stay, False)
         self._abitem.update_webif(_key_enter, False)
@@ -356,7 +369,7 @@ class SeState(StateEngineTools.SeItemChild):
     def run_leave(self, allow_item_repeat: bool):
         self._log_increase_indent()
         for elem in self._abitem.webif_infos:
-            _key_leave = ['{}'.format(elem), 'leave']
+            _key_leave = ["{}".format(elem), "leave"]
             self._abitem.update_webif(_key_leave, False)
         self.__actions_leave.execute(False, allow_item_repeat, self)
         self._log_decrease_indent(50)
@@ -364,8 +377,9 @@ class SeState(StateEngineTools.SeItemChild):
     def refill(self):
         cond_refill = not self.__use.is_empty() and ("eval" in self.__use.get_type() or "item" in self.__use.get_type())
         if cond_refill:
-            self._log_debug("State {}: se_use attribute including item or eval "
-                            "- updating state conditions and actions", self.__name)
+            self._log_debug(
+                "State {}: se_use attribute including item or eval - updating state conditions and actions", self.__name
+            )
             self._log_increase_indent()
             self.__fill(self, 0, "reinit")
             self._log_decrease_indent()
@@ -397,10 +411,14 @@ class SeState(StateEngineTools.SeItemChild):
             self.__text.set_from_attr(item_state, "se_name")
             self._log_develop("Updated name of state {} to {} based on se_name.", item_state, self.__name)
         elif str(item_state) != item_state.property.path or (self.__name == "" and recursion_depth == 0):
-            _name = str(item_state).split('.')[-1]
+            _name = str(item_state).split(".")[-1]
             self.__text.set(_name)
-            self._log_develop("Updated name of state {} to {} based on item name (recursion_depth = {}).",
-                              item_state, self.__name, recursion_depth)
+            self._log_develop(
+                "Updated name of state {} to {} based on item name (recursion_depth = {}).",
+                item_state,
+                self.__name,
+                recursion_depth,
+            )
         elif self.__text.is_empty() and recursion_depth == 0:
             self.__text.set("value:" + self.__name)
             self._log_develop("Set name of state {} to {} as it was empty.", item_state, self.__name)
@@ -441,17 +459,19 @@ class SeState(StateEngineTools.SeItemChild):
             return
         if "se_use" in item_state.conf:
             _returnvalue, _returntype, _, _issue, _origvalue = self.__use.set_from_attr(
-                item_state, "se_use", None, True, None,
-                self.__use_list + self.__use_ignore_list)
+                item_state, "se_use", None, True, None, self.__use_list + self.__use_ignore_list
+            )
             _configvalue = copy(_returnvalue)
             _configvalue = [_configvalue] if not isinstance(_configvalue, list) else _configvalue
             _configorigvalue = copy(_origvalue)
             _configorigvalue = [_configorigvalue] if not isinstance(_configorigvalue, list) else _configorigvalue
-            self._abitem.update_issues('config', {state.id: {'issue': _issue, 'attribute': 'se_use'}})
+            self._abitem.update_issues("config", {state.id: {"issue": _issue, "attribute": "se_use"}})
             _use = self.__use.get()
             if self.__use.is_empty() or _use is None:
                 _issue = "se_use {} is set up in a wrong way".format(_use)
-                self._abitem.update_issues('config', {state.id: {'issue': _issue, 'attribute': 'se_use', 'origin': state_type}})
+                self._abitem.update_issues(
+                    "config", {state.id: {"issue": _issue, "attribute": "se_use", "origin": state_type}}
+                )
                 self._log_warning("{} - ignoring.", _issue)
             else:
                 _use = [_use] if not isinstance(_use, list) else _use
@@ -473,7 +493,7 @@ class SeState(StateEngineTools.SeItemChild):
                         self._log_info(text1, _path, valid1, valid2)
                         if _fill is False:
                             _issue = "Not valid. Ensure it is addressed by <structpath>.rules.<state>."
-                            self._abitem.update_issues('struct', {_path: {'issue': _issue}})
+                            self._abitem.update_issues("struct", {_path: {"issue": _issue}})
                             self.__use_ignore_list.append(_path)
                         elif _configvalue and _configvalue[i] not in cleaned_use_list:
                             cleaned_use_list.append(_configvalue[i])
@@ -491,68 +511,101 @@ class SeState(StateEngineTools.SeItemChild):
                         self._log_info(text1, _path, valid1, valid2, valid3)
                         if _fill is False:
                             _issue = "Item {} is not a valid item for the state configuration.".format(_path)
-                            self._abitem.update_issues('config',
-                                                       {state.id: {'issue': _issue, 'attribute': 'se_use', 'origin': state_type}})
+                            self._abitem.update_issues(
+                                "config", {state.id: {"issue": _issue, "attribute": "se_use", "origin": state_type}}
+                            )
                             self.__use_ignore_list.append(_path)
                         elif _configorigvalue and _configorigvalue[i] not in cleaned_use_list:
                             cleaned_use_list.append(_configorigvalue[i])
-                    if _returntype[i] == 'value':
+                    if _returntype[i] == "value":
                         _issues = self.__use.get_issues()
-                        for item in _issues.get('cast_item'):
-                            if (_configorigvalue[i] is not None and isinstance(_configorigvalue[i], str) and
-                                    (StateEngineTools.partition_strip(_configorigvalue[i], ":")[1] in item or
-                                     _configorigvalue[i] in item)):
+                        for item in _issues.get("cast_item"):
+                            if (
+                                _configorigvalue[i] is not None
+                                and isinstance(_configorigvalue[i], str)
+                                and (
+                                    StateEngineTools.partition_strip(_configorigvalue[i], ":")[1] in item
+                                    or _configorigvalue[i] in item
+                                )
+                            ):
                                 _issue_list = [item for key, value in _issues.items() if value for item in value]
                                 self._log_warning("se_use {} points to invalid item. Ignoring.", _configorigvalue[i])
-                                self._abitem.update_issues('config', {state.id: {'issue': _issue_list,
-                                                                                 'attribute': 'se_use', 'origin': state_type}})
+                                self._abitem.update_issues(
+                                    "config",
+                                    {state.id: {"issue": _issue_list, "attribute": "se_use", "origin": state_type}},
+                                )
                                 self.__use_ignore_list.append(_configorigvalue[i])
                                 _path = None
-                    elif _returntype[i] in ['item', 'eval']:
+                    elif _returntype[i] in ["item", "eval"]:
                         _path = _configvalue[i]
                         _issues = self.__use.get_issues()
-                        for list_key in ['cast_item', 'eval', 'item']:
+                        for list_key in ["cast_item", "eval", "item"]:
                             if list_key in _issues:
                                 for item in _issues[list_key]:
-                                    if (_path is not None and isinstance(_path, str) and
-                                            StateEngineTools.partition_strip(_path, ":")[1] in item):
-
-                                        _issue_list = [item for key, value in _issues.items() if value for item in value]
+                                    if (
+                                        _path is not None
+                                        and isinstance(_path, str)
+                                        and StateEngineTools.partition_strip(_path, ":")[1] in item
+                                    ):
+                                        _issue_list = [
+                                            item for key, value in _issues.items() if value for item in value
+                                        ]
                                         self._log_warning("se_use {} defined by invalid item/eval. Ignoring.", _path)
-                                        self._abitem.update_issues('config', {state.id: {'issue': _issue_list,
-                                                                                         'attribute': 'se_use', 'origin': state_type}})
+                                        self._abitem.update_issues(
+                                            "config",
+                                            {
+                                                state.id: {
+                                                    "issue": _issue_list,
+                                                    "attribute": "se_use",
+                                                    "origin": state_type,
+                                                }
+                                            },
+                                        )
                                         self.__use_ignore_list.append(_path)
                                         _path = None
                         if _path is None:
                             pass
 
                         elif _path is not None and _configorigvalue[i] not in cleaned_use_list:
-                            self._log_info("se_use {} defined by item/eval {}. Even if current result is not valid, "
-                                           "entry will be re-evaluated on next state evaluation. element: {}", _path, _configorigvalue[i], element)
+                            self._log_info(
+                                "se_use {} defined by item/eval {}. Even if current result is not valid, "
+                                "entry will be re-evaluated on next state evaluation. element: {}",
+                                _path,
+                                _configorigvalue[i],
+                                element,
+                            )
                             cleaned_use_list.append(_configorigvalue[i])
-                            #self.__use_done.append(_path)
+                            # self.__use_done.append(_path)
                     if _path is None:
                         pass
                     elif element == self.state_item:
                         self._log_info("Use element {} is same as current state - Ignoring.", _name)
                         self.__use_ignore_list.append(element)
                     elif _fill and element is not None and _configorigvalue[i] not in self.__use_list:
-
                         if isinstance(_name, list):
                             self._log_develop(
                                 "Adding list element {} to state fill function. path is {}, name is {}. configvalue {}",
-                                element, _path, _name, _configorigvalue[i])
+                                element,
+                                _path,
+                                _name,
+                                _configorigvalue[i],
+                            )
                             self.__use_list.append(_configorigvalue[i])
                             for item in _name:
                                 self.__initialize_se_use(item, recursion_depth + 1)
                         else:
                             self._log_develop(
                                 "Adding element {} to state fill function. path is {}, name is {}.",
-                                _configorigvalue[i], _path, _name)
+                                _configorigvalue[i],
+                                _path,
+                                _name,
+                            )
                             self.__use_list.append(_configorigvalue[i])
                             self.__initialize_se_use(element, recursion_depth + 1)
                     elif _fill and element is not None and _configorigvalue[i] in self.__use_list:
-                        self._log_debug("Ignoring element {} as it is already added. cleaned use {}", element, cleaned_use_list)
+                        self._log_debug(
+                            "Ignoring element {} as it is already added. cleaned use {}", element, cleaned_use_list
+                        )
                 self.__use_list.extend(cleaned_use_list)
                 seen = set()
                 self.__use_list = [x for x in self.__use_list if not (x in seen or seen.add(x))]
@@ -565,8 +618,8 @@ class SeState(StateEngineTools.SeItemChild):
     def __fill(self, state, recursion_depth, se_use=None, use=None):
 
         def update_unused(used_attributes, attrib_type, attrib_name):
-            #filtered_dict = {key: value for key, value in self.__unused_attributes.items() if key not in used_attributes}
-            #self.__unused_attributes = copy(filtered_dict)
+            # filtered_dict = {key: value for key, value in self.__unused_attributes.items() if key not in used_attributes}
+            # self.__unused_attributes = copy(filtered_dict)
 
             for nested_entry, nested_dict in self.__unused_attributes.items():
                 if nested_entry in used_attributes.keys():
@@ -578,8 +631,11 @@ class SeState(StateEngineTools.SeItemChild):
         def update_action_status(actn_type, action_status):
             def filter_issues(input_dict):
                 return {
-                    key: {sub_key: sub_value for sub_key, sub_value in value.items() if
-                          sub_value.get('issue') not in (None, [], [None])}
+                    key: {
+                        sub_key: sub_value
+                        for sub_key, sub_value in value.items()
+                        if sub_value.get("issue") not in (None, [], [None])
+                    }
                     for key, value in input_dict.items()
                 }
 
@@ -598,20 +654,22 @@ class SeState(StateEngineTools.SeItemChild):
                         if key not in self.__action_status[actn_type][itm]:
                             self.__action_status[actn_type][itm][key] = value
 
-            for (itm, dct) in action_status.items():
-                issues = dct.get('issue')
-                attributes = dct.get('attribute')
+            for itm, dct in action_status.items():
+                issues = dct.get("issue")
+                attributes = dct.get("attribute")
                 if not isinstance(attributes, list):
                     attributes = [attributes]
-                if not isinstance(self.__action_status[actn_type][itm].get('attribute'), list):
-                    self.__action_status[actn_type][itm]['attribute'] = [self.__action_status[actn_type][itm].get('attribute')]
+                if not isinstance(self.__action_status[actn_type][itm].get("attribute"), list):
+                    self.__action_status[actn_type][itm]["attribute"] = [
+                        self.__action_status[actn_type][itm].get("attribute")
+                    ]
                 if issues:
                     if isinstance(issues, list):
-                        attributes = (attributes + [None] * len(issues))[:len(issues)]
+                        attributes = (attributes + [None] * len(issues))[: len(issues)]
                         for i, issue in enumerate(issues):
-                            if issue not in self.__action_status[actn_type][itm]['issue']:
-                                self.__action_status[actn_type][itm]['issue'].append(issue)
-                                self.__action_status[actn_type][itm]['attribute'].append(attributes[i])
+                            if issue not in self.__action_status[actn_type][itm]["issue"]:
+                                self.__action_status[actn_type][itm]["issue"].append(issue)
+                                self.__action_status[actn_type][itm]["attribute"].append(attributes[i])
 
             flattened_dict = {}
 
@@ -622,7 +680,7 @@ class SeState(StateEngineTools.SeItemChild):
                     if inner_key not in flattened_dict:
                         flattened_dict[inner_key] = {}
                     # Add 'used in' and update with existing data
-                    flattened_dict[inner_key]['used in'] = key
+                    flattened_dict[inner_key]["used in"] = key
                     flattened_dict[inner_key].update(nested_dict)
 
             self.__used_attributes = deepcopy(flattened_dict)
@@ -634,7 +692,9 @@ class SeState(StateEngineTools.SeItemChild):
             item_state = state.state_item
         else:
             item_state = state
-        self._log_develop("Fill state {} type {}, called by {}, recursion {}", item_state, type(item_state), se_use, recursion_depth)
+        self._log_develop(
+            "Fill state {} type {}, called by {}, recursion {}", item_state, type(item_state), se_use, recursion_depth
+        )
         if se_use == "reinit":
             self._log_develop("Resetting conditions and actions at re-init use is {}", use)
             self.__conditionsets.reset()
@@ -668,16 +728,18 @@ class SeState(StateEngineTools.SeItemChild):
             try:
                 if child_name == "enter" or child_name.startswith("enter_"):
                     _conditioncount += 1
-                    _unused_attributes, _used_attributes = self.__conditionsets.update(child_name, child_item, parent_item)
+                    _unused_attributes, _used_attributes = self.__conditionsets.update(
+                        child_name, child_item, parent_item
+                    )
                     self.__unused_attributes = copy(_unused_attributes)
                     self.__used_attributes = copy(_used_attributes)
                     for item in self.__unused_attributes.keys():
-                        if 'issue' in self.__unused_attributes[item].keys():
-                            if not self.__unused_attributes[item].get('issueorigin'):
-                                self.__unused_attributes[item].update({'issueorigin': []})
-                            entry = {'state': self.id, 'conditionset': child_name}
-                            if entry not in self.__unused_attributes[item].get('issueorigin'):
-                                self.__unused_attributes[item]['issueorigin'].append(entry)
+                        if "issue" in self.__unused_attributes[item].keys():
+                            if not self.__unused_attributes[item].get("issueorigin"):
+                                self.__unused_attributes[item].update({"issueorigin": []})
+                            entry = {"state": self.id, "conditionset": child_name}
+                            if entry not in self.__unused_attributes[item].get("issueorigin"):
+                                self.__unused_attributes[item]["issueorigin"].append(entry)
                     self._abitem.update_attributes(self.__unused_attributes, self.__used_attributes)
             except ValueError as ex:
                 raise ValueError("Condition {0} error: {1}".format(child_name, ex))
@@ -701,13 +763,19 @@ class SeState(StateEngineTools.SeItemChild):
                     "on_stay": ("stay", "actions_stay", self.__actions_stay),
                     "on_enter_or_stay": ("enter_or_stay", "actions_enter_or_stay", self.__actions_enter_or_stay),
                     "on_leave": ("leave", "actions_leave", self.__actions_leave),
-                    "on_pass": ("pass", "actions_pass", self.__actions_pass)
+                    "on_pass": ("pass", "actions_pass", self.__actions_pass),
                 }
 
                 if child_name in action_mapping:
                     action_name, action_type, action_method = action_mapping[child_name]
                     for attribute in child_item.conf:
-                        self._log_develop("Filling state with {} action named {} for state {} with config {}", child_name, attribute, state.id, child_item.conf)
+                        self._log_develop(
+                            "Filling state with {} action named {} for state {} with config {}",
+                            child_name,
+                            attribute,
+                            state.id,
+                            child_item.conf,
+                        )
                         action_method.update_action_details(self, action_type)
                         _result = action_method.update(attribute, child_item.conf.get(attribute))
                         _action_counts[action_name] += _result[0] if _result else 0
@@ -715,7 +783,7 @@ class SeState(StateEngineTools.SeItemChild):
                         if _action_status:
                             update_action_status(action_name, _action_status)
                             self._abitem.update_action_status(self.__action_status)
-                        update_unused(_used_attributes, 'action', child_name)
+                        update_unused(_used_attributes, "action", child_name)
 
             except ValueError as ex:
                 raise ValueError("Condition {0} check for actions error: {1}".format(child_name, ex))
@@ -731,7 +799,13 @@ class SeState(StateEngineTools.SeItemChild):
                 update_action_status("enter_or_stay", _action_status)
                 self._abitem.update_action_status(self.__action_status)
 
-        _total_actioncount = _action_counts["enter"] + _action_counts["stay"] + _action_counts["enter_or_stay"] + _action_counts["leave"] + _action_counts["pass"]
+        _total_actioncount = (
+            _action_counts["enter"]
+            + _action_counts["stay"]
+            + _action_counts["enter_or_stay"]
+            + _action_counts["leave"]
+            + _action_counts["pass"]
+        )
 
         self.update_name(item_state, recursion_depth)
         # Complete condition sets and actions at the end
@@ -762,14 +836,31 @@ class SeState(StateEngineTools.SeItemChild):
             self._abitem.update_attributes(self.__unused_attributes, self.__used_attributes)
         _summary = "{} on_enter, {} on_stay , {} on_enter_or_stay, {} on_leave, {} on_pass"
         if self.__action_status:
-            _ignore_list = [entry for entry in self.__action_status if self.__action_status[entry].get('ignore') is True]
+            _ignore_list = [
+                entry for entry in self.__action_status if self.__action_status[entry].get("ignore") is True
+            ]
             if _ignore_list:
                 self._log_info("Ignored {} action(s) due to errors: {}", len(_ignore_list), _ignore_list)
         if se_use is not None:
-            self._log_debug("Added {} action(s) based on se_use {}. " + _summary, _total_actioncount, se_use,
-                            _action_counts["enter"], _action_counts["stay"], _action_counts["enter_or_stay"], _action_counts["leave"], _action_counts["pass"])
+            self._log_debug(
+                "Added {} action(s) based on se_use {}. " + _summary,
+                _total_actioncount,
+                se_use,
+                _action_counts["enter"],
+                _action_counts["stay"],
+                _action_counts["enter_or_stay"],
+                _action_counts["leave"],
+                _action_counts["pass"],
+            )
             self._log_debug("Added {} condition set(s) based on se_use: {}", _conditioncount, se_use)
         else:
-            self._log_debug("Added {} action(s) based on item configuration: " + _summary, _total_actioncount,
-                            _action_counts["enter"], _action_counts["stay"], _action_counts["enter_or_stay"], _action_counts["leave"], _action_counts["pass"])
+            self._log_debug(
+                "Added {} action(s) based on item configuration: " + _summary,
+                _total_actioncount,
+                _action_counts["enter"],
+                _action_counts["stay"],
+                _action_counts["enter_or_stay"],
+                _action_counts["leave"],
+                _action_counts["pass"],
+            )
             self._log_debug("Added {} condition set(s) based on item configuration", _conditioncount)

@@ -101,7 +101,7 @@ class Enigma2Device:
 
         :return: number of items hold by the device
         """
-        return (len(self._items) + len(self._items_fast))
+        return len(self._items) + len(self._items_fast)
 
     def is_ssl(self):
         """
@@ -132,27 +132,47 @@ class Enigma2(SmartPlugin):
     """
     Main class of the Plugin. Does all plugin specific stuff and provides the update functions for the Enigma2Device
     """
+
     ALLOW_MULTIINSTANCE = True
     PLUGIN_VERSION = "1.4.13"
 
-    _url_suffix_map = dict([('about', '/web/about'),
-                            ('deviceinfo', '/web/deviceinfo'),
-                            ('epgservice', '/web/epgservice'),
-                            ('getaudiotracks', '/web/getaudiotracks'),
-                            ('getcurrent', '/web/getcurrent'),
-                            ('message', '/web/message'),
-                            ('messageanswer', '/web/messageanswer'),
-                            ('powerstate', '/web/powerstate'),
-                            ('remotecontrol', '/web/remotecontrol'),
-                            ('subservices', '/web/subservices'),
-                            ('zap', '/web/zap'),
-                            ('vol', '/web/vol')])
+    _url_suffix_map = dict(
+        [
+            ("about", "/web/about"),
+            ("deviceinfo", "/web/deviceinfo"),
+            ("epgservice", "/web/epgservice"),
+            ("getaudiotracks", "/web/getaudiotracks"),
+            ("getcurrent", "/web/getcurrent"),
+            ("message", "/web/message"),
+            ("messageanswer", "/web/messageanswer"),
+            ("powerstate", "/web/powerstate"),
+            ("remotecontrol", "/web/remotecontrol"),
+            ("subservices", "/web/subservices"),
+            ("zap", "/web/zap"),
+            ("vol", "/web/vol"),
+        ]
+    )
 
-    _keys_fast_refresh = ['current_eventtitle', 'current_eventdescription', 'current_eventdescriptionextended',
-                          'current_volume', 'e2servicename', 'e2videoheight', 'e2videowidth', 'e2apid', 'e2vpid',
-                          'e2instandby', 'e2servicereference']
-    _key_event_information = ['current_eventtitle', 'current_eventdescription', 'current_eventdescriptionextended',
-                              'e2servicereference', 'e2servicename']
+    _keys_fast_refresh = [
+        "current_eventtitle",
+        "current_eventdescription",
+        "current_eventdescriptionextended",
+        "current_volume",
+        "e2servicename",
+        "e2videoheight",
+        "e2videowidth",
+        "e2apid",
+        "e2vpid",
+        "e2instandby",
+        "e2servicereference",
+    ]
+    _key_event_information = [
+        "current_eventtitle",
+        "current_eventdescription",
+        "current_eventdescriptionextended",
+        "e2servicereference",
+        "e2servicename",
+    ]
 
     def __init__(self, sh, *args, **kwargs):
         """
@@ -171,18 +191,22 @@ class Enigma2(SmartPlugin):
 
         self._session = requests.Session()
         self._timeout = 10
-        self._verify = self.to_bool(self.get_parameter_value('verify'))
+        self._verify = self.to_bool(self.get_parameter_value("verify"))
 
-        ssl = self.to_bool(self.get_parameter_value('ssl'))
+        ssl = self.to_bool(self.get_parameter_value("ssl"))
         if ssl and not self._verify:
             urllib3.disable_warnings()
 
-        self._enigma2_device = Enigma2Device(self.get_parameter_value('host'), self.get_parameter_value('port'),
-                                             self.get_parameter_value('ssl'), self.get_parameter_value('username'),
-                                             self.get_parameter_value('password'))
+        self._enigma2_device = Enigma2Device(
+            self.get_parameter_value("host"),
+            self.get_parameter_value("port"),
+            self.get_parameter_value("ssl"),
+            self.get_parameter_value("username"),
+            self.get_parameter_value("password"),
+        )
 
-        self._cycle = int(self.get_parameter_value('cycle'))
-        self._fast_cycle = int(self.get_parameter_value('fast_cycle'))
+        self._cycle = int(self.get_parameter_value("cycle"))
+        self._fast_cycle = int(self.get_parameter_value("fast_cycle"))
 
         # Response Cache: Dictionary for storing the result of requests which is used for several different items,
         # refreshed each update cycle. Please use distinct keys!
@@ -195,8 +219,8 @@ class Enigma2(SmartPlugin):
         """
         Run method for the plugin
         """
-        self.scheduler_add('update', self._update_loop, cycle=self._cycle)
-        self.scheduler_add('update_fast', self._update_loop_fast, cycle=self._fast_cycle)
+        self.scheduler_add("update", self._update_loop, cycle=self._cycle)
+        self.scheduler_add("update_fast", self._update_loop_fast, cycle=self._fast_cycle)
         self.alive = True
 
     def stop(self):
@@ -209,7 +233,7 @@ class Enigma2(SmartPlugin):
         """
         Starts the update loop for all known items.
         """
-        self.logger.debug('Starting update loop for instance %s' % self.get_instance_name())
+        self.logger.debug("Starting update loop for instance %s" % self.get_instance_name())
         for item in self._enigma2_device.get_items():
             if not self.alive:
                 return
@@ -219,15 +243,15 @@ class Enigma2(SmartPlugin):
         """
         Starts the fast update loop for all known items.
         """
-        self.logger.debug('Starting fast update loop for instance %s' % self.get_instance_name())
+        self.logger.debug("Starting fast update loop for instance %s" % self.get_instance_name())
         for item in self._enigma2_device.get_fast_items():
             if not self.alive:
                 return
-            if self.get_iattr_value(item.conf, 'enigma2_data_type') in self._key_event_information:
+            if self.get_iattr_value(item.conf, "enigma2_data_type") in self._key_event_information:
                 self._update_event_items(cache, fast)
-            elif self.get_iattr_value(item.conf, 'enigma2_page') is not None:
+            elif self.get_iattr_value(item.conf, "enigma2_page") is not None:
                 self._update(item, fast)
-            elif self.get_iattr_value(item.conf, 'enigma2_data_type') == 'current_volume':
+            elif self.get_iattr_value(item.conf, "enigma2_data_type") == "current_volume":
                 self._update_volume(item, cache, fast)
 
         # empty response cache
@@ -243,17 +267,17 @@ class Enigma2(SmartPlugin):
 
         # normal items
         if self.has_iattr(item.conf, "enigma2_page"):
-            if self.get_iattr_value(item.conf, 'enigma2_page') in ['about', 'powerstate', 'subservices', 'deviceinfo']:
-                if self.get_iattr_value(item.conf, 'enigma2_data_type') in self._keys_fast_refresh:
+            if self.get_iattr_value(item.conf, "enigma2_page") in ["about", "powerstate", "subservices", "deviceinfo"]:
+                if self.get_iattr_value(item.conf, "enigma2_data_type") in self._keys_fast_refresh:
                     self.get_enigma2_device().get_fast_items().append(item)
                 else:
                     self.get_enigma2_device().get_items().append(item)
         elif self.has_iattr(item.conf, "enigma2_data_type"):
-            if self.get_iattr_value(item.conf, 'enigma2_data_type') in self._keys_fast_refresh:
+            if self.get_iattr_value(item.conf, "enigma2_data_type") in self._keys_fast_refresh:
                 self.get_enigma2_device().get_fast_items().append(item)
             else:
                 self.get_enigma2_device().get_items().append(item)
-            if self.get_iattr_value(item.conf, 'enigma2_data_type') in ['current_volume', 'e2servicereference']:
+            if self.get_iattr_value(item.conf, "enigma2_data_type") in ["current_volume", "e2servicereference"]:
                 return self.execute_item
         elif self.has_iattr(item.conf, "enigma2_remote_command_id") or self.has_iattr(item.conf, "sref"):
             self.get_enigma2_device().get_items_remote_command().append(item)
@@ -266,22 +290,22 @@ class Enigma2(SmartPlugin):
 
         :param item: item to be updated towards the Enigma2Device
         """
-        if caller != 'Enigma2':
+        if caller != "Enigma2":
             # enigma2 remote control
-            if self.has_iattr(item.conf, 'enigma2_remote_command_id'):
-                self.remote_control_command(self.get_iattr_value(item.conf, 'enigma2_remote_command_id'))
-                if self.get_iattr_value(item.conf, 'enigma2_remote_command_id') in ['105', '106', '116']:
+            if self.has_iattr(item.conf, "enigma2_remote_command_id"):
+                self.remote_control_command(self.get_iattr_value(item.conf, "enigma2_remote_command_id"))
+                if self.get_iattr_value(item.conf, "enigma2_remote_command_id") in ["105", "106", "116"]:
                     self._update_event_items(cache=False)
-            elif self.has_iattr(item.conf, 'sref'):
-                self.zap(self.get_iattr_value(item.conf, 'sref'))
+            elif self.has_iattr(item.conf, "sref"):
+                self.zap(self.get_iattr_value(item.conf, "sref"))
                 self._update_event_items(cache=False)
-            elif self.has_iattr(item.conf, 'enigma2_data_type'):
-                if self.get_iattr_value(item.conf, 'enigma2_data_type') == 'current_volume':
+            elif self.has_iattr(item.conf, "enigma2_data_type"):
+                if self.get_iattr_value(item.conf, "enigma2_data_type") == "current_volume":
                     self.set_volume(item())
-                elif self.get_iattr_value(item.conf, 'enigma2_data_type') == 'e2servicereference':
+                elif self.get_iattr_value(item.conf, "enigma2_data_type") == "e2servicereference":
                     self.zap(item())
 
-    def box_request(self, suffix, parameter=''):
+    def box_request(self, suffix, parameter=""):
         """
         Send request to Enigma2 box, ret the answer and parse it
 
@@ -295,27 +319,30 @@ class Enigma2(SmartPlugin):
             url = "http"
         url += "://%s:%s%s?%s" % (self._enigma2_device.get_host(), self._enigma2_device.get_port(), suffix, parameter)
         try:
-            response = self._session.get(url, timeout=self._timeout,
-                                         auth=HTTPBasicAuth(self._enigma2_device.get_user(),
-                                                            self._enigma2_device.get_password()), verify=self._verify)
+            response = self._session.get(
+                url,
+                timeout=self._timeout,
+                auth=HTTPBasicAuth(self._enigma2_device.get_user(), self._enigma2_device.get_password()),
+                verify=self._verify,
+            )
         except Exception as e:
             self.logger.error("Exception when sending GET request: {0}".format(str(e)))
-            return minidom.parseString('<noanswer/>')
+            return minidom.parseString("<noanswer/>")
 
         try:
             xml = minidom.parseString(response.content)
         except Exception as e:
             self.logger.error("Exception when parsing response: %s" % str(e))
-            xml = minidom.parseString('<noanswer/>')
+            xml = minidom.parseString("<noanswer/>")
         return xml
 
     def remote_control_command(self, command_id):
-        xml = self.box_request(self._url_suffix_map['remotecontrol'], 'command=%s' % command_id)
-        e2result_xml = xml.getElementsByTagName('e2result')
-        e2resulttext_xml = xml.getElementsByTagName('e2resulttext')
+        xml = self.box_request(self._url_suffix_map["remotecontrol"], "command=%s" % command_id)
+        e2result_xml = xml.getElementsByTagName("e2result")
+        e2resulttext_xml = xml.getElementsByTagName("e2resulttext")
         if len(e2resulttext_xml) > 0 and len(e2result_xml) > 0:
             if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
-                if e2result_xml[0].firstChild.data == 'True':
+                if e2result_xml[0].firstChild.data == "True":
                     self.logger.debug(e2resulttext_xml[0].firstChild.data)
 
     def get_cycle(self):
@@ -331,50 +358,50 @@ class Enigma2(SmartPlugin):
         :param result: Array of audiotracks with keys: 'e2audiotrackdescription', 'e2audiotrackid', 'e2audiotrackpid', 'e2audiotrackactive'
         """
         result = []
-        xml = self.box_request(self._url_suffix_map['getaudiotracks'])
+        xml = self.box_request(self._url_suffix_map["getaudiotracks"])
 
-        e2audiotrack_xml = xml.getElementsByTagName('e2audiotrack')
+        e2audiotrack_xml = xml.getElementsByTagName("e2audiotrack")
         if (len(e2audiotrack_xml)) > 0:
             for audiotrack_entry_xml in e2audiotrack_xml:
                 result_entry = {}
-                e2audiotrackdescription_xml = audiotrack_entry_xml.getElementsByTagName('e2audiotrackdescription')
+                e2audiotrackdescription_xml = audiotrack_entry_xml.getElementsByTagName("e2audiotrackdescription")
 
                 if (len(e2audiotrackdescription_xml)) > 0:
-                    result_entry['e2audiotrackdescription'] = e2audiotrackdescription_xml[0].firstChild.data
+                    result_entry["e2audiotrackdescription"] = e2audiotrackdescription_xml[0].firstChild.data
 
-                e2audiotrackid_xml = audiotrack_entry_xml.getElementsByTagName('e2audiotrackid')
+                e2audiotrackid_xml = audiotrack_entry_xml.getElementsByTagName("e2audiotrackid")
                 if (len(e2audiotrackid_xml)) > 0:
-                    result_entry['e2audiotrackid'] = int(e2audiotrackid_xml[0].firstChild.data)
+                    result_entry["e2audiotrackid"] = int(e2audiotrackid_xml[0].firstChild.data)
 
-                e2audiotrackpid_xml = audiotrack_entry_xml.getElementsByTagName('e2audiotrackpid')
+                e2audiotrackpid_xml = audiotrack_entry_xml.getElementsByTagName("e2audiotrackpid")
                 if (len(e2audiotrackpid_xml)) > 0:
-                    result_entry['e2audiotrackpid'] = int(e2audiotrackpid_xml[0].firstChild.data)
+                    result_entry["e2audiotrackpid"] = int(e2audiotrackpid_xml[0].firstChild.data)
 
-                e2audiotrackactive_xml = audiotrack_entry_xml.getElementsByTagName('e2audiotrackactive')
+                e2audiotrackactive_xml = audiotrack_entry_xml.getElementsByTagName("e2audiotrackactive")
                 if (len(e2audiotrackactive_xml)) > 0:
-                    if e2audiotrackactive_xml[0].firstChild.data in 'True':
-                        result_entry['e2audiotrackactive'] = True
+                    if e2audiotrackactive_xml[0].firstChild.data in "True":
+                        result_entry["e2audiotrackactive"] = True
                     else:
-                        result_entry['e2audiotrackactive'] = False
+                        result_entry["e2audiotrackactive"] = False
 
                 result.append(result_entry)
 
         return result
 
-    def zap(self, e2servicereference, title=''):
+    def zap(self, e2servicereference, title=""):
         """
         Zaps to another service by a given e2servicereference
 
         :param e2servicereference: reference to the service
         :param title: optional title of "zap" action
         """
-        xml = self.box_request(self._url_suffix_map['zap'], 'sRef=%s&title=%s' % (e2servicereference, title))
+        xml = self.box_request(self._url_suffix_map["zap"], "sRef=%s&title=%s" % (e2servicereference, title))
 
-        e2state_xml = xml.getElementsByTagName('e2state')
-        e2statetext_xml = xml.getElementsByTagName('e2statetext')
-        if (len(e2statetext_xml) > 0 and len(e2state_xml) > 0):
+        e2state_xml = xml.getElementsByTagName("e2state")
+        e2statetext_xml = xml.getElementsByTagName("e2statetext")
+        if len(e2statetext_xml) > 0 and len(e2state_xml) > 0:
             if e2statetext_xml[0].firstChild is not None and e2state_xml[0].firstChild is not None:
-                if e2state_xml[0].firstChild.data == 'True':
+                if e2state_xml[0].firstChild.data == "True":
                     self.logger.debug(e2statetext_xml[0].firstChild.data)
 
     def set_volume(self, value):
@@ -383,13 +410,13 @@ class Enigma2(SmartPlugin):
 
         :param value: value of the volume (int from 0 to 100)
         """
-        xml = self.box_request(self._url_suffix_map['vol'], 'set=set%s' % value)
+        xml = self.box_request(self._url_suffix_map["vol"], "set=set%s" % value)
 
-        e2result_xml = xml.getElementsByTagName('e2result')
-        e2resulttext_xml = xml.getElementsByTagName('e2resulttext')
+        e2result_xml = xml.getElementsByTagName("e2result")
+        e2resulttext_xml = xml.getElementsByTagName("e2resulttext")
         if len(e2resulttext_xml) > 0 and len(e2result_xml) > 0:
             if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
-                if e2result_xml[0].firstChild.data == 'True':
+                if e2result_xml[0].firstChild.data == "True":
                     self.logger.debug(e2resulttext_xml[0].firstChild.data)
 
     def set_power_state(self, value):
@@ -404,13 +431,13 @@ class Enigma2(SmartPlugin):
 
         :param value: value of the power state (int from 0 to 5)
         """
-        xml = self.box_request(self._url_suffix_map['powerstate'], 'newstate=%s' % value)
+        xml = self.box_request(self._url_suffix_map["powerstate"], "newstate=%s" % value)
 
-        e2result_xml = xml.getElementsByTagName('e2result')
-        e2resulttext_xml = xml.getElementsByTagName('e2resulttext')
+        e2result_xml = xml.getElementsByTagName("e2result")
+        e2resulttext_xml = xml.getElementsByTagName("e2resulttext")
         if len(e2resulttext_xml) > 0 and len(e2result_xml) > 0:
             if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
-                if e2result_xml[0].firstChild.data == 'True':
+                if e2result_xml[0].firstChild.data == "True":
                     self.logger.debug(e2resulttext_xml[0].firstChild.data)
 
     def send_message(self, messagetext, messagetype=1, timeout=10):
@@ -421,33 +448,34 @@ class Enigma2(SmartPlugin):
         messagetype=Number from 0 to 3, 0= Yes/No, 1= Info, 2=Message, 3=Attention
         timeout=Can be empty or the Number of seconds the Message should disappear after.
         """
-        xml = self.box_request(self._url_suffix_map['message'],
-                               'text=%s&type=%s&timeout=%s' % (messagetext, messagetype, timeout))
+        xml = self.box_request(
+            self._url_suffix_map["message"], "text=%s&type=%s&timeout=%s" % (messagetext, messagetype, timeout)
+        )
 
-        e2result_xml = xml.getElementsByTagName('e2result')
-        e2resulttext_xml = xml.getElementsByTagName('e2resulttext')
+        e2result_xml = xml.getElementsByTagName("e2result")
+        e2resulttext_xml = xml.getElementsByTagName("e2resulttext")
         if len(e2resulttext_xml) > 0 and len(e2result_xml) > 0:
             if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
-                if e2result_xml[0].firstChild.data == 'True':
+                if e2result_xml[0].firstChild.data == "True":
                     self.logger.debug(e2resulttext_xml[0].firstChild.data)
 
     def get_answer(self):
         """
         Retrieves the answer to a currently sent message, take care to take the timeout into account in which the answer can be given and start a thread which is polling the answer for that period.
         """
-        xml = self.box_request(self._url_suffix_map['messageanswer'], 'getanswer=now')
+        xml = self.box_request(self._url_suffix_map["messageanswer"], "getanswer=now")
 
-        e2result_xml = xml.getElementsByTagName('e2state')
-        e2resulttext_xml = xml.getElementsByTagName('e2statetext')
-        if (len(e2resulttext_xml) > 0 and len(e2result_xml) > 0):
+        e2result_xml = xml.getElementsByTagName("e2state")
+        e2resulttext_xml = xml.getElementsByTagName("e2statetext")
+        if len(e2resulttext_xml) > 0 and len(e2result_xml) > 0:
             if e2resulttext_xml[0].firstChild is not None and e2result_xml[0].firstChild is not None:
                 self.logger.debug(e2resulttext_xml[0].firstChild.data)
-                if e2result_xml[0].firstChild.data == 'True':
+                if e2result_xml[0].firstChild.data == "True":
                     return e2resulttext_xml[0].firstChild.data
 
     def _update_event_items(self, cache=True, fast=False):
         for item in self._enigma2_device.get_fast_items():
-            if self.get_iattr_value(item.conf, 'enigma2_data_type') in self._key_event_information:
+            if self.get_iattr_value(item.conf, "enigma2_data_type") in self._key_event_information:
                 self._update_current_event(item, cache, fast)
 
     def _update_volume(self, item, cache=True, fast=False):  # todo add cache
@@ -456,9 +484,9 @@ class Enigma2(SmartPlugin):
 
         :param item: item to be updated
         """
-        xml = self.box_request(self._url_suffix_map['getcurrent'])
+        xml = self.box_request(self._url_suffix_map["getcurrent"])
 
-        volume = self._get_value_from_xml_node(xml, 'e2current')
+        volume = self._get_value_from_xml_node(xml, "e2current")
         # self.logger.debug("Volume "+volume)
         item(volume)
 
@@ -468,55 +496,57 @@ class Enigma2(SmartPlugin):
 
         :param item: item to be updated
         """
-        if self.get_iattr_value(item.conf, 'enigma2_data_type') is None:
+        if self.get_iattr_value(item.conf, "enigma2_data_type") is None:
             self.logger.error("No enigma2_data_type set in item!")
             return
 
-        xml = self._cached_get_request('subservices', self._url_suffix_map['subservices'], '', cache, fast)
+        xml = self._cached_get_request("subservices", self._url_suffix_map["subservices"], "", cache, fast)
 
-        e2servicereference = 'N/A'
-        test_xml = xml.getElementsByTagName('noanswer')
+        e2servicereference = "N/A"
+        test_xml = xml.getElementsByTagName("noanswer")
         if len(test_xml) == 0:
-            element_xml = xml.getElementsByTagName('e2servicereference')
+            element_xml = xml.getElementsByTagName("e2servicereference")
             if len(element_xml) > 0:
                 if element_xml[0].firstChild is not None:
                     e2servicereference = element_xml[0].firstChild.data
             else:
-                e2servicereference = ''
-                self.logger.error("Attribute %s not available on the Enigma2Device" % self.get_iattr_value(item.conf,
-                                                                                                           'enigma2_data_type'))
+                e2servicereference = ""
+                self.logger.error(
+                    "Attribute %s not available on the Enigma2Device"
+                    % self.get_iattr_value(item.conf, "enigma2_data_type")
+                )
 
-        if not e2servicereference == 'N/A' and '1:0:0:0:0:0:0:0:0:0' not in e2servicereference:
+        if not e2servicereference == "N/A" and "1:0:0:0:0:0:0:0:0:0" not in e2servicereference:
             current_epgservice = self.get_current_epgservice_for_service_reference(e2servicereference, cache, fast)
         else:
             current_epgservice = {}
 
-        if self.get_iattr_value(item.conf, 'enigma2_data_type') == 'e2servicename':
-            e2servicename = self._get_value_from_xml_node(xml, 'e2servicename')
-            if e2servicename is None or e2servicename == 'N/A':
-                e2servicename = '-'
+        if self.get_iattr_value(item.conf, "enigma2_data_type") == "e2servicename":
+            e2servicename = self._get_value_from_xml_node(xml, "e2servicename")
+            if e2servicename is None or e2servicename == "N/A":
+                e2servicename = "-"
             item(e2servicename)
-        elif self.get_iattr_value(item.conf, 'enigma2_data_type') == 'e2servicereference':
-            if e2servicereference is None or e2servicereference == 'N/A':
-                servicereference = '-'
+        elif self.get_iattr_value(item.conf, "enigma2_data_type") == "e2servicereference":
+            if e2servicereference is None or e2servicereference == "N/A":
+                servicereference = "-"
             else:
                 servicereference = e2servicereference
             item(servicereference)
-        elif self.get_iattr_value(item.conf, 'enigma2_data_type') == 'current_eventtitle':
-            if 'e2eventtitle' in current_epgservice:
-                item(current_epgservice['e2eventtitle'])
+        elif self.get_iattr_value(item.conf, "enigma2_data_type") == "current_eventtitle":
+            if "e2eventtitle" in current_epgservice:
+                item(current_epgservice["e2eventtitle"])
             else:
-                item('-')
-        elif self.get_iattr_value(item.conf, 'enigma2_data_type') == 'current_eventdescription':
-            if 'e2eventdescription' in current_epgservice:
-                item(current_epgservice['e2eventdescription'])
+                item("-")
+        elif self.get_iattr_value(item.conf, "enigma2_data_type") == "current_eventdescription":
+            if "e2eventdescription" in current_epgservice:
+                item(current_epgservice["e2eventdescription"])
             else:
-                item('-')
-        elif self.get_iattr_value(item.conf, 'enigma2_data_type') == 'current_eventdescriptionextended':
-            if 'e2eventdescriptionextended' in current_epgservice:
-                item(current_epgservice['e2eventdescriptionextended'])
+                item("-")
+        elif self.get_iattr_value(item.conf, "enigma2_data_type") == "current_eventdescriptionextended":
+            if "e2eventdescriptionextended" in current_epgservice:
+                item(current_epgservice["e2eventdescriptionextended"])
             else:
-                item('-')
+                item("-")
 
     def get_current_epgservice_for_service_reference(self, service_reference, cache=True, fast=False):
         """
@@ -525,27 +555,29 @@ class Enigma2(SmartPlugin):
         :param referece of the service to retrieve data for:
         :return: dict of result data
         """
-        xml = self._cached_get_request('epgservice', self._url_suffix_map['epgservice'], 'sRef=%s' % service_reference,
-                                       cache, fast)
+        xml = self._cached_get_request(
+            "epgservice", self._url_suffix_map["epgservice"], "sRef=%s" % service_reference, cache, fast
+        )
 
-        e2event_list_xml = xml.getElementsByTagName('e2event')
+        e2event_list_xml = xml.getElementsByTagName("e2event")
         result_entry = {}
-        if (len(e2event_list_xml) > 0):
-            e2eventdescription = self._get_value_from_xml_node(e2event_list_xml[0], 'e2eventdescription')
+        if len(e2event_list_xml) > 0:
+            e2eventdescription = self._get_value_from_xml_node(e2event_list_xml[0], "e2eventdescription")
             if e2eventdescription is None:
-                e2eventdescription = '-'
-            result_entry['e2eventdescription'] = e2eventdescription
+                e2eventdescription = "-"
+            result_entry["e2eventdescription"] = e2eventdescription
 
-            e2eventdescriptionextended = self._get_value_from_xml_node(e2event_list_xml[0],
-                                                                       'e2eventdescriptionextended')
+            e2eventdescriptionextended = self._get_value_from_xml_node(
+                e2event_list_xml[0], "e2eventdescriptionextended"
+            )
             if e2eventdescriptionextended is None:
-                e2eventdescriptionextended = '-'
-            result_entry['e2eventdescriptionextended'] = e2eventdescriptionextended
+                e2eventdescriptionextended = "-"
+            result_entry["e2eventdescriptionextended"] = e2eventdescriptionextended
 
-            e2eventtitle = self._get_value_from_xml_node(e2event_list_xml[0], 'e2eventtitle')
+            e2eventtitle = self._get_value_from_xml_node(e2event_list_xml[0], "e2eventtitle")
             if e2eventtitle is None:
-                e2eventtitle = '-'
-            result_entry['e2eventtitle'] = e2eventtitle
+                e2eventtitle = "-"
+            result_entry["e2eventtitle"] = e2eventtitle
 
         return result_entry
 
@@ -557,43 +589,56 @@ class Enigma2(SmartPlugin):
         :param cache: cache for request true or false
         """
 
-        if self.get_iattr_value(item.conf, 'enigma2_data_type') is None:
+        if self.get_iattr_value(item.conf, "enigma2_data_type") is None:
             self.logger.error("No enigma2_data_type set in item!")
             return
 
-        xml = self._cached_get_request(self.get_iattr_value(item.conf, 'enigma2_page'),
-                                       self._url_suffix_map[self.get_iattr_value(item.conf, 'enigma2_page')], '', cache,
-                                       fast)
+        xml = self._cached_get_request(
+            self.get_iattr_value(item.conf, "enigma2_page"),
+            self._url_suffix_map[self.get_iattr_value(item.conf, "enigma2_page")],
+            "",
+            cache,
+            fast,
+        )
 
-        if "/" in self.get_iattr_value(item.conf, 'enigma2_data_type'):
-            strings = self.get_iattr_value(item.conf, 'enigma2_data_type').split('/')
+        if "/" in self.get_iattr_value(item.conf, "enigma2_data_type"):
+            strings = self.get_iattr_value(item.conf, "enigma2_data_type").split("/")
             parent_element_xml = xml.getElementsByTagName(strings[0])
             if len(parent_element_xml) > 0:
                 element_xml = parent_element_xml[0].getElementsByTagName(strings[1])
             else:
-                self.logger.info("Attribute %s not available on the Enigma2Device" % self.get_iattr_value(item.conf,
-                                                                                                          'enigma2_data_type'))
+                self.logger.info(
+                    "Attribute %s not available on the Enigma2Device"
+                    % self.get_iattr_value(item.conf, "enigma2_data_type")
+                )
                 return
         else:
-            element_xml = xml.getElementsByTagName(self.get_iattr_value(item.conf, 'enigma2_data_type'))
+            element_xml = xml.getElementsByTagName(self.get_iattr_value(item.conf, "enigma2_data_type"))
 
-        if (len(element_xml) > 0):
+        if len(element_xml) > 0:
             # self.logger.debug(element_xml[0].firstChild.data)
-            if item.type() == 'bool':
+            if item.type() == "bool":
                 if element_xml[0].firstChild is not None:
                     boolVal = self.to_bool(element_xml[0].firstChild.data.rstrip().lstrip())
                     item(boolVal)
-            elif item.type() == 'num':
+            elif item.type() == "num":
                 if element_xml[0].firstChild is not None:
                     if self.is_int(element_xml[0].firstChild.data):
                         item(int(element_xml[0].firstChild.data))
                     elif self.is_float(element_xml[0].firstChild.data):
                         item(float(element_xml[0].firstChild.data))
-                    elif self.get_iattr_value(item.conf, 'enigma2_data_type') in ['e2capacity', 'e2free']:
+                    elif self.get_iattr_value(item.conf, "enigma2_data_type") in ["e2capacity", "e2free"]:
                         # self.logger.debug(element_xml[0].firstChild.data)
-                        item(int(''.join(filter(lambda s: s.isdigit() or (s.startswith('-') and s[1:].isdigit()),
-                                                element_xml[
-                                                    0].firstChild.data))))  # remove "GB" String and convert to int
+                        item(
+                            int(
+                                "".join(
+                                    filter(
+                                        lambda s: s.isdigit() or (s.startswith("-") and s[1:].isdigit()),
+                                        element_xml[0].firstChild.data,
+                                    )
+                                )
+                            )
+                        )  # remove "GB" String and convert to int
                 else:
                     item(0)  # 0 if no value is provided
             else:
@@ -605,12 +650,13 @@ class Enigma2(SmartPlugin):
                 else:
                     item("-")
         else:
-            self.logger.info("Attribute %s not available on the Enigma2Device" % self.get_iattr_value(item.conf,
-                                                                                                      'enigma2_data_type'))
+            self.logger.info(
+                "Attribute %s not available on the Enigma2Device" % self.get_iattr_value(item.conf, "enigma2_data_type")
+            )
 
     # helper functions below
 
-    def _cached_get_request(self, cache_key, urlpart, parameter='', cache=True, fast=False):
+    def _cached_get_request(self, cache_key, urlpart, parameter="", cache=True, fast=False):
         if not fast:
             response_cache = self._response_cache
         else:
@@ -636,7 +682,7 @@ class Enigma2(SmartPlugin):
     def _get_value_from_xml_node(self, node, tag_name):
         data = None
         xml = node.getElementsByTagName(tag_name)
-        if (len(xml) > 0):
+        if len(xml) > 0:
             if xml[0].firstChild is not None:
                 data = xml[0].firstChild.data
         return data
@@ -645,14 +691,13 @@ class Enigma2(SmartPlugin):
         return self._enigma2_device
 
     def init_webinterface(self):
-        """"
+        """ "
         Initialize the web interface for this plugin
 
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module(
-                'http')  # try/except to handle disabled http module
+            self.mod_http = Modules.get_instance().get_module("http")  # try/except to handle disabled http module
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
@@ -660,23 +705,23 @@ class Enigma2(SmartPlugin):
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
+        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
         config = {
-            '/': {
-                'tools.staticdir.root': webif_dir,
+            "/": {
+                "tools.staticdir.root": webif_dir,
             },
-            '/static': {
-                'tools.staticdir.on': True,
-                'tools.staticdir.dir': 'static'
-            }
+            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
         }
 
         # Register the web interface as a cherrypy app
-        self.mod_http.register_webif(WebInterface(webif_dir, self),
-                                     self.get_shortname(),
-                                     config,
-                                     self.get_classname(), self.get_instance_name(),
-                                     description='')
+        self.mod_http.register_webif(
+            WebInterface(webif_dir, self),
+            self.get_shortname(),
+            config,
+            self.get_classname(),
+            self.get_instance_name(),
+            description="",
+        )
 
         return True
 
@@ -691,7 +736,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -716,13 +760,18 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('index.html')
-        return tmpl.render(plugin_shortname=self.plugin.get_shortname(), plugin_version=self.plugin.get_version(),
-                           interface=None, item_count=len(self.plugin.get_enigma2_device().get_items()),
-                           item_count_fast=len(self.plugin.get_enigma2_device().get_fast_items()),
-                           item_count_remote_command=len(self.plugin.get_enigma2_device().get_items_remote_command()),
-                           plugin_info=self.plugin.get_info(), tabcount=1,
-                           p=self.plugin)
+        tmpl = self.tplenv.get_template("index.html")
+        return tmpl.render(
+            plugin_shortname=self.plugin.get_shortname(),
+            plugin_version=self.plugin.get_version(),
+            interface=None,
+            item_count=len(self.plugin.get_enigma2_device().get_items()),
+            item_count_fast=len(self.plugin.get_enigma2_device().get_fast_items()),
+            item_count_remote_command=len(self.plugin.get_enigma2_device().get_items_remote_command()),
+            plugin_info=self.plugin.get_info(),
+            tabcount=1,
+            p=self.plugin,
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -739,17 +788,17 @@ class WebInterface(SmartPluginWebIf):
             data = {}
             for item in self.plugin.get_enigma2_device().get_items():
                 data[item.property.path + "_value"] = item()
-                data[item.property.path + "_last_update"] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                data[item.property.path + "_last_change"] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
 
             for item in self.plugin.get_enigma2_device().get_fast_items():
                 data[item.property.path + "_value"] = item()
-                data[item.property.path + "_last_update"] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                data[item.property.path + "_last_change"] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
             for item in self.plugin.get_enigma2_device().get_items_remote_command():
                 data[item.property.path + "_value"] = item()
-                data[item.property.path + "_last_update"] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                data[item.property.path + "_last_change"] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                data[item.property.path + "_last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                data[item.property.path + "_last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
 
             # return it as json the the web page
             return json.dumps(data)

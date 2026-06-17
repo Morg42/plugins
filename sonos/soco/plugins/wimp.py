@@ -162,9 +162,7 @@ class Wimp(SoCoPlugin):
 
         # Get a session id for the searches
         self._music_services = MusicServices(soco)
-        response = self._music_services.GetSessionId(
-            [("ServiceId", 20), ("Username", username)]
-        )
+        response = self._music_services.GetSessionId([("ServiceId", 20), ("Username", username)])
         self._session_id = response["SessionId"]
 
     @property
@@ -221,9 +219,7 @@ class Wimp(SoCoPlugin):
         """
         return self.get_music_service_information("playlists", search, start, max_items)
 
-    def get_music_service_information(
-        self, search_type, search, start=0, max_items=100
-    ):
+    def get_music_service_information(self, search_type, search, start=0, max_items=100):
         """Search for music service information items.
 
         :param search_type: The type of search to perform, possible values are:
@@ -315,8 +311,7 @@ class Wimp(SoCoPlugin):
         # ... and make sure there is exactly 1
         if len(metadata_result) != 1:
             raise UnknownXMLStructure(
-                "The results XML has more than 1 'getMetadataResult'. This "
-                "is unexpected and parsing will dis-continue."
+                "The results XML has more than 1 'getMetadataResult'. This is unexpected and parsing will dis-continue."
             )
         metadata_result = metadata_result[0]
 
@@ -482,9 +477,7 @@ class Wimp(SoCoPlugin):
             fault = error_dom.find(".//" + _ns_tag("s", "Fault"))
             error_description = fault.find("faultstring").text
             error_code = EXCEPTION_STR_TO_CODE[error_description]
-            message = "UPnP Error {} received: {} from {}".format(
-                error_code, error_description, self._url
-            )
+            message = "UPnP Error {} received: {} from {}".format(error_code, error_description, self._url)
             raise SoCoUPnPException(
                 message=message,
                 error_code=error_code,

@@ -8,7 +8,6 @@
 
 # This needs to be integrated with Music Library data structures
 
-
 from .exceptions import DIDLMetadataError
 from .utils import camel_to_underscore
 from .xml import NAMESPACES, XML, ns_tag
@@ -137,8 +136,7 @@ class MusicServiceItem:
         for key in cls.required_fields:
             if key not in content:
                 message = (
-                    "An XML field that correspond to the key '{}' "
-                    "is required. See the docstring for help.".format(key)
+                    "An XML field that correspond to the key '{}' is required. See the docstring for help.".format(key)
                 )
 
         return cls.from_dict(content)
@@ -229,10 +227,7 @@ class MusicServiceItem:
         """
         # Check if this item is meant to be played
         if not self.can_play:
-            message = (
-                "This item is not meant to be played and therefore "
-                "also not to create its own didl_metadata"
-            )
+            message = "This item is not meant to be played and therefore also not to create its own didl_metadata"
             raise DIDLMetadataError(message)
         # Check if we have the attributes to create the didl metadata:
         for key in ["extended_id", "title", "item_class"]:
@@ -358,9 +353,7 @@ class MSTrack(MusicServiceItem):
         "service_id",
     ]
 
-    def __init__(
-        self, title, item_id, extended_id, uri, description, service_id, **kwargs
-    ):
+    def __init__(self, title, item_id, extended_id, uri, description, service_id, **kwargs):
         """Initialize MSTrack item."""
         content = {
             "title": title,
@@ -424,9 +417,7 @@ class MSAlbum(MusicServiceItem):
         "service_id",
     ]
 
-    def __init__(
-        self, title, item_id, extended_id, uri, description, service_id, **kwargs
-    ):
+    def __init__(self, title, item_id, extended_id, uri, description, service_id, **kwargs):
         content = {
             "title": title,
             "item_id": item_id,
@@ -476,9 +467,7 @@ class MSAlbumList(MusicServiceItem):
         "service_id",
     ]
 
-    def __init__(
-        self, title, item_id, extended_id, uri, description, service_id, **kwargs
-    ):
+    def __init__(self, title, item_id, extended_id, uri, description, service_id, **kwargs):
         content = {
             "title": title,
             "item_id": item_id,
@@ -524,9 +513,7 @@ class MSPlaylist(MusicServiceItem):
         "service_id",
     ]
 
-    def __init__(
-        self, title, item_id, extended_id, uri, description, service_id, **kwargs
-    ):
+    def __init__(self, title, item_id, extended_id, uri, description, service_id, **kwargs):
         content = {
             "title": title,
             "item_id": item_id,
@@ -561,9 +548,7 @@ class MSArtistTracklist(MusicServiceItem):
         "service_id",
     ]
 
-    def __init__(
-        self, title, item_id, extended_id, uri, description, service_id, **kwargs
-    ):
+    def __init__(self, title, item_id, extended_id, uri, description, service_id, **kwargs):
         content = {
             "title": title,
             "item_id": item_id,

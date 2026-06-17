@@ -100,31 +100,31 @@ def get_last_part_of_item_id(item):
 
 
 def parse_relative(evalstr, begintag, endtags):
-    if begintag == '' and endtags == '':
+    if begintag == "" and endtags == "":
         return evalstr
-    if evalstr.find(begintag+'.') == -1:
+    if evalstr.find(begintag + ".") == -1:
         return evalstr
-    pref = ''
+    pref = ""
     rest = evalstr
     endtags = [endtags] if isinstance(endtags, str) else endtags
 
-    while rest.find(begintag+'.') != -1:
-        pref += rest[:rest.find(begintag+'.')]
-        rest = rest[rest.find(begintag+'.')+len(begintag):]
-        endtag = ''
+    while rest.find(begintag + ".") != -1:
+        pref += rest[: rest.find(begintag + ".")]
+        rest = rest[rest.find(begintag + ".") + len(begintag) :]
+        endtag = ""
         previousposition = 1000
         for end in endtags:
             position = rest.find(end)
             if position < previousposition and not position == -1:
                 endtag = end
                 previousposition = position
-        rel = rest[:rest.find(endtag)]
-        rest = rest[rest.find(endtag)+len(endtag):]
-        if 'property' in endtag:
-            rest1 = re.split('([- +*/])', rest, 1)
-            rest = ''.join(rest1[1:])
+        rel = rest[: rest.find(endtag)]
+        rest = rest[rest.find(endtag) + len(endtag) :]
+        if "property" in endtag:
+            rest1 = re.split("([- +*/])", rest, 1)
+            rest = "".join(rest1[1:])
             pref += "se_eval.get_relative_itemproperty('{}', '{}')".format(rel, rest1[0])
-        elif '()' in endtag:
+        elif "()" in endtag:
             pref += "se_eval.get_relative_itemvalue('{}')".format(rel)
     pref += rest
     return pref
@@ -184,9 +184,9 @@ def cast_bool(value):
         else:
             raise ValueError("Can't cast {0} to bool!".format(value))
     elif isinstance(value, str):
-        if value.lower() in ['0', 'false', 'no', 'off']:
+        if value.lower() in ["0", "false", "no", "off"]:
             return False
-        elif value.lower() in ['1', 'true', 'yes', 'on']:
+        elif value.lower() in ["1", "true", "yes", "on"]:
             return True
         else:
             raise ValueError("Can't cast {0} to bool!".format(value))
@@ -245,7 +245,9 @@ def cast_time(value):
         except ValueError:
             raise ValueError("Can not cast '{0}' to data type 'time' due to non-numeric parts!".format(orig_value))
         if hour > 24 or minute > 59:
-            raise ValueError("Can not cast '{0}' to data type 'time'. Hour or minute values too high!".format(orig_value))
+            raise ValueError(
+                "Can not cast '{0}' to data type 'time'. Hour or minute values too high!".format(orig_value)
+            )
         elif hour == 24 and minute >= 0:
             return datetime.time(23, 59, 59)
         else:
@@ -320,7 +322,7 @@ def convert_str_to_list(value, force=True):
     if isinstance(value, str):
         orig_value = value
         value = value.strip()
-        if value.startswith('[') and value.endswith(']'):
+        if value.startswith("[") and value.endswith("]"):
             value = value[1:-1].strip()
         else:
             return orig_value
@@ -328,8 +330,9 @@ def convert_str_to_list(value, force=True):
     if isinstance(value, str) and "," in value:
         try:
             elements = re.findall(r"'([^']*)'|\"([^\"]*)\"|([^,]+)", value)
-            flattened_elements = [element[0] if element[0] else (element[1] if element[1] else element[2].strip()) for
-                                  element in elements]
+            flattened_elements = [
+                element[0] if element[0] else (element[1] if element[1] else element[2].strip()) for element in elements
+            ]
             flattened_elements = [element.strip() for element in flattened_elements]
             formatted_elements = []
             for element in flattened_elements:
@@ -355,11 +358,11 @@ def convert_str_to_list(value, force=True):
 # returns: OrderedDict or original value
 def convert_str_to_dict(value):
     if isinstance(value, str) and value.startswith("["):
-        value = re.split(r'(, (?![^(]*\)))', value.strip(']['))
-        value = [s for s in value if s != ', ']
+        value = re.split(r"(, (?![^(]*\)))", value.strip("]["))
+        value = [s for s in value if s != ", "]
         result = []
         for s in value:
-            m = re.match(r'^OrderedDict\((.+)\)$', s)
+            m = re.match(r"^OrderedDict\((.+)\)$", s)
             if m:
                 result.append(dict(literal_eval(m.group(1))))
             else:
@@ -400,9 +403,9 @@ def get_eval_name(eval_func):
 # source: source
 # item: item being updated
 # eval_type: update or change
-def get_original_caller(smarthome, elog, caller, source, item=None, eval_keyword=None, eval_type='update'):
+def get_original_caller(smarthome, elog, caller, source, item=None, eval_keyword=None, eval_type="update"):
     if eval_keyword is None:
-        eval_keyword = ['Eval']
+        eval_keyword = ["Eval"]
     original_caller = caller
     original_item = item
     if isinstance(source, str):
@@ -414,8 +417,9 @@ def get_original_caller(smarthome, elog, caller, source, item=None, eval_keyword
         if original_item is None:
             elog.info("get_caller({0}, {1}): original item not found", caller, source)
             break
-        original_manipulated_by = original_item.property.last_update_by if eval_type == "update" else \
-            original_item.property.last_change_by
+        original_manipulated_by = (
+            original_item.property.last_update_by if eval_type == "update" else original_item.property.last_change_by
+        )
         if ":" not in original_manipulated_by:
             break
         original_caller, __, original_source = original_manipulated_by.partition(":")

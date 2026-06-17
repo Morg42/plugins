@@ -34,35 +34,43 @@ import json
 import os
 import time
 
+
 class SHNGHomeConnect(SmartPlugin):
     PLUGIN_VERSION = "1.0.0"
 
     def __init__(self, sh):
         super().__init__()
         self.shtime = Shtime.get_instance()
-        self._client_id = self.get_parameter_value('client_id')
-        self._client_secret = self.get_parameter_value('client_secret')
-        self._cycle = self.get_parameter_value('cycle')
-        self._simulate = self.get_parameter_value('simulate')
+        self._client_id = self.get_parameter_value("client_id")
+        self._client_secret = self.get_parameter_value("client_secret")
+        self._cycle = self.get_parameter_value("cycle")
+        self._simulate = self.get_parameter_value("simulate")
         self._token = None
         self._items = {}
 
         if not self.init_webinterface(WebInterface):
             self._init_complete = False
         else:
-            self._hc = HomeConnect(self._client_id, self._client_secret, self.get_redirect_uri(), simulate=self._simulate, token_cache=self.get_sh().get_basedir()+"/plugins/homeconnect/homeconnect_oauth_token.json", token_listener=self.set_token)
+            self._hc = HomeConnect(
+                self._client_id,
+                self._client_secret,
+                self.get_redirect_uri(),
+                simulate=self._simulate,
+                token_cache=self.get_sh().get_basedir() + "/plugins/homeconnect/homeconnect_oauth_token.json",
+                token_listener=self.set_token,
+            )
             self._token = self.get_hc().token_load()
-            self.logger.debug("Token loaded: %s"%self._token)
+            self.logger.debug("Token loaded: %s" % self._token)
             if self._token:
                 if not self.get_hc().token_expired(self._token):
                     self._init_appliance_listeners()
 
     def run(self):
         self.alive = True
-        self.scheduler_add('poll_data', self._update_loop, cycle=self._cycle)
+        self.scheduler_add("poll_data", self._update_loop, cycle=self._cycle)
 
     def stop(self):
-        self.scheduler_remove('poll_data')
+        self.scheduler_remove("poll_data")
         self.alive = False
 
     def _update_loop(self):
@@ -80,7 +88,7 @@ class SHNGHomeConnect(SmartPlugin):
         """
         Updates information on diverse items
         """
-        self.logger.debug("Token in _update is %s"%self._token)
+        self.logger.debug("Token in _update is %s" % self._token)
         if self._token:
             if not self.get_hc().token_expired(self._token):
                 try:
@@ -88,7 +96,7 @@ class SHNGHomeConnect(SmartPlugin):
                         if appliance.haId + "_status" in self._items:
                             self._items[appliance.haId + "_status"](appliance.connected)
                 except Exception as e:
-                    self.logger.error("An exception occurred in _update %s"%e)
+                    self.logger.error("An exception occurred in _update %s" % e)
         pass
 
     def _update_listener(self):
@@ -109,8 +117,12 @@ class SHNGHomeConnect(SmartPlugin):
 
         :param item: The item to process.
         """
-        if self.get_iattr_value(item.conf, 'homeconnect_data_type'):
-            self._items[self.get_iattr_value(item.conf, 'ha_id')+"_"+self.get_iattr_value(item.conf, 'homeconnect_data_type')] = item
+        if self.get_iattr_value(item.conf, "homeconnect_data_type"):
+            self._items[
+                self.get_iattr_value(item.conf, "ha_id")
+                + "_"
+                + self.get_iattr_value(item.conf, "homeconnect_data_type")
+            ] = item
         pass
 
     def get_items(self):
@@ -136,7 +148,7 @@ class SHNGHomeConnect(SmartPlugin):
                 try:
                     return appliance.get_programs_active()
                 except Exception as e:
-                    self.logger.debug("An exception occurred: %s"%str(e))
+                    self.logger.debug("An exception occurred: %s" % str(e))
                     return ""
 
     def get_programs_selected(self, ha_id):
@@ -150,7 +162,7 @@ class SHNGHomeConnect(SmartPlugin):
                 try:
                     return appliance.get_program_options(program_key)
                 except Exception as e:
-                    self.logger.debug("An exception occurred: %s"%str(e))
+                    self.logger.debug("An exception occurred: %s" % str(e))
                     return ""
 
     def start_program(self, ha_id, program_key, options=None):
@@ -172,7 +184,7 @@ class SHNGHomeConnect(SmartPlugin):
                     return ""
 
     def set_token(self, new_token):
-        self.logger.debug("Updating token: %s"%new_token)
+        self.logger.debug("Updating token: %s" % new_token)
         self._token = new_token
 
     def get_client_secret(self):
@@ -186,10 +198,8 @@ class SHNGHomeConnect(SmartPlugin):
         port = self.mod_http.get_local_port()
         web_ifs = self.mod_http.get_webifs_for_plugin(self.get_shortname())
         for web_if in web_ifs:
-            if web_if['Instance'] == self.get_instance_name():
-                redirect_uri = "http://{}:{}{}".format(ip, port, web_if['Mount'])
-                self.logger.debug("WebIf of plugin {} found, callback is {}".format(self.get_fullname(),
-                                                                       redirect_uri))
+            if web_if["Instance"] == self.get_instance_name():
+                redirect_uri = "http://{}:{}{}".format(ip, port, web_if["Mount"])
+                self.logger.debug("WebIf of plugin {} found, callback is {}".format(self.get_fullname(), redirect_uri))
             return redirect_uri
         self.logger.error("Redirect URL cannot be established.")
-

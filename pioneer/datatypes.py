@@ -7,8 +7,8 @@ import re
 
 class DT_PioDisplay(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
-        tempvalue = "".join(list(map(lambda i: chr(int(data[2 * i:][:2], 0x10)), range(14)))).strip()
-        data = re.sub(r'^[^A-Z0-9]*', '', tempvalue)
+        tempvalue = "".join(list(map(lambda i: chr(int(data[2 * i :][:2], 0x10)), range(14)))).strip()
+        data = re.sub(r"^[^A-Z0-9]*", "", tempvalue)
         return data
 
 
@@ -28,6 +28,7 @@ class DT_PioSleep(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
         return int(data)
 
+
 class DT_PioStandby(DT.Datatype):
     def get_send_data(self, data, **kwargs):
         if data == 0:
@@ -41,6 +42,7 @@ class DT_PioStandby(DT.Datatype):
 
     def get_shng_data(self, data, type=None, **kwargs):
         return int(data)
+
 
 class DT_PioStandby2(DT.Datatype):
     def get_send_data(self, data, **kwargs):
@@ -71,6 +73,7 @@ class DT_PioStandby2(DT.Datatype):
         elif data == "0091":
             return 9
 
+
 class DT_PioInitVol(DT.Datatype):
     def get_send_data(self, data, **kwargs):
         if int(data) == 999:
@@ -89,10 +92,11 @@ class DT_PioInitVol(DT.Datatype):
         elif data == "000":
             _returnvalue = -81
         elif int(data) >= 161:
-            _returnvalue =  ((data - 161) / (185 - 161)) * 12
+            _returnvalue = ((data - 161) / (185 - 161)) * 12
         elif int(data) < 161:
             _returnvalue = ((data - 161) / 160) * 80
         return _returnvalue
+
 
 class DT_PioChannelVol(DT.Datatype):
     def get_send_data(self, data, **kwargs):
@@ -101,23 +105,26 @@ class DT_PioChannelVol(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
         return (int(data) - 50) / 2
 
+
 class DT_PioName(DT.Datatype):
     def get_send_data(self, data, **kwargs):
         return f'"{data}"{len(data):02}'
 
+
 class DT_PioOnoff(DT.Datatype):
     def get_send_data(self, data, **kwargs):
-        return 'O' if data else 'F'
+        return "O" if data else "F"
 
     def get_shng_data(self, data, type=None, **kwargs):
-        if type is None or type == 'bool':
-            return True if data == '0' else False
+        if type is None or type == "bool":
+            return True if data == "0" else False
 
         return super().get_shng_data(data, type)
 
+
 class DT_PioBool(DT.Datatype):
     def get_shng_data(self, data, type=None, **kwargs):
-        if type is None or type == 'bool':
-            return True if data == '1' else False if data == '0' else None
+        if type is None or type == "bool":
+            return True if data == "1" else False if data == "0" else None
 
         return super().get_shng_data(data, type)

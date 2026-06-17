@@ -44,7 +44,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -61,7 +60,6 @@ class WebInterface(SmartPluginWebIf):
 
         self.tplenv = self.init_template_environment()
 
-
     @cherrypy.expose
     def index(self, reload=None):
         """
@@ -71,13 +69,14 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin,
-                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
-                           item_count=0,
-                           rtr=self.plugin._rtr)
-
+        return tmpl.render(
+            p=self.plugin,
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])),
+            item_count=0,
+            rtr=self.plugin._rtr,
+        )
 
     def get_value(self, param):
         try:
@@ -103,33 +102,33 @@ class WebInterface(SmartPluginWebIf):
                 result[r] = {}
                 rtr = self.plugin._rtr[r]
                 # data for tab 1 'Raumtemperatur Regler'
-                result[r]['temp_actual'] = rtr.temp_actual_item()
-                result[r]['temp_set'] = rtr.temp_set_item()
-                result[r]['control_output'] = rtr.control_output_item()
-                result[r]['mode'] = str(rtr._mode)
-                result[r]['lock_status'] = rtr.lock_status_item()
-                result[r]['setting_temp_comfort'] = rtr.setting_temp_comfort_item()
-                result[r]['setting_temp_standby'] = rtr.setting_temp_standby_item()
-                result[r]['setting_temp_night'] = rtr.setting_temp_night_item()
-                result[r]['setting_temp_frost'] = rtr.setting_temp_frost_item()
+                result[r]["temp_actual"] = rtr.temp_actual_item()
+                result[r]["temp_set"] = rtr.temp_set_item()
+                result[r]["control_output"] = rtr.control_output_item()
+                result[r]["mode"] = str(rtr._mode)
+                result[r]["lock_status"] = rtr.lock_status_item()
+                result[r]["setting_temp_comfort"] = rtr.setting_temp_comfort_item()
+                result[r]["setting_temp_standby"] = rtr.setting_temp_standby_item()
+                result[r]["setting_temp_night"] = rtr.setting_temp_night_item()
+                result[r]["setting_temp_frost"] = rtr.setting_temp_frost_item()
 
                 # data for tab 2 'Erweiterte Einstellungen'
-                result[r]['controller_type'] = rtr.controller.controller_type
-                result[r]['controller_Kp'] = rtr.controller._Kp
-                result[r]['controller_Ki'] = rtr.controller._Ki
-                if rtr.controller.controller_type == 'PID':
-                    result[r]['controller_Kd'] = self.get_value(rtr.controller._Kd)
+                result[r]["controller_type"] = rtr.controller.controller_type
+                result[r]["controller_Kp"] = rtr.controller._Kp
+                result[r]["controller_Ki"] = rtr.controller._Ki
+                if rtr.controller.controller_type == "PID":
+                    result[r]["controller_Kd"] = self.get_value(rtr.controller._Kd)
                 else:
-                    result[r]['controller_Kd'] = '-'
-                result[r]['valve_protect'] = rtr.valve_protect
+                    result[r]["controller_Kd"] = "-"
+                result[r]["valve_protect"] = rtr.valve_protect
 
-                result[r]['setting_standby_reduction'] = rtr.setting_standby_reduction_item()
-                result[r]['setting_night_reduction'] = rtr.setting_night_reduction_item()
-                result[r]['setting_fixed_reduction'] = rtr.setting_fixed_reduction_item()
-                result[r]['setting_min_output'] = rtr.setting_min_output_item()
-                result[r]['setting_max_output'] = rtr.setting_max_output_item()
+                result[r]["setting_standby_reduction"] = rtr.setting_standby_reduction_item()
+                result[r]["setting_night_reduction"] = rtr.setting_night_reduction_item()
+                result[r]["setting_fixed_reduction"] = rtr.setting_fixed_reduction_item()
+                result[r]["setting_min_output"] = rtr.setting_min_output_item()
+                result[r]["setting_max_output"] = rtr.setting_max_output_item()
 
-    # send result to wen interface
+            # send result to wen interface
             try:
                 data = json.dumps(result)
                 if data:
@@ -139,4 +138,3 @@ class WebInterface(SmartPluginWebIf):
             except Exception as e:
                 self.logger.error(f"get_data_html exception: {e}")
         return {}
-

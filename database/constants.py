@@ -25,13 +25,13 @@ from typing import NamedTuple
 # Item table  ({prefix}item)
 # Stores the *latest* value of every tracked item.
 # ──────────────────────────────────────────────────────────────────────────────
-COL_ITEM = ('id', 'name', 'time', 'val_str', 'val_num', 'val_bool', 'changed')
-COL_ITEM_ID      = 0
-COL_ITEM_NAME    = 1
-COL_ITEM_TIME    = 2
+COL_ITEM = ("id", "name", "time", "val_str", "val_num", "val_bool", "changed")
+COL_ITEM_ID = 0
+COL_ITEM_NAME = 1
+COL_ITEM_TIME = 2
 COL_ITEM_VAL_STR = 3
 COL_ITEM_VAL_NUM = 4
-COL_ITEM_VAL_BOL = 5   # NOTE: keep COL_ITEM_VAL_BOOL as alias for back-compat
+COL_ITEM_VAL_BOL = 5  # NOTE: keep COL_ITEM_VAL_BOOL as alias for back-compat
 COL_ITEM_VAL_BOOL = 5
 COL_ITEM_CHANGED = 6
 
@@ -39,19 +39,19 @@ COL_ITEM_CHANGED = 6
 # Log table  ({prefix}log)
 # Stores every historical value together with how long it was active.
 # ──────────────────────────────────────────────────────────────────────────────
-COL_LOG = ('time', 'item_id', 'duration', 'val_str', 'val_num', 'val_bool', 'changed')
-COL_LOG_TIME     = 0
-COL_LOG_ITEM_ID  = 1
+COL_LOG = ("time", "item_id", "duration", "val_str", "val_num", "val_bool", "changed")
+COL_LOG_TIME = 0
+COL_LOG_ITEM_ID = 1
 COL_LOG_DURATION = 2
-COL_LOG_VAL_STR  = 3
-COL_LOG_VAL_NUM  = 4
+COL_LOG_VAL_STR = 3
+COL_LOG_VAL_NUM = 4
 COL_LOG_VAL_BOOL = 5
-COL_LOG_CHANGED  = 6
+COL_LOG_CHANGED = 6
 
 # ──────────────────────────────────────────────────────────────────────────────
 # Data-quality flags  (stored in the val_quality column added in schema v7)
 # ──────────────────────────────────────────────────────────────────────────────
-QUALITY_VALID   = 0
+QUALITY_VALID = 0
 """Normal, measured value.  All pre-existing rows implicitly have this quality."""
 
 QUALITY_NO_DATA = 1
@@ -82,7 +82,8 @@ class BufferEntry(NamedTuple):
                      measurement, ``QUALITY_NO_DATA`` (1) for a gap caused by
                      source unavailability.
     """
-    time:     int
-    duration: 'int | None'
-    value:    object
-    quality:  int = QUALITY_VALID
+
+    time: int
+    duration: "int | None"
+    value: object
+    quality: int = QUALITY_VALID

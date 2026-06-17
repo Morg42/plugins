@@ -44,7 +44,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -58,8 +57,8 @@ class WebInterface(SmartPluginWebIf):
         self.webif_dir = webif_dir
         self.plugin = plugin
         self.tplenv = self.init_template_environment()
-        self.tplenv.filters['dateformat'] = self.dateformat
-        self.tplenv.filters['timeformat'] = self.timeformat
+        self.tplenv.filters["dateformat"] = self.dateformat
+        self.tplenv.filters["timeformat"] = self.timeformat
         self.items = Items.get_instance()
 
     @cherrypy.expose
@@ -73,44 +72,42 @@ class WebInterface(SmartPluginWebIf):
         """
 
         if cmd:
-            self.logger.debug(f'Command: {cmd}')
-            if cmd == 'clean':
+            self.logger.debug(f"Command: {cmd}")
+            if cmd == "clean":
                 self.logger.info("WebIf: Start cleaning")
                 self.plugin.clean()
-            elif cmd == 'clean_room':
-                self.logger.info(
-                    f"WebIf: Start cleaning {type} (id: {id})")
+            elif cmd == "clean_room":
+                self.logger.info(f"WebIf: Start cleaning {type} (id: {id})")
                 self.plugin.clean(id)
-            elif cmd == 'pause':
+            elif cmd == "pause":
                 self.logger.info("WebIf: Pause cleaning")
                 self.plugin.pause()
-            elif cmd == 'charge':
+            elif cmd == "charge":
                 self.logger.info("WebIf: Return to charging station")
                 self.plugin.charge()
-            elif cmd == 'locate':
+            elif cmd == "locate":
                 self.logger.info("WebIf: Locating robot")
                 self.plugin.locate()
-            elif cmd == 'set_fan_speed':
+            elif cmd == "set_fan_speed":
                 self.logger.info(f"WebIf: Update fan speed to {speed}")
                 self.plugin.set_fan_speed(speed)
-            elif cmd == 'set_water_level':
-                self.logger.info(
-                    f"WebIf: Update water level to {level}")
+            elif cmd == "set_water_level":
+                self.logger.info(f"WebIf: Update water level to {level}")
                 self.plugin.set_water_level(level)
             else:
-                self.logger.warning(f'Unknown command: {cmd}')
+                self.logger.warning(f"Unknown command: {cmd}")
 
         # get list of items with the attribute knx_dpt
         plgitems = []
         for item in self.items.return_items():
-            self.logger.debug(f'For: {item.conf}')
+            self.logger.debug(f"For: {item.conf}")
             if self.plugin.get_shortname() in item.conf:
-                self.logger.debug(f'Item: {item}')
+                self.logger.debug(f"Item: {item}")
                 plgitems.append(item)
 
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin, items=sorted(plgitems, key=lambda k: str.lower(k['_path'])))
+        return tmpl.render(p=self.plugin, items=sorted(plgitems, key=lambda k: str.lower(k["_path"])))
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -124,7 +121,7 @@ class WebInterface(SmartPluginWebIf):
         """
         if dataSet is None:
             data = {}
-            data['mybot'] = self.plugin.mybot
+            data["mybot"] = self.plugin.mybot
             # return it as json the the web page
             try:
                 return json.dumps(data)
@@ -138,7 +135,7 @@ class WebInterface(SmartPluginWebIf):
             _datetime = datetime.datetime.fromtimestamp(timestamp)
             result = _datetime.strftime("%d/%m/%Y")
         except Exception:
-            result = 'ERROR'
+            result = "ERROR"
         return result
 
     def timeformat(self, timestamp):
@@ -146,5 +143,5 @@ class WebInterface(SmartPluginWebIf):
             _datetime = datetime.datetime.fromtimestamp(timestamp)
             result = _datetime.strftime("%H:%M:%S")
         except Exception:
-            result = 'ERROR'
+            result = "ERROR"
         return result

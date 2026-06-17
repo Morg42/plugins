@@ -1,8 +1,7 @@
 from models.TextDisplayModel import TextDisplayModel
 
 
-room_names = ["Jens", "Kino", "Bad EG", "Flur", "EWoZi", "Küche",
-              "Johanna", "Bad OG", "SchlaZi", "Werkstatt", "Außen"]
+room_names = ["Jens", "Kino", "Bad EG", "Flur", "EWoZi", "Küche", "Johanna", "Bad OG", "SchlaZi", "Werkstatt", "Außen"]
 prio_msg = ["A", "B"]
 turbo = ["X"]
 relevanz_maske = {
@@ -29,13 +28,13 @@ def content_reader(prefix, suffix):
 
 def append_msg_src(model, ring, room, suffix, path):
     rel_path = room.lower() + f".{path}.relevant"
-    model.append_message_source_to_ring(ring,
-                                        content_source_path=room.lower() +
-                                        f".{path}.msg",
-                                        content_source=lambda: content_reader(
-                                            room, suffix),
-                                        is_relevant_path=rel_path,
-                                        is_relevant=lambda: relevanz_maske[rel_path])
+    model.append_message_source_to_ring(
+        ring,
+        content_source_path=room.lower() + f".{path}.msg",
+        content_source=lambda: content_reader(room, suffix),
+        is_relevant_path=rel_path,
+        is_relevant=lambda: relevanz_maske[rel_path],
+    )
 
 
 def fill_model(model):
@@ -51,8 +50,7 @@ def fill_model(model):
 
 model = TextDisplayModel()
 
-model.append_message_sink_to_rings(
-    "sink_key", ["prio", "fenster", "oswald"], "Banana")
+model.append_message_sink_to_rings("sink_key", ["prio", "fenster", "oswald"], "Banana")
 model.append_message_sink_to_overruling_rings("sink_key", ["turbo"])
 
 model = fill_model(model)

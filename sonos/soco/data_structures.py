@@ -27,7 +27,6 @@ helpful.
 # Although Sonos uses ContentDirectory v1, the document for v2 is more helpful:
 # http://upnp.org/specs/av/UPnP-av-ContentDirectory-v2-Service.pdf
 
-
 import textwrap
 import warnings
 
@@ -251,9 +250,7 @@ class DidlResource:
                 try:
                     return int(result)
                 except ValueError as error:
-                    raise DIDLMetadataError(
-                        "Could not convert {} to an integer".format(name)
-                    ) from error
+                    raise DIDLMetadataError("Could not convert {} to an integer".format(name)) from error
             else:
                 return None
 
@@ -264,10 +261,7 @@ class DidlResource:
         # required
         content["protocol_info"] = element.get("protocolInfo")
         if content["protocol_info"] is None:
-            raise DIDLMetadataError(
-                "Could not create Resource from Element: "
-                "protocolInfo not found (required)."
-            )
+            raise DIDLMetadataError("Could not create Resource from Element: protocolInfo not found (required).")
         # Optional
         content["import_uri"] = element.get("importUri")
         content["size"] = _int_helper("size")
@@ -283,9 +277,7 @@ class DidlResource:
         return cls(**content)
 
     def __repr__(self):
-        return "<{} '{}' at {}>".format(
-            self.__class__.__name__, self.uri, hex(id(self))
-        )
+        return "<{} '{}' at {}>".format(self.__class__.__name__, self.uri, hex(id(self)))
 
     def __str__(self):
         return self.__repr__()
@@ -297,11 +289,7 @@ class DidlResource:
             ~xml.etree.ElementTree.Element: an Element.
         """
         if not self.protocol_info:
-            raise DIDLMetadataError(
-                "Could not create Element for this"
-                "resource:"
-                "protocolInfo not set (required)."
-            )
+            raise DIDLMetadataError("Could not create Element for thisresource:protocolInfo not set (required).")
         root = XML.Element("res")
 
         # Required
@@ -550,8 +538,7 @@ class DidlObject(metaclass=DidlMetaClass):
         tag = element.tag
         if not (tag.endswith("item") or tag.endswith("container")):
             raise DIDLMetadataError(
-                "Wrong element. Expected <item> or <container>,"
-                " got <{}> for class {}'".format(tag, cls.item_class)
+                "Wrong element. Expected <item> or <container>, got <{}> for class {}'".format(tag, cls.item_class)
             )
         # and that the upnp matches what we are expecting
         item_class = element.find(ns_tag("upnp", "class")).text
@@ -564,8 +551,7 @@ class DidlObject(metaclass=DidlMetaClass):
 
         if item_class != cls.item_class:
             raise DIDLMetadataError(
-                "UPnP class is incorrect. Expected '{}',"
-                " got '{}'".format(cls.item_class, item_class)
+                "UPnP class is incorrect. Expected '{}', got '{}'".format(cls.item_class, item_class)
             )
 
         # parent_id, item_id  and restricted are stored as attributes on the
@@ -645,9 +631,7 @@ class DidlObject(metaclass=DidlMetaClass):
         # Do we really need this constructor? Could use DidlObject(**content)
         # instead.  -- We do now
         if "resources" in content:
-            content["resources"] = [
-                DidlResource.from_dict(x) for x in content["resources"]
-            ]
+            content["resources"] = [DidlResource.from_dict(x) for x in content["resources"]]
         return cls(**content)
 
     def __eq__(self, playable_item):
@@ -723,10 +707,7 @@ class DidlObject(metaclass=DidlMetaClass):
         content["restricted"] = self.restricted
         content["title"] = self.title
         if self.resources != []:
-            content["resources"] = [
-                resource.to_dict(remove_nones=remove_nones)
-                for resource in self.resources
-            ]
+            content["resources"] = [resource.to_dict(remove_nones=remove_nones) for resource in self.resources]
         content["desc"] = self.desc
         return content
 

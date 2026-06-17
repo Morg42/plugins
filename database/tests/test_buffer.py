@@ -9,15 +9,18 @@ from plugins.database.constants import BufferEntry, QUALITY_VALID, QUALITY_NO_DA
 
 class _Item:
     """Minimal item stand-in (only needs to be hashable)."""
-    def __init__(self, name): self.name = name
-    def __repr__(self): return f'Item({self.name})'
+
+    def __init__(self, name):
+        self.name = name
+
+    def __repr__(self):
+        return f"Item({self.name})"
 
 
 class TestBufferManagerRegistration(unittest.TestCase):
-
     def setUp(self):
         self.mgr = BufferManager()
-        self.item = _Item('test.item')
+        self.item = _Item("test.item")
 
     def test_register_creates_empty_list(self):
         self.mgr.register(self.item)
@@ -25,7 +28,7 @@ class TestBufferManagerRegistration(unittest.TestCase):
 
     def test_double_register_is_idempotent(self):
         self.mgr.register(self.item)
-        self.mgr.register(self.item)   # must not raise or reset
+        self.mgr.register(self.item)  # must not raise or reset
         self.assertEqual(self.mgr.pending_count(self.item), 0)
 
     def test_items_returns_registered(self):
@@ -34,10 +37,9 @@ class TestBufferManagerRegistration(unittest.TestCase):
 
 
 class TestBufferManagerPushPop(unittest.TestCase):
-
     def setUp(self):
         self.mgr = BufferManager()
-        self.item = _Item('test.item')
+        self.item = _Item("test.item")
         self.mgr.register(self.item)
 
     def _entry(self, t, d=None, v=1.0):
@@ -76,10 +78,9 @@ class TestBufferManagerPushPop(unittest.TestCase):
 
 
 class TestBufferManagerCloseOpen(unittest.TestCase):
-
     def setUp(self):
         self.mgr = BufferManager()
-        self.item = _Item('test.item')
+        self.item = _Item("test.item")
         self.mgr.register(self.item)
 
     def test_close_open_sets_duration(self):
@@ -94,10 +95,10 @@ class TestBufferManagerCloseOpen(unittest.TestCase):
         self.mgr.push(self.item, BufferEntry(time=1000, duration=200, value=5.0))
         self.mgr.close_open(self.item, end_ts=1500)
         last = self.mgr.last_entry(self.item)
-        self.assertEqual(last.duration, 200)   # unchanged
+        self.assertEqual(last.duration, 200)  # unchanged
 
     def test_close_open_does_nothing_on_empty_buffer(self):
-        self.mgr.close_open(self.item, end_ts=1500)   # must not raise
+        self.mgr.close_open(self.item, end_ts=1500)  # must not raise
 
     def test_has_open_entry_true_when_open(self):
         self.mgr.push(self.item, BufferEntry(time=1000, duration=None, value=3.0))
@@ -112,10 +113,9 @@ class TestBufferManagerCloseOpen(unittest.TestCase):
 
 
 class TestBufferManagerQuality(unittest.TestCase):
-
     def setUp(self):
         self.mgr = BufferManager()
-        self.item = _Item('solar.power')
+        self.item = _Item("solar.power")
         self.mgr.register(self.item)
 
     def test_push_invalid_creates_no_data_entry(self):
@@ -128,7 +128,7 @@ class TestBufferManagerQuality(unittest.TestCase):
         # second entry is the gap
         self.assertEqual(entries[1].quality, QUALITY_NO_DATA)
         self.assertIsNone(entries[1].value)
-        self.assertIsNone(entries[1].duration)   # still open
+        self.assertIsNone(entries[1].duration)  # still open
 
     def test_push_invalid_then_close_gap(self):
         self.mgr.push_invalid(self.item, start_ts=2000)
@@ -143,5 +143,5 @@ class TestBufferManagerQuality(unittest.TestCase):
         self.assertEqual(last.quality, QUALITY_VALID)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main(verbosity=2)

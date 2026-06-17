@@ -26,9 +26,10 @@
 __license__ = "GPL"
 __version__ = "2.0"
 __revision__ = "0.1"
-__docformat__ = 'reStructuredText'
+__docformat__ = "reStructuredText"
 
 import datetime
+
 
 class Conversion:
     def _to_datetime_ZST10(self, text):
@@ -44,12 +45,12 @@ class Conversion:
             self.logger.error("only digits allowed for date/time code from OBIS")
             return None
         else:
-            year = int(text[0:2])+2000
+            year = int(text[0:2]) + 2000
             month = int(text[2:4])
             day = int(text[4:6])
             hour = int(text[6:8])
             minute = int(text[8:10])
-            return datetime.datetime(year,month,day,hour,minute,0)
+            return datetime.datetime(year, month, day, hour, minute, 0)
 
     def _to_datetime_ZST12(self, text):
         """
@@ -64,13 +65,13 @@ class Conversion:
             self.logger.error("only digits allowed for date/time code from OBIS")
             return None
         else:
-            year = int(text[0:2])+2000
+            year = int(text[0:2]) + 2000
             month = int(text[2:4])
             day = int(text[4:6])
             hour = int(text[6:8])
             minute = int(text[8:10])
             second = int(text[10:12])
-            return datetime.datetime(year,month,day,hour,minute,second)
+            return datetime.datetime(year, month, day, hour, minute, second)
 
     def _to_date_D6(self, text):
         """
@@ -85,10 +86,10 @@ class Conversion:
             self.logger.error("only digits allowed for date code from OBIS")
             return None
         else:
-            year = int(text[0:2])+2000
+            year = int(text[0:2]) + 2000
             month = int(text[2:4])
             day = int(text[4:6])
-            return datetime.date(year,month,day)
+            return datetime.date(year, month, day)
 
     def _to_time_Z4(self, text):
         """
@@ -105,7 +106,7 @@ class Conversion:
         else:
             hour = int(text[0:2])
             minute = int(text[2:4])
-            return datetime.time(hour,minute)
+            return datetime.time(hour, minute)
 
     def _to_time_Z6(self, text):
         """
@@ -123,9 +124,9 @@ class Conversion:
             hour = int(text[0:2])
             minute = int(text[2:4])
             second = int(text[4:6])
-            return datetime.time(hour,minute,second)
+            return datetime.time(hour, minute, second)
 
-    def _convert_value( self, v, converter = 'str'):
+    def _convert_value(self, v, converter="str"):
         """
         This function converts the OBIS value to a user chosen value
         :param v: the value to convert from given as string
@@ -133,16 +134,16 @@ class Conversion:
         :return: after successful conversion the value in converted form
         """
 
-        if converter == 'str' or len(converter) == 0:
+        if converter == "str" or len(converter) == 0:
             return v
 
-        if converter == 'float':
+        if converter == "float":
             try:
                 return float(v)
             except ValueError:
-                if ',' in v:
-                    v2 = v.replace(',','.')
-                else: 
+                if "," in v:
+                    v2 = v.replace(",", ".")
+                else:
                     self.logger.error(f"Could not convert from '{v}' to a float")
                     return None
             try:
@@ -151,14 +152,14 @@ class Conversion:
                 self.logger.error(f"Could not convert from '{v}' to a float")
                 return None
 
-        if converter == 'int':
+        if converter == "int":
             try:
                 return int(v)
             except ValueError:
                 self.logger.error(f"Could not convert from '{v}' to an integer")
                 return None
 
-        if converter == 'ZST10':
+        if converter == "ZST10":
             if len(v) == 10 and v.isdigit():
                 # this is a date!
                 v = self._to_datetime_ZST10(v)
@@ -166,7 +167,7 @@ class Conversion:
             else:
                 self.logger.error(f"Could not convert from '{v}' to a Datetime")
 
-        if converter == 'ZST12':
+        if converter == "ZST12":
             if len(v) == 12 and v.isdigit():
                 # this is a date!
                 v = self._to_datetime_ZST12(v)
@@ -174,7 +175,7 @@ class Conversion:
             else:
                 self.logger.error(f"Could not convert from '{v}' to a Datetime")
 
-        if converter == 'D6':
+        if converter == "D6":
             if len(v) == 6 and v.isdigit():
                 # this is a date!
                 v = self._to_date_D6(v)
@@ -182,7 +183,7 @@ class Conversion:
             else:
                 self.logger.error(f"Could not convert from '{v}' to a Datetime")
 
-        if converter == 'Z6':
+        if converter == "Z6":
             if len(v) == 6 and v.isdigit():
                 # this is a date!
                 v = self._to_time_Z6(v)
@@ -190,7 +191,7 @@ class Conversion:
             else:
                 self.logger.error(f"Could not convert from '{v}' to a Datetime")
 
-        if converter == 'Z4':
+        if converter == "Z4":
             if len(v) == 4 and v.isdigit():
                 # this is a date!
                 v = self._to_time_Z4(v)
@@ -198,7 +199,7 @@ class Conversion:
             else:
                 self.logger.error(f"Could not convert from '{v}' to a Datetime")
 
-        if converter == 'num':
+        if converter == "num":
             try:
                 return int(v)
             except ValueError:
@@ -207,9 +208,9 @@ class Conversion:
             try:
                 return float(v)
             except ValueError:
-                if ',' in v:
-                    v2 = v.replace(',','.')
-                else: 
+                if "," in v:
+                    v2 = v.replace(",", ".")
+                else:
                     self.logger.error(f"Could not convert from '{v}' to a num")
                     return None
             try:
@@ -219,4 +220,3 @@ class Conversion:
                 return None
 
         return v
-

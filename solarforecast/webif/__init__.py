@@ -44,7 +44,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -61,7 +60,6 @@ class WebInterface(SmartPluginWebIf):
 
         self.tplenv = self.init_template_environment()
 
-
     @cherrypy.expose
     def index(self, reload=None):
         """
@@ -71,7 +69,7 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # try to get the webif pagelength from the module.yaml configuration
         global_pagelength = cherrypy.config.get("webif_pagelength")
         if global_pagelength:
@@ -84,11 +82,12 @@ class WebInterface(SmartPluginWebIf):
         except Exception:
             pass
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin,
-                           webif_pagelength=pagelength,
-                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
-                           item_count=0)
-
+        return tmpl.render(
+            p=self.plugin,
+            webif_pagelength=pagelength,
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])),
+            item_count=0,
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -101,7 +100,7 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         # if dataSets are used, define them here
-        if dataSet == 'overview':
+        if dataSet == "overview":
             # get the new data from the plugin variable called _webdata
             data = self.plugin._webdata
             try:

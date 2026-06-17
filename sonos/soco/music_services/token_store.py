@@ -79,9 +79,9 @@ class JsonFileTokenStore(TokenStoreBase):
         """Save a token value pair (token, key) which is a 2 item sequence"""
         if self.token_collection not in self._token_store:
             self._token_store[self.token_collection] = {}
-        self._token_store[self.token_collection][
-            self._create_jsonable_key(music_service_id, household_id)
-        ] = list(token_pair)
+        self._token_store[self.token_collection][self._create_jsonable_key(music_service_id, household_id)] = list(
+            token_pair
+        )
         self.save_collection()
 
     def load_token_pair(self, music_service_id, household_id):
@@ -92,9 +92,9 @@ class JsonFileTokenStore(TokenStoreBase):
 
     def has_token(self, music_service_id, household_id):
         """Return True if a token is stored for the music service"""
-        return self._create_jsonable_key(
-            music_service_id, household_id
-        ) in self._token_store.get(self.token_collection, {})
+        return self._create_jsonable_key(music_service_id, household_id) in self._token_store.get(
+            self.token_collection, {}
+        )
 
     @staticmethod
     def _create_jsonable_key(music_service_id, household_id):

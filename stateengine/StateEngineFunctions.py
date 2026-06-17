@@ -68,17 +68,23 @@ class SeFunctions:
         def check_include_exclude(entry_type):
             conf_entry = item.conf["se_manual_{}".format(entry_type)]
             if isinstance(conf_entry, str):
-                if ',' in conf_entry or conf_entry.startswith("["):
+                if "," in conf_entry or conf_entry.startswith("["):
                     try:
                         new_conf_entry = literal_eval(conf_entry)
                         if isinstance(new_conf_entry, list):
                             conf_entry = new_conf_entry
                     except Exception:
-                        conf_entry = [conf_entry, ]
+                        conf_entry = [
+                            conf_entry,
+                        ]
                 else:
-                    conf_entry = [conf_entry, ]
+                    conf_entry = [
+                        conf_entry,
+                    ]
             elif not isinstance(conf_entry, list):
-                elog.error("Item '{0}', Attribute 'se_manual_{1}': Value must be a string or a list!", item_id, entry_type)
+                elog.error(
+                    "Item '{0}', Attribute 'se_manual_{1}': Value must be a string or a list!", item_id, entry_type
+                )
                 return retval_no_trigger
             elog.info("checking manual {0} values: {1}", entry_type, conf_entry)
             elog.increase_indent()
@@ -128,14 +134,16 @@ class SeFunctions:
             elog.info("Current value of item {0} is {1}", item_id, retval_no_trigger)
 
             original_caller, original_source = StateEngineTools.get_original_caller(self.__sh, elog, caller, source)
-            elog.info("get_caller({0}, {1}): original trigger by {2}:{3}", caller, source,
-                      original_caller, original_source)
+            elog.info(
+                "get_caller({0}, {1}): original trigger by {2}:{3}", caller, source, original_caller, original_source
+            )
             original = "{}:{}".format(original_caller, original_source)
             entry = re.compile(StateEngineDefaults.plugin_identification, re.IGNORECASE)
             result = entry.match(original)
             if result is not None:
-                elog.info("Manual item updated by Stateengine Plugin. Ignoring change and writing value {}",
-                          retval_no_trigger)
+                elog.info(
+                    "Manual item updated by Stateengine Plugin. Ignoring change and writing value {}", retval_no_trigger
+                )
                 return retval_no_trigger
 
             if "se_manual_on" in item.conf:

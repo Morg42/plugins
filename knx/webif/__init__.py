@@ -59,7 +59,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -76,16 +75,16 @@ class WebInterface(SmartPluginWebIf):
         self.last_upload = ""
 
         self.tplenv = self.init_template_environment()
-        self.knxdaemon = ''
-        if os.name != 'nt':
-            if self.get_process_info("ps cax|grep eibd") != '':
-                self.knxdaemon = 'eibd'
-            if self.get_process_info("ps cax|grep knxd") != '':
-                if self.knxdaemon != '':
-                    self.knxdaemon += ' and '
-                self.knxdaemon += 'knxd'
+        self.knxdaemon = ""
+        if os.name != "nt":
+            if self.get_process_info("ps cax|grep eibd") != "":
+                self.knxdaemon = "eibd"
+            if self.get_process_info("ps cax|grep knxd") != "":
+                if self.knxdaemon != "":
+                    self.knxdaemon += " and "
+                self.knxdaemon += "knxd"
         else:
-            self.knxdaemon = 'can not be determined when running on Windows'
+            self.knxdaemon = "can not be determined when running on Windows"
 
     def get_process_info(self, command):
         """
@@ -104,8 +103,7 @@ class WebInterface(SmartPluginWebIf):
 
         ## Wait for date to terminate. Get return returncode ##
         p.wait()
-        return str(result, encoding='utf-8', errors='strict')
-
+        return str(result, encoding="utf-8", errors="strict")
 
     @cherrypy.expose
     def index(self, reload=None, knxprojfile=None, password=None):
@@ -114,9 +112,9 @@ class WebInterface(SmartPluginWebIf):
         Render the template and return the html file to be delivered to the browser
         :return: contents of the template after beeing rendered
         """
-        pagelength = self.plugin.get_parameter_value('webif_pagelength')
+        pagelength = self.plugin.get_parameter_value("webif_pagelength")
         if password is not None:
-            if password != '':
+            if password != "":
                 self.plugin.project_file_password = password
                 self.logger.debug("Set password for knxproj file")
             else:
@@ -128,14 +126,16 @@ class WebInterface(SmartPluginWebIf):
             # ``knxprojfile.file`` is a memory file prepared by cherrypy,
             # it could however be ``None``` if no valid file was uploaded by html page
             if knxprojfile.file is not None:
-                with open(self.plugin.projectpath, 'wb') as out:
+                with open(self.plugin.projectpath, "wb") as out:
                     while True:
                         data = knxprojfile.file.read(8192)
                         if not data:
                             break
                         out.write(data)
                         size += len(data)
-                self.last_upload = "File received.\nFilename: {}\nLength: {}\nMime-type: {}\n".format(knxprojfile.filename, size, knxprojfile.content_type)
+                self.last_upload = "File received.\nFilename: {}\nLength: {}\nMime-type: {}\n".format(
+                    knxprojfile.filename, size, knxprojfile.content_type
+                )
                 self.logger.debug(f"Uploaded projectfile {knxprojfile.filename} with {size} bytes")
                 self.plugin._parse_projectfile()
             else:
@@ -143,7 +143,10 @@ class WebInterface(SmartPluginWebIf):
 
         plgitems = []
         for item in self.items.return_items():
-            if any(elem in item.property.attributes for elem in [KNX_DPT, KNX_STATUS, KNX_SEND, KNX_REPLY, KNX_CACHE, KNX_INIT, KNX_LISTEN, KNX_POLL]):
+            if any(
+                elem in item.property.attributes
+                for elem in [KNX_DPT, KNX_STATUS, KNX_SEND, KNX_REPLY, KNX_CACHE, KNX_INIT, KNX_LISTEN, KNX_POLL]
+            ):
                 plgitems.append(item)
 
         # build a dict with groupaddress as key to items and their attributes
@@ -178,20 +181,32 @@ class WebInterface(SmartPluginWebIf):
                                 ga_usage_by_Attrib[ga][elem] = {}
                             ga_usage_by_Attrib[ga][elem][item] = True
 
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin,
-                           webif_pagelength=pagelength,
-                           items=sorted(plgitems, key=lambda k: str.lower(k['_path'])),
-                           knxdaemon=self.knxdaemon,
-                           stats_ga=self.plugin.get_stats_ga(), stats_ga_list=sorted(self.plugin.get_stats_ga(), key=lambda k: str(int(k.split('/')[0]) + 100) + str(int(k.split('/')[1]) + 100) + str(int(k.split('/')[2]) + 1000)),
-                           stats_pa=self.plugin.get_stats_pa(), stats_pa_list=sorted(self.plugin.get_stats_pa(), key=lambda k: str(int(k.split('.')[0]) + 100) + str(int(k.split('.')[1]) + 100) + str(int(k.split('.')[2]) + 1000)),
-                           last_upload=self.last_upload,
-                           ga_usage_by_Item=ga_usage_by_Item,
-                           ga_usage_by_Attrib=ga_usage_by_Attrib,
-                           knx_attribs=[KNX_DPT, KNX_STATUS, KNX_SEND, KNX_REPLY, KNX_CACHE, KNX_INIT, KNX_LISTEN, KNX_POLL]
-                           )
-
+        return tmpl.render(
+            p=self.plugin,
+            webif_pagelength=pagelength,
+            items=sorted(plgitems, key=lambda k: str.lower(k["_path"])),
+            knxdaemon=self.knxdaemon,
+            stats_ga=self.plugin.get_stats_ga(),
+            stats_ga_list=sorted(
+                self.plugin.get_stats_ga(),
+                key=lambda k: (
+                    str(int(k.split("/")[0]) + 100) + str(int(k.split("/")[1]) + 100) + str(int(k.split("/")[2]) + 1000)
+                ),
+            ),
+            stats_pa=self.plugin.get_stats_pa(),
+            stats_pa_list=sorted(
+                self.plugin.get_stats_pa(),
+                key=lambda k: (
+                    str(int(k.split(".")[0]) + 100) + str(int(k.split(".")[1]) + 100) + str(int(k.split(".")[2]) + 1000)
+                ),
+            ),
+            last_upload=self.last_upload,
+            ga_usage_by_Item=ga_usage_by_Item,
+            ga_usage_by_Attrib=ga_usage_by_Attrib,
+            knx_attribs=[KNX_DPT, KNX_STATUS, KNX_SEND, KNX_REPLY, KNX_CACHE, KNX_INIT, KNX_LISTEN, KNX_POLL],
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -203,7 +218,7 @@ class WebInterface(SmartPluginWebIf):
         :param dataSet: Dataset for which the data should be returned (standard: None)
         :return: dict with the data needed to update the web page.
         """
-        if dataSet == 'itemtable':
+        if dataSet == "itemtable":
             # get the new data
             data = self.plugin._webdata
             try:
@@ -211,7 +226,7 @@ class WebInterface(SmartPluginWebIf):
                 return data
             except Exception as e:
                 self.logger.error(f"get_data_html exception: {e}")
-        if dataSet == 'patable':
+        if dataSet == "patable":
             # get the new data
             data = self.plugin.get_stats_pa()
             try:
@@ -219,7 +234,7 @@ class WebInterface(SmartPluginWebIf):
                 return data
             except Exception as e:
                 self.logger.error(f"get_data_html exception: {e}")
-        if dataSet == 'gatable':
+        if dataSet == "gatable":
             # get the new data
             data = self.plugin.get_stats_ga()
             try:

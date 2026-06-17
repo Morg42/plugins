@@ -31,7 +31,6 @@ Argument(name='CurrentDateFormat', vartype='string')] ...
 
 # UPnP Spec at http://upnp.org/specs/arch/UPnP-arch-DeviceArchitecture-v1.0.pdf
 
-
 import logging
 from collections import namedtuple
 from xml.sax.saxutils import escape
@@ -248,9 +247,7 @@ class Service:
 
         tags = []
         for name, value in args:
-            tag = "<{name}>{value}</{name}>".format(
-                name=name, value=escape("%s" % value, {'"': "&quot;"})
-            )
+            tag = "<{name}>{value}</{name}>".format(name=name, value=escape("%s" % value, {'"': "&quot;"}))
             # % converts to unicode because we are using unicode literals.
             # Avoids use of 'unicode' function which does not exist in python 3
             tags.append(tag)
@@ -299,18 +296,14 @@ class Service:
         except XML.ParseError:
             # Try to filter illegal xml chars (as unicode), in case that is
             # the reason for the parse error
-            filtered = illegal_xml_re.sub("", xml_response.decode("utf-8")).encode(
-                "utf-8"
-            )
+            filtered = illegal_xml_re.sub("", xml_response.decode("utf-8")).encode("utf-8")
             tree = XML.fromstring(filtered)
 
         # Get the first child of the <Body> tag which will be
         # <{actionNameResponse}> (depends on what actionName is). Turn the
         # children of this into a {tagname, content} dict. XML unescaping
         # is carried out for us by elementree.
-        action_response = tree.find("{http://schemas.xmlsoap.org/soap/envelope/}Body")[
-            0
-        ]
+        action_response = tree.find("{http://schemas.xmlsoap.org/soap/envelope/}Body")[0]
         return {i.tag: i.text or "" for i in action_response}
 
     def compose_args(self, action_name, in_argdict):
@@ -345,9 +338,7 @@ class Service:
         unexpected = set(in_argdict) - {argument.name for argument in action.in_args}
         if unexpected:
             raise ValueError(
-                "Unexpected argument '{}'. Method signature: {}".format(
-                    next(iter(unexpected)), str(action)
-                )
+                "Unexpected argument '{}'. Method signature: {}".format(next(iter(unexpected)), str(action))
             )
 
         # List the (name, value) tuples for each argument in the argument list
@@ -362,11 +353,7 @@ class Service:
                 continue
             if argument.vartype.default is not None:
                 composed.append((name, argument.vartype.default))
-            raise ValueError(
-                "Missing argument '{}'. Method signature: {}".format(
-                    argument.name, str(action)
-                )
-            )
+            raise ValueError("Missing argument '{}'. Method signature: {}".format(argument.name, str(action)))
         return composed
 
     def build_command(self, action, args=None):
@@ -413,12 +400,8 @@ class Service:
             service_type=self.service_type,
             version=self.version,
         )
-        soap_action_template = (
-            "urn:schemas-upnp-org:service:{service_type}:{version}#{action}"
-        )
-        soap_action = soap_action_template.format(
-            service_type=self.service_type, version=self.version, action=action
-        )
+        soap_action_template = "urn:schemas-upnp-org:service:{service_type}:{version}#{action}"
+        soap_action = soap_action_template.format(service_type=self.service_type, version=self.version, action=action)
         headers = {
             "Content-Type": 'text/xml; charset="utf-8"',
             "SOAPACTION": soap_action,
@@ -509,9 +492,7 @@ class Service:
             cache.put(result, action, args, timeout=cache_timeout)
             return result
         elif status == 405:
-            raise NotSupportedException(
-                "{} not supported on {}".format(action, self.soco.ip_address)
-            )
+            raise NotSupportedException("{} not supported on {}".format(action, self.soco.ip_address))
         elif status == 500:
             # Internal server error. UPnP requires this to be returned if the
             # device does not like the action for some reason. The returned
@@ -567,15 +548,11 @@ class Service:
             xml_error = xml_error.encode("utf-8")
             error = ET.fromstring(xml_error)
             log.debug("Error %s", xml_error)
-            error_code = error.findtext(
-                ".//{urn:schemas-upnp-org:control-1-0}errorCode"
-            )
+            error_code = error.findtext(".//{urn:schemas-upnp-org:control-1-0}errorCode")
             if error_code is not None:
                 description = self.UPNP_ERRORS.get(int(error_code), "")
                 raise SoCoUPnPException(
-                    message="UPnP Error {} received: {} from {}".format(
-                        error_code, description, self.soco.ip_address
-                    ),
+                    message="UPnP Error {} received: {} from {}".format(error_code, description, self.soco.ip_address),
                     error_code=error_code,
                     error_description=description,
                     error_xml=xml_error,
@@ -588,9 +565,7 @@ class Service:
             log.error(error, self.soco.ip_address, xml_error)
             raise UnknownSoCoException(xml_error) from e
 
-    def subscribe(
-        self, requested_timeout=None, auto_renew=False, event_queue=None, strict=True
-    ):
+    def subscribe(self, requested_timeout=None, auto_renew=False, event_queue=None, strict=True):
         """Subscribe to the service's events.
 
         Args:
@@ -622,9 +597,7 @@ class Service:
         method on the returned object.
         """
         subscription = config.EVENTS_MODULE.Subscription(self, event_queue)
-        return subscription.subscribe(
-            requested_timeout=requested_timeout, auto_renew=auto_renew, strict=strict
-        )
+        return subscription.subscribe(requested_timeout=requested_timeout, auto_renew=auto_renew, strict=strict)
 
     def _update_cache_on_event(self, event):
         """Update the cache when an event is received.
@@ -721,17 +694,9 @@ class Service:
                 datatype = state.findtext("{}dataType".format(ns))
                 default = state.findtext("{}defaultValue".format(ns))
                 value_list_elt = state.find("{}allowedValueList".format(ns))
-                value_list = (
-                    ([item.text for item in value_list_elt] or None)
-                    if value_list_elt is not None
-                    else None
-                )
+                value_list = ([item.text for item in value_list_elt] or None) if value_list_elt is not None else None
                 value_range_elt = state.find("{}allowedValueRange".format(ns))
-                value_range = (
-                    ([item.text for item in value_range_elt] or None)
-                    if value_range_elt is not None
-                    else None
-                )
+                value_range = ([item.text for item in value_range_elt] or None) if value_range_elt is not None else None
                 vartypes[name] = Vartype(datatype, default, value_list, value_range)
         # find all the actions
         actionLists = tree.findall("{}actionList".format(ns))
@@ -747,9 +712,7 @@ class Service:
                     for arg in args_iter:
                         arg_name = arg.findtext("{}name".format(ns))
                         direction = arg.findtext("{}direction".format(ns))
-                        related_variable = arg.findtext(
-                            "{}relatedStateVariable".format(ns)
-                        )
+                        related_variable = arg.findtext("{}relatedStateVariable".format(ns))
                         vartype = vartypes[related_variable]
                         if direction == "in":
                             in_args.append(Argument(arg_name, vartype))

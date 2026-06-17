@@ -35,8 +35,8 @@ from lib.model.smartplugin import SmartPluginWebIf
 
 import cherrypy
 
-class WebInterface(SmartPluginWebIf):
 
+class WebInterface(SmartPluginWebIf):
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -54,7 +54,7 @@ class WebInterface(SmartPluginWebIf):
         self.vis_enabled = plugin.vis_enabled
 
     @cherrypy.expose
-    def index(self, action=None, item_id=None, item_path=None, reload=None, abitem=None, page='index'):
+    def index(self, action=None, item_id=None, item_path=None, reload=None, abitem=None, page="index"):
         """
         Build index.html for cherrypy
 
@@ -62,27 +62,34 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('{}.html'.format(page))
-        pagelength = self.plugin.get_parameter_value('webif_pagelength')
+        tmpl = self.tplenv.get_template("{}.html".format(page))
+        pagelength = self.plugin.get_parameter_value("webif_pagelength")
         if action == "get_graph" and abitem is not None:
             if isinstance(abitem, str):
                 try:
                     abitem = self.plugin.abitems[abitem]
                 except Exception as e:
-                    self.logger.warning("Item {} not initialized yet. "
-                                        "Try again later. Error: {}".format(abitem, e))
+                    self.logger.warning("Item {} not initialized yet. Try again later. Error: {}".format(abitem, e))
                     return None
             if self.vis_enabled:
-                self.plugin.get_graph(abitem, 'graph')
-            tmpl = self.tplenv.get_template('visu.html')
-            return tmpl.render(p=self.plugin, item=abitem, firstrun=str(abitem.firstrun),
-                               language=self.plugin.get_sh().get_defaultlanguage(), now=self.plugin.shtime.now())
+                self.plugin.get_graph(abitem, "graph")
+            tmpl = self.tplenv.get_template("visu.html")
+            return tmpl.render(
+                p=self.plugin,
+                item=abitem,
+                firstrun=str(abitem.firstrun),
+                language=self.plugin.get_sh().get_defaultlanguage(),
+                now=self.plugin.shtime.now(),
+            )
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin,
-                           vis_enabled=self.vis_enabled,
-                           webif_pagelength=pagelength,
-                           item_count=len(self.plugin._items),
-                           language=self.plugin.get_sh().get_defaultlanguage(), now=self.plugin.shtime.now())
+        return tmpl.render(
+            p=self.plugin,
+            vis_enabled=self.vis_enabled,
+            webif_pagelength=pagelength,
+            item_count=len(self.plugin._items),
+            language=self.plugin.get_sh().get_defaultlanguage(),
+            now=self.plugin.shtime.now(),
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -106,10 +113,17 @@ class WebInterface(SmartPluginWebIf):
                 if item.laststate_releasedby in [None, []]:
                     lsr = "-"
                 else:
-                    lsr = [entry.split('.')[-1] for entry in item.laststate_releasedby]
-                data.update({item.id: {'laststate': laststate,
-                           'lastconditionset': conditionset, 'log_level': ll,
-                           'laststate_releasedby': lsr}})
+                    lsr = [entry.split(".")[-1] for entry in item.laststate_releasedby]
+                data.update(
+                    {
+                        item.id: {
+                            "laststate": laststate,
+                            "lastconditionset": conditionset,
+                            "log_level": ll,
+                            "laststate_releasedby": lsr,
+                        }
+                    }
+                )
             try:
                 return json.dumps(data)
             except Exception as e:
@@ -118,11 +132,10 @@ class WebInterface(SmartPluginWebIf):
             try:
                 dataSet = self.plugin.abitems[dataSet]
             except Exception as e:
-                self.logger.warning("Item {} not initialized yet. "
-                                    "Try again later. Error: {}".format(dataSet, e))
+                self.logger.warning("Item {} not initialized yet. Try again later. Error: {}".format(dataSet, e))
                 return json.dumps({"success": "error"})
             if self.vis_enabled and dataSet.firstrun is None:
-                self.plugin.get_graph(dataSet, 'graph')
+                self.plugin.get_graph(dataSet, "graph")
                 return json.dumps({"success": "true"})
             return json.dumps({"success": "false"})
         else:

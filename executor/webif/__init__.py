@@ -50,32 +50,38 @@ from jinja2 import Environment, FileSystemLoader
 
 import sys
 
+
 class PrintCapture:
     """this class overwrites stdout and stderr temporarily to capture output"""
+
     def __init__(self):
         self.data = []
+
     def write(self, s):
         self.data.append(s)
+
     def __enter__(self):
         sys.stdout = self
         sys.stderr = self
         return self
+
     def __exit__(self, ext_type, exc_value, traceback):
         sys.stdout = sys.__stdout__
         sys.stderr = sys.__stderr__
 
-class Stub():
+
+class Stub:
     def __init__(self, *args, **kwargs):
         print(args)
         print(kwargs)
-        for k,v in kwargs.items():
+        for k, v in kwargs.items():
             setattr(self, k, v)
+
 
 # e.g. logger = Stub(warning=print, info=print, debug=print)
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -92,7 +98,6 @@ class WebInterface(SmartPluginWebIf):
 
         self.tplenv = self.init_template_environment()
 
-
     @cherrypy.expose
     def index(self, reload=None):
         """
@@ -102,18 +107,19 @@ class WebInterface(SmartPluginWebIf):
 
         :return: contents of the template after beeing rendered
         """
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
         # Setting pagelength (max. number of table entries per page) for web interface
         try:
             pagelength = self.plugin.webif_pagelength
         except Exception:
             pagelength = 100
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
-        return tmpl.render(p=self.plugin,
-                           webif_pagelength=pagelength,
-                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
-                           item_count=0)
-
+        return tmpl.render(
+            p=self.plugin,
+            webif_pagelength=pagelength,
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k["_path"])),
+            item_count=0,
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -139,7 +145,6 @@ class WebInterface(SmartPluginWebIf):
             # except Exception as e:
             #     self.logger.error("get_data_html exception: {}".format(e))
         return {}
-
 
     """
     According to SmartHomeNG documentation the following modules are loaded for the
@@ -167,14 +172,14 @@ class WebInterface(SmartPluginWebIf):
         result = ""
 
         g = {}
-        loc = { 'sh': self.plugin.get_sh() }
+        loc = {"sh": self.plugin.get_sh()}
         self.logger.debug(f"eval {eline} (raw) for item path {path}")
         eline = urllib.parse.unquote(eline)
-        if path != '':
+        if path != "":
             try:
                 path = self.items.return_item(path)
-                eline = path.get_stringwithabsolutepathes(eline, 'sh.', '(')
-                eline = path.get_stringwithabsolutepathes(eline, 'sh.', '.property')
+                eline = path.get_stringwithabsolutepathes(eline, "sh.", "(")
+                eline = path.get_stringwithabsolutepathes(eline, "sh.", ".property")
                 self.logger.debug(f"eval {eline} (unquoted) for item path {path}")
             except Exception as e:
                 res = f"Error '{e}' while evaluating"
@@ -183,7 +188,7 @@ class WebInterface(SmartPluginWebIf):
 
         try:
             if eline:
-                res = eval(eline,g,loc)
+                res = eval(eline, g, loc)
             else:
                 res = "Nothing to do"
         except Exception as e:
@@ -201,44 +206,55 @@ class WebInterface(SmartPluginWebIf):
         :return: result of the evaluation
         """
         result = ""
-        stub_logger = Stub(warning=print, info=print, debug=print, error=print, criticl=print, notice=print, dbghigh=print, dbgmed=print, dbglow=print)
+        stub_logger = Stub(
+            warning=print,
+            info=print,
+            debug=print,
+            error=print,
+            criticl=print,
+            notice=print,
+            dbghigh=print,
+            dbgmed=print,
+            dbglow=print,
+        )
 
         g = {}
-        loc = { 'sh': self.plugin.get_sh(),
-            'time': time,
-            'datetime': datetime,
-            'random': random,
-            'json': json,
-            'pprint': pprint,
-            'logger': stub_logger,
-            'logging': logging
-            }
+        loc = {
+            "sh": self.plugin.get_sh(),
+            "time": time,
+            "datetime": datetime,
+            "random": random,
+            "json": json,
+            "pprint": pprint,
+            "logger": stub_logger,
+            "logging": logging,
+        }
         self.logger.debug(f"Got request to evaluate {eline} (raw)")
         eline = urllib.parse.unquote(eline)
         self.logger.debug(f"Got request to evaluate {eline} (unquoted)")
         with PrintCapture() as p:
             try:
                 if eline:
-                    exec(eline,g,loc)
+                    exec(eline, g, loc)
                 res = ""
             except Exception as e:
                 res = f"Error '{e}' while evaluating"
 
-        result = ''.join(p.data) + res
+        result = "".join(p.data) + res
         self.logger.debug(f"{result=}")
         return result
 
     @cherrypy.expose
-    def get_code(self, filename=''):
+    def get_code(self, filename=""):
         """loads and returns the given filename from the defined script path"""
         self.logger.debug(f"get_code called with {filename=}")
         try:
-            if (self.plugin.executor_scripts is not None and filename != '') or filename.startswith('examples/'):
-                if filename.startswith('examples/'):
-                    filepath = os.path.join(self.plugin.get_plugin_dir(),filename)
+            if (self.plugin.executor_scripts is not None and filename != "") or filename.startswith("examples/"):
+                if filename.startswith("examples/"):
+                    filepath = os.path.join(self.plugin.get_plugin_dir(), filename)
                     self.logger.debug(f"Getting file from example path {filepath=}")
                 else:
-                    filepath = os.path.join(self.plugin.executor_scripts,filename)
+                    filepath = os.path.join(self.plugin.executor_scripts, filename)
                     self.logger.debug(f"Getting file from script path {filepath=}")
                 code_file = open(filepath)
                 data = code_file.read()
@@ -249,16 +265,16 @@ class WebInterface(SmartPluginWebIf):
         return f"### {filename} could not be read ###"
 
     @cherrypy.expose
-    def save_code(self, filename='', code=''):
+    def save_code(self, filename="", code=""):
         """save the given code at filename from the defined script path"""
         self.logger.debug(f"save_code called with {filename=}")
         try:
-            if self.plugin.executor_scripts is not None and filename != '' and code != '':
-                if '/' in filename or '\\' in filename or '..' in filename:
+            if self.plugin.executor_scripts is not None and filename != "" and code != "":
+                if "/" in filename or "\\" in filename or ".." in filename:
                     raise ValueError("Special Characters not allowed in filename")
-                if (filename[-3:] != '.py'):
-                    filename += '.py'
-                filepath = os.path.join(self.plugin.executor_scripts,filename)
+                if filename[-3:] != ".py":
+                    filename += ".py"
+                filepath = os.path.join(self.plugin.executor_scripts, filename)
                 self.logger.debug(f"{filepath=}")
                 with open(filepath, "w") as code_file:
                     code_file.write(code)
@@ -268,12 +284,12 @@ class WebInterface(SmartPluginWebIf):
         return f"{filename} could not be saved"
 
     @cherrypy.expose
-    def delete_file(self, filename=''):
+    def delete_file(self, filename=""):
         """deletes the file with given filename from the defined script path"""
         self.logger.debug(f"delete_file called with {filename=}")
         try:
-            if self.plugin.executor_scripts is not None and filename != '':
-                filepath = os.path.join(self.plugin.executor_scripts,filename)
+            if self.plugin.executor_scripts is not None and filename != "":
+                filepath = os.path.join(self.plugin.executor_scripts, filename)
                 if os.path.exists(filepath) and os.path.isfile(filepath):
                     os.remove(filepath)
                     self.logger.debug(f"{filepath} successfully deleted")
@@ -284,7 +300,6 @@ class WebInterface(SmartPluginWebIf):
             self.logger.error(f"{e}: {filepath} could not be deleted")
         return f"### {filename} could not be deleted ###"
 
-
     @cherrypy.expose
     def get_filelist(self):
         """returns all filenames from the defined script path with suffix ``.py``, newest first"""
@@ -292,24 +307,25 @@ class WebInterface(SmartPluginWebIf):
         files2 = []
         subdir = "{}/examples".format(self.plugin.get_plugin_dir())
         self.logger.debug(f"list files in plugin examples {subdir}")
+
         def mtime(f):
             return os.stat(os.path.join(subdir, f)).st_mtime
+
         files = list(reversed(sorted(os.listdir(subdir), key=mtime)))
-        files = [f for f in files if os.path.isfile(os.path.join(subdir,f))]
+        files = [f for f in files if os.path.isfile(os.path.join(subdir, f))]
         files = ["examples/{}".format(f) for f in files if f.endswith(".py")]
-        #files = '\n'.join(f for f in files)
+        # files = '\n'.join(f for f in files)
         self.logger.debug(f"Examples Scripts {files}")
         if self.plugin.executor_scripts is not None:
             subdir = self.plugin.executor_scripts
             self.logger.debug(f"list files in {subdir}")
             files2 = list(reversed(sorted(os.listdir(subdir), key=mtime)))
-            files2 = [f for f in files2 if os.path.isfile(os.path.join(subdir,f))]
+            files2 = [f for f in files2 if os.path.isfile(os.path.join(subdir, f))]
             files2 = [f for f in files2 if f.endswith(".py")]
-            #files = '\n'.join(f for f in files)
+            # files = '\n'.join(f for f in files)
             self.logger.debug(f"User scripts {files2}")
 
         return json.dumps(files2 + files)
-
 
     @cherrypy.expose
     def get_autocomplete(self):
@@ -317,18 +333,17 @@ class WebInterface(SmartPluginWebIf):
         plugins = _sh.plugins.get_instance()
         plugin_list = []
         for x in plugins.return_plugins():
-          if isinstance(x, SmartPlugin):
-            plugin_config_name = x.get_configname()
-            if x.metadata is not None:
-              api = x.metadata.get_plugin_function_defstrings(with_type=True, with_default=True)
-              if api is not None:
-                for function in api:
-                  plugin_list.append("sh."+plugin_config_name + "." + function)
-
+            if isinstance(x, SmartPlugin):
+                plugin_config_name = x.get_configname()
+                if x.metadata is not None:
+                    api = x.metadata.get_plugin_function_defstrings(with_type=True, with_default=True)
+                    if api is not None:
+                        for function in api:
+                            plugin_list.append("sh." + plugin_config_name + "." + function)
 
         myItems = _sh.return_items()
         itemList = []
         for item in myItems:
-          itemList.append("sh."+str(item.property.path)+"()")
-        retValue = {'items':itemList,'plugins':plugin_list}
-        return (json.dumps(retValue))
+            itemList.append("sh." + str(item.property.path) + "()")
+        retValue = {"items": itemList, "plugins": plugin_list}
+        return json.dumps(retValue)

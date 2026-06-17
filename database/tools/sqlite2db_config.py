@@ -35,24 +35,23 @@ import argparse
 
 
 def convert_config(filename):
-    with open(filename, 'r') as f:
+    with open(filename, "r") as f:
         data = f.read()
-        data = re.sub(r'sqlite([\w\s@]*)(=|:)(\s*)(\w+)', r'database\1\2\3\4', data)
-    print(data) 
+        data = re.sub(r"sqlite([\w\s@]*)(=|:)(\s*)(\w+)", r"database\1\2\3\4", data)
+    print(data)
 
-if __name__ == '__main__':
 
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(add_help=False)
     group = parser.add_mutually_exclusive_group()
-    group.add_argument('-c', '--config', dest='config', help='the configuration file to convert')
+    group.add_argument("-c", "--config", dest="config", help="the configuration file to convert")
     args = parser.parse_args()
 
     if args.config:
         convert_config(args.config)
     else:
-        print('')
-        print(os.path.basename(__file__) + ' - Converts the configuration file for database plugin')
-        print('')
+        print("")
+        print(os.path.basename(__file__) + " - Converts the configuration file for database plugin")
+        print("")
         parser.print_help()
         print()
-

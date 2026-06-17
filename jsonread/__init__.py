@@ -35,16 +35,18 @@ from .webif import WebInterface
 # PATCH: Move jq engine into JSONREAD class without breaking behavior
 # Drop-in replacement for previous global jq_* functions
 
+
 class JSONREAD(SmartPlugin):
     PLUGIN_VERSION = "2.0.0"
+
     def __init__(self, sh):
         super().__init__()
 
-        self._url = self.get_parameter_value('url')
-        self._cycle = self.get_parameter_value('cycle')
+        self._url = self.get_parameter_value("url")
+        self._cycle = self.get_parameter_value("cycle")
 
         self._session = requests.Session()
-        self._session.mount('file://', FileAdapter())
+        self._session.mount("file://", FileAdapter())
 
         self._items = {}
         self._compiled_filters = {}
@@ -87,22 +89,22 @@ class JSONREAD(SmartPlugin):
         """
         expr = expr.strip()
         # entferne äußere Klammern
-        if expr.startswith('(') and expr.endswith(')'):
+        if expr.startswith("(") and expr.endswith(")"):
             expr = expr[1:-1].strip()
 
         pipes = []
-        buf = ''
+        buf = ""
         depth = 0
         i = 0
         while i < len(expr):
             ch = expr[i]
-            if ch == '(':
+            if ch == "(":
                 depth += 1
-            elif ch == ')':
+            elif ch == ")":
                 depth -= 1
-            elif ch == '|' and depth == 0:
+            elif ch == "|" and depth == 0:
                 pipes.append(buf.strip())
-                buf = ''
+                buf = ""
                 i += 1
                 continue
             buf += ch
@@ -114,13 +116,13 @@ class JSONREAD(SmartPlugin):
         # Nachträglich: splitte select(...) von nachfolgenden Pfaden
         new_pipes = []
         for p in pipes:
-            if p.startswith('select(') and ')' in p:
-                idx = p.index(')') + 1
+            if p.startswith("select(") and ")" in p:
+                idx = p.index(")") + 1
                 select_part = p[:idx]
-                rest = p[idx:].lstrip('.')
+                rest = p[idx:].lstrip(".")
                 new_pipes.append(select_part)
                 if rest:
-                    new_pipes.append('.' + rest if rest[0] != '.' else rest)
+                    new_pipes.append("." + rest if rest[0] != "." else rest)
             else:
                 new_pipes.append(p)
 
@@ -151,14 +153,14 @@ class JSONREAD(SmartPlugin):
             # split at first ')'
             depth = 0
             for i, ch in enumerate(expr):
-                if ch == '(':
+                if ch == "(":
                     depth += 1
-                elif ch == ')':
+                elif ch == ")":
                     depth -= 1
                     if depth == 0:
                         break
-            cond = expr[7:i]                # Inhalt von select(...)
-            rest = expr[i+1:].lstrip('.')   # alles danach
+            cond = expr[7:i]  # Inhalt von select(...)
+            rest = expr[i + 1 :].lstrip(".")  # alles danach
 
             if not isinstance(value, list):
                 value = [value]
@@ -182,14 +184,14 @@ class JSONREAD(SmartPlugin):
                 return obj
             return [obj]
 
-        if keypath.startswith('.'):
+        if keypath.startswith("."):
             keypath = keypath[1:]
 
-        parts = keypath.split('.', 1)
+        parts = keypath.split(".", 1)
         key = parts[0]
-        rest = parts[1] if len(parts) > 1 else ''
+        rest = parts[1] if len(parts) > 1 else ""
 
-        if key.endswith('[]'):
+        if key.endswith("[]"):
             key = key[:-2]
             val = []
             if isinstance(obj, dict) and key in obj:
@@ -220,10 +222,9 @@ class JSONREAD(SmartPlugin):
 
         return []
 
-
     def jq_condition(self, cond, obj):
         # Unterstützt ==, !=, >, <, >=, <=
-        m = re.match(r'\.(.+?)\s*(==|!=|>=|<=|>|<)\s*(.+)', cond)
+        m = re.match(r"\.(.+?)\s*(==|!=|>=|<=|>|<)\s*(.+)", cond)
         if not m:
             return False
 
@@ -231,9 +232,9 @@ class JSONREAD(SmartPlugin):
         raw_val = raw_val.strip().strip('"')
 
         # Konvertiere Werte
-        if raw_val.lower() == 'true':
+        if raw_val.lower() == "true":
             cmp_val = True
-        elif raw_val.lower() == 'false':
+        elif raw_val.lower() == "false":
             cmp_val = False
         else:
             try:
@@ -253,22 +254,22 @@ class JSONREAD(SmartPlugin):
             except Exception:
                 pass
 
-            if op == '==':
+            if op == "==":
                 if val == cmp_val:
                     return True
-            elif op == '!=':
+            elif op == "!=":
                 if val != cmp_val:
                     return True
-            elif op == '>':
+            elif op == ">":
                 if val > cmp_val:
                     return True
-            elif op == '<':
+            elif op == "<":
                 if val < cmp_val:
                     return True
-            elif op == '>=':
+            elif op == ">=":
                 if val >= cmp_val:
                     return True
-            elif op == '<=':
+            elif op == "<=":
                 if val <= cmp_val:
                     return True
 
@@ -345,8 +346,8 @@ class JSONREAD(SmartPlugin):
 
     # MODIFY parse_item
     def parse_item(self, item):
-        if self.has_iattr(item.conf, 'jsonread_filter'):
-            expr = self.get_iattr_value(item.conf, 'jsonread_filter')
+        if self.has_iattr(item.conf, "jsonread_filter"):
+            expr = self.get_iattr_value(item.conf, "jsonread_filter")
             self._items[item] = expr
             self._compiled_filters[item] = self.jq_compile(expr)
 
@@ -372,7 +373,7 @@ class JSONREAD(SmartPlugin):
         try:
             self._lastresult = json_obj
             self._lastresultstr = json.dumps(json_obj, indent=4, sort_keys=True, ensure_ascii=False)
-            self._lastresultjq = '\n'.join(self.pathes(json_obj))
+            self._lastresultjq = "\n".join(self.pathes(json_obj))
         except Exception:
             self._lastresultstr = "<format error>"
 

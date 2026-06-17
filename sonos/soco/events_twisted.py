@@ -167,16 +167,12 @@ class EventListener(EventListenerBase):
         """
         # pylint: disable=possibly-used-before-assignment
         factory = Site(EventNotifyHandler())
-        for port_number in range(
-            self.requested_port_number, self.requested_port_number + 100
-        ):
+        for port_number in range(self.requested_port_number, self.requested_port_number + 100):
             try:
                 if port_number > self.requested_port_number:
                     log.debug("Trying next port (%d)", port_number)
                 # pylint: disable=no-member
-                self.port = reactor.listenTCP(
-                    port_number, factory, interface=ip_address
-                )
+                self.port = reactor.listenTCP(port_number, factory, interface=ip_address)
                 break
             # pylint: disable=invalid-name,used-before-assignment
             except twisted.internet.error.CannotListenError as e:
@@ -324,9 +320,7 @@ class Subscription(SubscriptionBase):
     def _auto_renew_start(self, interval):
         """Starts the auto_renew loop."""
         # pylint: disable=possibly-used-before-assignment
-        self._auto_renew_loop = task.LoopingCall(
-            self.renew, is_autorenew=True, strict=False
-        )
+        self._auto_renew_loop = task.LoopingCall(self.renew, is_autorenew=True, strict=False)
         # False means wait for the interval to elapse, rather than fire at once
         self._auto_renew_loop.start(interval, False)
 
@@ -450,24 +444,18 @@ class Subscription(SubscriptionBase):
                 # subscribe, renew or unsubscribe, cancel it unless the
                 # Failure or Exception was a SoCoException upon subscribe
                 if failure.type != SoCoException or action == "renew":
-                    msg = (
-                        "An Exception occurred. Subscription to"
-                        + " {}, sid: {} has been cancelled".format(
-                            self.service.base_url + self.service.event_subscription_url,
-                            self.sid,
-                        )
+                    msg = "An Exception occurred. Subscription to" + " {}, sid: {} has been cancelled".format(
+                        self.service.base_url + self.service.event_subscription_url,
+                        self.sid,
                     )
                     self._cancel_subscription(msg)
                 # If we're not being strict, log the Failure
                 if not strict:
-                    msg = (
-                        "Failure received in Subscription"
-                        + ".{} for Subscription to:\n{}, sid: {}: {}".format(
-                            action,
-                            self.service.base_url + self.service.event_subscription_url,
-                            self.sid,
-                            str(failure),
-                        )
+                    msg = "Failure received in Subscription" + ".{} for Subscription to:\n{}, sid: {}: {}".format(
+                        action,
+                        self.service.base_url + self.service.event_subscription_url,
+                        self.sid,
+                        str(failure),
                     )
                     log.exception(msg)
                     # If we're not being strict upon a renewal

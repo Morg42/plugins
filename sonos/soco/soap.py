@@ -26,7 +26,6 @@ services.
 # Some is the same as that in services.py.
 # TODO: refactor services.py to depend on this code
 
-
 import logging
 from xml.sax.saxutils import escape
 
@@ -198,9 +197,7 @@ class SoapMessage:
 
         tags = []
         for name, value in parameters:
-            tag = "<{name}>{value}</{name}>".format(
-                name=name, value=escape("%s" % value, {'"': "&quot;"})
-            )
+            tag = "<{name}>{value}</{name}>".format(name=name, value=escape("%s" % value, {'"': "&quot;"}))
             # % converts to unicode because we are using unicode literals.
             # Avoids use of 'unicode' function which does not exist in python 3
             tags.append(tag)
@@ -208,19 +205,11 @@ class SoapMessage:
         wrapped_params = "".join(tags)
         # Prepare the SOAP Body
         if namespace is not None:
-            soap_body = (
-                '<{method} xmlns="{namespace}">'
-                "{params}"
-                "</{method}>".format(
-                    method=method, params=wrapped_params, namespace=namespace
-                )
+            soap_body = '<{method} xmlns="{namespace}">{params}</{method}>'.format(
+                method=method, params=wrapped_params, namespace=namespace
             )
         else:
-            soap_body = (
-                "<{method}>"
-                "{params}"
-                "</{method}>".format(method=method, params=wrapped_params)
-            )
+            soap_body = "<{method}>{params}</{method}>".format(method=method, params=wrapped_params)
 
         return soap_body
 
@@ -248,9 +237,7 @@ class SoapMessage:
             "</s:Body>"
             "</s:Envelope>"
         )  # noqa PEP8
-        return soap_env_template.format(
-            soap_header=prepared_soap_header, soap_body=prepared_soap_body
-        )
+        return soap_env_template.format(soap_header=prepared_soap_header, soap_body=prepared_soap_body)
 
     def prepare(self):
         """Prepare the SOAP message for sending to the server."""

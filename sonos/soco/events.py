@@ -188,9 +188,7 @@ class EventListener(EventListenerBase):
             The port on which the event listener listens is configurable.
             See `config.EVENT_LISTENER_PORT`
         """
-        for port_number in range(
-            self.requested_port_number, self.requested_port_number + 100
-        ):
+        for port_number in range(self.requested_port_number, self.requested_port_number + 100):
             address = (ip_address, port_number)
             try:
                 server = EventServer(address, EventNotifyHandler)
@@ -203,7 +201,7 @@ class EventListener(EventListenerBase):
 
         self._listener_thread = EventServerThread(server)
         self._listener_thread.daemon = True
-        debugName = 'SonosEventServerThread'
+        debugName = "SonosEventServerThread"
         self._listener_thread.setName(debugName)
         self._listener_thread.start()
         if port_number != self.requested_port_number:
@@ -362,10 +360,8 @@ class Subscription(SubscriptionBase):
                 while not stop_flag.wait(interval):
                     subscription.renew(is_autorenew=True, strict=False)
 
-        auto_renew_thread = AutoRenewThread(
-            interval, self._auto_renew_thread_flag, self
-        )
-        debugName = 'SonosAutoRenewThread'
+        auto_renew_thread = AutoRenewThread(interval, self._auto_renew_thread_flag, self)
+        debugName = "SonosAutoRenewThread"
         auto_renew_thread.setName(debugName)
         auto_renew_thread.start()
 
@@ -449,23 +445,17 @@ class Subscription(SubscriptionBase):
                 if cancel:
                     # If the cancel flag was set to true, cancel the
                     # subscription with an explanation.
-                    msg = (
-                        "An Exception occurred. Subscription to"
-                        + " {}, sid: {} has been cancelled".format(
-                            self.service.base_url + self.service.event_subscription_url,
-                            self.sid,
-                        )
+                    msg = "An Exception occurred. Subscription to" + " {}, sid: {} has been cancelled".format(
+                        self.service.base_url + self.service.event_subscription_url,
+                        self.sid,
                     )
                     self._cancel_subscription(msg)
                 # If we're not being strict, log the Exception
                 if not strict:
-                    msg = (
-                        "Exception received in Subscription."
-                        + "{} for Subscription to:\n{}, sid: {}".format(
-                            action,
-                            self.service.base_url + self.service.event_subscription_url,
-                            self.sid,
-                        )
+                    msg = "Exception received in Subscription." + "{} for Subscription to:\n{}, sid: {}".format(
+                        action,
+                        self.service.base_url + self.service.event_subscription_url,
+                        self.sid,
                     )
                     log.exception(msg)
                     # If we're not being strict upon a renewal

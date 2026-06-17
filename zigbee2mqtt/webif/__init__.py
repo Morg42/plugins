@@ -32,7 +32,6 @@ from lib.model.smartplugin import SmartPluginWebIf
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -61,21 +60,22 @@ class WebInterface(SmartPluginWebIf):
 
         self.plugin.get_broker_info()
 
-        tmpl = self.tplenv.get_template('index.html')
+        tmpl = self.tplenv.get_template("index.html")
 
         try:
             pagelength = self.plugin.webif_pagelength
         except Exception:
             pagelength = 100
 
-        return tmpl.render(plugin_shortname=self.plugin.get_shortname(),
-                           plugin_version=self.plugin.get_version(),
-                           plugin_info=self.plugin.get_info(),
-                           items=sorted([i for i in self.plugin.get_item_list()], key=lambda x: x.property.path.lower()),
-                           item_count=len(self.plugin.get_item_list()),
-                           p=self.plugin,
-                           webif_pagelength=pagelength,
-                           )
+        return tmpl.render(
+            plugin_shortname=self.plugin.get_shortname(),
+            plugin_version=self.plugin.get_version(),
+            plugin_info=self.plugin.get_info(),
+            items=sorted([i for i in self.plugin.get_item_list()], key=lambda x: x.property.path.lower()),
+            item_count=len(self.plugin.get_item_list()),
+            p=self.plugin,
+            webif_pagelength=pagelength,
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -91,34 +91,38 @@ class WebInterface(SmartPluginWebIf):
             # get the new data
             self.plugin.get_broker_info()
             data = dict()
-            data['broker_info'] = self.plugin._broker
-            data['broker_uptime'] = self.plugin.broker_uptime()
+            data["broker_info"] = self.plugin._broker
+            data["broker_uptime"] = self.plugin.broker_uptime()
 
-            data['item_values'] = {}
+            data["item_values"] = {}
             for item in self.plugin.get_item_list():
-                data['item_values'][item.property.path] = {}
-                data['item_values'][item.property.path]['value'] = item.property.value
-                data['item_values'][item.property.path]['last_update'] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                data['item_values'][item.property.path]['last_change'] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                data["item_values"][item.property.path] = {}
+                data["item_values"][item.property.path]["value"] = item.property.value
+                data["item_values"][item.property.path]["last_update"] = item.property.last_update.strftime(
+                    "%d.%m.%Y %H:%M:%S"
+                )
+                data["item_values"][item.property.path]["last_change"] = item.property.last_change.strftime(
+                    "%d.%m.%Y %H:%M:%S"
+                )
 
-            data['device_values'] = {}
+            data["device_values"] = {}
             for device in self.plugin._devices:
-                if 'data' in self.plugin._devices[device]:
-                    data['device_values'][device] = {
-                        'lqi': str(self.plugin._devices[device]['data'].get('linkquality', '-')),
-                        'data': ", ".join(list(self.plugin._devices[device]['data'].keys()))
+                if "data" in self.plugin._devices[device]:
+                    data["device_values"][device] = {
+                        "lqi": str(self.plugin._devices[device]["data"].get("linkquality", "-")),
+                        "data": ", ".join(list(self.plugin._devices[device]["data"].keys())),
                     }
                 else:
-                    data['device_values'][device] = {'lqi': '-', 'data': '-'}
+                    data["device_values"][device] = {"lqi": "-", "data": "-"}
 
-                if 'meta' in self.plugin._devices[device]:
-                    last_seen = self.plugin._devices[device]['meta'].get('lastSeen', None)
+                if "meta" in self.plugin._devices[device]:
+                    last_seen = self.plugin._devices[device]["meta"].get("lastSeen", None)
                     if last_seen:
-                        data['device_values'][device]['last_seen'] = last_seen.strftime('%d.%m.%Y %H:%M:%S')
+                        data["device_values"][device]["last_seen"] = last_seen.strftime("%d.%m.%Y %H:%M:%S")
                     else:
-                        data['device_values'][device]['last_seen'] = '-'
+                        data["device_values"][device]["last_seen"] = "-"
                 else:
-                    data['device_values'][device]['last_seen'] = '-'
+                    data["device_values"][device]["last_seen"] = "-"
 
             # return it as json the web page
             try:

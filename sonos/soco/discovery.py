@@ -73,12 +73,8 @@ def discover(
 
         _sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM, socket.IPPROTO_UDP)
         # UPnP v1.0 requires a TTL of 4
-        _sock.setsockopt(
-            socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, struct.pack("B", 4)
-        )
-        _sock.setsockopt(
-            socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(interface_addr)
-        )
+        _sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_TTL, struct.pack("B", 4))
+        _sock.setsockopt(socket.IPPROTO_IP, socket.IP_MULTICAST_IF, socket.inet_aton(interface_addr))
         return _sock
 
     # pylint: disable=invalid-name
@@ -96,13 +92,9 @@ def discover(
         try:
             _ = socket.inet_aton(interface_addr)
         except OSError as e:
-            raise ValueError(
-                "{} is not a valid IP address string".format(interface_addr)
-            ) from e
+            raise ValueError("{} is not a valid IP address string".format(interface_addr)) from e
         addresses = {interface_addr}
-        _LOG.debug(
-            "Sending discovery packets on specified interface %s", interface_addr
-        )
+        _LOG.debug("Sending discovery packets on specified interface %s", interface_addr)
     else:  # Use all qualified, discovered network interfaces
         addresses = _find_ipv4_addresses()
         if len(addresses) == 0:
@@ -243,9 +235,7 @@ def any_soco(allow_network_scan=False, **network_scan_kwargs):
         # as long as it is visible (i.e. not a bridge etc). Otherwise,
         # perform discovery (again, excluding invisibles) and return one of
         # those
-        device = next(
-            d for d in cls._instances[cls._class_group].values() if d.is_visible
-        )
+        device = next(d for d in cls._instances[cls._class_group].values() if d.is_visible)
     except (KeyError, StopIteration):
         devices = discover(allow_network_scan=allow_network_scan, **network_scan_kwargs)
         return None if devices is None else devices.pop()
@@ -414,9 +404,7 @@ def scan_network(
     return zones
 
 
-def scan_network_by_household_id(
-    household_id, include_invisible=False, **network_scan_kwargs
-):
+def scan_network_by_household_id(household_id, include_invisible=False, **network_scan_kwargs):
     """Convenience function to find the zones in a specific Sonos
     household.
 
@@ -634,11 +622,7 @@ def _find_ipv4_networks(min_netmask):
 
             ipv4_network = ipaddress.ip_network(ifaddr_network.ip)
             # Restrict to private networks, and exclude loopback and link local
-            if (
-                ipv4_network.is_private
-                and not ipv4_network.is_loopback
-                and not ipv4_network.is_link_local
-            ):
+            if ipv4_network.is_private and not ipv4_network.is_loopback and not ipv4_network.is_link_local:
                 # Constrain the size of network that will be searched
                 netmask = ifaddr_network.network_prefix
                 if netmask < min_netmask:
@@ -724,9 +708,7 @@ def _is_sonos(ip_address):
         return False
 
 
-def _sonos_scan_worker_thread(
-    ip_set, socket_timeout, sonos_ip_addresses, multi_household
-):
+def _sonos_scan_worker_thread(ip_set, socket_timeout, sonos_ip_addresses, multi_household):
     """Helper function worker thread to take IP addresses from a set and
     test whether there is (1) a device with port 1400 open at that IP
     address, then (2) check the device is a Sonos device.

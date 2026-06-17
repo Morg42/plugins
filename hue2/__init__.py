@@ -48,25 +48,24 @@ class Hue2(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '2.3.1'    # (must match the version specified in plugin.yaml)
+    PLUGIN_VERSION = "2.3.1"  # (must match the version specified in plugin.yaml)
 
-    hue_group_action_values          = ['on', 'bri', 'hue', 'sat', 'ct', 'xy', 'bri_inc', 'colormode', 'alert', 'effect']
-    hue_light_action_writable_values = ['on', 'bri', 'hue', 'sat', 'ct', 'xy', 'bri_inc']
-    hue_light_state_values           = ['on', 'bri', 'hue', 'sat', 'ct', 'xy', 'colormode', 'reachable', 'alert', 'effect']
-    hue_light_state_writable_values  = ['on', 'bri', 'hue', 'sat', 'ct', 'xy', 'alert', 'effect']
-    hue_sensor_state_values          = ['daylight', 'temperature', 'presence', 'lightlevel', 'status']
-    hue_sensor_config_values         = ['reachable', 'battery', 'on', 'sunriseoffset', 'sunsetoffset']
+    hue_group_action_values = ["on", "bri", "hue", "sat", "ct", "xy", "bri_inc", "colormode", "alert", "effect"]
+    hue_light_action_writable_values = ["on", "bri", "hue", "sat", "ct", "xy", "bri_inc"]
+    hue_light_state_values = ["on", "bri", "hue", "sat", "ct", "xy", "colormode", "reachable", "alert", "effect"]
+    hue_light_state_writable_values = ["on", "bri", "hue", "sat", "ct", "xy", "alert", "effect"]
+    hue_sensor_state_values = ["daylight", "temperature", "presence", "lightlevel", "status"]
+    hue_sensor_config_values = ["reachable", "battery", "on", "sunriseoffset", "sunsetoffset"]
 
-    br = None               # Bridge object for communication with the bridge
+    br = None  # Bridge object for communication with the bridge
     bridge_lights = {}
     bridge_groups = {}
     bridge_config = {}
-    #bridge_schedules = {}
+    # bridge_schedules = {}
     bridge_scenes = {}
-    #bridge_rules = {}
+    # bridge_rules = {}
     bridge_sensors = {}
-    #bridge_resourcelinks = {}
-
+    # bridge_resourcelinks = {}
 
     def __init__(self, sh):
         """
@@ -85,19 +84,19 @@ class Hue2(SmartPlugin):
         super().__init__()
 
         # get the parameters for the plugin (as defined in metadata plugin.yaml):
-        #self.bridge_type = self.get_parameter_value('bridge_type')
-        self.bridge_serial = self.get_parameter_value('bridge_serial')
-        self.bridge_ip = self.get_parameter_value('bridge_ip')
-        self.bridge_port = self.get_parameter_value('bridge_port')
-        self.bridge_user = self.get_parameter_value('bridge_user')
+        # self.bridge_type = self.get_parameter_value('bridge_type')
+        self.bridge_serial = self.get_parameter_value("bridge_serial")
+        self.bridge_ip = self.get_parameter_value("bridge_ip")
+        self.bridge_port = self.get_parameter_value("bridge_port")
+        self.bridge_user = self.get_parameter_value("bridge_user")
 
         # polled for value changes by adding a scheduler entry in the run method of this plugin
-        self.sensor_items_configured = False   # If no sensor items are configured, the sensor-scheduler is not started
-        self.light_items_configured = False   # If no sensor items are configured, the sensor-scheduler is not started
-        self._cycle_sensors = self.get_parameter_value('polltime_sensors')
-        self._cycle_lights = self.get_parameter_value('polltime_lights')
-        self._cycle_bridge = self.get_parameter_value('polltime_bridge')
-        self._default_transition_time = int(float(self.get_parameter_value('default_transitionTime'))*10)
+        self.sensor_items_configured = False  # If no sensor items are configured, the sensor-scheduler is not started
+        self.light_items_configured = False  # If no sensor items are configured, the sensor-scheduler is not started
+        self._cycle_sensors = self.get_parameter_value("polltime_sensors")
+        self._cycle_lights = self.get_parameter_value("polltime_lights")
+        self._cycle_bridge = self.get_parameter_value("polltime_bridge")
+        self._default_transition_time = int(float(self.get_parameter_value("default_transitionTime")) * 10)
 
         self.discovered_bridges = []
         self.bridge = self.get_bridge_desciption(self.bridge_ip, self.bridge_port)
@@ -109,38 +108,45 @@ class Hue2(SmartPlugin):
             # self.get_bridgeinfo()
             # self.logger.warning("Configured Bridge={}, type={}".format(self.bridge, type(self.bridge)))
 
-            if self.bridge_serial == '':
+            if self.bridge_serial == "":
                 self.bridge = {}
             else:
                 # if a bridge is configured
                 # find bridge using its serial number
                 self.bridge = self.get_data_from_discovered_bridges(self.bridge_serial)
-                if self.bridge.get('serialNumber', '') == '':
-                    self.logger.warning("Configured bridge {} is not in the list of discovered bridges, starting second discovery")
+                if self.bridge.get("serialNumber", "") == "":
+                    self.logger.warning(
+                        "Configured bridge {} is not in the list of discovered bridges, starting second discovery"
+                    )
                     self.discovered_bridges = self.discover_bridges()
 
-                    if self.bridge.get('serialNumber', '') == '':
+                    if self.bridge.get("serialNumber", "") == "":
                         # if not discovered, use stored ip address
-                        self.bridge['ip'] = self.bridge_ip
-                        self.bridge['port'] = self.bridge_port
-                        self.bridge['serialNumber'] = self.bridge_serial
-                        self.logger.warning("Configured bridge {} is still not in the list of discovered bridges, trying with stored ip address {}:{}".format(self.bridge_serial, self.bridge_ip, self.bridge_port))
+                        self.bridge["ip"] = self.bridge_ip
+                        self.bridge["port"] = self.bridge_port
+                        self.bridge["serialNumber"] = self.bridge_serial
+                        self.logger.warning(
+                            "Configured bridge {} is still not in the list of discovered bridges, trying with stored ip address {}:{}".format(
+                                self.bridge_serial, self.bridge_ip, self.bridge_port
+                            )
+                        )
 
-                        api_config = self.get_api_config_of_bridge('http://'+self.bridge['ip']+':'+str(self.bridge['port'])+'/')
-                        self.bridge['datastoreversion'] = api_config.get('datastoreversion', '')
-                        self.bridge['apiversion'] = api_config.get('apiversion', '')
-                        self.bridge['swversion'] = api_config.get('swversion', '')
-                        self.bridge['modelid'] = api_config.get('modelid', '')
+                        api_config = self.get_api_config_of_bridge(
+                            "http://" + self.bridge["ip"] + ":" + str(self.bridge["port"]) + "/"
+                        )
+                        self.bridge["datastoreversion"] = api_config.get("datastoreversion", "")
+                        self.bridge["apiversion"] = api_config.get("apiversion", "")
+                        self.bridge["swversion"] = api_config.get("swversion", "")
+                        self.bridge["modelid"] = api_config.get("modelid", "")
 
-
-        self.bridge['username'] = self.bridge_user
-        if self.bridge.get('ip', '') != self.bridge_ip:
+        self.bridge["username"] = self.bridge_user
+        if self.bridge.get("ip", "") != self.bridge_ip:
             # if ip address of bridge has changed, store new ip address in configuration data
             self.update_plugin_config()
 
         if not self.get_bridgeinfo():
             self.bridge = {}
-            if self.bridge_serial == '':
+            if self.bridge_serial == "":
                 self.logger.notice("No bridge is configured")
             else:
                 self.logger.notice("Bridge '{}' is treated as unconfigured".format(self.bridge_serial))
@@ -163,10 +169,10 @@ class Hue2(SmartPlugin):
         self.logger.debug("Run method called")
         # setup scheduler for device poll loop   (disable the following line, if you don't need to poll the device. Rember to comment the self_cycle statement in __init__ as well)
         if self.sensor_items_configured:
-            self.scheduler_add('update_sensors', self.poll_bridge_sensors, cycle=self._cycle_sensors)
+            self.scheduler_add("update_sensors", self.poll_bridge_sensors, cycle=self._cycle_sensors)
         if self.light_items_configured:
-            self.scheduler_add('update_lights', self.poll_bridge_lights, cycle=self._cycle_lights)
-        self.scheduler_add('update_bridge', self.poll_bridge, cycle=self._cycle_bridge)
+            self.scheduler_add("update_lights", self.poll_bridge_lights, cycle=self._cycle_lights)
+        self.scheduler_add("update_bridge", self.poll_bridge, cycle=self._cycle_bridge)
 
         self.alive = True
         # if you need to create child threads, do not make them daemon = True!
@@ -178,10 +184,10 @@ class Hue2(SmartPlugin):
         """
         self.logger.debug("Stop method called")
         if self.sensor_items_configured:
-            self.scheduler_remove('update_sensors')
+            self.scheduler_remove("update_sensors")
         if self.light_items_configured:
-            self.scheduler_remove('update_lights')
-        self.scheduler_remove('update_bridge')
+            self.scheduler_remove("update_lights")
+        self.scheduler_remove("update_bridge")
         self.alive = False
 
     def parse_item(self, item):
@@ -197,42 +203,44 @@ class Hue2(SmartPlugin):
                         with the item, caller, source and dest as arguments and in case of the knx plugin the value
                         can be sent to the knx with a knx write function within the knx plugin.
         """
-        if self.has_iattr(item.conf, 'hue2_id') and self.has_iattr(item.conf, 'hue2_function'):
+        if self.has_iattr(item.conf, "hue2_id") and self.has_iattr(item.conf, "hue2_function"):
             self.logger.debug("parse item: {}".format(item))
             conf_data = {}
-            conf_data['id'] = self.get_iattr_value(item.conf, 'hue2_id')
-            conf_data['resource'] = self.get_iattr_value(item.conf, 'hue2_resource')
-            conf_data['function'] = self.get_iattr_value(item.conf, 'hue2_function')
-            if self.has_iattr(item.conf, 'hue2_reference_light_id'):
-                if conf_data['resource'] == "group":
-                    conf_data['hue2_reference_light_id'] = self.get_iattr_value(item.conf, 'hue2_reference_light_id')
+            conf_data["id"] = self.get_iattr_value(item.conf, "hue2_id")
+            conf_data["resource"] = self.get_iattr_value(item.conf, "hue2_resource")
+            conf_data["function"] = self.get_iattr_value(item.conf, "hue2_function")
+            if self.has_iattr(item.conf, "hue2_reference_light_id"):
+                if conf_data["resource"] == "group":
+                    conf_data["hue2_reference_light_id"] = self.get_iattr_value(item.conf, "hue2_reference_light_id")
 
-            conf_data['item'] = item
+            conf_data["item"] = item
             self.plugin_items[item.property.path] = conf_data
-            if conf_data['resource'] == 'sensor':
+            if conf_data["resource"] == "sensor":
                 # ensure that the scheduler for sensors will be started if items use sensor data
                 self.sensor_items_configured = True
-            if conf_data['resource'] == 'light':
+            if conf_data["resource"] == "light":
                 # ensure that the scheduler for sensors will be started if items use sensor data
                 self.light_items_configured = True
 
-            if conf_data['resource'] == 'group':
+            if conf_data["resource"] == "group":
                 # bridge updates are allways scheduled
                 self.logger.debug("parse_item: configured group item = {}".format(conf_data))
 
-            if conf_data['function'] not in ['reachable', 'colormode', 'battery'] and \
-               conf_data['function'] not in self.hue_sensor_state_values:
+            if (
+                conf_data["function"] not in ["reachable", "colormode", "battery"]
+                and conf_data["function"] not in self.hue_sensor_state_values
+            ):
                 return self.update_item
             return
 
-        if 'dpt3_dim' in item.conf:
+        if "dpt3_dim" in item.conf:
             return self.dimDPT3
 
     def parse_logic(self, logic):
         """
         Default plugin parse_logic method
         """
-        if 'xxx' in logic.conf:
+        if "xxx" in logic.conf:
             # self.function(logic['name'])
             pass
 
@@ -246,12 +254,12 @@ class Hue2(SmartPlugin):
             # dimmen
             if item()[0] == 1:
                 # up
-                parent(254, self.get_shortname()+"dpt3")
+                parent(254, self.get_shortname() + "dpt3")
             else:
                 # down
-                parent(-254, self.get_shortname()+"dpt3")
+                parent(-254, self.get_shortname() + "dpt3")
         else:
-            parent(0, self.get_shortname()+"dpt3")
+            parent(0, self.get_shortname() + "dpt3")
 
     def update_item(self, item, caller=None, source=None, dest=None):
         """
@@ -269,136 +277,145 @@ class Hue2(SmartPlugin):
         if self.alive and caller != self.get_shortname():
             # code to execute if the plugin is not stopped
             # and only, if the item has not been changed by this this plugin:
-            self.logger.info("update_item: {} has been changed by caller {} outside this plugin".format(item.property.path, caller))
+            self.logger.info(
+                "update_item: {} has been changed by caller {} outside this plugin".format(item.property.path, caller)
+            )
 
             if item.property.path in self.plugin_items:
                 plugin_item = self.plugin_items[item.property.path]
-                if plugin_item['resource'] == 'light':
+                if plugin_item["resource"] == "light":
                     self.update_light_from_item(plugin_item, item)
-                elif plugin_item['resource'] == 'scene':
+                elif plugin_item["resource"] == "scene":
                     self.update_scene_from_item(plugin_item, item())
-                elif plugin_item['resource'] == 'group':
+                elif plugin_item["resource"] == "group":
                     self.update_group_from_item(plugin_item, item)
-                elif plugin_item['resource'] == 'sensor':
+                elif plugin_item["resource"] == "sensor":
                     self.update_sensor_from_item(plugin_item, item())
 
         return
-
 
     def update_light_from_item(self, plugin_item, item):
         value = item()
         self.logger.debug("update_light_from_item: plugin_item = {}".format(plugin_item))
         hue_transition_time = self._default_transition_time
-        if 'hue2_transitionTime' in item.conf:
-            hue_transition_time = int(float(item.conf['hue2_transitionTime']) * 10)
+        if "hue2_transitionTime" in item.conf:
+            hue_transition_time = int(float(item.conf["hue2_transitionTime"]) * 10)
         try:
-            if plugin_item['function'] == 'dict':
-                self.br.lights[plugin_item['id']]['state'](**value)
-            elif plugin_item['function'] == 'on':
-                self.br.lights[plugin_item['id']]['state'](on=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'bri':
+            if plugin_item["function"] == "dict":
+                self.br.lights[plugin_item["id"]]["state"](**value)
+            elif plugin_item["function"] == "on":
+                self.br.lights[plugin_item["id"]]["state"](on=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "bri":
                 if value > 0:
-                    self.br.lights[plugin_item['id']]['state'](on=True, bri=value, transitiontime=hue_transition_time)
+                    self.br.lights[plugin_item["id"]]["state"](on=True, bri=value, transitiontime=hue_transition_time)
                 else:
-                    self.br.lights[plugin_item['id']]['state'](bri=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'bri_inc':
-                self.br.lights[plugin_item['id']]['state'](on=True, bri_inc=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'hue':
-                self.br.lights[plugin_item['id']]['state'](hue=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'sat':
-                self.br.lights[plugin_item['id']]['state'](sat=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'ct':
-                self.br.lights[plugin_item['id']]['state'](ct=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'name':
-                self.br.lights[plugin_item['id']](name=value)
-            elif plugin_item['function'] == 'xy':
-                self.br.lights[plugin_item['id']]['state'](xy=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'alert':
-                self.br.lights[plugin_item['id']]['state'](alert=value)
-            elif plugin_item['function'] == 'effect':
-                self.br.lights[plugin_item['id']]['state'](effect=value)
+                    self.br.lights[plugin_item["id"]]["state"](bri=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "bri_inc":
+                self.br.lights[plugin_item["id"]]["state"](on=True, bri_inc=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "hue":
+                self.br.lights[plugin_item["id"]]["state"](hue=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "sat":
+                self.br.lights[plugin_item["id"]]["state"](sat=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "ct":
+                self.br.lights[plugin_item["id"]]["state"](ct=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "name":
+                self.br.lights[plugin_item["id"]](name=value)
+            elif plugin_item["function"] == "xy":
+                self.br.lights[plugin_item["id"]]["state"](xy=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "alert":
+                self.br.lights[plugin_item["id"]]["state"](alert=value)
+            elif plugin_item["function"] == "effect":
+                self.br.lights[plugin_item["id"]]["state"](effect=value)
 
         except qhue.qhue.QhueException as e:
-            if self.bridge['modelid'] == 'deCONZ':
+            if self.bridge["modelid"] == "deCONZ":
                 msg = f"qhue exception {e.message}"
             else:
                 msg = f"{e}"
             msg = f"update_light_from_item: item {plugin_item['item'].id()} - function={plugin_item['function']} - PROBLEM: '{msg}'"
             msg += f" - last_change_by={plugin_item['item'].property.last_change_by}"
-            if msg.find(' 201 ') >= 0 or msg.find(' 201,201 ') >= 0 or str(e).endswith('is not modifiable. Device is set to off.'):
+            if (
+                msg.find(" 201 ") >= 0
+                or msg.find(" 201,201 ") >= 0
+                or str(e).endswith("is not modifiable. Device is set to off.")
+            ):
                 self.logger.info(msg)
             else:
                 self.logger.error(msg)
         return
 
-
     def update_scene_from_item(self, plugin_item, value):
 
         self.logger.debug("update_scene_from_item: plugin_item = {}".format(plugin_item))
-        if plugin_item['function'] == 'name':
-            self.br.scenes[plugin_item['id']](name=value)
+        if plugin_item["function"] == "name":
+            self.br.scenes[plugin_item["id"]](name=value)
         return
-
 
     def update_group_from_item(self, plugin_item, item):
         value = item()
         self.logger.debug("update_group_from_item: plugin_item = {} -> value = {}".format(plugin_item, value))
         hue_transition_time = self._default_transition_time
-        if 'hue2_transitionTime' in item.conf:
-            hue_transition_time = int(float(item.conf['hue2_transitionTime']) * 10)
+        if "hue2_transitionTime" in item.conf:
+            hue_transition_time = int(float(item.conf["hue2_transitionTime"]) * 10)
         try:
-            if plugin_item['function'] == 'dict':
-                self.br.groups[plugin_item['id']]['action'](**value)
-            elif plugin_item['function'] == 'on':
-                self.br.groups[plugin_item['id']]['action'](on=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'bri':
+            if plugin_item["function"] == "dict":
+                self.br.groups[plugin_item["id"]]["action"](**value)
+            elif plugin_item["function"] == "on":
+                self.br.groups[plugin_item["id"]]["action"](on=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "bri":
                 if value > 0:
-                    self.br.groups[plugin_item['id']]['action'](on=True, bri=value, transitiontime=hue_transition_time)
+                    self.br.groups[plugin_item["id"]]["action"](on=True, bri=value, transitiontime=hue_transition_time)
                 else:
-                    self.br.groups[plugin_item['id']]['action'](bri=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'bri_inc':
-                self.br.groups[plugin_item['id']]['action'](bri_inc=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'hue':
-                self.br.groups[plugin_item['id']]['action'](hue=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'sat':
-                self.br.groups[plugin_item['id']]['action'](sat=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'ct':
-                self.br.groups[plugin_item['id']]['action'](ct=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'name':
-                self.br.groups[plugin_item['id']](name=value)
-            elif plugin_item['function'] == 'xy':
-                self.br.groups[plugin_item['id']]['action'](xy=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'activate_scene':
-                self.br.groups(plugin_item['id'], 'action', scene=value, transitiontime=hue_transition_time)
-            elif plugin_item['function'] == 'modify_scene':
-                 self.br.groups(plugin_item['id'], 'scenes', value['scene_id'], 'lights', value['light_id'], 'state', **(value['state']))
+                    self.br.groups[plugin_item["id"]]["action"](bri=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "bri_inc":
+                self.br.groups[plugin_item["id"]]["action"](bri_inc=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "hue":
+                self.br.groups[plugin_item["id"]]["action"](hue=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "sat":
+                self.br.groups[plugin_item["id"]]["action"](sat=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "ct":
+                self.br.groups[plugin_item["id"]]["action"](ct=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "name":
+                self.br.groups[plugin_item["id"]](name=value)
+            elif plugin_item["function"] == "xy":
+                self.br.groups[plugin_item["id"]]["action"](xy=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "activate_scene":
+                self.br.groups(plugin_item["id"], "action", scene=value, transitiontime=hue_transition_time)
+            elif plugin_item["function"] == "modify_scene":
+                self.br.groups(
+                    plugin_item["id"],
+                    "scenes",
+                    value["scene_id"],
+                    "lights",
+                    value["light_id"],
+                    "state",
+                    **(value["state"]),
+                )
 
         except qhue.qhue.QhueException as e:
-            if self.bridge['modelid'] == 'deCONZ':
+            if self.bridge["modelid"] == "deCONZ":
                 msg = f"qhue exception {e.message}"
             else:
                 msg = f"{e}"
             msg = f"update_light_from_item: item {plugin_item['item'].id()} - function={plugin_item['function']} - '{msg}'"
-            if msg.find(' 201 ') >= 0:
+            if msg.find(" 201 ") >= 0:
                 self.logger.info(msg)
             else:
                 self.logger.error(msg)
 
         return
 
-
     def update_sensor_from_item(self, plugin_item, value):
 
         self.logger.debug("update_sensor_from_item: plugin_item = {}".format(plugin_item))
-        if plugin_item['function'] == 'name':
-            self.br.sensors[plugin_item['id']](name=value)
+        if plugin_item["function"] == "name":
+            self.br.sensors[plugin_item["id"]](name=value)
 
         return
 
-
     def get_api_config_of_bridge(self, urlbase):
 
-        url = urlbase + 'api/config'
+        url = urlbase + "api/config"
         api_config = {}
         try:
             r = requests.get(url)
@@ -407,7 +424,6 @@ class Hue2(SmartPlugin):
         except Exception as e:
             self.logger.error(f"get_api_config_of_bridge: url='{url}' - Exception {e}")
         return api_config
-
 
     def get_data_from_discovered_bridges(self, serialno):
         """
@@ -418,26 +434,25 @@ class Hue2(SmartPlugin):
         """
         result = {}
         for db in self.discovered_bridges:
-            if db['serialNumber'] == serialno:
+            if db["serialNumber"] == serialno:
                 result = db
                 break
         if result == {}:
             # if bridge is not in list of discovered bridges, rediscover bridges and try again
             self.discovered_bridges = self.discover_bridges()
             for db in self.discovered_bridges:
-                if db['serialNumber'] == serialno:
+                if db["serialNumber"] == serialno:
                     result = db
                     break
 
         if result != {}:
-            api_config = self.get_api_config_of_bridge(result.get('URLBase',''))
-            result['datastoreversion'] = api_config.get('datastoreversion', '')
-            result['apiversion'] = api_config.get('apiversion', '')
-            result['swversion'] = api_config.get('swversion', '')
-            result['modelid'] = api_config.get('modelid', '')
+            api_config = self.get_api_config_of_bridge(result.get("URLBase", ""))
+            result["datastoreversion"] = api_config.get("datastoreversion", "")
+            result["apiversion"] = api_config.get("apiversion", "")
+            result["swversion"] = api_config.get("swversion", "")
+            result["modelid"] = api_config.get("modelid", "")
 
         return result
-
 
     def poll_bridge(self):
         """
@@ -449,8 +464,8 @@ class Hue2(SmartPlugin):
         """
         # # get the value from the device
         # device_value = ...
-        #self.get_lights_info()
-        if self.bridge.get('serialNumber','') == '':
+        # self.get_lights_info()
+        if self.bridge.get("serialNumber", "") == "":
             self.bridge_groups = {}
             self.bridge_config = {}
             self.bridge_scenes = {}
@@ -479,25 +494,26 @@ class Hue2(SmartPlugin):
 
         # update items with polled data
         src = self.get_instance_name()
-        if src == '':
+        if src == "":
             src = None
         for pi in self.plugin_items:
             plugin_item = self.plugin_items[pi]
-            if plugin_item['resource'] == 'scene':
-                value = self._get_scene_item_value(plugin_item['id'], plugin_item['function'], plugin_item['item'].id())
+            if plugin_item["resource"] == "scene":
+                value = self._get_scene_item_value(plugin_item["id"], plugin_item["function"], plugin_item["item"].id())
                 if value is not None:
-                    plugin_item['item'](value, self.get_shortname(), src)
-            if plugin_item['resource'] == 'group':
+                    plugin_item["item"](value, self.get_shortname(), src)
+            if plugin_item["resource"] == "group":
                 if "hue2_reference_light_id" not in plugin_item:
-                    if plugin_item['function'] != 'dict' and plugin_item['function'] != 'modify_scene':
-                        if plugin_item['function'] == 'on':
-                            value = self._get_group_item_value(plugin_item['id'], 'any_on', plugin_item['item'].id())
+                    if plugin_item["function"] != "dict" and plugin_item["function"] != "modify_scene":
+                        if plugin_item["function"] == "on":
+                            value = self._get_group_item_value(plugin_item["id"], "any_on", plugin_item["item"].id())
                         else:
-                            value = self._get_group_item_value(plugin_item['id'], plugin_item['function'], plugin_item['item'].id())
+                            value = self._get_group_item_value(
+                                plugin_item["id"], plugin_item["function"], plugin_item["item"].id()
+                            )
                         if value is not None:
-                            plugin_item['item'](value, self.get_shortname(), src)
+                            plugin_item["item"](value, self.get_shortname(), src)
         return
-
 
     def poll_bridge_lights(self):
         """
@@ -508,7 +524,7 @@ class Hue2(SmartPlugin):
         It is called by the scheduler which is set within run() method.
         """
         # get the value from the device: poll data from bridge
-        if self.bridge.get('serialNumber','') == '':
+        if self.bridge.get("serialNumber", "") == "":
             self.bridge_lights = {}
             return
         else:
@@ -521,28 +537,31 @@ class Hue2(SmartPlugin):
 
         # update items with polled data
         src = self.get_instance_name()
-        if src == '':
+        if src == "":
             src = None
         for pi in self.plugin_items:
             plugin_item = self.plugin_items[pi]
-            if plugin_item['resource'] == 'light':
-                if plugin_item['function'] != 'modify_scene':
-                    value = self._get_light_item_value(plugin_item['id'], plugin_item['function'], plugin_item['item'].id())
+            if plugin_item["resource"] == "light":
+                if plugin_item["function"] != "modify_scene":
+                    value = self._get_light_item_value(
+                        plugin_item["id"], plugin_item["function"], plugin_item["item"].id()
+                    )
                     if value is not None:
-                        plugin_item['item'](value, self.get_shortname(), src)
+                        plugin_item["item"](value, self.get_shortname(), src)
 
-            if plugin_item['resource'] == 'group' and plugin_item['function'] != 'dict':
+            if plugin_item["resource"] == "group" and plugin_item["function"] != "dict":
                 if "hue2_reference_light_id" in plugin_item:
                     reference_light_id = plugin_item["hue2_reference_light_id"]
-                    value = self._get_light_item_value(reference_light_id, plugin_item['function'], plugin_item['item'].id())
+                    value = self._get_light_item_value(
+                        reference_light_id, plugin_item["function"], plugin_item["item"].id()
+                    )
                     if value is not None:
-                        plugin_item['item'](value, self.get_shortname(), src)
-                elif plugin_item['function'] == 'on':
-                    value = self._get_group_item_value(plugin_item['id'], 'any_on', plugin_item['item'].id())
+                        plugin_item["item"](value, self.get_shortname(), src)
+                elif plugin_item["function"] == "on":
+                    value = self._get_group_item_value(plugin_item["id"], "any_on", plugin_item["item"].id())
                     if value is not None:
-                        plugin_item['item'](value, self.get_shortname(), src)
+                        plugin_item["item"](value, self.get_shortname(), src)
         return
-
 
     def poll_bridge_sensors(self):
         """
@@ -553,7 +572,7 @@ class Hue2(SmartPlugin):
         It is called by the scheduler which is set within run() method.
         """
         # get the value from the device: poll data from bridge
-        if self.bridge.get('serialNumber','') == '':
+        if self.bridge.get("serialNumber", "") == "":
             self.bridge_sensors = {}
             return
         else:
@@ -565,16 +584,17 @@ class Hue2(SmartPlugin):
 
         # update items with polled data
         src = self.get_instance_name()
-        if src == '':
+        if src == "":
             src = None
         for pi in self.plugin_items:
             plugin_item = self.plugin_items[pi]
-            if  plugin_item['resource'] == 'sensor':
-                value = self._get_sensor_item_value(plugin_item['id'], plugin_item['function'], plugin_item['item'].id())
+            if plugin_item["resource"] == "sensor":
+                value = self._get_sensor_item_value(
+                    plugin_item["id"], plugin_item["function"], plugin_item["item"].id()
+                )
                 if value is not None:
-                    plugin_item['item'](value, self.get_shortname(), src)
+                    plugin_item["item"](value, self.get_shortname(), src)
         return
-
 
     def _get_light_item_value(self, light_id, function, item_path):
         """
@@ -583,52 +603,55 @@ class Hue2(SmartPlugin):
         :param function:
         :return:
         """
-        result = ''
+        result = ""
         try:
             light = self.bridge_lights[light_id]
         except KeyError:
             self.logger.error(f"poll_bridge_lights: Light '{light_id}' not defined on bridge (item '{item_path}')")
             return None
-        except Exception as e :
-            self.logger.exception(f"poll_bridge_lights: Light '{light_id}' on bridge (item '{item_path}') - exception: {e}")
+        except Exception as e:
+            self.logger.exception(
+                f"poll_bridge_lights: Light '{light_id}' on bridge (item '{item_path}') - exception: {e}"
+            )
             return None
 
         if function in self.hue_light_state_values:
             try:
-                result = light['state'][function]
+                result = light["state"][function]
             except KeyError:
-                self.logger.warning(f"poll_bridge_lights: Function {function} not supported by light '{light_id}' (item '{item_path}')")
-                result = ''
-        elif function == 'dict':
+                self.logger.warning(
+                    f"poll_bridge_lights: Function {function} not supported by light '{light_id}' (item '{item_path}')"
+                )
+                result = ""
+        elif function == "dict":
             # work in progress for read in 'dict'  (for self.hue_light_action_writable_values?)
             result = {}
             for action in self.hue_light_action_writable_values:
-                value = light['state'].get(action, None)
+                value = light["state"].get(action, None)
                 if value is not None:
                     result[action] = value
-            colormode = light['state'].get('colormode', '')
-            if colormode == 'xy':
-                result.pop('ct', '')
-                result.pop('hue', '')
-                result.pop('sat', '')
-            if colormode == 'ct':
-                result.pop('xy', '')
-                result.pop('hue', '')
-                result.pop('sat', '')
-            if colormode == 'hs':
-                result.pop('xy', '')
-                result.pop('ct', '')
-            #self.logger.notice(f"_get_light_item_value: {item_path}, result={result} - colormode={light['state'].get('colormode', None)}")
-        elif function == 'name':
-            result = light['name']
-        elif function == 'type':
-            result = light['type']
-        elif function == 'modelid':
-            result = light['modelid']
-        elif function == 'swversion':
-            result = light['swversion']
+            colormode = light["state"].get("colormode", "")
+            if colormode == "xy":
+                result.pop("ct", "")
+                result.pop("hue", "")
+                result.pop("sat", "")
+            if colormode == "ct":
+                result.pop("xy", "")
+                result.pop("hue", "")
+                result.pop("sat", "")
+            if colormode == "hs":
+                result.pop("xy", "")
+                result.pop("ct", "")
+            # self.logger.notice(f"_get_light_item_value: {item_path}, result={result} - colormode={light['state'].get('colormode', None)}")
+        elif function == "name":
+            result = light["name"]
+        elif function == "type":
+            result = light["type"]
+        elif function == "modelid":
+            result = light["modelid"]
+        elif function == "swversion":
+            result = light["swversion"]
         return result
-
 
     def _get_group_item_value(self, group_id, function, item_path):
         """
@@ -637,8 +660,8 @@ class Hue2(SmartPlugin):
         :param function:
         :return:
         """
-        result = ''
-        if group_id != '0':
+        result = ""
+        if group_id != "0":
             # group_id 0 is a special group for "all groups" and can not be polled
             try:
                 group = self.bridge_groups[group_id]
@@ -647,13 +670,12 @@ class Hue2(SmartPlugin):
                 return None
 
             if function in self.hue_group_action_values:
-                result = group['action'].get(function, '')
-            elif function == 'any_on':
-                result = group['state'].get(function, '')
-            elif function == 'name':
-                result = group['name']
+                result = group["action"].get(function, "")
+            elif function == "any_on":
+                result = group["state"].get(function, "")
+            elif function == "name":
+                result = group["name"]
         return result
-
 
     def _get_scene_item_value(self, scene_id, function, item_path):
         """
@@ -662,17 +684,16 @@ class Hue2(SmartPlugin):
         :param function:
         :return:
         """
-        result = ''
+        result = ""
         try:
             scene = self.bridge_scenes[scene_id]
         except KeyError:
             self.logger.error(f"poll_bridge: Scene '{scene_id}' not defined on bridge (item '{item_path}')")
             return None
 
-        if function == 'name':
-            result = scene['name']
+        if function == "name":
+            result = scene["name"]
         return result
-
 
     def _get_sensor_item_value(self, sensor_id, function, item_path):
         """
@@ -681,33 +702,36 @@ class Hue2(SmartPlugin):
         :param function:
         :return:
         """
-        result = ''
+        result = ""
         try:
             sensor = self.bridge_sensors[sensor_id]
         except KeyError:
             self.logger.error(f"poll_bridge_sensors: Sensor '{sensor_id}' not defined on bridge (item '{item_path}')")
             return None
-        except Exception as e :
-            self.logger.exception(f"poll_bridge_sensors: Sensor '{sensor_id}' on bridge (item '{item_path}') - exception: {e}")
+        except Exception as e:
+            self.logger.exception(
+                f"poll_bridge_sensors: Sensor '{sensor_id}' on bridge (item '{item_path}') - exception: {e}"
+            )
             return None
         if function in self.hue_sensor_state_values:
             try:
-                result = sensor['state'][function]
+                result = sensor["state"][function]
             except KeyError:
                 self.logger.warning(
-                    f"poll_bridge_sensors: Function {function} not supported by sensor '{sensor_id}' (item '{item_path}')")
-                result = ''
+                    f"poll_bridge_sensors: Function {function} not supported by sensor '{sensor_id}' (item '{item_path}')"
+                )
+                result = ""
         elif function in self.hue_sensor_config_values:
             try:
-                result = sensor['config'][function]
+                result = sensor["config"][function]
             except KeyError:
                 self.logger.warning(
-                    f"poll_bridge_sensors: Function {function} not supported by sensor '{sensor_id}' (item '{item_path}')")
-                result = ''
-        elif function == 'name':
-            result = sensor['name']
+                    f"poll_bridge_sensors: Function {function} not supported by sensor '{sensor_id}' (item '{item_path}')"
+                )
+                result = ""
+        elif function == "name":
+            result = sensor["name"]
         return result
-
 
     def update_plugin_config(self):
         """
@@ -718,17 +742,17 @@ class Hue2(SmartPlugin):
         """
         conf_dict = {}
         # conf_dict['bridge'] = self.bridge
-        conf_dict['bridge_serial'] = self.bridge.get('serialNumber','')
-        conf_dict['bridge_user'] = self.bridge.get('username','')
-        conf_dict['bridge_ip'] = self.bridge.get('ip','')
-        conf_dict['bridge_port'] = self.bridge.get('port','')
+        conf_dict["bridge_serial"] = self.bridge.get("serialNumber", "")
+        conf_dict["bridge_user"] = self.bridge.get("username", "")
+        conf_dict["bridge_ip"] = self.bridge.get("ip", "")
+        conf_dict["bridge_port"] = self.bridge.get("port", "")
         self.update_config_section(conf_dict)
         return
 
     # ============================================================================================
 
     def get_bridgeinfo(self):
-        if self.bridge.get('serialNumber','') == '':
+        if self.bridge.get("serialNumber", "") == "":
             self.br = None
             self.bridge_lights = {}
             self.bridge_groups = {}
@@ -737,7 +761,7 @@ class Hue2(SmartPlugin):
             self.bridge_sensors = {}
             return
         self.logger.info("get_bridgeinfo: self.bridge = {}".format(self.bridge))
-        self.br = qhue.Bridge(self.bridge['ip']+':'+str(self.bridge['port']), self.bridge['username'])
+        self.br = qhue.Bridge(self.bridge["ip"] + ":" + str(self.bridge["port"]), self.bridge["username"])
         try:
             self.bridge_lights = self.br.lights()
             self.bridge_groups = self.br.groups()
@@ -745,7 +769,7 @@ class Hue2(SmartPlugin):
             self.bridge_scenes = self.br.scenes()
             self.bridge_sensors = self.br.sensors()
         except Exception as e:
-            self.logger.error(f"Bridge '{self.bridge.get('serialNumber','')}' returned exception {e}")
+            self.logger.error(f"Bridge '{self.bridge.get('serialNumber', '')}' returned exception {e}")
             self.br = None
             self.bridge_lights = {}
             self.bridge_groups = {}
@@ -755,7 +779,6 @@ class Hue2(SmartPlugin):
             return False
 
         return True
-
 
     def get_bridge_desciption(self, ip, port):
         """
@@ -767,49 +790,48 @@ class Hue2(SmartPlugin):
         """
         br_info = {}
 
-        protocol = 'http'
-        if str(port) == '443':
-            protocol = 'https'
+        protocol = "http"
+        if str(port) == "443":
+            protocol = "https"
 
         requests.packages.urllib3.disable_warnings(requests.packages.urllib3.exceptions.InsecureRequestWarning)
-        r = requests.get(protocol + '://' + ip + ':' + str(port) + '/description.xml', verify=False)
+        r = requests.get(protocol + "://" + ip + ":" + str(port) + "/description.xml", verify=False)
         if r.status_code == 200:
             xmldict = xmltodict.parse(r.text)
-            br_info['ip'] = ip
-            br_info['port'] = str(port)
-            br_info['friendlyName'] = str(xmldict['root']['device']['friendlyName'])
-            br_info['manufacturer'] = str(xmldict['root']['device']['manufacturer'])
-            br_info['manufacturerURL'] = str(xmldict['root']['device']['manufacturerURL'])
-            br_info['modelDescription'] = str(xmldict['root']['device']['modelDescription'])
-            br_info['modelName'] = str(xmldict['root']['device']['modelName'])
-            br_info['modelURL'] = str(xmldict['root']['device']['modelURL'])
-            br_info['modelNumber'] = str(xmldict['root']['device']['modelNumber'])
-            br_info['serialNumber'] = str(xmldict['root']['device']['serialNumber'])
-            br_info['UDN'] = str(xmldict['root']['device']['UDN'])
-            br_info['gatewayName'] = str(xmldict['root']['device'].get('gatewayName', ''))
+            br_info["ip"] = ip
+            br_info["port"] = str(port)
+            br_info["friendlyName"] = str(xmldict["root"]["device"]["friendlyName"])
+            br_info["manufacturer"] = str(xmldict["root"]["device"]["manufacturer"])
+            br_info["manufacturerURL"] = str(xmldict["root"]["device"]["manufacturerURL"])
+            br_info["modelDescription"] = str(xmldict["root"]["device"]["modelDescription"])
+            br_info["modelName"] = str(xmldict["root"]["device"]["modelName"])
+            br_info["modelURL"] = str(xmldict["root"]["device"]["modelURL"])
+            br_info["modelNumber"] = str(xmldict["root"]["device"]["modelNumber"])
+            br_info["serialNumber"] = str(xmldict["root"]["device"]["serialNumber"])
+            br_info["UDN"] = str(xmldict["root"]["device"]["UDN"])
+            br_info["gatewayName"] = str(xmldict["root"]["device"].get("gatewayName", ""))
 
-            br_info['URLBase'] = str(xmldict['root']['URLBase'])
-            if br_info['modelName'] == 'Philips hue bridge 2012':
-                br_info['version'] = 'v1'
-            elif br_info['modelName'] == 'Philips hue bridge 2015':
-                br_info['version'] = 'v2'
+            br_info["URLBase"] = str(xmldict["root"]["URLBase"])
+            if br_info["modelName"] == "Philips hue bridge 2012":
+                br_info["version"] = "v1"
+            elif br_info["modelName"] == "Philips hue bridge 2015":
+                br_info["version"] = "v2"
             else:
-                br_info['version'] = 'unknown'
+                br_info["version"] = "unknown"
 
             # get API information
-            api_config = self.get_api_config_of_bridge(br_info['URLBase'])
-            br_info['datastoreversion'] = api_config.get('datastoreversion', '')
-            br_info['apiversion'] = api_config.get('apiversion', '')
-            br_info['swversion'] = api_config.get('swversion', '')
-            br_info['modelid'] = api_config.get('modelid', '')
+            api_config = self.get_api_config_of_bridge(br_info["URLBase"])
+            br_info["datastoreversion"] = api_config.get("datastoreversion", "")
+            br_info["apiversion"] = api_config.get("apiversion", "")
+            br_info["swversion"] = api_config.get("swversion", "")
+            br_info["modelid"] = api_config.get("modelid", "")
 
         return br_info
-
 
     def discover_bridges(self):
         bridges = []
         try:
-            #discovered_bridges = discover_bridges(mdns=True, upnp=True, httponly=True)
+            # discovered_bridges = discover_bridges(mdns=True, upnp=True, httponly=True)
             discovered_bridges = discover_bridges(upnp=True, httponly=True)
 
         except Exception as e:
@@ -817,8 +839,8 @@ class Hue2(SmartPlugin):
             discovered_bridges = {}
 
         for br in discovered_bridges:
-            ip = discovered_bridges[br].split('/')[2].split(':')[0]
-            port = discovered_bridges[br].split('/')[2].split(':')[1]
+            ip = discovered_bridges[br].split("/")[2].split(":")[0]
+            port = discovered_bridges[br].split("/")[2].split(":")[1]
             br_info = self.get_bridge_desciption(ip, port)
 
             bridges.append(br_info)
@@ -847,7 +869,7 @@ class Hue2(SmartPlugin):
             QhueException if something went wrong with username generation (for
                 example, if the bridge button wasn't pressed).
         """
-        api_url = "http://{}/api".format(ip+':'+port)
+        api_url = "http://{}/api".format(ip + ":" + port)
         try:
             # for qhue versions v2.0.0 and up
             session = requests.Session()
@@ -865,11 +887,10 @@ class Hue2(SmartPlugin):
             response = res(devicetype=devicetype, http_method="post")
         except Exception as e:
             self.logger.warning("create_new_username: Exception {}".format(e))
-            return ''
+            return ""
         else:
             self.logger.info("create_new_username: Generated username = {}".format(response[0]["success"]["username"]))
             return response[0]["success"]["username"]
-
 
     def remove_username(self, ip, port, username, timeout=5):
         """
@@ -886,7 +907,7 @@ class Hue2(SmartPlugin):
         Raises:
             QhueException if something went wrong with username deletion
         """
-        api_url = "http://{}/api/{}".format(ip+':'+port, username)
+        api_url = "http://{}/api/{}".format(ip + ":" + port, username)
         url = api_url + "/config/whitelist/{}".format(username)
         self.logger.info("remove_username: url = {}".format(url))
         res = qhue.qhue.Resource(url, timeout)
@@ -898,10 +919,11 @@ class Hue2(SmartPlugin):
             response = res(devicetype=devicetype, http_method="delete")
         except Exception as e:
             self.logger.error("remove_username: res-delete exception {}".format(e))
-            response = [{'error': str(e)}]
+            response = [{"error": str(e)}]
 
-        if 'success' not in response[0]:
-            self.logger.warning("remove_username: Error removing username/application key {} - {}".format(username, response[0]))
+        if "success" not in response[0]:
+            self.logger.warning(
+                "remove_username: Error removing username/application key {} - {}".format(username, response[0])
+            )
         else:
             self.logger.info("remove_username: username/application key {} removed".format(username))
-

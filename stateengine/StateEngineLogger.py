@@ -26,7 +26,6 @@ from . import StateEngineDefaults
 
 
 class SeLogger:
-
     @property
     def default_log_level(self):
         return SeLogger.__default_log_level.get()
@@ -127,8 +126,8 @@ class SeLogger:
     # Constructor
     # item: item for which the detailed log is (used as part of file name)
     def __init__(self, item, manual=False):
-        self.logger = logging.getLogger('stateengine.{}'.format(item.property.path))
-        self.__name = 'stateengine.{}'.format(item.property.path)
+        self.logger = logging.getLogger("stateengine.{}".format(item.property.path))
+        self.__name = "stateengine.{}".format(item.property.path)
         self.__section = item.property.path.replace(".", "_").replace("/", "")
         self.__indentlevel = 0
         self.__indentprefix = ""
@@ -181,8 +180,7 @@ class SeLogger:
             except Exception as e:
                 if self.__logerror is False:
                     self.__logerror = True
-                    self.logger.error("There is a problem with "
-                                      "the logfile {}: {}".format(self.__filename, e))
+                    self.logger.error("There is a problem with the logfile {}: {}".format(self.__filename, e))
 
     # log header line (as info)
     # text: header text
@@ -198,7 +196,7 @@ class SeLogger:
     def info(self, text, *args):
         self.log(1, text, *args)
         indent = "\t" * self.__indentlevel
-        text = '{}{}{}'.format(self.__indentprefix, indent, text)
+        text = "{}{}{}".format(self.__indentprefix, indent, text)
         if args:
             text = text.format(*args)
         self.logger.info(text)
@@ -209,7 +207,7 @@ class SeLogger:
     def debug(self, text, *args):
         self.log(2, text, *args)
         indent = "\t" * self.__indentlevel
-        text = '{}{}{}'.format(self.__indentprefix, indent, text)
+        text = "{}{}{}".format(self.__indentprefix, indent, text)
         if args:
             text = text.format(*args)
         self.logger.debug(text)
@@ -220,7 +218,7 @@ class SeLogger:
     def develop(self, text, *args):
         self.log(3, "DEV: " + text, *args)
         indent = "\t" * self.__indentlevel
-        text = '{}{}{}'.format(self.__indentprefix, indent, text)
+        text = "{}{}{}".format(self.__indentprefix, indent, text)
         if args:
             text = text.format(*args)
         self.logger.log(StateEngineDefaults.VERBOSE, text)
@@ -232,7 +230,7 @@ class SeLogger:
     def warning(self, text, *args):
         self.log(1, "WARNING: " + text, *args)
         indent = "\t" * self.__indentlevel
-        text = '{}{}{}'.format(self.__indentprefix, indent, text)
+        text = "{}{}{}".format(self.__indentprefix, indent, text)
         if args:
             text = text.format(*args)
         self.logger.warning(text)
@@ -244,7 +242,7 @@ class SeLogger:
     def error(self, text, *args):
         self.log(1, "ERROR: " + text, *args)
         indent = "\t" * self.__indentlevel
-        text = '{}{}{}'.format(self.__indentprefix, indent, text)
+        text = "{}{}{}".format(self.__indentprefix, indent, text)
         if args:
             text = text.format(*args)
         self.logger.error(text)

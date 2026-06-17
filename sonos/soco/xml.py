@@ -38,11 +38,7 @@ illegal_unichrs = [
     (0x10FFFE, 0x10FFFF),
 ]
 
-illegal_ranges = [
-    "{}-{}".format(chr(low), chr(high))
-    for (low, high) in illegal_unichrs
-    if low < sys.maxunicode
-]
+illegal_ranges = ["{}-{}".format(chr(low), chr(high)) for (low, high) in illegal_unichrs if low < sys.maxunicode]
 
 illegal_xml_re = re.compile("[%s]" % "".join(illegal_ranges))
 

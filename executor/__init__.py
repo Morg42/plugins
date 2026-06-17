@@ -40,7 +40,7 @@ class Executor(SmartPlugin):
     the update functions for the items
     """
 
-    PLUGIN_VERSION = '1.2.1'
+    PLUGIN_VERSION = "1.2.1"
 
     def __init__(self, sh):
         """
@@ -55,8 +55,8 @@ class Executor(SmartPlugin):
         # If an package import with try/except is done, handle an import error like this:
         self.logger.debug("init {}".format(__name__))
 
-        self._scripts = self.get_parameter_value('scripts')    #default is *executor_scripts*
-        self._script_entries = self.get_parameter_value('script_entries')    #default is 6
+        self._scripts = self.get_parameter_value("scripts")  # default is *executor_scripts*
+        self._script_entries = self.get_parameter_value("script_entries")  # default is 6
         self.logger.debug(f"{self._scripts=}, {self._script_entries=}")
         try:
             vardir = sh.get_vardir()
@@ -65,7 +65,9 @@ class Executor(SmartPlugin):
             self.logger.debug(f"{self.executor_scripts=}")
             os.makedirs(self.executor_scripts, exist_ok=True)
         except Exception as e:
-            self.logger.warning(f"Exception {e}: could not access {self._scripts}, executor plugin will not be able to load or save scripts")
+            self.logger.warning(
+                f"Exception {e}: could not access {self._scripts}, executor plugin will not be able to load or save scripts"
+            )
             self._scripts = None
             self.executor_scripts = None
 
@@ -104,13 +106,13 @@ class Executor(SmartPlugin):
         pass
 
     def init_webinterface(self):
-        """"
+        """ "
         Initialize the web interface for this plugin
 
         This method is only needed if the plugin is implementing a web interface
         """
         try:
-            self.mod_http = Modules.get_instance().get_module('http')
+            self.mod_http = Modules.get_instance().get_module("http")
         except Exception:
             self.mod_http = None
         if self.mod_http is None:
@@ -118,27 +120,28 @@ class Executor(SmartPlugin):
             return False
 
         import sys
-        if "SmartPluginWebIf" not in list(sys.modules['lib.model.smartplugin'].__dict__):
+
+        if "SmartPluginWebIf" not in list(sys.modules["lib.model.smartplugin"].__dict__):
             self.logger.warning("Web interface needs SmartHomeNG v1.9 and up. Not initializing the web interface")
             return False
 
         # set application configuration for cherrypy
-        webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
+        webif_dir = self.path_join(self.get_plugin_dir(), "webif")
         config = {
-            '/': {
-                'tools.staticdir.root': webif_dir,
+            "/": {
+                "tools.staticdir.root": webif_dir,
             },
-            '/static': {
-                'tools.staticdir.on': True,
-                'tools.staticdir.dir': 'static'
-            }
+            "/static": {"tools.staticdir.on": True, "tools.staticdir.dir": "static"},
         }
 
         # Register the web interface as a cherrypy app
-        self.mod_http.register_webif(WebInterface(webif_dir, self),
-                                     self.get_shortname(),
-                                     config,
-                                     self.get_classname(), self.get_instance_name(),
-                                     description='')
+        self.mod_http.register_webif(
+            WebInterface(webif_dir, self),
+            self.get_shortname(),
+            config,
+            self.get_classname(),
+            self.get_instance_name(),
+            description="",
+        )
 
         return True

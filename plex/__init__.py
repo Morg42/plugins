@@ -30,7 +30,7 @@ class Plex(SmartPlugin):
     ALLOW_MULTIINSTANCE = False
 
     def __init__(self, sh, **kwargs):
-        self._displayTime = self.get_parameter_value('displaytime')
+        self._displayTime = self.get_parameter_value("displaytime")
         self.logger.info("Init Plex notifications")
         self._images = ["info", "error", "warning"]
         self._clients = []
@@ -44,13 +44,12 @@ class Plex(SmartPlugin):
     def _push(self, host, data):
         if self.alive:
             try:
-                res = requests.post(host,
-                                    headers={
-                                        "User-Agent": "sh.py",
-                                        "Content-Type": "application/json"},
-                                    timeout=4,
-                                    data=json.dumps(data),
-                                    )
+                res = requests.post(
+                    host,
+                    headers={"User-Agent": "sh.py", "Content-Type": "application/json"},
+                    timeout=4,
+                    data=json.dumps(data),
+                )
                 self.logger.debug(res)
                 response = res.text
                 del res
@@ -62,22 +61,23 @@ class Plex(SmartPlugin):
         if image not in self._images:
             self.logger.warn("Plex image must be: {}".format(", ".join(self._images)))
         else:
-            data = {"jsonrpc": "2.0",
-                    "id": random.randint(1, 99),
-                    "method": "GUI.ShowNotification",
-                    "params": {"title": title, "message": message, "image": image},
-                    "displayTime": self._displayTime
-                    }
+            data = {
+                "jsonrpc": "2.0",
+                "id": random.randint(1, 99),
+                "method": "GUI.ShowNotification",
+                "params": {"title": title, "message": message, "image": image},
+                "displayTime": self._displayTime,
+            }
             for host in self._clients:
                 self.logger.debug("Plex sending push notification to host {}: {}".format(host, data))
                 self._push(host, data)
 
     def parse_item(self, item):
-        if 'plex_host' in item.conf:
-            host = item.conf['plex_host']
-            if 'plex_port' in item.conf:
-                port = item.conf['plex_port']
+        if "plex_host" in item.conf:
+            host = item.conf["plex_host"]
+            if "plex_port" in item.conf:
+                port = item.conf["plex_port"]
             else:
                 port = 3005
             self.logger.info("Plex found client {}".format(item))
-            self._clients.append('http://' + host + ':' + str(port) + '/jsonrpc')
+            self._clients.append("http://" + host + ":" + str(port) + "/jsonrpc")

@@ -20,5 +20,5 @@ class MessageRingModel:
         for source in self.__ring_slots:
             if source.is_relevant:
                 return True
-        
+
         return False

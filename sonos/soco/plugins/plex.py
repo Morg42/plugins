@@ -154,9 +154,7 @@ class PlexPlugin(SoCoPlugin):
 
         plex_server = plex_media._server  # pylint: disable=protected-access
         try:
-            base_id = "{}:{}".format(
-                plex_server.machineIdentifier, plex_media.librarySectionID
-            )
+            base_id = "{}:{}".format(plex_server.machineIdentifier, plex_media.librarySectionID)
         except AttributeError:
             base_id = "{}:".format(plex_server.machineIdentifier)
 
@@ -167,17 +165,11 @@ class PlexPlugin(SoCoPlugin):
         desc = "SA_RINCON{st}_X_#Svc{st}-0-Token".format(st=self.service_type)
 
         if item_type == "track":
-            parent_uri = "{}:{}:{}".format(
-                base_id, plex_media.album().ratingKey, parent_type
-            )
+            parent_uri = "{}:{}:{}".format(base_id, plex_media.album().ratingKey, parent_type)
         elif item_type == "album":
-            parent_uri = "{}:{}:{}".format(
-                base_id, plex_media.artist().ratingKey, parent_type
-            )
+            parent_uri = "{}:{}:{}".format(base_id, plex_media.artist().ratingKey, parent_type)
         elif item_type == "artist":
-            parent_uri = "{}:{}".format(
-                "00020000artist", plex_media.title.split(" ")[0]
-            )
+            parent_uri = "{}:{}".format("00020000artist", plex_media.title.split(" ")[0])
         elif item_type == "playlist":
             if not plex_media.isAudio:
                 raise SoCoException("Non-audio playlists are not supported")
@@ -192,9 +184,7 @@ class PlexPlugin(SoCoPlugin):
         )
 
         metadata = to_didl_string(item_didl)
-        enqueued_uri = "x-rincon-cpcontainer:{}?sid={}&flags=8300&sn=9".format(
-            item_didl.item_id, self.service_id
-        )
+        enqueued_uri = "x-rincon-cpcontainer:{}?sid={}&flags=8300&sn=9".format(item_didl.item_id, self.service_id)
         response = self.soco.avTransport.AddURIToQueue(
             [
                 ("InstanceID", 0),

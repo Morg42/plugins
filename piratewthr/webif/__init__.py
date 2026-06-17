@@ -42,7 +42,6 @@ from jinja2 import Environment, FileSystemLoader
 
 
 class WebInterface(SmartPluginWebIf):
-
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -67,7 +66,7 @@ class WebInterface(SmartPluginWebIf):
         :return: contents of the template after beeing rendered
         """
 
-        def printdict(OD, mode='dict', s="", indent=' '*4, level=0):
+        def printdict(OD, mode="dict", s="", indent=" " * 4, level=0):
             def is_number(s):
                 try:
                     float(s)
@@ -77,21 +76,25 @@ class WebInterface(SmartPluginWebIf):
 
             def fstr(s):
                 return s if is_number(s) else '"{}"'.format(s)
-            if mode != 'dict':
+
+            if mode != "dict":
                 kv_tpl = '("{}")'.format(s)
-                ST = 'OrderedDict([\n'
-                END = '])'
+                ST = "OrderedDict([\n"
+                END = "])"
             else:
                 kv_tpl = '"%s": %s'
-                ST = '{\n'
-                END = '}'
+                ST = "{\n"
+                END = "}"
             for i, k in enumerate(OD.keys()):
                 if type(OD[k]) in [dict, OrderedDict]:
                     level += 1
-                    s += (level-1)*indent+kv_tpl%(k,ST+printdict(OD[k], mode=mode, indent=indent, level=level)+(level-1)*indent+END)
+                    s += (level - 1) * indent + kv_tpl % (
+                        k,
+                        ST + printdict(OD[k], mode=mode, indent=indent, level=level) + (level - 1) * indent + END,
+                    )
                     level -= 1
                 else:
-                    s += level*indent+kv_tpl%(k,fstr(OD[k]))
+                    s += level * indent + kv_tpl % (k, fstr(OD[k]))
                 if i != len(OD) - 1:
                     s += ","
                 s += "\n"
@@ -99,13 +102,13 @@ class WebInterface(SmartPluginWebIf):
 
         json_data = json.dumps(self.plugin.get_json_data(), indent=4)
 
-        tmpl = self.tplenv.get_template('index.html')
-        return tmpl.render(p=self.plugin,
-                           webif_pagelength=self.plugin.get_parameter_value('webif_pagelength'),
-                           items=sorted(self.plugin.get_item_list(), key=lambda k: str.lower(k['_path'])),
-
-                           json_data=json_data )
-
+        tmpl = self.tplenv.get_template("index.html")
+        return tmpl.render(
+            p=self.plugin,
+            webif_pagelength=self.plugin.get_parameter_value("webif_pagelength"),
+            items=sorted(self.plugin.get_item_list(), key=lambda k: str.lower(k["_path"])),
+            json_data=json_data,
+        )
 
     @cherrypy.expose
     def get_data_html(self, dataSet=None):
@@ -118,20 +121,19 @@ class WebInterface(SmartPluginWebIf):
         :return: dict with the data needed to update the web page.
         """
         if dataSet is None:
-
             # callect data for 'items' tab
             item_list = []
             for item in self.plugin.get_item_list():
                 value_dict = {}
-                value_dict['path'] = item.property.path
-                value_dict['type'] = item.type()
-                value_dict['matchstring'] = self.plugin.get_item_mapping(item)
-                value_dict['value'] = item()
-                value_dict['last_update'] = item.property.last_update.strftime('%d.%m.%Y %H:%M:%S')
-                value_dict['last_change'] = item.property.last_change.strftime('%d.%m.%Y %H:%M:%S')
+                value_dict["path"] = item.property.path
+                value_dict["type"] = item.type()
+                value_dict["matchstring"] = self.plugin.get_item_mapping(item)
+                value_dict["value"] = item()
+                value_dict["last_update"] = item.property.last_update.strftime("%d.%m.%Y %H:%M:%S")
+                value_dict["last_change"] = item.property.last_change.strftime("%d.%m.%Y %H:%M:%S")
                 item_list.append(value_dict)
 
-            result = {'items': item_list}
+            result = {"items": item_list}
 
             # send result to wen interface
             try:

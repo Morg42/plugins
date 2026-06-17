@@ -82,9 +82,7 @@ class SpotifyShare(ShareClass):
     """Spotify share class."""
 
     def canonical_uri(self, uri):
-        match = re.search(
-            r"spotify.*[:/](album|episode|playlist|show|track)[:/](\w+)", uri
-        )
+        match = re.search(r"spotify.*[:/](album|episode|playlist|show|track)[:/](\w+)", uri)
         if match:
             return "spotify:" + match.group(1) + ":" + match.group(2)
 
@@ -131,9 +129,7 @@ class DeezerShare(ShareClass):
     """Deezer share class."""
 
     def canonical_uri(self, uri):
-        match = re.search(
-            r"https://www.deezer.*[:/](album|track|playlist)[:/]([\w-]+)", uri
-        )
+        match = re.search(r"https://www.deezer.*[:/](album|track|playlist)[:/]([\w-]+)", uri)
         if match:
             return "deezer:" + match.group(1) + ":" + match.group(2)
 
@@ -154,9 +150,7 @@ class AppleMusicShare(ShareClass):
 
     def canonical_uri(self, uri):
         # https://music.apple.com/dk/album/black-velvet/217502930?i=217503142
-        match = re.search(
-            r"https://music\.apple\.com/\w+/album/[^/]+/\d+\?i=(\d+)", uri
-        )
+        match = re.search(r"https://music\.apple\.com/\w+/album/[^/]+/\d+\?i=(\d+)", uri)
         if match:
             return "song:" + match.group(1)
 
@@ -169,9 +163,7 @@ class AppleMusicShare(ShareClass):
         # https://music.apple.com/dk/playlist/power-ballads-essentials/pl.92e04ee75ed64804b9df468b5f45a161
         # User-created playlist
         # https://music.apple.com/de/playlist/unnamed-playlist/pl.u-rR2PCrLdLJk
-        match = re.search(
-            r"https://music\.apple\.com/\w+/playlist/[^/]+/(pl\.[-a-zA-Z0-9]+)", uri
-        )
+        match = re.search(r"https://music\.apple\.com/\w+/playlist/[^/]+/(pl\.[-a-zA-Z0-9]+)", uri)
         if match:
             return "playlist:" + match.group(1)
 

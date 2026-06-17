@@ -137,9 +137,7 @@ class SoCoFault:
         raise self.exception
 
     def __repr__(self):
-        return "<{}: {} at {}>".format(
-            self.__class__.__name__, repr(self.exception), hex(id(self))
-        )
+        return "<{}: {} at {}>".format(self.__class__.__name__, repr(self.exception), hex(id(self)))
 
     def __str__(self):
         return "<{}: {}>".format(self.__class__.__name__, repr(self.exception))

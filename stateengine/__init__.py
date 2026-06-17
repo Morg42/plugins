@@ -39,13 +39,14 @@ from datetime import datetime
 
 try:
     import pydotplus
+
     VIS_ENABLED = True
 except Exception:
     VIS_ENABLED = False
 
 
 class StateEngine(SmartPlugin):
-    PLUGIN_VERSION = '2.3.0'
+    PLUGIN_VERSION = "2.3.0"
 
     # Constructor
     # noinspection PyUnusedLocal,PyMissingConstructor
@@ -60,7 +61,9 @@ class StateEngine(SmartPlugin):
         self.__cli = None
         self.vis_enabled = self._test_visualization()
         if not self.vis_enabled:
-            self.logger.warning('StateEngine is missing the PyDotPlus package or GraphViz, WebIf visualization is disabled')
+            self.logger.warning(
+                "StateEngine is missing the PyDotPlus package or GraphViz, WebIf visualization is disabled"
+            )
         self.init_webinterface(WebInterface)
         self.__sh.stateengine_plugin_functions = StateEngineFunctions.SeFunctions(self.__sh, self.logger)
         try:
@@ -80,7 +83,11 @@ class StateEngine(SmartPlugin):
             default_log_level_value = StateEngineValue.SeValue(self, "Default Log Level", False, "num")
             default_log_level_value.set(log_level)
             SeLogger.default_log_level = default_log_level_value
-            self.logger.info("Set default log level to {}, Startup log level to {}.".format(SeLogger.log_level, SeLogger.startup_log_level))
+            self.logger.info(
+                "Set default log level to {}, Startup log level to {}.".format(
+                    SeLogger.log_level, SeLogger.startup_log_level
+                )
+            )
             self.logger.info("Init StateEngine (log_level={0}, log_directory={1})".format(log_level, log_directory))
             StateEngineDefaults.startup_delay = self.get_parameter_value("startup_delay_default")
             suspend_time = self.get_parameter_value("suspend_time_default")
@@ -88,7 +95,9 @@ class StateEngine(SmartPlugin):
             suspend_time_value.set(suspend_time)
             StateEngineDefaults.suspend_time = suspend_time_value
             default_instant_leaveaction = self.get_parameter_value("instant_leaveaction")
-            self.__default_instant_leaveaction = StateEngineValue.SeValue(self, "Default Instant Leave Action", False, "bool")
+            self.__default_instant_leaveaction = StateEngineValue.SeValue(
+                self, "Default Instant Leave Action", False, "bool"
+            )
             self.__default_instant_leaveaction.set(default_instant_leaveaction)
 
             StateEngineDefaults.suntracking_offset = self.get_parameter_value("lamella_offset")
@@ -108,8 +117,8 @@ class StateEngine(SmartPlugin):
 
             if log_maxage > 0:
                 self.logger.info("StateEngine extended log files will be deleted after {0} days.".format(log_maxage))
-                cron = ['init', '30 0 * *']
-                self.scheduler_add('Remove old logfiles', SeLogger.remove_old_logfiles, cron=cron, offset=0)
+                cron = ["init", "30 0 * *"]
+                self.scheduler_add("Remove old logfiles", SeLogger.remove_old_logfiles, cron=cron, offset=0)
 
         except Exception as ex:
             self._init_complete = False
@@ -119,9 +128,11 @@ class StateEngine(SmartPlugin):
     # Parse an item
     # noinspection PyMethodMayBeStatic
     def parse_item(self, item):
-        item.expand_relativepathes('se_manual_logitem', '', '')
+        item.expand_relativepathes("se_manual_logitem", "", "")
         if self.has_iattr(item.conf, "se_manual_include") or self.has_iattr(item.conf, "se_manual_exclude"):
-            item._eval = "sh.stateengine_plugin_functions.manual_item_update_eval('" + item.property.path + "', caller, source)"
+            item._eval = (
+                "sh.stateengine_plugin_functions.manual_item_update_eval('" + item.property.path + "', caller, source)"
+            )
         elif self.has_iattr(item.conf, "se_manual_invert"):
             item._eval = "not sh." + item.property.path + "()"
         return None
@@ -159,8 +170,8 @@ class StateEngine(SmartPlugin):
         self.scheduler_remove_all()
         for item in self._items:
             self._items[item].ab_alive = False
-            self.scheduler_remove('{}'.format(item))
-            self.scheduler_remove('{}-Startup Delay'.format(item))
+            self.scheduler_remove("{}".format(item))
+            self.scheduler_remove("{}-Startup Delay".format(item))
             self._items[item].remove_all_schedulers()
 
         self.alive = False
@@ -176,7 +187,8 @@ class StateEngine(SmartPlugin):
         for entry in changed_by:
             entry_caller, __, entry_source = entry.partition(":")
             if (entry_caller == original_caller or entry_caller == "*") and (
-                            entry_source == original_source or entry_source == "*"):
+                entry_source == original_source or entry_source == "*"
+            ):
                 return True
         return False
 
@@ -189,7 +201,8 @@ class StateEngine(SmartPlugin):
         for entry in changed_by:
             entry_caller, __, entry_source = entry.partition(":")
             if (entry_caller == original_caller or entry_caller == "*") and (
-                            entry_source == original_source or entry_source == "*"):
+                entry_source == original_source or entry_source == "*"
+            ):
                 return False
         return True
 
@@ -206,63 +219,69 @@ class StateEngine(SmartPlugin):
             finallist.append(self._items[i])
         return finallist
 
-    def get_graph(self, abitem, graphtype='link', width=1, height=1):
+    def get_graph(self, abitem, graphtype="link", width=1, height=1):
         if isinstance(abitem, str):
             abitem = self._items[abitem]
         webif = StateEngineWebif.WebInterface(abitem)
         webif.width = width
         webif.height = height
         try:
-            os.makedirs(self.path_join(self.get_plugin_dir(), 'webif/static/img/visualisations/'))
+            os.makedirs(self.path_join(self.get_plugin_dir(), "webif/static/img/visualisations/"))
         except OSError:
             pass
-        vis_file = self.path_join(self.get_plugin_dir(), 'webif/static/img/visualisations/{}.svg'.format(abitem))
-        #self.logger.debug("Getting graph: {}, {}".format(abitem, webif))
+        vis_file = self.path_join(self.get_plugin_dir(), "webif/static/img/visualisations/{}.svg".format(abitem))
+        # self.logger.debug("Getting graph: {}, {}".format(abitem, webif))
         try:
-            if graphtype == 'link':
-                return '<a href="static/img/visualisations/{}.svg"><img src="static/img/vis.png" width="30"></a>'.format(abitem)
+            if graphtype == "link":
+                return (
+                    '<a href="static/img/visualisations/{}.svg"><img src="static/img/vis.png" width="30"></a>'.format(
+                        abitem
+                    )
+                )
             elif abitem.firstrun is None:
                 webif.drawgraph(vis_file)
                 try:
                     change_timestamp = os.path.getmtime(vis_file)
                     change_datetime = datetime.fromtimestamp(change_timestamp)
-                    formatted_date = change_datetime.strftime('%H:%M:%S, %d. %B')
+                    formatted_date = change_datetime.strftime("%H:%M:%S, %d. %B")
                 except Exception:
                     formatted_date = "Unbekannt"
-                return f'<div style="margin-bottom:15px;">{self.translate("Letzte Aktualisierung:")} {formatted_date}<br></div>\
+                return (
+                    f'<div style="margin-bottom:15px;">{self.translate("Letzte Aktualisierung:")} {formatted_date}<br></div>\
                         <object type="image/svg+xml" data="static/img/visualisations/{abitem}.svg" id="visu_object">\
                         <iframe src="static/img/visualisations/{abitem}.svg">\
                         <img src="static/img/visualisations/{abitem}.svg">\
                         </iframe></object>'
+                )
             else:
-                return ''
+                return ""
         except pydotplus.graphviz.InvocationException as ex:
-           self.logger.error("Problem getting graph for {}. Error: {}".format(abitem, ex))
-           return '<h4>Can not show visualization. Most likely GraphViz is not installed.</h4> ' \
-                  'Current issue: ' + str(ex) + '<br/>'\
-                  'Please make sure <a href="https://graphviz.org/download/" target="_new">' \
-                  'graphviz</a> is installed.<br/>' \
-                  'On Windows add install path to your environment path AND run dot -c. ' \
-                  'Additionally copy dot.exe to fdp.exe!'
+            self.logger.error("Problem getting graph for {}. Error: {}".format(abitem, ex))
+            return (
+                "<h4>Can not show visualization. Most likely GraphViz is not installed.</h4> "
+                "Current issue: " + str(ex) + "<br/>"
+                'Please make sure <a href="https://graphviz.org/download/" target="_new">'
+                "graphviz</a> is installed.<br/>"
+                "On Windows add install path to your environment path AND run dot -c. "
+                "Additionally copy dot.exe to fdp.exe!"
+            )
         except Exception as ex:
             self.logger.error("Problem getting graph for {}. Unspecified Error: {}".format(abitem, ex))
-            return '<h4>Can not show visualization.</h4> ' \
-                   'Current issue: ' + str(ex) + '<br/>'
+            return "<h4>Can not show visualization.</h4> Current issue: " + str(ex) + "<br/>"
 
     def _test_visualization(self):
         if not VIS_ENABLED:
             return False
 
-        img_path = self.path_join(self.get_plugin_dir(), 'webif/static/img/visualisations/se_test')
-        graph = pydotplus.Dot('StateEngine', graph_type='digraph', splines='false',
-                              overlap='scale', compound='false', imagepath=img_path)
-        graph.set_node_defaults(color='lightgray', style='filled', shape='box',
-                                fontname='Helvetica', fontsize='10')
-        graph.set_edge_defaults(color='darkgray', style='filled', shape='box',
-                                fontname='Helvetica', fontsize='10')
+        img_path = self.path_join(self.get_plugin_dir(), "webif/static/img/visualisations/se_test")
+        graph = pydotplus.Dot(
+            "StateEngine", graph_type="digraph", splines="false", overlap="scale", compound="false", imagepath=img_path
+        )
+        graph.set_node_defaults(color="lightgray", style="filled", shape="box", fontname="Helvetica", fontsize="10")
+        graph.set_edge_defaults(color="darkgray", style="filled", shape="box", fontname="Helvetica", fontsize="10")
 
         try:
-            result = graph.write_svg(img_path, prog='fdp')
+            result = graph.write_svg(img_path, prog="fdp")
         except pydotplus.graphviz.InvocationException:
-            result =  False
+            result = False
         return result

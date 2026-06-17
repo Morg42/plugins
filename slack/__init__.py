@@ -29,13 +29,13 @@ from lib.model.smartplugin import SmartPlugin
 class Slack(SmartPlugin):
     PLUGIN_VERSION = "1.0.0"
     ALLOW_MULTIINSTANCE = True
-    SLACK_INCOMING_WEBHOOK = 'https://hooks.slack.com/services/%s'
+    SLACK_INCOMING_WEBHOOK = "https://hooks.slack.com/services/%s"
 
     def __init__(self, sh):
         self.logger = logging.getLogger(__name__)
         self.logger.info("Init Slack notifications")
         self._sh = sh
-        self.token = self.get_parameter_value('token')
+        self.token = self.get_parameter_value("token")
 
     def run(self):
         pass
@@ -46,14 +46,12 @@ class Slack(SmartPlugin):
     def _push(self, payload):
         webhook = self.SLACK_INCOMING_WEBHOOK % self.token
         try:
-            res = requests.post(webhook,
-                                headers={
-                                    "User-Agent": "sh.py",
-                                    "Content-Type": "application/json",
-                                    "Accept": "application/json"},
-                                timeout=4,
-                                data=payload,
-                                )
+            res = requests.post(
+                webhook,
+                headers={"User-Agent": "sh.py", "Content-Type": "application/json", "Accept": "application/json"},
+                timeout=4,
+                data=payload,
+            )
             self.logger.debug(res)
             response = res.text
             del res
@@ -61,10 +59,10 @@ class Slack(SmartPlugin):
         except BaseException as e:
             self.logger.exception(e)
 
-    def notify(self, channel, text, color='normal'):
-        color_choices = ['normal', 'good', 'warning', 'danger']
+    def notify(self, channel, text, color="normal"):
+        color_choices = ["normal", "good", "warning", "danger"]
         if color not in color_choices:
-            self.logger.error("Please choose a valid color from {}".format(','.join(color_choices)))
+            self.logger.error("Please choose a valid color from {}".format(",".join(color_choices)))
             color = "normal"
         payload = {}
         if color == "normal" and text is not None:
@@ -72,10 +70,10 @@ class Slack(SmartPlugin):
         elif text is not None:
             payload = dict(attachments=[dict(text=html.escape(text, quote=False), color=color, mrkdwn_in=["text"])])
         if channel is not None:
-            if (channel[0] == '#') or (channel[0] == '@'):
-                payload['channel'] = channel
+            if (channel[0] == "#") or (channel[0] == "@"):
+                payload["channel"] = channel
             else:
-                payload['channel'] = '#' + channel
+                payload["channel"] = "#" + channel
 
         payload = json.dumps(payload)
         self.logger.debug("Slack sending notification {}".format(payload))

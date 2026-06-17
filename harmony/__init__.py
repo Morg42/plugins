@@ -40,11 +40,12 @@ class Harmony(SmartPlugin):
     def _message(self, message):
         self._logger.debug("Harmony: message: {msg}".format(msg=message))
         # we have to check two response due to some version changes in harmony device
-        match = re.match(r".*?startActivityFinished\">activityId=(-?\d+):errorCode=200.*",
-                         html.unescape(str(message)))
+        match = re.match(r".*?startActivityFinished\">activityId=(-?\d+):errorCode=200.*", html.unescape(str(message)))
         if not match:
-            match = re.match(r".*?startActivityFinished\">errorCode=200:errorString=OK:activityId=(-?\d+)",
-                             html.unescape(str(message)))
+            match = re.match(
+                r".*?startActivityFinished\">errorCode=200:errorString=OK:activityId=(-?\d+)",
+                html.unescape(str(message)),
+            )
         if match:
             self._set_current_activity(int(match.group(1)))
 
@@ -77,14 +78,19 @@ class Harmony(SmartPlugin):
             if not token:
                 return
             self._client = HarmonyClient(token)
-            self._client.add_custom_handler('stream_negotiated', self._event_session_negotiated)
-            self._client.add_event_handler('socket_error', self._event_socket_error)
-            self._client.add_custom_handler('session_end', self._event_session_end)
-            self._client.add_event_handler('message', self._message)
+            self._client.add_custom_handler("stream_negotiated", self._event_session_negotiated)
+            self._client.add_event_handler("socket_error", self._event_socket_error)
+            self._client.add_custom_handler("session_end", self._event_session_end)
+            self._client.add_event_handler("message", self._message)
             self._client.whitespace_keepalive = True
             self._client.whitespace_keepalive_interval = 30
-            self._client.register_handler(sleekxmpp.Callback('Example Handler', sleekxmpp.MatchXPath(
-                '{%s}message/{connect.logitech.com}event' % self._client.default_ns), self._message))
+            self._client.register_handler(
+                sleekxmpp.Callback(
+                    "Example Handler",
+                    sleekxmpp.MatchXPath("{%s}message/{connect.logitech.com}event" % self._client.default_ns),
+                    self._message,
+                )
+            )
             self._client.connect_client(self._ip, self._port)
         else:
             self._get_config()
@@ -92,13 +98,13 @@ class Harmony(SmartPlugin):
     def _get_config(self):
         try:
             config = self._client.get_config()
-            if 'activity' in config:
-                for activity in config['activity']:
+            if "activity" in config:
+                for activity in config["activity"]:
                     self._activities[int(activity["id"])] = activity["label"]
-            if 'device' in config:
-                for device in config['device']:
-                    if 'label' in device and 'id' in device:
-                        self._devices[int(device['id'])] = device['label']
+            if "device" in config:
+                for device in config["device"]:
+                    if "label" in device and "id" in device:
+                        self._devices[int(device["id"])] = device["label"]
             self._set_current_activity()
         except Exception:
             self._client.disconnect(reconnect=False, send_close=False, wait=2)
@@ -130,37 +136,47 @@ class Harmony(SmartPlugin):
 
     def run(self):
         self._harmony_init()
-        self._sh.scheduler.add("harmony_init", self._harmony_init, prio=3, cron=None, cycle=self._get_config_reconnect,
-                               value=None, offset=None, next=None)
+        self._sh.scheduler.add(
+            "harmony_init",
+            self._harmony_init,
+            prio=3,
+            cron=None,
+            cycle=self._get_config_reconnect,
+            value=None,
+            offset=None,
+            next=None,
+        )
         self.alive = True
 
     def stop(self):
-        self._client.del_event_handler('session_negotiated', self._event_session_negotiated)
-        self._client.del_event_handler('socket_error', self._event_socket_error)
-        self._client.del_event_handler('session_end', self._event_session_end)
+        self._client.del_event_handler("session_negotiated", self._event_session_negotiated)
+        self._client.del_event_handler("socket_error", self._event_socket_error)
+        self._client.del_event_handler("session_end", self._event_session_end)
         self._client.disconnect(reconnect=False)
         self._client.abort()
         self.alive = False
 
     def parse_item(self, item):
-        if self.has_iattr(item.conf, 'harmony_command_0') or self.has_iattr(item.conf, 'harmony_command_1'):
+        if self.has_iattr(item.conf, "harmony_command_0") or self.has_iattr(item.conf, "harmony_command_1"):
             return self.update_item
 
-        if self.has_iattr(item.conf, 'harmony_item'):
-            value = self.get_iattr_value(item.conf, 'harmony_item')
+        if self.has_iattr(item.conf, "harmony_item"):
+            value = self.get_iattr_value(item.conf, "harmony_item")
             if value.lower() == "current_activity_id":
                 # check item is type int
-                if item.type() != 'num':
-                    self._logger.warning("The harmony item 'current_activity_id' has to be a 'num' type. "
-                                         "Ignoring item.")
+                if item.type() != "num":
+                    self._logger.warning(
+                        "The harmony item 'current_activity_id' has to be a 'num' type. Ignoring item."
+                    )
                     return
                 self._current_activity_id_items.append(item)
 
             if value.lower() == "current_activity_name":
                 # check item is type str
-                if item.type() != 'str':
-                    self._logger.warning("The harmony item 'current_activity_name' has to be a 'str' type. "
-                                         "Ignoring item.")
+                if item.type() != "str":
+                    self._logger.warning(
+                        "The harmony item 'current_activity_name' has to be a 'str' type. Ignoring item."
+                    )
                     return
                 self._current_activity_name_items.append(item)
         return
@@ -174,11 +190,11 @@ class Harmony(SmartPlugin):
         if item is None:
             return
 
-        suffix = '1' if item() else '0'
+        suffix = "1" if item() else "0"
 
-        command = self.get_iattr_value(item.conf, 'harmony_command_{suffix}'.format(suffix=suffix))
+        command = self.get_iattr_value(item.conf, "harmony_command_{suffix}".format(suffix=suffix))
         if isinstance(command, str):
-            command = command.split('|')
+            command = command.split("|")
 
         if command is None:
             return
@@ -187,7 +203,6 @@ class Harmony(SmartPlugin):
         scheduler = sched.scheduler(time.time, time.sleep)
 
         for action in command:
-
             delay = self._default_delay
 
             action = action.split(":")
@@ -195,19 +210,25 @@ class Harmony(SmartPlugin):
                 self._logger.error("Invalid command {action} in item {item}".format(action=action, item=item))
                 return
             # first item has to be an integer (device id) or an 'a' as an alias for activity
-            if not Utils.is_int(action[0]) and str(action[0]).lower() != 'a' and str(action[0]).lower() != 'activity':
-                self._logger.error("Invalid device id or 'activity' alias for action {action} in item {item}".
-                                   format(action=action, item=item))
+            if not Utils.is_int(action[0]) and str(action[0]).lower() != "a" and str(action[0]).lower() != "activity":
+                self._logger.error(
+                    "Invalid device id or 'activity' alias for action {action} in item {item}".format(
+                        action=action, item=item
+                    )
+                )
                 continue
 
-            is_activity = True if (str(action[0]).lower() == 'a' or str(action[0]).lower() == 'activity') else False
+            is_activity = True if (str(action[0]).lower() == "a" or str(action[0]).lower() == "activity") else False
 
             action_label = "activity" if is_activity else "command"
 
             if len(action) == 3:
                 if not Utils.is_float(action[2]):
-                    self._logger.error("Invalid delay for action {action_label} in item {item}".
-                                       format(action_label=action_label, item=item))
+                    self._logger.error(
+                        "Invalid delay for action {action_label} in item {item}".format(
+                            action_label=action_label, item=item
+                        )
+                    )
                     return
                 delay = float(action[2])
 
@@ -227,14 +248,13 @@ class HarmonyClient(sleekxmpp.ClientXMPP):
     def __init__(self, auth_token):
         self.token = None
         self.uuid = None
-        user = '%s@connect.logitech.com/gatorade.' % auth_token
+        user = "%s@connect.logitech.com/gatorade." % auth_token
         password = auth_token
         plugin_config = {
             # Enables PLAIN authentication which is off by default.
-            'feature_mechanisms': {'unencrypted_plain': True},
+            "feature_mechanisms": {"unencrypted_plain": True},
         }
-        super(HarmonyClient, self).__init__(
-            user, password, plugin_config=plugin_config)
+        super(HarmonyClient, self).__init__(user, password, plugin_config=plugin_config)
 
     def connect_client(self, ip_address, port):
 
@@ -257,11 +277,10 @@ class HarmonyClient(sleekxmpp.ClientXMPP):
 
     def get_current_activity(self):
         iq_cmd = self.Iq()
-        iq_cmd['type'] = 'get'
-        action_cmd = ET.Element('oa')
-        action_cmd.attrib['xmlns'] = 'connect.logitech.com'
-        action_cmd.attrib['mime'] = (
-            'vnd.logitech.harmony/vnd.logitech.harmony.engine?getCurrentActivity')
+        iq_cmd["type"] = "get"
+        action_cmd = ET.Element("oa")
+        action_cmd.attrib["xmlns"] = "connect.logitech.com"
+        action_cmd.attrib["mime"] = "vnd.logitech.harmony/vnd.logitech.harmony.engine?getCurrentActivity"
         iq_cmd.set_payload(action_cmd)
         try:
             result = iq_cmd.send(block=True)
@@ -270,54 +289,54 @@ class HarmonyClient(sleekxmpp.ClientXMPP):
         payload = result.get_payload()
         assert len(payload) == 1
         action_cmd = payload[0]
-        assert action_cmd.attrib['errorcode'] == '200'
+        assert action_cmd.attrib["errorcode"] == "200"
         activity = action_cmd.text.split("=")
         return int(activity[1])
 
     def get_config(self):
         iq_cmd = self.Iq()
-        iq_cmd['type'] = 'get'
-        action_cmd = ET.Element('oa')
-        action_cmd.attrib['xmlns'] = "connect.logitech.com"
-        action_cmd.attrib['mime'] = "vnd.logitech.harmony/vnd.logitech.harmony.engine?config"
+        iq_cmd["type"] = "get"
+        action_cmd = ET.Element("oa")
+        action_cmd.attrib["xmlns"] = "connect.logitech.com"
+        action_cmd.attrib["mime"] = "vnd.logitech.harmony/vnd.logitech.harmony.engine?config"
         iq_cmd.set_payload(action_cmd)
         result = iq_cmd.send(block=True)
         payload = result.get_payload()
         assert len(payload) == 1
         action_cmd = payload[0]
-        assert action_cmd.attrib['errorcode'] == '200'
+        assert action_cmd.attrib["errorcode"] == "200"
         device_list = action_cmd.text
         return json.loads(device_list)
 
     def send_command(self, device, command):
         device = str(device)
         iq_cmd = self.Iq()
-        iq_cmd['type'] = 'get'
-        iq_cmd['id'] = '5e518d07-bcc2-4634-ba3d-c20f338d8927-2'
-        action_cmd = ET.Element('oa')
-        action_cmd.attrib['xmlns'] = 'connect.logitech.com'
-        action_cmd.attrib['mime'] = (
-            'vnd.logitech.harmony/vnd.logitech.harmony.engine?holdAction')
-        action_cmd.text = 'action={"type"::"IRCommand","deviceId"::"' + device + '","command"::"' + command + \
-                          '"}:status=press'
+        iq_cmd["type"] = "get"
+        iq_cmd["id"] = "5e518d07-bcc2-4634-ba3d-c20f338d8927-2"
+        action_cmd = ET.Element("oa")
+        action_cmd.attrib["xmlns"] = "connect.logitech.com"
+        action_cmd.attrib["mime"] = "vnd.logitech.harmony/vnd.logitech.harmony.engine?holdAction"
+        action_cmd.text = (
+            'action={"type"::"IRCommand","deviceId"::"' + device + '","command"::"' + command + '"}:status=press'
+        )
         iq_cmd.set_payload(action_cmd)
         iq_cmd.send(block=False)
 
-        action_cmd.attrib['mime'] = (
-            'vnd.logitech.harmony/vnd.logitech.harmony.engine?holdAction')
-        action_cmd.text = 'action={"type"::"IRCommand","deviceId"::"' + device + '","command"::"' + command + \
-                          '"}:status=release'
+        action_cmd.attrib["mime"] = "vnd.logitech.harmony/vnd.logitech.harmony.engine?holdAction"
+        action_cmd.text = (
+            'action={"type"::"IRCommand","deviceId"::"' + device + '","command"::"' + command + '"}:status=release'
+        )
         iq_cmd.set_payload(action_cmd)
         result = iq_cmd.send(block=False)
         return result
 
     def start_activity(self, activity_id):
         iq_cmd = self.Iq()
-        iq_cmd['type'] = 'get'
-        action_cmd = ET.Element('oa')
-        action_cmd.attrib['xmlns'] = 'connect.logitech.com'
-        action_cmd.attrib['mime'] = ('harmony.engine?startactivity')
-        cmd = 'activityId=' + str(activity_id) + ':timestamp=0'
+        iq_cmd["type"] = "get"
+        action_cmd = ET.Element("oa")
+        action_cmd.attrib["xmlns"] = "connect.logitech.com"
+        action_cmd.attrib["mime"] = "harmony.engine?startactivity"
+        cmd = "activityId=" + str(activity_id) + ":timestamp=0"
         action_cmd.text = cmd
         iq_cmd.set_payload(action_cmd)
         try:
@@ -344,33 +363,33 @@ class AuthToken(sleekxmpp.ClientXMPP):
         """Initializes the client."""
         plugin_config = {
             # Enables PLAIN authentication which is off by default.
-            'feature_mechanisms': {'unencrypted_plain': True},
+            "feature_mechanisms": {"unencrypted_plain": True},
         }
         super(AuthToken, self).__init__(
-            'guest@connect.logitech.com/gatorade.', 'gatorade.', plugin_config=plugin_config)
+            "guest@connect.logitech.com/gatorade.", "gatorade.", plugin_config=plugin_config
+        )
 
         self.token = None
         self.uuid = None
-        self.add_event_handler('session_start', self.session_start)
+        self.add_event_handler("session_start", self.session_start)
 
     def session_start(self, _):
         """Called when the XMPP session has been initialized."""
         iq_cmd = self.Iq()
-        iq_cmd['type'] = 'get'
-        action_cmd = ET.Element('oa')
-        action_cmd.attrib['xmlns'] = 'connect.logitech.com'
-        action_cmd.attrib['mime'] = 'vnd.logitech.connect/vnd.logitech.pair'
-        action_cmd.text = 'token=%s:name=%s' % (self.token,
-                                                'foo#iOS6.0.1#iPhone')
+        iq_cmd["type"] = "get"
+        action_cmd = ET.Element("oa")
+        action_cmd.attrib["xmlns"] = "connect.logitech.com"
+        action_cmd.attrib["mime"] = "vnd.logitech.connect/vnd.logitech.pair"
+        action_cmd.text = "token=%s:name=%s" % (self.token, "foo#iOS6.0.1#iPhone")
         iq_cmd.set_payload(action_cmd)
         result = iq_cmd.send(block=True)
         payload = result.get_payload()
         assert len(payload) == 1
         oa_resp = payload[0]
-        assert oa_resp.attrib['errorcode'] == '200'
-        match = re.search(r'identity=(?P<uuid>[\w-]+):status', oa_resp.text)
+        assert oa_resp.attrib["errorcode"] == "200"
+        match = re.search(r"identity=(?P<uuid>[\w-]+):status", oa_resp.text)
         assert match
-        self.uuid = match.group('uuid')
+        self.uuid = match.group("uuid")
         self.disconnect(send_close=False)
 
 
