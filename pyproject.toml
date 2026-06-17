@@ -1,0 +1,32 @@
+# pyproject.toml — SmartHomeNG plugins
+#
+# SYNC NOTE: ruff settings here must stay in sync with ../smarthome/pyproject.toml
+# (the shng core repo).  When changing either file, update the other.
+# The core file carries a matching reminder pointing here.
+#
+# Why two files: the plugins repo has its own .git root, so ruff does not
+# walk up to the core repo's pyproject.toml.  Cross-repo imports (plugins →
+# lib/) are not resolved by ruff, so coupling is linting-only, not semantic.
+
+[tool.ruff]
+target-version = "py310"
+line-length = 120
+exclude = [
+    "*/_pv_*",                   # old/superseded plugin versions kept for reference
+    "helios/files",              # sample logic scripts: sh/trigger/logic/shtime injected at exec() time
+    "wettercom/additional_files",# sample script: sh/logger/dateutil injected at exec() time
+    "knx/Check_KNX.py",          # sample script: sh injected at exec() time
+    "asterisk/agi",              # AGI scripts: agi_callerid injected by Asterisk at exec() time
+    "executor/examples",         # example logic scripts with injected namespace
+]
+
+[tool.ruff.lint]
+select = ["E", "F"]
+ignore = [
+    "E501",   # line too long — pervasive, cosmetic; address separately
+    "E402",   # module-level import not at top — smarthome uses dynamic/conditional imports
+    "F401",   # unused import — some are intentional re-exports; audit before enabling
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["F401", "F811"]
