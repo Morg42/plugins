@@ -284,7 +284,6 @@ class trovis557x(SmartPlugin):
                 digits = alle_details['Digits']
             else:
                 alle_details = self._coil_tabelle[kurzname]
-            alle_details['Art']
             typ = alle_details['Typ']
             einheit = alle_details['Einheit']
             

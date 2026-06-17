@@ -236,7 +236,6 @@ class Simulation(SmartPlugin):
             seconds = int(time.split(':')[2])
             now = self.shtime.now()
             next = now.replace(hour=hour, minute=minute, second=seconds)
-            next - now
             if (self.lastday != '') and (self.lastday != day):
                 self.logger.debug('Found next day {} {} {} shitfing to tomorrow.'.format(target, value, next))
                 next = next + timedelta(1)
@@ -268,7 +267,6 @@ class Simulation(SmartPlugin):
                 seconds = int(time.split(':')[2])
                 now = self.shtime.now()
                 next = now.replace(hour=hour, minute=minute, second=seconds)
-                next - now
             else:
                 self.logger.info('End of file reached, simulation ended')
                 self._message_item('Simulation ended', 'Simulation')

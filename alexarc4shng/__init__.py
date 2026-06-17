@@ -607,7 +607,6 @@ class AlexaRc4shNG(SmartPlugin):
         mValue = self.replace_mutated_vowel(mValue)
                 
         
-        BytesIO()
         actEcho = None
         try:
             actEcho = self.Echos.get(dvName)
@@ -697,7 +696,6 @@ class AlexaRc4shNG(SmartPlugin):
             return None
         
         for device in myDict['devices']:
-            device['deviceFamily']
             #if deviceFamily == 'WHA' or deviceFamily == 'VOX' or deviceFamily == 'FIRE_TV' or deviceFamily == 'TABLET':
             #    continue
             try:
@@ -988,7 +986,6 @@ class AlexaRc4shNG(SmartPlugin):
             path=self.sh.get_basedir()+"/plugins/alexarc4shng/cmd/"
         
         result = ""
-        ApiURL[0:1]
         if (ApiURL[0:1] != "/"):
             ApiURL = "/"+ApiURL
             
@@ -1119,7 +1116,6 @@ class AlexaRc4shNG(SmartPlugin):
                     "Referer": myLocation
                    }
         newUrl = "https://www.amazon.de"+"/ap/signin/"+actSessionID
-        urlencode(PostData)
         
         myStatus,myRespHeader, myRespCookie, myContent = self.send_post_request(newUrl,myHeaders,myCollectionCookie,PostData)
         myCollectionTxtCookie = self.parse_response_cookie_2_txt(myRespCookie,myCollectionTxtCookie)
@@ -1162,7 +1158,6 @@ class AlexaRc4shNG(SmartPlugin):
             myResults.append('MFA  : ' + 'use MFA/OTP - Login OTP : {}'.format(mfaCode))
             
         
-        urlencode(PostData)
         myStatus,myRespHeader, myRespCookie, myContent = self.send_post_request(newUrl,myHeaders,myCollectionCookie,PostData)
         myCollectionTxtCookie = self.parse_response_cookie_2_txt(myRespCookie,myCollectionTxtCookie)
         myCollectionCookie = self.parse_response_cookie(myRespCookie,myCollectionCookie)
@@ -1607,7 +1602,6 @@ class WebInterface(SmartPluginWebIf):
         
         
         myDevices = self.get_device_list()
-        len(myDevices)
         
         '''
         tmpl = self.tplenv.get_template('index.html')

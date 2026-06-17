@@ -122,7 +122,6 @@ class PanComfortCloud(SmartPlugin):
 
         self.pcc_readdevicelist()
         for idx, device in enumerate(self._devices):
-            idx + 1
             self.poll_device()
             #self.logger.notice(f"- Device {index} status: {self._devices[str(index)]['parameters']}")
 

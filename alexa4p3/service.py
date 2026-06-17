@@ -649,7 +649,6 @@ class AlexaRequestHandler(BaseHTTPRequestHandler):
         
         Properties.append(MyNewProperty)
             
-        self.search(directive,'endpoint')
         myScope = self.search(directive,'scope')
         myEndPointID = self.search(directive,'endpointId')
         myHeader = self.search(directive,'header')

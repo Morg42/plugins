@@ -122,7 +122,6 @@ class WebInterface(SmartPluginWebIf):
             # callect data for 'items' tab
             item_list = []
             for item in self.plugin.get_item_list():
-                self.plugin.get_item_config(item)
                 value_dict = {}
                 value_dict['path'] = item.property.path
                 value_dict['type'] = item.type()

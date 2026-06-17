@@ -556,7 +556,6 @@ class Telegram(SmartPlugin):
             # checking, if message should be send to specific chat-id
             if self.has_iattr(item.conf, ITEM_ATTR_MSG_ID):
                 msg_chat_id = self.get_iattr_value(item.conf, ITEM_ATTR_MSG_ID)
-                str(msg_chat_id)
             else:
                 msg_chat_id = None
 

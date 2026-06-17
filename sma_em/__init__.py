@@ -453,7 +453,6 @@ class SMA_EM(SmartPlugin):
             # self.logger.debug('seral: {}'.format(emID))
             emparts['serial'] = emID
             # timestamp
-            int.from_bytes(datagram[24:28], byteorder='big')
             # self.logger.debug('timestamp: {}'.format(timestamp))
             # decode OBIS data blocks
             # start with header

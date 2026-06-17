@@ -166,7 +166,6 @@ class AlexaAction(object):
         return orgDirective
     
     def p3_respond(self, Request):
-        self.search(Request,'endpoint')
         myScope = self.search(Request,'scope')
         myEndPointID = self.search(Request,'endpointId')
         myHeader = self.search(Request,'header')

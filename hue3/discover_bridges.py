@@ -130,7 +130,6 @@ def discover_via_mdns():
     time.sleep(2)
 
     zeroconf.close()
-    datetime.now()
 
     for sv in listener.services:
         service = listener.services[sv]
@@ -156,9 +155,7 @@ except Exception:
 
 def discover_via_upnp():
 
-    datetime.now()
     ssdp_list = ssdp_discover("ssdp:all", timeout=10)
-    datetime.now()
 
     devices = [u for u in ssdp_list if (u.server is not None and 'IpBridge' in u.server)]
     for d in devices:

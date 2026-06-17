@@ -378,7 +378,6 @@ class BeoDevices():
     def set_speaker_volume(self, beo_id, volume):
 
         ip = self.beodeviceinfo[beo_id]['device']['ip']
-        self.beodeviceinfo[beo_id]['device'].get('FriendlyName', ip)
 
         data = '{'+'"level": {}'.format(volume)+'}'
         self.beo_put_request(ip, '/BeoZone/Zone/Sound/Volume/Speaker/Level', data)
@@ -389,7 +388,6 @@ class BeoDevices():
     def set_speaker_muted(self, beo_id, state):
 
         ip = self.beodeviceinfo[beo_id]['device']['ip']
-        self.beodeviceinfo[beo_id]['device'].get('FriendlyName', ip)
 
         data = '{'+'"muted": {}'.format(str(state).lower())+'}'
         self.beo_put_request(ip, '/BeoZone/Zone/Sound/Volume/Speaker/Muted', data)
@@ -420,7 +418,6 @@ class BeoDevices():
     def set_stand(self, beo_id, position):
 
         ip = self.beodeviceinfo[beo_id]['device']['ip']
-        self.beodeviceinfo[beo_id]['device'].get('FriendlyName', ip)
 
         data = '{'+'"active": {}'.format(str(position).lower())+'}'
         self.beo_put_request(ip, '/BeoZone/Zone/Stand/Active', data)

@@ -73,7 +73,6 @@ class LevelJet(SmartPlugin):
                 length = len(rcv)
                 # break if timeout or Frame found
                 if (length >= 12)and(rcv[-12] == 0x00)and(rcv[-11] == 0x10):
-                    rcv[-12:]
                     break
                 if (length == prev_length):
                     self.logger.warning("leveljet: read timeout! - rcv={}".format(rcv))

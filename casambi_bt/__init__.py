@@ -282,7 +282,6 @@ class Casambi_bt(SmartPlugin):
                 if id_item is self._sh:
                     self.logger.error(f"Could not find casambi_bt_id for item {item}")
                     return None
-            item.conf['casambi_bt_rx_key'].upper()
             id = int(id_item.conf['casambi_bt_id'])
 
             if (id not in self._rx_items):

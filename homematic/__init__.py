@@ -325,7 +325,6 @@ class Homematic(SmartPlugin):
 
                 # Write item value to HomeMatic device
                 if dev is not None:
-                    myitem[5]
                     hm_channel = myitem[3]
                     hm_function = myitem[4]
                     dev.CHANNELS[int(hm_channel)].setValue(hm_function, item())
@@ -334,7 +333,6 @@ class Homematic(SmartPlugin):
                     dev = self.hmip.devices[self.hmip_id].get(dev_id)
                     # Write item value to HomeMaticIP device
                     if dev is not None:
-                        myitem[5]
                         hm_channel = myitem[3]
                         hm_function = myitem[4]
                         dev.CHANNELS[int(hm_channel)].setValue(hm_function, item())

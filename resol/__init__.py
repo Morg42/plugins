@@ -70,7 +70,6 @@ class Resol(SmartPlugin):
 
     def parse_item(self, item):
         if self.has_iattr(item.conf, 'resol_offset'): 
-            self.get_iattr_value(item.conf, 'resol_offset')
             parentItem = item.return_parent()
             if self.has_iattr(parentItem.conf, 'resol_source'):
                 resol_source = self.get_iattr_value(parentItem.conf, 'resol_source')
@@ -398,7 +397,6 @@ class Resol(SmartPlugin):
             if self.has_iattr(item.conf, 'resol_isSigned'):
                 resol_isSigned = self.get_iattr_value(item.conf, 'resol_isSigned')
 
-            int(resol_offset) + int((resol_bituse + 1) / 8)
             #self.logger.warning(f"Debug Start: {resol_offset}, End: {end}")
             
             value = 0

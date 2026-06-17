@@ -171,7 +171,6 @@ def query( config ):
     InitialBaudrate = config.get('baudrate', 300)
     QueryCode = config.get('querycode', '?')
     use_checksum = config.get('use_checksum', True)
-    config.get('baudrate_fix', False)
     timeout = config.get('timeout', 3)
     OnlyListen = config.get('onlylisten', False)    # just for the case that smartmeter transmits data without a query first
     logger.debug(f"Config='{config}'")

@@ -62,7 +62,6 @@ class eBus(SmartPlugin):
         # Call init code of parent class (SmartPlugin)
         super().__init__()
 
-        logging.getLogger(__name__)   # remove for shNG v1.6
         self.host = self.get_parameter_value('host')
         self.port = self.get_parameter_value('port')
         self._cycle = self.get_parameter_value('cycle')

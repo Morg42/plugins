@@ -524,7 +524,6 @@ class Casambi(SmartPlugin):
                 if (id_item is self._sh):
                     self.logger.error(f"Could not find casambi_id for item {item}")
                     return None
-            item.conf['casambi_rx_key'].upper()
             id = int(id_item.conf['casambi_id'])
 
             if (id not in self._rx_items):
@@ -541,7 +540,6 @@ class Casambi(SmartPlugin):
                     self.logger.error(f"Could not find casambi_id for item {item}")
                     return None
 
-            item.conf['casambi_tx_key'].upper()
             id = int(id_item.conf['casambi_id'])
             #self.logger.debug(f"New TX-item: {item} with casambi ID: {id} and tx key: {tx_key}")
           

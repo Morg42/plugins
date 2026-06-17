@@ -214,7 +214,6 @@ class BeoNetlink(SmartPlugin):
 
                 beo_id = self.get_iattr_value(item.conf, 'beo_id').upper()
                 beo_command = self.get_iattr_value(item.conf, 'beo_command').lower()
-                item()
                 if beo_command == 'muted':
                     self.beodevices.set_speaker_muted(beo_id, item())
                     api_url = ''

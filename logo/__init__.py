@@ -181,12 +181,10 @@ class LOGO(SmartPlugin):
             if len(self.writes) > 0:    # beim Schreiben sofort schreiben
                 self._write_cycle()
                 self._read_cycle()
-                time.time() - start
                 #self.logger.debug("{0}: logo_cycle takes {1} seconds".format(self.get_instance_name(), cycletime))
                 self.threadLastRead = time.time()
             elif t > self._io_wait:  # erneutes Lesen erst wenn Zeit um ist
                 self._read_cycle()
-                time.time() - start
                 #self.logger.debug("{0}: logo_cycle takes {1} seconds. Last read: {2}".format(self.get_instance_name(), cycletime, t))
                 self.threadLastRead = time.time()
 

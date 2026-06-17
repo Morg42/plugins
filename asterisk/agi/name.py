@@ -7,10 +7,6 @@ import sys
 import re
 import urllib.request
 import urllib.parse
-import urllib.error
-import urllib.request
-import urllib.error
-import urllib.parse
 
 while 1:
     line = sys.stdin.readline()

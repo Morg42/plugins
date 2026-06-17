@@ -281,7 +281,6 @@ class Alexa4P3(SmartPlugin):
         
         
         if 'alexa_thermo_config' in item.conf:
-            item.conf['alexa_thermo_config']
             device.thermo_config =item.conf['alexa_thermo_config']
             self.logger.debug("Alexa4P3: {}-Thermo-Config = {}".format(item.property.path, device.thermo_config))
         # Icon for Alexa-App - default = SWITCH
@@ -481,7 +480,6 @@ class Alexa4P3(SmartPlugin):
             path=self.sh.get_basedir()+"/plugins/alexa4p3/directives/"
         
         result = ""
-        ApiURL[0:1]
         if (ApiURL[0:1] != "/"):
             ApiURL = "/"+ApiURL
             

@@ -444,7 +444,6 @@ class Rtr_object():
             if len(controller_settings) > 1:
                 Ki = controller_settings[1]
             if len(controller_settings) > 2:
-                controller_settings[2]
 
         self._mode = Mode()
 

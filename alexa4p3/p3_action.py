@@ -196,7 +196,6 @@ def SetThermostatMode(self, directive):
     
     AlexaItem = self.devices.get(device_id)
     myModes = AlexaItem.thermo_config
-    self.GenerateThermoList(myModes,1)
     myModeList = self.GenerateThermoList(myModes,2)
     
     # End of Modes-List
@@ -247,7 +246,6 @@ def SetTargetTemperature(self, directive):
     items = self.items(device_id)
 
     target_temp = float( directive['payload']['targetSetpoint']['value'] )
-    items[0]() if items else 0
 
     for item in items:
         item_range = self.item_range(item, DEFAULT_TEMP_RANGE)

@@ -368,7 +368,6 @@ class SolarLog(SmartPlugin):
         """
         for parameter in self._items:
              params = '{"801":{"170":null}}'
-             params.encode('utf-8')
              headers = {"Content-Type": "application/json",
                         "Accept": "text/plain"}
              conn = http.client.HTTPConnection(self.host)

@@ -342,7 +342,6 @@ class EspHome(SmartPlugin):
         if self.discovered_devices[short_name]['state_change'] == 'Added':
             self.discovered_devices[short_name]['details'] = {}
             self.logger.notice(f"Device discovered: {short_name:15} (ESPHome={self.discovered_devices[short_name]['version']}, board={self.discovered_devices[short_name]['board']})")
-            asyncio.get_event_loop()
             #self.logger.notice(f"- event loop: {loop}")
             # try:
             #     self.run_asyncio_coro(self.retrieve_details_main(short_name), timeout=90, return_exeption=True)

@@ -53,7 +53,6 @@ def CreateStreamPayLoad(myItemConf):
         streamResolution = {}
         highestRes = 0
         for res in v['resolutions']:
-            res['width']
             if res['width'] > highestRes:
                 streamResolution = res
                 highestRes = res['width']

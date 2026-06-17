@@ -214,7 +214,6 @@ class SmartVisu(SmartPlugin):
                 if line.find('//') > -1:
                     line = line[:line.find('//')]
                 if line.startswith("'config_version'"):
-                    line[len("'config_version'"):].strip(", ';)")
                 elif line.startswith("'config_version_major'"):
                     v_major = line[len("'config_version_major'"):].strip(", ';)")
                 elif line.startswith("'config_version_minor'"):

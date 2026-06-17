@@ -434,7 +434,6 @@ class KNX(SmartPlugin):
         dst = self.decode(knx_data[2:4], 'ga')
 
         flg = knx_data[5] & KNX_FLAG_MASK
-        knx_data[4] & 0b1000000
         if flg == FLAG_KNXWRITE:
             flg = 'write'
         elif flg == FLAG_KNXREAD:
@@ -693,7 +692,6 @@ class KNX(SmartPlugin):
                 self.logger.info(
                     "Item {} is polled on GA {} every {} seconds".format(item, poll_ga, poll_interval))
                 randomwait = random.randrange(15)
-                self.shtime.now() + timedelta(seconds=poll_interval + randomwait)
                 self._startup_polling.update({item: {'ga': poll_ga, 'interval': poll_interval}})
             else:
                 self.logger.warning("Ignoring knx_poll for item {}: We need two parameters, one for the GA and one for the polling interval.".format(item))
