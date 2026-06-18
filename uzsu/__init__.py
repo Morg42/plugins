@@ -101,7 +101,7 @@ class UZSU(SmartPlugin):
 
     ALLOW_MULTIINSTANCE = False
 
-    PLUGIN_VERSION = "2.1.0"      # item buffer for all uzsu enabled items
+    PLUGIN_VERSION = "2.1.1"      # item buffer for all uzsu enabled items
 
     def __init__(self, smarthome):
         """
@@ -404,9 +404,9 @@ class UZSU(SmartPlugin):
             items_to_change = [item]
         if isinstance(set, str):
             if set.lower() in ['1', 'yes', 'true', 'on']:
-                reset = True
+                set = True
             elif set.lower() in ['0', 'no', 'false', 'off']:
-                reset = False
+                set = False
             else:
                 self.logger.warning(f'Value to reset activeToday of item "{item}" has to be boolean.')
         if isinstance(set, bool):
@@ -1219,7 +1219,7 @@ class UZSU(SmartPlugin):
                         int(mydict['series']['timeSeriesIntervall'].split(":")[1])
                     exceptions = 0
                     for day in list(rrule):
-                        if not mydays[day.weekday()] in mydict['rrule']:
+                        if mydays[day.weekday()] not in mydict['rrule']:
                             continue
                         myrulenext = f'FREQ=MINUTELY;COUNT={daycount};INTERVAL={interval}'
 
@@ -1524,24 +1524,25 @@ class UZSU(SmartPlugin):
         if smin is not None:
             h, _, m = smin.partition(':')
             try:
-                dmin = next_time.replace(day=dt.day, hour=int(h), minute=int(m), second=0, tzinfo=self._timezone)
+                dmin = next_time.replace(day=dt.day, month=dt.month, year=dt.year, hour=int(h), minute=int(m), second=0, tzinfo=self._timezone)
             except Exception as err:
-                self.logger.error(f'Problems assigning dmin: {err}. Wrong syntax: {tstr}. Should be [H:M<](sunrise|sunset)[+|-][offset][<H:M]')
+                self.logger.error(f'Problems assigning dmin for dt {dt}: {err}. Wrong syntax: {tstr}. Should be [H:M<](sunrise|sunset)[+|-][offset][<H:M]')
                 return
         elif smax is None:
             dmin = next_time
         if smax is not None:
             h, _, m = smax.partition(':')
             try:
-                dmax = next_time.replace(day=dt.day, hour=int(h), minute=int(m), second=0, tzinfo=self._timezone)
+                dmax = next_time.replace(day=dt.day, month=dt.month, year=dt.year, hour=int(h), minute=int(m), second=0, tzinfo=self._timezone)
             except Exception as err:
-                self.logger.error(f'Problems assigning dmax: {err}. Wrong syntax: {tstr}. Should be [H:M<](sunrise|sunset)[+|-][offset][<H:M]')
+                self.logger.error(f'Problems assigning dmax for dt {dt}: {err}. Wrong syntax: {tstr}. Should be [H:M<](sunrise|sunset)[+|-][offset][<H:M]')
                 return
         elif smin is None:
             dmax = next_time
         if dmin is not None and dmax is not None and dmin > dmax:
             self.logger.error(f'Wrong times: the earliest time should be smaller than the latest time in {tstr}')
             return
+        old_next_time = next_time
         try:
             next_time = max(dmin, next_time)
         except Exception:
@@ -1550,6 +1551,7 @@ class UZSU(SmartPlugin):
             next_time = min(dmax, next_time)
         except Exception:
             pass
+        self.logger.develop(f'dt: {dt}, dmax: {dmax}, dmin: {dmin}, tstr: {tstr}, next_time: {next_time} - was: {old_next_time}')
         return next_time
 
     def _get_dependant(self, item):

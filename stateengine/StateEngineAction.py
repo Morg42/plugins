@@ -72,7 +72,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
         self._caller = StateEngineDefaults.plugin_identification
         self.shtime = Shtime.get_instance()
         self._name = name
-        self.__delay = StateEngineValue.SeValue(self._abitem, "delay")
+        self._delay = StateEngineValue.SeValue(self._abitem, "delay")
         self.__repeat = None
         self.__instanteval = None
         self.__overwrite = None
@@ -121,7 +121,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
         return _issue_list
 
     def update_delay(self, value):
-        _issue = self._update_value(self.__delay, value, 'delay', 'seconds')
+        _issue = self._update_value(self._delay, value, 'delay', 'seconds')
         return _issue
 
     def update_instanteval(self, value):
@@ -206,7 +206,7 @@ class SeActionBase(StateEngineTools.SeItemChild):
     # Write action to logger
     def write_to_logger(self):
         self._log_info("function: {}", self._function)
-        delay = self.__delay.write_to_logger() or 0
+        delay = self._delay.write_to_logger() or 0
         if self.__repeat is not None:
             repeat = self.__repeat.write_to_logger()
         else:
@@ -551,17 +551,20 @@ class SeActionBase(StateEngineTools.SeItemChild):
                 repeat_text = ""
         self._log_increase_indent()
         if _validitem:
-            delay = 0 if self.__delay.is_empty() else self.__delay.get()
+            delay = 0 if self._delay.is_empty() else self._delay.get()
+            overwrite = None if self.__overwrite is None else self.__overwrite.get()
+            cond_remove = delay == -1 and self._scheduler_name
             plan_next = None
             if self._scheduler_name:
                 plan_next = self._se_plugin.scheduler_return_next(self._scheduler_name)
-            if plan_next is not None and plan_next > self.shtime.now() or delay == -1:
-                self._log_info("Action '{0}: Removing previous delay timer '{1}'.", self._name, self._scheduler_name)
+            cond_plan = plan_next is not None and plan_next > self.shtime.now()
+            cond_remove = delay == -1 and self._scheduler_name
+            if cond_plan and overwrite is False:
+                self._log_develop("Not removing previous delay timer '{0}' because overwrite is false. Action will run at {1}", self._scheduler_name, plan_next)
+                return
+            elif cond_plan or cond_remove:
+                self._log_info("Removing previous delay timer '{0}'.", self._scheduler_name)
                 self._se_plugin.scheduler_remove(self._scheduler_name)
-                try:
-                    self._abitem.remove_scheduler_entry(self._scheduler_name)
-                except Exception:
-                    pass
 
             actionname = "Action '{0}'".format(self._name) if delay == 0 else "Delayed Action ({0} seconds) '{1}'.".format(
                 delay, self._scheduler_name)
@@ -613,82 +616,47 @@ class SeActionBase(StateEngineTools.SeItemChild):
 
         self._log_decrease_indent(50)
         self._log_increase_indent()
-        vals = {
-            'state': state,
-            'actionname': actionname,
-            'namevar': self._name,
-            'repeat_text': repeat_text,
-            'value': None,
-            'current_condition': current_condition,
-            'previous_condition': previous_condition,
-            'previousstate_condition': previousstate_condition,
-            'next_condition': next_condition
-        }
         if delay == 0:
-            self._abitem.scheduler_remove(self._scheduler_name)
+            if self._scheduler_name:
+                self._se_plugin.scheduler_remove(self._scheduler_name)
+                self._abitem.remove_scheduler_entry(self._scheduler_name)
             self._log_info("Action '{}': Running.", namevar)
-            self.real_execute(
-                state, actionname, namevar, repeat_text,
-                None, False,  # False = kein Instant Eval
-                current_condition, previous_condition,
-                previousstate_condition, next_condition
-            )
+            self.real_execute(state, actionname, namevar, repeat_text, None, False, current_condition, previous_condition, previousstate_condition, next_condition)
         else:
             instanteval = None if self.__instanteval is None else self.__instanteval.get()
             overwrite = None if self.__overwrite is None else self.__overwrite.get()
+            next_run = (self.shtime.now() + datetime.timedelta(seconds=delay)).replace(microsecond=0)
             self._log_info(
-                "Action '{0}': Add {1} second timer '{2}' for delayed execution.{3} Instant Eval: {4}. Overwrite: {5}",
-                self._name, delay, self._scheduler_name, repeat_text, instanteval, overwrite
+                "Action '{0}': Add {1} second timer '{2}' for delayed execution.{3} Instant Eval: {4}. Overwrite: {5}. Action will run at ca. {6}",
+                self._name, delay, self._scheduler_name, repeat_text, instanteval, overwrite, next_run
             )
-
             next_run = self.shtime.now() + datetime.timedelta(seconds=delay)
-
             if instanteval is True:
                 self._log_increase_indent()
                 self._log_debug("Evaluating value for delayed action '{}'.", namevar)
-
-                vals['value'] = self.real_execute(
-                    state, actionname, self._name, repeat_text,
-                    None, True,
-                    current_condition, previous_condition,
-                    previousstate_condition, next_condition
-                )
-
-                self._log_debug("Value for delayed action is going to be '{}'.", vals['value'])
+                value = self.real_execute(state, actionname, namevar, repeat_text, None, True, current_condition, previous_condition, previousstate_condition, next_condition)
+                self._log_debug("Value for delayed action is going to be '{}'.", value)
                 self._log_decrease_indent()
-
+            else:
+                value = None
+            self._abitem.add_scheduler_entry(self._scheduler_name)
             self.update_webif_actionstatus(state, self._name, 'Scheduled')
+            self._se_plugin.scheduler_add(self._scheduler_name, self._delayed_execute,
+                                          value={'actionname': actionname, 'namevar': self._name,
+                                                 'repeat_text': repeat_text, 'value': value,
+                                                 'current_condition': current_condition,
+                                                 'previous_condition': previous_condition,
+                                                 'previousstate_condition': previousstate_condition,
+                                                 'next_condition': next_condition, 'state': state}, next=next_run)
 
-            self._abitem.scheduler_add(
-                self._scheduler_name,
-                self,
-                value=vals,
-                next=next_run,
-                overwrite=overwrite
-            )
-
-    def delayed_execute(self, actionname: str, namevar: str = "", repeat_text: str = "", value=None, current_condition=None, previous_condition=None, previousstate_condition=None, next_condition=None, state=None, caller=None):
-        self._log_debug(
-            "Putting action '{}'{} into queue. Caller: {}", namevar,
-            f" from state '{state}'" if state else "", caller
-        )
-
-        self.__queue.put([
-            "delayedaction",
-            self,
-            actionname,
-            namevar,
-            repeat_text,
-            value,
-            current_condition,
-            previous_condition,
-            previousstate_condition,
-            next_condition,
-            state
-        ])
+    def _delayed_execute(self, actionname: str, namevar: str = "", repeat_text: str = "", value=None, current_condition=None, previous_condition=None, previousstate_condition=None, next_condition=None, state=None, caller=None):
+        if state:
+            self._log_debug("Putting delayed action '{}' from state '{}' into queue. Caller: {}", namevar, state, caller)
+            self.__queue.put(["delayedaction", self, actionname, namevar, repeat_text, value, current_condition, previous_condition, previousstate_condition, next_condition, state])
+        else:
+            self._log_debug("Putting delayed action '{}' into queue. Caller: {}", namevar, caller)
+            self.__queue.put(["delayedaction", self, actionname, namevar, repeat_text, value, current_condition, previous_condition, previousstate_condition, next_condition])
         if not self._abitem.update_lock.locked():
-            self._log_debug("Running queue")
-            self._log_increase_indent()
             self._abitem.run_queue()
 
     # Really execute the action (needs to be implemented in derived classes)
@@ -1055,6 +1023,7 @@ class SeActionTrigger(SeActionBase):
         self._log_develop('Completing action {}, action type {}, state {}', self._name, self._action_type, self._state)
         self._abitem.set_variable('current.action_name', self._name)
         self._abitem.set_variable('current.state_name', self._state.name)
+        delay = 0 if self._delay.is_empty() else self._delay.get()
         self._scheduler_name = "{}-SeLogicDelayTimer".format(self.__logic)
         _issue = {self._name: {'issue': None, 'logic': self.__logic,
                                'issueorigin': [{'state': self._state.id, 'action': self._function}]}}
@@ -1381,7 +1350,8 @@ class SeActionSpecial(SeActionBase):
         # determine remaining suspend time and write to variable item.suspend_remaining
         suspend_time = self._abitem.get_variable("item.suspend_time")
         suspend_over = suspend_item.property.last_change_age
-        suspend_remaining = int(suspend_time - suspend_over + 0.5)   # adding 0.5 causes round up ...
+        suspend_remaining = max(-1, int(suspend_time - suspend_over + 0.5)) # adding 0.5 causes round up ...
+
         self._abitem.set_variable("item.suspend_remaining", suspend_remaining)
         self._log_debug("Updated variable 'item.suspend_remaining' to {0}", suspend_remaining)
         self._action_status = _issue

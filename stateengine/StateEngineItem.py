@@ -466,10 +466,10 @@ class SeItem:
             self.__logger.warning("se_instant_leaveaction for item {} can not be defined as a list"
                                   " ({}). Using default value {}.", self.id, _returnvalue_leave,
                                   default_instant_leaveaction_value)
-            self.__instant_leaveaction = default_instant_leaveaction
+            self.__instant_leaveaction = default_instant_leaveaction_value
             self.__variables.update({"item.instant_leaveaction": default_instant_leaveaction_value})
         elif len(_returnvalue_leave) == 1 and _returnvalue_leave[0] is None:
-            self.__instant_leaveaction = default_instant_leaveaction
+            self.__instant_leaveaction = default_instant_leaveaction_value
             self.__variables.update({"item.instant_leaveaction": default_instant_leaveaction_value})
             self.__logger.info("Using default instant_leaveaction {0} "
                                "as no se_instant_leaveaction is set.".format(default_instant_leaveaction_value))
@@ -478,6 +478,7 @@ class SeItem:
             self.__logger.info("Using default instant_leaveaction {0} "
                                "as no se_instant_leaveaction is set.".format(default_instant_leaveaction_value))
         else:
+            _returnvalue_leave = _returnvalue_leave[0] if isinstance(_returnvalue_leave, list) else _returnvalue_leave
             self.__variables.update({"item.instant_leaveaction": _returnvalue_leave})
             self.__logger.info("Using instant_leaveaction {0} "
                                "from attribute se_instant_leaveaction. "
@@ -489,41 +490,13 @@ class SeItem:
         else:
             self.__templates[template] = value
 
-    def scheduler_add(self, name, action, value=None, next=None, overwrite=True):
-        def _log_result(added, new_next):
-            if added:
-                self._delayedactions_text.append(f"Scheduling action {action} with name '{name}' at {next}.")
-            else:
-                self._delayedactions_text.append(f"Scheduled action '{name}' already exists, overwrite is set to {overwrite}. Will run at {new_next}")
-
-        self.__se_plugin._action_scheduler.add(self, name, action, value, next, overwrite=overwrite, callback=_log_result)
-
-    def scheduler_remove(self, name):
-        def _log_result(removed):
-            if removed:
-                self.__logger.debug("Removed scheduled action '{}'", name)
-            else:
-                self.__logger.develop("Scheduled action '{}' not found – nothing to remove", name)
-        if not name:
-            return
-        self.__logger.develop("Requesting removal of scheduler '{}'", name)
-        self.__se_plugin._action_scheduler.remove(self, name, callback=_log_result)
-        #self.__se_plugin.scheduler_trigger('actionscheduler')
-
-    def scheduler_remove_all(self):
-        def _log_result(count):
-            self.__logger.debug("Removed {} scheduled actions for item {}", count, self.id)
-
-        self.__logger.develop("Requesting removal of all schedulers for item {}", self.id)
-        self.__se_plugin._action_scheduler.remove_all(self, callback=_log_result)
-        #self.__se_plugin.scheduler_trigger('actionscheduler')
-
     def add_scheduler_entry(self, name):
         if name not in self.__active_schedulers:
             self.__active_schedulers.append(name)
 
     def remove_scheduler_entry(self, name):
-        self.__active_schedulers.remove(name)
+        if name in self.__active_schedulers:
+            self.__active_schedulers.remove(name)
 
     def remove_all_schedulers(self):
         for entry in self.__active_schedulers:
@@ -545,8 +518,11 @@ class SeItem:
             self.__logger.debug("{} not running (anymore). Queue not activated.",
                                 StateEngineDefaults.plugin_identification)
             return
+        self.update_lock.acquire(True, 10)
+        self.__logger.develop("Geting log level")
         _current_log_level = self.__log_level.get()
         _default_log_level = self.__logger.default_log_level.get()
+        self.__logger.debug("Running queue")
 
         if _current_log_level <= -1:
             self.__using_default_log_level = True
@@ -594,7 +570,7 @@ class SeItem:
             additional_text = ""
         self.__logger.debug("Current suspend time {}, default {}{}",
                             _suspend_time, self.__default_suspend_time, additional_text)
-        self.update_lock.acquire(True, 10)
+
         self.__reorder_states(init=False)
         all_released_by = {}
         new_state = None
@@ -609,11 +585,12 @@ class SeItem:
                 self.__logger.debug("No jobs in queue left or plugin not active anymore")
                 break
             elif job[0] == "delayedaction":
-                _, action, actionname, namevar, repeat_text, value, current_condition, previous_condition, previousstate_condition, next_condition, state = job
+                self.__logger.debug("Job {}", job)
+                (_, action, actionname, namevar, repeat_text, value, current_condition, previous_condition,
+                 previousstate_condition, next_condition, state) = job
                 self.__logger.info(
                     "Running delayed action: {0} based on current_condition {1} / previous_condition {2} / previousstate_condition {3} or next condition {4}",
-                    actionname, current_condition, previous_condition, previousstate_condition, next_condition
-                )
+                    actionname, current_condition, previous_condition, previousstate_condition, next_condition)
                 action.real_execute(state, actionname, namevar, repeat_text, value, False, current_condition, previous_condition, previousstate_condition, next_condition)
             else:
                 (_, item, caller, source, dest) = job
@@ -773,14 +750,11 @@ class SeItem:
                             text = "No matching state found, staying at {0} ('{1}') based on conditionset {2} ('{3}')"
                             self.__logger.info(text, last_state.id, last_state.name, _last_conditionset_id,
                                                _last_conditionset_name)
-                        last_state.run_stay(self.__repeat_actions.get())                
-                    self.__logger.decrease_indent(50)
-                    self.__logger.debug("State evaluation finished")
-                    for entry in self._delayedactions_text:
-                        self.__logger.debug("{}", entry)
-                    self._delayedactions_text = []
+                        last_state.run_stay(self.__repeat_actions.get())
                     if self.update_lock.locked():
                         self.update_lock.release()
+                    self.__logger.decrease_indent(50)
+                    self.__logger.debug("State evaluation finished")
                     self.__logger.info("State evaluation queue empty.")
                     self.__handle_releasedby(new_state, last_state, _instant_leaveaction)
 
@@ -1489,19 +1463,19 @@ class SeItem:
     def __update_check_can_enter(self, state, instant_leaveaction, refill=True):
         try:
             wasreleasedby = state.was_releasedby.id
-        except:
+        except Exception:
             wasreleasedby = state.was_releasedby
         try:
             iscopyfor = state.is_copy_for.id
-        except:
+        except Exception:
             iscopyfor = state.is_copy_for
         try:
             hasreleased = state.has_released.id
-        except:
+        except Exception:
             hasreleased = state.has_released
         try:
             canrelease = state.can_release.id
-        except:
+        except Exception:
             canrelease = state.can_release
         try:
             self.__variables["release.can_release"] = canrelease
@@ -1907,7 +1881,7 @@ class SeItem:
                         _converted_typelist.append(_returntype[i])
                     else:
                         _returnvalue_issue = "Found invalid definition in se_released_by attribute " \
-                                             "of state {}, original {}.".format(state.id, v, original_value)
+                                             "of state {}: {}, original {}.".format(state.id, v, original_value)
                         self.__logger.warning("{} Removing it.", _returnvalue_issue)
                 _converted_evaluatedlist.append(v_list)
             except Exception as ex:

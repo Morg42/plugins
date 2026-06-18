@@ -29,12 +29,10 @@ from . import StateEngineFunctions
 from . import StateEngineValue
 from . import StateEngineWebif
 from . import StateEngineStructs
-from . import StateEngineActionScheduler
-
 import logging
 import os
 import copy
-from lib.model.smartplugin import *
+from lib.model.smartplugin import SmartPlugin
 from lib.item import Items
 from .webif import WebInterface
 from datetime import datetime
@@ -46,11 +44,8 @@ except Exception:
     VIS_ENABLED = False
 
 
-logging.addLevelName(StateEngineDefaults.VERBOSE, 'DEVELOP')
-
-
 class StateEngine(SmartPlugin):
-    PLUGIN_VERSION = '2.2.2'
+    PLUGIN_VERSION = '2.3.0'
 
     # Constructor
     # noinspection PyUnusedLocal,PyMissingConstructor
@@ -65,12 +60,10 @@ class StateEngine(SmartPlugin):
         self.__cli = None
         self.vis_enabled = self._test_visualization()
         if not self.vis_enabled:
-            self.logger.warning(f'StateEngine is missing the PyDotPlus package or GraphViz, WebIf visualization is disabled')
+            self.logger.warning('StateEngine is missing the PyDotPlus package or GraphViz, WebIf visualization is disabled')
         self.init_webinterface(WebInterface)
         self.__sh.stateengine_plugin_functions = StateEngineFunctions.SeFunctions(self.__sh, self.logger)
         try:
-            self._action_scheduler = StateEngineActionScheduler.ActionScheduler(self.__sh, self, self.logger)
-            self.scheduler_add('actionscheduler', self._action_scheduler.run, cron='init')
             log_level = self.get_parameter_value("log_level")
             startup_log_level = self.get_parameter_value("startup_log_level")
             log_directory = self.get_parameter_value("log_directory")
@@ -116,7 +109,7 @@ class StateEngine(SmartPlugin):
             if log_maxage > 0:
                 self.logger.info("StateEngine extended log files will be deleted after {0} days.".format(log_maxage))
                 cron = ['init', '30 0 * *']
-                self.scheduler_add('remove old logfiles', SeLogger.remove_old_logfiles, cron=cron, offset=0)
+                self.scheduler_add('Remove old logfiles', SeLogger.remove_old_logfiles, cron=cron, offset=0)
 
         except Exception as ex:
             self._init_complete = False
@@ -154,7 +147,6 @@ class StateEngine(SmartPlugin):
         if len(self._items) > 0:
             self.logger.info("Using StateEngine for {} items".format(len(self._items)))
         else:
-            self.scheduler_remove('actionscheduler')
             self.logger.info("StateEngine deactivated because no items have been found.")
 
         self.__cli = StateEngineCliCommands.SeCliCommands(self.__sh, self._items, self.logger)
