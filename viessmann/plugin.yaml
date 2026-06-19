@@ -48,6 +48,32 @@ parameters:
             de: Item-Pfad für das Suspend-Item
             en: item path for suspend switch item
 
+    loop_guard_count:
+        type: num
+        default: 5
+        description:
+            de: Anzahl identischer Schreibversuche im Zeitfenster, die den Loop-Guard auslösen (0 = deaktiviert)
+            en: number of identical write attempts within the time window that trigger the loop guard (0 = disabled)
+
+    loop_guard_window:
+        type: num
+        default: 5.0
+        description:
+            de: Zeitfenster in Sekunden für den Loop-Guard
+            en: time window in seconds for the loop guard
+
+    loop_guard_source:
+        type: str
+        default: ''
+        description:
+            de: Präfix des aufrufenden Systems, auf das der Loop-Guard beschränkt wird (leer = alle externen Aufrufer)
+            en: caller prefix to restrict loop guard to (empty = all external callers)
+        description_long:
+            de: 'Wenn gesetzt, zählt der Loop-Guard nur Schreibversuche, deren "caller"-String mit diesem Präfix
+                 beginnt (z.B. "MQTT"). Schreibvorgänge anderer Aufrufer werden immer durchgelassen.'
+            en: 'If set, the loop guard only counts write attempts whose "caller" string starts with this prefix
+                 (e.g. "MQTT"). Writes from all other callers always pass through freely.'
+
     command_class:
         type: str
         default: SDPCommandViessmann

@@ -26,7 +26,8 @@
 
 import logging
 
-from lib.model.sdp.globals import (CONN_SER_DIR, PLUGIN_ATTR_CB_ON_CONNECT, PLUGIN_ATTR_CB_ON_DISCONNECT, PLUGIN_ATTR_CONNECTION, PLUGIN_ATTR_CONN_AUTO_CONN, PLUGIN_ATTR_CONN_BINARY, PLUGIN_ATTR_CONN_CYCLE, PLUGIN_ATTR_CONN_RETRIES, PLUGIN_ATTR_CONN_TIMEOUT, PLUGIN_ATTR_SERIAL_BAUD, PLUGIN_ATTR_SERIAL_BSIZE, PLUGIN_ATTR_SERIAL_PARITY, PLUGIN_ATTR_SERIAL_PORT, PLUGIN_ATTR_SERIAL_STOP)
+from lib.model.sdp.globals import (SDPError, SDPConnectionError, SDPProtocolError,
+    CONN_SER_DIR, PLUGIN_ATTR_CB_ON_CONNECT, PLUGIN_ATTR_CB_ON_DISCONNECT, PLUGIN_ATTR_CONNECTION, PLUGIN_ATTR_CONN_AUTO_CONN, PLUGIN_ATTR_CONN_BINARY, PLUGIN_ATTR_CONN_CYCLE, PLUGIN_ATTR_CONN_RETRIES, PLUGIN_ATTR_CONN_TIMEOUT, PLUGIN_ATTR_SERIAL_BAUD, PLUGIN_ATTR_SERIAL_BSIZE, PLUGIN_ATTR_SERIAL_PARITY, PLUGIN_ATTR_SERIAL_PORT, PLUGIN_ATTR_SERIAL_STOP)
 from lib.model.sdp.protocol import SDPProtocol
 
 from time import sleep
@@ -223,8 +224,10 @@ class SDPProtocolViessmann(SDPProtocol):
                     self.__syncsent = False
                     empty_replies = 0
 
-            self.logger.debug(f'communication initialized: {self._is_initialized}')
-            return self._is_initialized
+            if not self._is_initialized:
+                raise SDPProtocolError('P300 protocol initialization failed after 10 attempts')
+            self.logger.debug('P300 communication initialized successfully')
+            return True
 
         elif self._viess_proto == 'KW':
 
@@ -249,80 +252,79 @@ class SDPProtocolViessmann(SDPProtocol):
                     return True
                 sleep(.8)
                 attempt = attempt + 1
-            self.logger.error(f'sync not acquired after {attempt} attempts')
-            self._close()
-            return False
+            self.logger.error(f'KW sync not acquired after {attempt} attempts')
+            raise SDPProtocolError(f'KW protocol sync failed after {attempt} attempts')
 
         return True
 
     def _send(self, data_dict, **kwargs):
         """
-        send data. data_dict needs to contain the following information:
+        Send payload and return parsed response, or raise on any failure.
 
         data_dict['payload']: address from/to which to read/write (hex, str)
         data_dict['data']['len']: length of command to send
         data_dict['data']['value']: value bytes to write, None if reading
 
         :param data_dict: send data
-        :param read_response: KW only: read response value (True) or only return status byte
         :type data_dict: dict
-        :type read_response: bool
-        :return: Response packet (bytearray) if no error occured, None otherwise
+        :return: Response bytes if read command, None if write command
+        :raises SDPConnectionError: serial I/O failure or no response from device
+        :raises SDPProtocolError: unexpected or invalid device response
         """
         if kwargs:
             self.logger.debug(f'got additional kw args {kwargs}')
 
         (packet, responselen) = self._build_payload(data_dict)
 
-        # send payload
-        self._lock.acquire()
         try:
-            self._send_bytes(packet)
-            self.logger.debug(f'successfully sent packet {self._bytes2hexstring(packet)}')
+            with self._lock:
+                self._send_bytes(packet)
+                self.logger.debug(f'sent packet {self._bytes2hexstring(packet)}')
 
-            # receive response
-            response_packet = bytearray()
-            self.logger.debug(f'trying to receive {responselen} bytes of the response')
-            chunk = self._read_bytes(responselen)
-            if self._viess_proto == 'P300':
-                self.logger.debug(f'received {len(chunk)} bytes chunk of response as hexstring {self._bytes2hexstring(chunk)} and as bytes {chunk}')
-                if len(chunk) != 0:
+                chunk = self._read_bytes(responselen)
+                self.logger.debug(
+                    f'received {len(chunk)} bytes: '
+                    f'{self._bytes2hexstring(chunk) if chunk else "empty"}'
+                )
+
+                if self._viess_proto == 'P300':
+                    if len(chunk) == 0:
+                        raise SDPConnectionError('no response from device after P300 command')
                     if chunk[:1] == self._int2bytes(self._controlset['error'], 1):
-                        self.logger.error(f'interface returned error, response was {chunk}')
-                    elif len(chunk) == 1 and chunk[:1] == self._int2bytes(self._controlset['not_initiated'], 1):
-                        self.logger.error('received invalid chunk, connection not initialized, forcing re-initialize...')
-                        self._initialized = False
-                    elif chunk[:1] != self._int2bytes(self._controlset['acknowledge'], 1):
-                        self.logger.error(f'received invalid chunk, not starting with ACK, response was {chunk}')
-                        self.logger.warning('encountered invalid chunk, maybe communication was lost, forcing re-initialize')
-                        self._close()
-                        sleep(1)
-                        self._open()
-                    else:
-                        response_packet.extend(chunk)
-                        return self._parse_response(response_packet)
-                else:
-                    self.logger.debug(f'received 0 bytes chunk - ignoring response_packet, chunk was {chunk}')
-            elif self._viess_proto == 'KW':
-                self.logger.debug(f'received {len(chunk)} bytes chunk of response as hexstring {self._bytes2hexstring(chunk)} and as bytes {chunk}')
-                if len(chunk) != 0:
-                    response_packet.extend(chunk)
-                    return self._parse_response(response_packet, data_dict['data']['value'] is None)
-                else:
-                    self.logger.error('received 0 bytes chunk - this probably is a communication error, possibly a wrong datapoint address?')
-        except IOError as e:
-            self.logger.error(f'send_command_packet failed with IO error, trying to reconnect. Error was: {e}')
-            self._close()
-        except Exception as e:
-            self.logger.error(f'send_command_packet failed with error: {e}')
-        finally:
-            try:
-                self._lock.release()
-            except RuntimeError:
-                pass
+                        raise SDPProtocolError(
+                            f'device reported protocol error, response: {self._bytes2hexstring(chunk)}'
+                        )
+                    if (len(chunk) == 1 and
+                            chunk[:1] == self._int2bytes(self._controlset['not_initiated'], 1)):
+                        self._is_initialized = False
+                        raise SDPProtocolError(
+                            'device reports not initialized; will re-initialize on next send'
+                        )
+                    if chunk[:1] != self._int2bytes(self._controlset['acknowledge'], 1):
+                        raise SDPProtocolError(
+                            f'unexpected P300 response (no ACK): {self._bytes2hexstring(chunk)}'
+                        )
+                    return self._parse_response(bytearray(chunk))
 
-        # if we didn't return with data earlier, we hit an error. Act accordingly
-        return None
+                elif self._viess_proto == 'KW':
+                    if len(chunk) == 0:
+                        raise SDPConnectionError('no response from device after KW command')
+                    return self._parse_response(bytearray(chunk), data_dict['data']['value'] is None)
+
+        except SDPError:
+            self._is_initialized = False
+            try:
+                self._close()
+            except Exception:
+                pass
+            raise
+        except Exception as e:
+            self._is_initialized = False
+            try:
+                self._close()
+            except Exception:
+                pass
+            raise SDPConnectionError(f'unexpected error during send: {e}') from e
 
     def _parse_response(self, response, read_response=True):
         """
@@ -343,11 +345,10 @@ class SDPProtocolViessmann(SDPProtocol):
             checksum = self._calc_checksum(response[1:len(response) - 1])  # first, cut first byte (ACK) and last byte (checksum) and then calculate checksum
             received_checksum = response[len(response) - 1]
             if received_checksum != checksum:
-                self.logger.error(f'calculated checksum {checksum} does not match received checksum of {received_checksum}! Ignoring reponse, cycling connection')
-                self._close()
-                sleep(1)
-                self._open()
-                return None
+                raise SDPProtocolError(
+                    f'P300 checksum mismatch: expected {checksum:#04x}, '
+                    f'got {received_checksum:#04x}'
+                )
 
             # Extract command/address, valuebytes and valuebytecount out of response
             responsetypecode = response[3]  # 0x00 = query, 0x01 = reply, 0x03 = error
@@ -357,7 +358,7 @@ class SDPProtocolViessmann(SDPProtocol):
             # Extract databytes out of response
             rawdatabytes = bytearray()
             rawdatabytes.extend(response[8:8 + (valuebytecount)])
-        elif self._protocol == 'KW':
+        elif self._viess_proto == 'KW':
 
             # imitate P300 response code data for easier combined handling afterwards
             # a read_response telegram consists only of the value bytes

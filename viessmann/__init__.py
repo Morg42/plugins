@@ -187,10 +187,11 @@ class viessmann(SmartDevicePlugin):
         """
         addr = addr.lower()
 
-        commandname = self._commands.get_command_from_reply(addr)
-        if commandname is None:
+        results = self._commands.get_commands_from_reply(addr)
+        if results is None:
             self.logger.debug(f'Address {addr} not defined in commandset, aborting')
             return
+        commandname = results[0]
 
         self.logger.debug(f'Attempting to write address {addr} with value {value} for command {commandname}')
 

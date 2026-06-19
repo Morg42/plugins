@@ -66,13 +66,13 @@ class DT_Time(DT_Number):
             raise ValueError(f'incorrect data format, YYYY-MM-DD expected. Error was: {e}')
 
     def get_shng_data(self, data, type=None, **kwargs):
-        return datetime.strptime(data.hex(), '%Y%m%d%W%H%M%S').isoformat()
+        return datetime.datetime.strptime(data.hex(), '%Y%m%d%W%H%M%S').isoformat()
 
 
 # D = date
 class DT_Date(DT_Time):
     def get_shng_data(self, data, type=None, **kwargs):
-        return datetime.strptime(data.hex(), '%Y%m%d%W%H%M%S').date().isoformat()
+        return datetime.datetime.strptime(data.hex(), '%Y%m%d%W%H%M%S').date().isoformat()
 
 
 # C = control timer (?)
@@ -86,12 +86,15 @@ class DT_Control(DT_Number):
                 times += f'{an:02x}{aus:02x}'
             valuebytes = bytes.fromhex(times)
             self.logger.debug(f'created value bytes as hexstring: {bytes2hexstring(valuebytes)} and as bytes: {valuebytes}')
+            return valuebytes
+        except ValueError:
+            raise
         except Exception as e:
             raise ValueError(f'incorrect data format, (An: hh:mm Aus: hh:mm) expected. Error was: {e}')
 
     def get_shng_data(self, data, type=None, **kwargs):
-        timer = self._decode_timer(data.hex())
-        return [{'An': on_time, 'Aus': off_time} for on_time, off_time in zip(timer, timer)]
+        timer = list(decode_timer(data.hex()))
+        return [{'An': on_time, 'Aus': off_time} for on_time, off_time in zip(timer[::2], timer[1::2])]
 
 
 # H = hex
