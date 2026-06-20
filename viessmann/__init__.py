@@ -35,13 +35,14 @@ import cherrypy
 if __name__ == '__main__':
     # just needed for standalone mode
 
-    class SmartPlugin():
+    class SmartPlugin:
         pass
 
-    class SmartPluginWebIf():
+    class SmartPluginWebIf:
         pass
 
     import os
+
     BASE = os.path.sep.join(os.path.realpath(__file__).split(os.path.sep)[:-3])
     sys.path.insert(0, BASE)
     import commands
@@ -56,19 +57,20 @@ else:
 
 
 class Viessmann(SmartPlugin):
-    '''
+    """
     Main class of the plugin. Provides communication with Viessmann heating systems
     via serial / USB-to-serial connections to read values and set operating parameters.
 
     Supported device types must be defined in ./commands.py.
-    '''
+    """
+
     ALLOW_MULTIINSTANCE = False
 
     PLUGIN_VERSION = '1.2.3'
 
-#
-# public methods
-#
+    #
+    # public methods
+    #
 
     def __init__(self, sh, *args, standalone='', logger=None, **kwargs):
 
@@ -92,14 +94,14 @@ class Viessmann(SmartPlugin):
 
         # Set variables
         self._error_count = 0
-        self._params = {}                                                   # Item dict
-        self._init_cmds = []                                                # List of command codes for read at init
-        self._cyclic_cmds = {}                                              # Dict of command codes with cylce-times for cyclic readings
-        self._application_timer = {}                                        # Dict of application timer with command codes and values
-        self._timer_cmds = []                                               # List of command codes for timer
+        self._params = {}  # Item dict
+        self._init_cmds = []  # List of command codes for read at init
+        self._cyclic_cmds = {}  # Dict of command codes with cylce-times for cyclic readings
+        self._application_timer = {}  # Dict of application timer with command codes and values
+        self._timer_cmds = []  # List of command codes for timer
         self._viess_timer_dict = {}
         self._last_values = {}
-        self._balist_item = None                                # list of last value per command code
+        self._balist_item = None  # list of last value per command code
         self._lock = threading.Lock()
         self._initread = False
         self._timerread = False
@@ -115,7 +117,8 @@ class Viessmann(SmartPlugin):
             'TH': ['do', 'donnerstag', 'thursday'],
             'FR': ['fr', 'freitag', 'friday'],
             'SA': ['sa', 'samstag', 'saturday'],
-            'SU': ['so', 'sonntag', 'sunday']}
+            'SU': ['so', 'sonntag', 'sunday'],
+        }
 
         # if running standalone, don't initialize command sets
         if not sh:
@@ -134,9 +137,9 @@ class Viessmann(SmartPlugin):
         self.init_webinterface()
 
     def run(self):
-        '''
+        """
         Run method for the plugin
-        '''
+        """
         if not self._config_loaded:
             if not self._load_configuration():
                 return
@@ -146,9 +149,9 @@ class Viessmann(SmartPlugin):
         self._read_timers()
 
     def stop(self):
-        '''
+        """
         Stop method for the plugin
-        '''
+        """
         self.alive = False
         if self.scheduler_get('cyclic'):
             self.scheduler_remove('cyclic')
@@ -157,7 +160,7 @@ class Viessmann(SmartPlugin):
         self._config_loaded = False
 
     def parse_item(self, item):
-        '''
+        """
         Method for parsing items.
         If the item carries any viess_* field, this item is registered to the plugin.
 
@@ -166,7 +169,7 @@ class Viessmann(SmartPlugin):
 
         :return:        The item update method to be triggered if the item is changed, or None.
         :rtype:         object
-        '''
+        """
         # Process the update config
         if self.has_iattr(item.conf, 'viess_update'):
             self.logger.debug(f'Item for requesting update for all items triggered: {item}')
@@ -256,17 +259,19 @@ class Viessmann(SmartPlugin):
         pass
 
     def update_item(self, item, caller=None, source=None, dest=None):
-        '''
+        """
         Callback method for sending values to the plugin when a registered item has changed
 
         :param item: item to be updated towards the plugin
         :param caller: if given it represents the callers name
         :param source: if given it represents the source
         :param dest: if given it represents the dest
-        '''
+        """
         if self.alive and caller != self.get_shortname():
             self.logger.info(f'Update item: {item.property.path}, item has been changed outside this plugin')
-            self.logger.debug(f'update_item was called with item {item} from caller {caller}, source {source} and dest {dest}')
+            self.logger.debug(
+                f'update_item was called with item {item} from caller {caller}, source {source} and dest {dest}'
+            )
 
             if self.has_iattr(item.conf, 'viess_send'):
                 # Send write command
@@ -279,7 +284,9 @@ class Viessmann(SmartPlugin):
                 if not self._send_command(commandname, value):
                     # create_write_command() liefert False, wenn das Schreiben fehlgeschlagen ist
                     # -> dann auch keine weitere Verarbeitung
-                    self.logger.debug(f'Write for {commandname} with value {value} failed, reverting value, canceling followup actions')
+                    self.logger.debug(
+                        f'Write for {commandname} with value {value} failed, reverting value, canceling followup actions'
+                    )
                     item(item.property.last_value, self.get_shortname())
                     return None
 
@@ -287,7 +294,9 @@ class Viessmann(SmartPlugin):
                 if self.has_iattr(item.conf, 'viess_read') and self.has_iattr(item.conf, 'viess_read_afterwrite'):
                     readcommandname = self.get_iattr_value(item.conf, 'viess_read')
                     readafterwrite = self.get_iattr_value(item.conf, 'viess_read_afterwrite')
-                    self.logger.debug(f'Attempting read after write for item {item}, command {readcommandname}, delay {readafterwrite}')
+                    self.logger.debug(
+                        f'Attempting read after write for item {item}, command {readcommandname}, delay {readafterwrite}'
+                    )
                     if readcommandname is not None and readafterwrite is not None:
                         aw = float(readafterwrite)
                         time.sleep(aw)
@@ -302,7 +311,7 @@ class Viessmann(SmartPlugin):
                         tdelay = 5  # default delay
                         if self.has_iattr(item.conf, 'viess_trigger_afterwrite'):
                             tdelay = float(self.get_iattr_value(item.conf, 'viess_trigger_afterwrite'))
-                        if type(trigger) != list:
+                        if not isinstance(trigger, list):
                             trigger = [trigger]
                         for triggername in trigger:
                             triggername = triggername.strip()
@@ -323,12 +332,14 @@ class Viessmann(SmartPlugin):
                     self.update_all_read_items()
 
     def send_cyclic_cmds(self):
-        '''
+        """
         Recall function for shng scheduler. Reads all values configured to be read cyclically.
-        '''
+        """
         # check if another cyclic cmd run is still active
         if self._cyclic_update_active:
-            self.logger.warning('Triggered cyclic command read, but previous cyclic run is still active. Check device and cyclic configuration (too much/too short?)')
+            self.logger.warning(
+                'Triggered cyclic command read, but previous cyclic run is still active. Check device and cyclic configuration (too much/too short?)'
+            )
             return
         else:
             self.logger.info('Triggering cyclic command read')
@@ -339,7 +350,6 @@ class Viessmann(SmartPlugin):
         read_items = 0
         todo = []
         for commandcode in list(self._cyclic_cmds.keys()):
-
             entry = self._cyclic_cmds[commandcode]
             # Is the command already due?
             if entry['nexttime'] <= currenttime:
@@ -361,31 +371,33 @@ class Viessmann(SmartPlugin):
 
                 commandname = self._commandname_by_commandcode(addr)
                 self.logger.debug(f'Triggering cyclic read command: {commandname}')
-                self._send_command(commandname, )
+                self._send_command(commandname)
                 self._cyclic_cmds[addr]['nexttime'] = currenttime + self._cyclic_cmds[addr]['cycle']
                 read_items += 1
 
         self._cyclic_update_active = False
         if read_items:
-            self.logger.debug(f'cyclic command read took {(time.time() - currenttime):.1f} seconds for {read_items} items')
+            self.logger.debug(
+                f'cyclic command read took {(time.time() - currenttime):.1f} seconds for {read_items} items'
+            )
 
     def update_all_read_items(self):
-        '''
+        """
         Read all values preset in commands.py as readable
-        '''
+        """
         for commandcode in list(self._params.keys()):
             commandname = self._commandname_by_commandcode(commandcode)
             self.logger.debug(f'Triggering read command: {commandname} for requested value update')
             self._send_command(commandname)
 
     def read_addr(self, addr):
-        '''
+        """
         Tries to read a data point indepently of item config
 
         :param addr: data point addr (2 byte hex address)
         :type addr: str
         :return: Value if read is successful, None otherwise
-        '''
+        """
         addr = addr.lower()
 
         commandname = self._commandname_by_commandcode(addr)
@@ -412,7 +424,7 @@ class Viessmann(SmartPlugin):
         return value
 
     def read_temp_addr(self, addr, length, unit):
-        '''
+        """
         Tries to read an arbitrary supplied data point indepently of device config
 
         :param addr: data point addr (2 byte hex address)
@@ -422,25 +434,25 @@ class Viessmann(SmartPlugin):
         :param unit: Unit code from commands.py
         :type unit: str
         :return: Value if read is successful, None otherwise
-        '''
+        """
         # as we have no reference whatever concerning the supplied data, we do a few sanity checks...
 
         addr = addr.lower()
 
-        if len(addr) != 4:              # addresses are 2 bytes
+        if len(addr) != 4:  # addresses are 2 bytes
             self.logger.warning(f'temp address: address not 4 digits long: {addr}')
             return None
 
-        for c in addr:                  # addresses are hex strings
+        for c in addr:  # addresses are hex strings
             if c not in '0123456789abcdef':
                 self.logger.warning(f'temp address: address digit "{c}" is not hex char')
                 return None
 
-        if length < 1 or length > 32:          # empiritistical choice
+        if length < 1 or length > 32:  # empiritistical choice
             self.logger.warning(f'temp address: len is not > 0 and < 33: {len}')
             return None
 
-        if unit not in self._unitset:   # units need to be predefined
+        if unit not in self._unitset:  # units need to be predefined
             self.logger.warning(f'temp address: unit {unit} not in unitset. Cannot use custom units')
             return None
 
@@ -463,14 +475,14 @@ class Viessmann(SmartPlugin):
         return res
 
     def write_addr(self, addr, value):
-        '''
+        """
         Tries to write a data point indepently of item config
 
         :param addr: data point addr (2 byte hex address)
         :type addr: str
         :param value: value to write
         :return: Value if read is successful, None otherwise
-        '''
+        """
         addr = addr.lower()
 
         commandname = self._commandname_by_commandcode(addr)
@@ -490,17 +502,23 @@ class Viessmann(SmartPlugin):
 
         return self._parse_response(response_packet, commandname)
 
-#
-# initialization methods
-#
+    #
+    # initialization methods
+    #
 
     def _load_configuration(self):
-        '''
+        """
         Load configuration sets from commands.py
-        '''
+        """
 
         # Load protocol dependent sets
-        if self._protocol in commands.controlset and self._protocol in commands.errorset and self._protocol in commands.unitset and self._protocol in commands.returnstatus and self._protocol in commands.setreturnstatus:
+        if (
+            self._protocol in commands.controlset
+            and self._protocol in commands.errorset
+            and self._protocol in commands.unitset
+            and self._protocol in commands.returnstatus
+            and self._protocol in commands.setreturnstatus
+        ):
             self._controlset = commands.controlset[self._protocol]
             self.logger.debug(f'Loaded controlset for protocol {self._controlset}')
             self._errorset = commands.errorset[self._protocol]
@@ -518,7 +536,11 @@ class Viessmann(SmartPlugin):
             return False
 
         # Load device dependent sets
-        if self._heating_type in commands.commandset and self._heating_type in commands.operatingmodes and self._heating_type in commands.systemschemes:
+        if (
+            self._heating_type in commands.commandset
+            and self._heating_type in commands.operatingmodes
+            and self._heating_type in commands.systemschemes
+        ):
             self._commandset = commands.commandset[self._heating_type]
             self.logger.debug(f'Loaded commands for heating type {self._commandset}')
             self._operatingmodes = commands.operatingmodes[self._heating_type]
@@ -542,13 +564,13 @@ class Viessmann(SmartPlugin):
         return True
 
     def _connect(self):
-        '''
+        """
         Tries to establish a connection to the serial reading device. To prevent
         multiple concurrent connection locking is used.
 
         :return: Returns True if connection was established, False otherwise
         :rtype: bool
-        '''
+        """
         if not self.alive:
             return False
 
@@ -586,9 +608,9 @@ class Viessmann(SmartPlugin):
             self._lock.release()
 
     def _disconnect(self):
-        '''
+        """
         Disconnect any connected devices.
-        '''
+        """
         self._connected = False
         self._initialized = False
         try:
@@ -603,21 +625,19 @@ class Viessmann(SmartPlugin):
         self.logger.info('Disconnected')
 
     def _init_communication(self):
-        '''
+        """
         After connecting to the device, setup the communication protocol
 
         :return: Returns True, if communication was established successfully, False otherwise
         :rtype: bool
-        '''
+        """
         # just try to connect anyway; if connected, this does nothing and no harm, if not, it connects
         if not self._connect():
-
             self.logger.error('Init communication not possible as connect failed.')
             return False
 
         # initialization only necessary for P300 protocol...
         if self._protocol == 'P300':
-
             # init procedure is
             # interface: 0x04 (reset)
             #                           device: 0x05 (repeated)
@@ -640,16 +660,22 @@ class Viessmann(SmartPlugin):
                     break
                 if self._lastbyte == self._int2bytes(self._controlset['Not_initiated'], 1):
                     self._send_bytes(self._int2bytes(self._controlset['Sync_Command'], 3))
-                    self.logger.debug(f'send_bytes: Send sync command {self._int2bytes(self._controlset["Sync_Command"], 3)}')
+                    self.logger.debug(
+                        f'send_bytes: Send sync command {self._int2bytes(self._controlset["Sync_Command"], 3)}'
+                    )
                     initstringsent = True
                 elif self._lastbyte == self._int2bytes(self._controlset['Init_Error'], 1):
                     self.logger.error(f'The interface has reported an error (\x15), loop increment {i}')
                     self._send_bytes(self._int2bytes(self._controlset['Reset_Command'], 1))
-                    self.logger.debug(f'send_bytes: Send reset command {self._int2bytes(self._controlset["Reset_Command"], 1)}')
+                    self.logger.debug(
+                        f'send_bytes: Send reset command {self._int2bytes(self._controlset["Reset_Command"], 1)}'
+                    )
                     initstringsent = False
                 else:
                     self._send_bytes(self._int2bytes(self._controlset['Reset_Command'], 1))
-                    self.logger.debug(f'send_bytes: Send reset command {self._int2bytes(self._controlset["Reset_Command"], 1)}')
+                    self.logger.debug(
+                        f'send_bytes: Send reset command {self._int2bytes(self._controlset["Reset_Command"], 1)}'
+                    )
                     initstringsent = False
                 readbyte = self._read_bytes(1)
                 self.logger.debug(f'read_bytes: read {readbyte}, last byte is {self._lastbyte}')
@@ -664,9 +690,9 @@ class Viessmann(SmartPlugin):
         return is_initialized
 
     def _create_cyclic_scheduler(self):
-        '''
+        """
         Setup the scheduler to handle cyclic read commands and find the proper time for the cycle.
-        '''
+        """
         if not self.alive:
             return
 
@@ -684,12 +710,14 @@ class Viessmann(SmartPlugin):
             if self.scheduler_get('cyclic'):
                 self.scheduler_remove('cyclic')
             self.scheduler_add('cyclic', self.send_cyclic_cmds, cycle=workercycle, prio=5, offset=0)
-            self.logger.info(f'Added cyclic worker thread ({workercycle} sec cycle). Shortest item update cycle found: {shortestcycle} sec')
+            self.logger.info(
+                f'Added cyclic worker thread ({workercycle} sec cycle). Shortest item update cycle found: {shortestcycle} sec'
+            )
 
     def _read_initial_values(self):
-        '''
+        """
         Read all values configured to be read at startup / connection
-        '''
+        """
         if self._balist_item is not None:
             balist = list(self._operatingmodes.values())
             self._balist_item(balist, self.get_shortname())
@@ -712,10 +740,10 @@ class Viessmann(SmartPlugin):
     #
 
     def _read_timers(self):
-        '''
+        """
         Read all configured timer values from device and create uzsu timer dict
-        '''
-        if self._application_timer is not []:
+        """
+        if self._application_timer != []:
             self.logger.debug('Starting timer read commands.')
             for timer_app in self._application_timer:
                 for commandcode in self._application_timer[timer_app]['commandcodes']:
@@ -727,7 +755,7 @@ class Viessmann(SmartPlugin):
             self._viess_dict_to_uzsu_dict()
 
     def _send_command(self, commandname, value=None):
-        '''
+        """
         Create formatted command sequence from command name and send to device
 
         Note: The implementation detail results in "write if value present, read if value is None".
@@ -737,7 +765,7 @@ class Viessmann(SmartPlugin):
         :param commandname: Command for which to create command sequence as defined in commands.py
         :type commandname: str
         :param value: Value to write to device, None if command is read command
-        '''
+        """
         if value is not None:
             self.logger.debug(f'Got a new write job: Command {commandname} with value {value}')
         else:
@@ -766,16 +794,18 @@ class Viessmann(SmartPlugin):
         return result
 
     def _KW_send_multiple_read_commands(self, commandcodes):
-        '''
+        """
         Takes list of commandnames, builds all command packets and tries to send them in one go.
         This only works for read commands and only with KW protocol.
         On error the whole remaining read process is aborted, no retries or continuation is attempted.
 
         :param commandnames: List of commands for which to create command sequence as defined in commands.py
         :type commandname: str
-        '''
+        """
         if self._protocol != 'KW':
-            self.logger.error(f'Called _KW_send_multiple_read_commands, but protocol is {self._protocol}. This shouldn\'t happen..')
+            self.logger.error(
+                f"Called _KW_send_multiple_read_commands, but protocol is {self._protocol}. This shouldn't happen.."
+            )
             return
 
         self.logger.debug(f'Got a new bulk read job: Commands {commandcodes}')
@@ -813,7 +843,6 @@ class Viessmann(SmartPlugin):
             first_packet = bytearray(self._int2bytes(self._controlset['StartByte'], 1))
 
             for addr in bulk.keys():
-
                 if first_cmd:
                     # make sure that the first sent packet has the StartByte (0x01) lead byte set
                     # this way the first packet actually sent has the start byte, regardless of bulk.keys() order
@@ -838,11 +867,15 @@ class Viessmann(SmartPlugin):
                     self.logger.debug(f'Trying to receive {bulk[addr]["responselen"]} bytes of the response')
                     chunk = self._read_bytes(bulk[addr]['responselen'])
 
-                    self.logger.debug(f'Received {len(chunk)} bytes chunk of response as hexstring {self._bytes2hexstring(chunk)} and as bytes {chunk}')
+                    self.logger.debug(
+                        f'Received {len(chunk)} bytes chunk of response as hexstring {self._bytes2hexstring(chunk)} and as bytes {chunk}'
+                    )
                     if len(chunk) != 0:
                         replies[addr].extend(chunk)
                     else:
-                        self.logger.error(f'Received 0 bytes chunk from {addr} - this probably is a communication error, possibly a wrong datapoint address?')
+                        self.logger.error(
+                            f'Received 0 bytes chunk from {addr} - this probably is a communication error, possibly a wrong datapoint address?'
+                        )
                         return
                 except IOError as io:
                     raise IOError(f'IO Error: {io}')
@@ -873,14 +906,14 @@ class Viessmann(SmartPlugin):
                 pass
 
     def _KW_get_sync(self):
-        '''
+        """
         Try to get a sync packet (0x05) from heating system to be able to send commands
 
         :return: True if sync packet received, False otherwise (after retries)
         :rtype: bool
-        '''
+        """
         if not self._connected or self._protocol != 'KW':
-            return False    # don't even try. We only want to be called by _send_command_packet, which just before executed connect()
+            return False  # don't even try. We only want to be called by _send_command_packet, which just before executed connect()
 
         retries = 5
 
@@ -898,7 +931,7 @@ class Viessmann(SmartPlugin):
             if chunk == self._int2bytes(self._controlset['Not_initiated'], 1, False):
                 self.logger.debug('Got sync. Commencing command send')
                 return True
-            time.sleep(.8)
+            time.sleep(0.8)
             attempt = attempt + 1
         self.logger.error(f'Sync not acquired after {attempt} attempts')
         self._disconnect()
@@ -906,7 +939,7 @@ class Viessmann(SmartPlugin):
         return False
 
     def _send_command_packet(self, packet, packetlen_response):
-        '''
+        """
         Send command sequence to device
 
         :param packet: Command sequence to send
@@ -916,7 +949,7 @@ class Viessmann(SmartPlugin):
         :param read_response: True if command was read command and value is expected, False if only status byte is expected (only needed for KW protocol)
         :type read_response: bool
         :return: Response packet (bytearray) if no error occured, None otherwise
-        '''
+        """
         if not self._connected:
             self.logger.error('Not connected, trying to reconnect.')
             if not self._connect():
@@ -956,18 +989,24 @@ class Viessmann(SmartPlugin):
                 chunk = self._read_bytes(packetlen_response)
 
                 if self._protocol == 'P300':
-                    self.logger.debug(f'Received {len(chunk)} bytes chunk of response as hexstring {self._bytes2hexstring(chunk)} and as bytes {chunk}')
+                    self.logger.debug(
+                        f'Received {len(chunk)} bytes chunk of response as hexstring {self._bytes2hexstring(chunk)} and as bytes {chunk}'
+                    )
                     if len(chunk) != 0:
                         if chunk[:1] == self._int2bytes(self._controlset['Error'], 1):
                             self.logger.error(f'Interface returned error! response was: {chunk}')
                         elif len(chunk) == 1 and chunk[:1] == self._int2bytes(self._controlset['Not_initiated'], 1):
-                            self.logger.error('Received invalid chunk, connection not initialized. Forcing re-initialize...')
+                            self.logger.error(
+                                'Received invalid chunk, connection not initialized. Forcing re-initialize...'
+                            )
                             self._initialized = False
                         elif chunk[:1] != self._int2bytes(self._controlset['Acknowledge'], 1):
                             self.logger.error(f'Received invalid chunk, not starting with ACK! response was: {chunk}')
                             self._error_count += 1
                             if self._error_count >= 5:
-                                self.logger.warning('Encountered 5 invalid chunks in sequence. Maybe communication was lost, re-initializing')
+                                self.logger.warning(
+                                    'Encountered 5 invalid chunks in sequence. Maybe communication was lost, re-initializing'
+                                )
                                 self._initialized = False
                         else:
                             response_packet.extend(chunk)
@@ -976,12 +1015,16 @@ class Viessmann(SmartPlugin):
                     else:
                         self.logger.error(f'Received 0 bytes chunk - ignoring response_packet! chunk was: {chunk}')
                 elif self._protocol == 'KW':
-                    self.logger.debug(f'Received {len(chunk)} bytes chunk of response as hexstring {self._bytes2hexstring(chunk)} and as bytes {chunk}')
+                    self.logger.debug(
+                        f'Received {len(chunk)} bytes chunk of response as hexstring {self._bytes2hexstring(chunk)} and as bytes {chunk}'
+                    )
                     if len(chunk) != 0:
                         response_packet.extend(chunk)
                         return response_packet
                     else:
-                        self.logger.error('Received 0 bytes chunk - this probably is a communication error, possibly a wrong datapoint address?')
+                        self.logger.error(
+                            'Received 0 bytes chunk - this probably is a communication error, possibly a wrong datapoint address?'
+                        )
             else:
                 raise Exception('Interface not initialized!')
         except IOError as io:
@@ -1000,14 +1043,14 @@ class Viessmann(SmartPlugin):
         return None
 
     def _send_bytes(self, packet):
-        '''
+        """
         Send data to device
 
         :param packet: Data to be sent
         :type packet: bytearray
         :return: Returns False, if no connection is established or write failed; True otherwise
         :rtype: bool
-        '''
+        """
         if not self._connected:
             return False
 
@@ -1020,14 +1063,14 @@ class Viessmann(SmartPlugin):
         return True
 
     def _read_bytes(self, length):
-        '''
+        """
         Try to read bytes from device
 
         :param length: Number of bytes to read
         :type length: int
         :return: Number of bytes actually read
         :rtype: int
-        '''
+        """
         if not self._connected:
             return 0
 
@@ -1050,7 +1093,6 @@ class Viessmann(SmartPlugin):
 
         # timeout reached, did we read anything?
         if not totalreadbytes:
-
             # just in case, force plugin to reconnect
             self._connected = False
             self._initialized = False
@@ -1059,7 +1101,7 @@ class Viessmann(SmartPlugin):
         return totalreadbytes
 
     def _process_response(self, response, commandname='', read_response=True, update_item=True):
-        '''
+        """
         Process device response data, try to parse type and value and assign value to associated item
 
         :param response: Data received from device
@@ -1070,7 +1112,7 @@ class Viessmann(SmartPlugin):
         :type read_response: bool
         :param update_item: True if value should be written to corresponding item
         :type update_item: bool
-        '''
+        """
         res = self._parse_response(response, commandname, read_response)
 
         # None means error on read/parse or write reponse. Errors are already logged, so no further action necessary
@@ -1091,7 +1133,6 @@ class Viessmann(SmartPlugin):
 
         # update items if commandcode is in item-dict
         if commandcode in self._params.keys():
-
             # Find corresponding item
             item = self._params[commandcode]['item']
             self.logger.debug(f'Corresponding item {item} for command {commandname}')
@@ -1130,7 +1171,10 @@ class Viessmann(SmartPlugin):
                 self.logger.debug(f'Not updating item {item} as not requested')
         else:
             if (commandcode not in self._timer_cmds) and update_item:
-                self.logger.error(f'Should update item with response to a command not in item config: {commandcode}. This shouldn''t happen..')
+                self.logger.error(
+                    f'Should update item with response to a command not in item config: {commandcode}. This shouldn'
+                    't happen..'
+                )
 
         # Process response for timers in timer-dict using the commandcode
         if commandcode in self._timer_cmds:
@@ -1148,18 +1192,18 @@ class Viessmann(SmartPlugin):
             self._viess_timer_dict[timer_app][commandname] = value
             self.logger.debug(f'Viessmann timer dict: {self._viess_timer_dict}')
 
-#
-# convert data types
-#
+    #
+    # convert data types
+    #
 
     def _build_valuebytes_from_value(self, value, commandconf):
-        '''
+        """
         Convert value to formatted bytearray for write commands
         :param value: Value to send
         :param commandconf: configuration set for requested command
         :type commandconf: dict
         :return: bytearray with value if successful, None if error
-        '''
+        """
         try:
             commandvaluebytes = commandconf['len']
             commandunit = commandconf['unit']
@@ -1178,12 +1222,10 @@ class Viessmann(SmartPlugin):
 
         # unit HEX = hex values as string is only for read requests (debugging). Don't even try...
         if commandunit == 'HEX':
-
             self.logger.error(f'Error in command configuration {commandconf}: unit HEX is not writable, aborting')
             return None
 
         if commandunit == 'BA':
-
             # try to convert BA string to byte value, setting str values will fail
             # this will not work properly if multiple entries have the same value!
             try:
@@ -1211,16 +1253,22 @@ class Viessmann(SmartPlugin):
 
         # check if writing is allowed for this address
         if not set_allowed:
-            self.logger.error(f'Command {self._commandname_by_commandcode(commandconf["addr"])} is not configured for writing')
+            self.logger.error(
+                f'Command {self._commandname_by_commandcode(commandconf["addr"])} is not configured for writing'
+            )
             return None
 
         # check if value is empty
         if value is None or value == '':
-            self.logger.error(f'Command value for command {self._commandname_by_commandcode(commandconf["addr"])} is empty, not possible to send (check item, command and unit configuration')
+            self.logger.error(
+                f'Command value for command {self._commandname_by_commandcode(commandconf["addr"])} is empty, not possible to send (check item, command and unit configuration'
+            )
             return None
 
         # check if value to be written is in allowed range
-        if (min_allowed_value is not None and min_allowed_value > value) or (max_allowed_value is not None and max_allowed_value < value):
+        if (min_allowed_value is not None and min_allowed_value > value) or (
+            max_allowed_value is not None and max_allowed_value < value
+        ):
             self.logger.error(f'Invalid range - value {value} not in range [{min_allowed_value}, {max_allowed_value}]')
             return None
 
@@ -1244,7 +1292,9 @@ class Viessmann(SmartPlugin):
                         aus = self._encode_timer(switching_time['Aus'])
                         times += f'{an:02x}{aus:02x}'
                     valuebytes = bytes.fromhex(times)
-                    self.logger.debug(f'Created value bytes for type {valuetype} as hexstring: {self._bytes2hexstring(valuebytes)} and as bytes: {valuebytes}')
+                    self.logger.debug(
+                        f'Created value bytes for type {valuetype} as hexstring: {self._bytes2hexstring(valuebytes)} and as bytes: {valuebytes}'
+                    )
                 except Exception as e:
                     self.logger.error(f'Incorrect data format, (An: hh:mm Aus: hh:mm) expected; Error: {e}')
                     return None
@@ -1259,7 +1309,9 @@ class Viessmann(SmartPlugin):
                 else:
                     value = int(value)
                 valuebytes = self._int2bytes(value, commandvaluebytes, byteorder='little')
-                self.logger.debug(f'Created value bytes for type {valuetype} as hexstring: {self._bytes2hexstring(valuebytes)} and as bytes: {valuebytes}')
+                self.logger.debug(
+                    f'Created value bytes for type {valuetype} as hexstring: {self._bytes2hexstring(valuebytes)} and as bytes: {valuebytes}'
+                )
             else:
                 self.logger.error(f'Type {valuetype} not definied for creating write command bytes')
                 return None
@@ -1270,7 +1322,7 @@ class Viessmann(SmartPlugin):
         return valuebytes
 
     def _build_command_packet(self, commandname, value=None, KWFollowUp=False):
-        '''
+        """
         Create formatted command sequence from command name.
         If value is None, a read packet will be built, a write packet otherwise
 
@@ -1281,7 +1333,7 @@ class Viessmann(SmartPlugin):
         :type KWFollowUp: bool
         :return: tuple of (command sequence, expected response len), (None, 0) if error occured
         :rtype: tuple (bytearray, int)
-        '''
+        """
 
         # A read_request telegram looks like this:
         # P300: ACK (1 byte), startbyte (1 byte), data length in bytes (1 byte), request/response (1 byte), read/write (1 byte), addr (2 byte), amount of value bytes expected in answer (1 byte), checksum (1 byte)
@@ -1345,14 +1397,18 @@ class Viessmann(SmartPlugin):
             responselen = 1 if write else int(commandvaluebytes)
 
         if write:
-            self.logger.debug(f'Created command {commandname} to be sent as hexstring: {self._bytes2hexstring(packet)} and as bytes: {packet} with value {value} (transformed to value byte {self._bytes2hexstring(valuebytes)})')
+            self.logger.debug(
+                f'Created command {commandname} to be sent as hexstring: {self._bytes2hexstring(packet)} and as bytes: {packet} with value {value} (transformed to value byte {self._bytes2hexstring(valuebytes)})'
+            )
         else:
-            self.logger.debug(f'Created command {commandname} to be sent as hexstring: {self._bytes2hexstring(packet)} and as bytes: {packet}')
+            self.logger.debug(
+                f'Created command {commandname} to be sent as hexstring: {self._bytes2hexstring(packet)} and as bytes: {packet}'
+            )
 
         return (packet, responselen)
 
     def _parse_response(self, response, commandname='', read_response=True):
-        '''
+        """
         Process device response data, try to parse type and value
 
         :param response: Data received from device
@@ -1362,17 +1418,20 @@ class Viessmann(SmartPlugin):
         :param read_response: True if command was read command and value is expected, False if only status byte is expected (only needed for KW protocol)
         :type read_response: bool
         :return: tuple of (parsed response value, commandcode) or None if error
-        '''
+        """
         if self._protocol == 'P300':
-
             # A read_response telegram looks like this: ACK (1 byte), startbyte (1 byte), data length in bytes (1 byte), request/response (1 byte), read/write (1 byte), addr (2 byte), amount of valuebytes (1 byte), value (bytes as per last byte), checksum (1 byte)
             # A write_response telegram looks like this: ACK (1 byte), startbyte (1 byte), data length in bytes (1 byte), request/response (1 byte), read/write (1 byte), addr (2 byte), amount of bytes written (1 byte), checksum (1 byte)
 
             # Validate checksum
-            checksum = self._calc_checksum(response[1:len(response) - 1])  # first, cut first byte (ACK) and last byte (checksum) and then calculate checksum
+            checksum = self._calc_checksum(
+                response[1 : len(response) - 1]
+            )  # first, cut first byte (ACK) and last byte (checksum) and then calculate checksum
             received_checksum = response[len(response) - 1]
             if received_checksum != checksum:
-                self.logger.error(f'Calculated checksum {checksum} does not match received checksum of {received_checksum}! Ignoring reponse')
+                self.logger.error(
+                    f'Calculated checksum {checksum} does not match received checksum of {received_checksum}! Ignoring reponse'
+                )
                 return None
 
             # Extract command/address, valuebytes and valuebytecount out of response
@@ -1383,14 +1442,15 @@ class Viessmann(SmartPlugin):
 
             # Extract databytes out of response
             rawdatabytes = bytearray()
-            rawdatabytes.extend(response[8:8 + (valuebytecount)])
+            rawdatabytes.extend(response[8 : 8 + (valuebytecount)])
         elif self._protocol == 'KW':
-
             # imitate P300 response code data for easier combined handling afterwards
             # a read_response telegram consists only of the value bytes
             # a write_response telegram is 0x00 for OK, 0xXX for error
             if commandname == '':
-                self.logger.error('trying to parse KW protocol response, but commandname not set in _parse_response. This should not happen...')
+                self.logger.error(
+                    'trying to parse KW protocol response, but commandname not set in _parse_response. This should not happen...'
+                )
                 return None
 
             responsetypecode = 1
@@ -1411,13 +1471,16 @@ class Viessmann(SmartPlugin):
                     # error if status reply is not 0x00
                     responsetypecode = 3
 
-        self.logger.debug(f'Response decoded to: commandcode: {commandcode}, responsedatacode: {responsedatacode}, valuebytecount: {valuebytecount}, responsetypecode: {responsetypecode}')
-        self.logger.debug(f'Rawdatabytes formatted: {self._bytes2hexstring(rawdatabytes)} and unformatted: {rawdatabytes}')
+        self.logger.debug(
+            f'Response decoded to: commandcode: {commandcode}, responsedatacode: {responsedatacode}, valuebytecount: {valuebytecount}, responsetypecode: {responsetypecode}'
+        )
+        self.logger.debug(
+            f'Rawdatabytes formatted: {self._bytes2hexstring(rawdatabytes)} and unformatted: {rawdatabytes}'
+        )
 
         # Process response for items if response and not error
         # added: only in P300 or if read_response is set, do not try if KW replies with 0x00 (OK)
-        if responsedatacode == 1 and responsetypecode != 3  and (self._protocol == 'P300' or read_response):
-
+        if responsedatacode == 1 and responsetypecode != 3 and (self._protocol == 'P300' or read_response):
             # parse response if command config is available
             commandname = self._commandname_by_commandcode(commandcode)
             if commandname is None:
@@ -1430,7 +1493,9 @@ class Viessmann(SmartPlugin):
             commandunit = commandconf['unit']
             unitconf = self._unitset.get(commandunit)
             if not unitconf:
-                self.logger.error(f'Unit configuration not found for unit {commandunit} in protocol {self._protocol}. This is a configuration error in commands.py, please fix')
+                self.logger.error(
+                    f'Unit configuration not found for unit {commandunit} in protocol {self._protocol}. This is a configuration error in commands.py, please fix'
+                )
                 return None
             commandsigned = unitconf['signed']
             valuetransform = unitconf['read_value_transform']
@@ -1439,52 +1504,69 @@ class Viessmann(SmartPlugin):
             if commandunit == 'CT':
                 timer = self._decode_timer(rawdatabytes.hex())
                 # fill list
-                timer = [{'An': on_time, 'Aus': off_time}
-                         for on_time, off_time in zip(timer, timer)]
+                timer = [{'An': on_time, 'Aus': off_time} for on_time, off_time in zip(timer, timer)]
                 value = timer
-                self.logger.debug(f'Matched command {commandname} and read transformed timer {value} and byte length {commandvaluebytes}')
+                self.logger.debug(
+                    f'Matched command {commandname} and read transformed timer {value} and byte length {commandvaluebytes}'
+                )
             elif commandunit == 'TI':
                 # decode datetime
                 value = datetime.strptime(rawdatabytes.hex(), '%Y%m%d%W%H%M%S').isoformat()
-                self.logger.debug(f'Matched command {commandname} and read transformed datetime {value} and byte length {commandvaluebytes}')
+                self.logger.debug(
+                    f'Matched command {commandname} and read transformed datetime {value} and byte length {commandvaluebytes}'
+                )
             elif commandunit == 'DA':
                 # decode date
                 value = datetime.strptime(rawdatabytes.hex(), '%Y%m%d%W%H%M%S').date().isoformat()
-                self.logger.debug(f'Matched command {commandname} and read transformed datetime {value} and byte length {commandvaluebytes}')
+                self.logger.debug(
+                    f'Matched command {commandname} and read transformed datetime {value} and byte length {commandvaluebytes}'
+                )
             elif commandunit == 'ES':
                 # erstes Byte = Fehlercode; folgenden 8 Byte = Systemzeit
                 errorcode = (rawdatabytes[:1]).hex()
                 # errorquerytime = (rawdatabytes[1:8]).hex()
                 value = self._error_decode(errorcode)
-                self.logger.debug(f'Matched command {commandname} and read transformed errorcode {value} (raw value was {errorcode}) and byte length {commandvaluebytes}')
+                self.logger.debug(
+                    f'Matched command {commandname} and read transformed errorcode {value} (raw value was {errorcode}) and byte length {commandvaluebytes}'
+                )
             elif commandunit == 'SC':
                 # erstes Byte = Anlagenschema
                 systemschemescode = (rawdatabytes[:1]).hex()
                 value = self._systemscheme_decode(systemschemescode)
-                self.logger.debug(f'Matched command {commandname} and read transformed system scheme {value} (raw value was {systemschemescode}) and byte length {commandvaluebytes}')
+                self.logger.debug(
+                    f'Matched command {commandname} and read transformed system scheme {value} (raw value was {systemschemescode}) and byte length {commandvaluebytes}'
+                )
             elif commandunit == 'BA':
                 operatingmodecode = (rawdatabytes[:1]).hex()
                 value = self._operatingmode_decode(operatingmodecode)
-                self.logger.debug(f'Matched command {commandname} and read transformed operating mode {value} (raw value was {operatingmodecode}) and byte length {commandvaluebytes}')
+                self.logger.debug(
+                    f'Matched command {commandname} and read transformed operating mode {value} (raw value was {operatingmodecode}) and byte length {commandvaluebytes}'
+                )
             elif commandunit == 'DT':
                 # device type has 8 bytes, but first 4 bytes are device type indicator
                 devicetypebytes = rawdatabytes[:2].hex()
                 value = self._devicetype_decode(devicetypebytes).upper()
-                self.logger.debug(f'Matched command {commandname} and read transformed device type {value} (raw value was {devicetypebytes}) and byte length {commandvaluebytes}')
+                self.logger.debug(
+                    f'Matched command {commandname} and read transformed device type {value} (raw value was {devicetypebytes}) and byte length {commandvaluebytes}'
+                )
             elif commandunit == 'SN':
                 # serial number has 7 bytes,
                 serialnumberbytes = rawdatabytes[:7]
                 value = self._serialnumber_decode(serialnumberbytes)
-                self.logger.debug(f'Matched command {commandname} and read transformed device type {value} (raw value was {serialnumberbytes}) and byte length {commandvaluebytes}')
+                self.logger.debug(
+                    f'Matched command {commandname} and read transformed device type {value} (raw value was {serialnumberbytes}) and byte length {commandvaluebytes}'
+                )
             elif commandunit == 'HEX':
                 # hex string for debugging purposes
                 hexstr = rawdatabytes.hex()
-                value = ' '.join([hexstr[i:i + 2] for i in range(0, len(hexstr), 2)])
+                value = ' '.join([hexstr[i : i + 2] for i in range(0, len(hexstr), 2)])
                 self.logger.debug(f'Read hex bytes {value}')
             else:
                 rawvalue = self._bytes2int(rawdatabytes, commandsigned)
                 value = self._value_transform_read(rawvalue, valuetransform)
-                self.logger.debug(f'Matched command {commandname} and read transformed value {value} (integer raw value was {rawvalue}) and byte length {commandvaluebytes}')
+                self.logger.debug(
+                    f'Matched command {commandname} and read transformed value {value} (integer raw value was {rawvalue}) and byte length {commandvaluebytes}'
+                )
 
             # assign to dict for use by other functions
             self._last_values[commandcode] = value
@@ -1500,11 +1582,11 @@ class Viessmann(SmartPlugin):
             return None
 
     def _viess_dict_to_uzsu_dict(self):
-        '''
+        """
         Convert data read from device to UZSU compatible struct.
         Input is taken from self._viess_timer_dict, output is written to
         self._uzsu_dict
-        '''
+        """
         dict_timer = {}
         empty_time = '00:00'
         shitems = Items.get_instance()
@@ -1522,7 +1604,7 @@ class Viessmann(SmartPlugin):
                 dict_timer[application] = {}
             for application_day in self._viess_timer_dict[application]:
                 timer = self._viess_timer_dict[application][application_day]
-                day = application_day[(application_day.rfind('_') + 1):len(application_day)].lower()
+                day = application_day[(application_day.rfind('_') + 1) : len(application_day)].lower()
 
                 # normalize days
                 for element in self._wochentage:
@@ -1548,7 +1630,20 @@ class Viessmann(SmartPlugin):
             # read UZSU-dict (or use preset if empty)
             uzsu_dict = item()
             if not item():
-                uzsu_dict = {'lastvalue': '0', 'sunset': sunset, 'list': [], 'active': True, 'interpolation': {'initage': '', 'initialized': True, 'itemtype': 'bool', 'interval': '', 'type': 'none'}, 'sunrise': sunrise}
+                uzsu_dict = {
+                    'lastvalue': '0',
+                    'sunset': sunset,
+                    'list': [],
+                    'active': True,
+                    'interpolation': {
+                        'initage': '',
+                        'initialized': True,
+                        'itemtype': 'bool',
+                        'interval': '',
+                        'type': 'none',
+                    },
+                    'sunrise': sunrise,
+                }
 
             # create empty list
             uzsu_dict['list'] = []
@@ -1563,7 +1658,7 @@ class Viessmann(SmartPlugin):
             item(uzsu_dict, self.get_shortname())
 
     def _uzsu_dict_to_viess_timer(self, timer_app, uzsu_dict):
-        '''
+        """
         Convert UZSU dict from item/visu for selected application into separate
         on/off time events and write all timers to the device
 
@@ -1571,9 +1666,8 @@ class Viessmann(SmartPlugin):
         :type timer_app: str
         :param uzsu_dict: UZSU-compatible dict with timer data
         :type uzsu_dict: dict
-        '''
+        """
         if self._timerread:
-
             # set variables
             commandnames = set()
             timer_dict = {}
@@ -1584,7 +1678,9 @@ class Viessmann(SmartPlugin):
             if timer_app not in self._application_timer:
                 return
 
-            commandnames.update([self._commandname_by_commandcode(code) for code in self._application_timer[timer_app]['commandcodes']])
+            commandnames.update(
+                [self._commandname_by_commandcode(code) for code in self._application_timer[timer_app]['commandcodes']]
+            )
             self.logger.debug(f'Commandnames: {commandnames}')
 
             # find switching times and create lists for on and off operations
@@ -1613,9 +1709,14 @@ class Viessmann(SmartPlugin):
             for commandname in commandnames:
                 self.logger.debug(f'Commandname in process: {commandname}')
                 # create empty dict
-                timer_dict[commandname] = [{'An': '00:00', 'Aus': '00:00'}, {'An': '00:00', 'Aus': '00:00'}, {'An': '00:00', 'Aus': '00:00'}, {'An': '00:00', 'Aus': '00:00'}]
+                timer_dict[commandname] = [
+                    {'An': '00:00', 'Aus': '00:00'},
+                    {'An': '00:00', 'Aus': '00:00'},
+                    {'An': '00:00', 'Aus': '00:00'},
+                    {'An': '00:00', 'Aus': '00:00'},
+                ]
                 # get current day
-                wday = commandname[(commandname.rfind('_') + 1):len(commandname)].lower()
+                wday = commandname[(commandname.rfind('_') + 1) : len(commandname)].lower()
                 # normalize day
                 for element in self._wochentage:
                     if wday in self._wochentage[element]:
@@ -1634,14 +1735,14 @@ class Viessmann(SmartPlugin):
                 self._send_command(commandname, value)
 
     def _calc_checksum(self, packet):
-        '''
+        """
         Calculate checksum for P300 protocol packets
 
         :parameter packet: Data packet for which to calculate checksum
         :type packet: bytearray
         :return: Calculated checksum
         :rtype: int
-        '''
+        """
         checksum = 0
         if len(packet) > 0:
             if packet[:1] == b'\x41':
@@ -1655,7 +1756,7 @@ class Viessmann(SmartPlugin):
         return checksum
 
     def _int2bytes(self, value, length, signed=False, byteorder='big'):
-        '''
+        """
         Convert value to bytearray with respect to defined length and sign format.
         Value exceeding limit set by length and sign will be truncated
 
@@ -1667,12 +1768,12 @@ class Viessmann(SmartPlugin):
         :type signed: bool
         :return: Converted value
         :rtype: bytearray
-        '''
+        """
         value = value % (2 ** (length * 8))
         return value.to_bytes(length, byteorder=byteorder, signed=signed)
 
     def _bytes2int(self, rawbytes, signed):
-        '''
+        """
         Convert bytearray to value with respect to sign format
 
         :parameter rawbytes: Bytes to convert
@@ -1681,21 +1782,21 @@ class Viessmann(SmartPlugin):
         :type signed: bool
         :return: Converted value
         :rtype: int
-        '''
+        """
         return int.from_bytes(rawbytes, byteorder='little', signed=signed)
 
     def _bytes2hexstring(self, bytesvalue):
-        '''
+        """
         Create hex-formatted string from bytearray
         :param bytesvalue: Bytes to convert
         :type bytesvalue: bytearray
         :return: Converted hex string
         :rtype: str
-        '''
+        """
         return ''.join(f'{c:02x}' for c in bytesvalue)
 
     def _decode_rawvalue(self, rawdatabytes, commandsigned):
-        '''
+        """
         Convert little-endian byte sequence to int value
 
         :param rawdatabytes: Bytes to convert
@@ -1704,7 +1805,7 @@ class Viessmann(SmartPlugin):
         :type commandsigned: str
         :return: Converted value
         :rtype: int
-        '''
+        """
         rawvalue = 0
         for i in range(len(rawdatabytes)):
             leftbyte = rawdatabytes[0]
@@ -1717,12 +1818,12 @@ class Viessmann(SmartPlugin):
         return rawvalue
 
     def _decode_timer(self, rawdatabytes):
-        '''
+        """
         Generator to convert byte sequence to a number of time strings hh:mm
 
         :param rawdatabytes: Bytes to convert
         :type rawdatabytes: bytearray
-        '''
+        """
         while rawdatabytes:
             hours, minutes = divmod(int(rawdatabytes[:2], 16), 8)
             if minutes >= 6 or hours >= 24:
@@ -1734,29 +1835,29 @@ class Viessmann(SmartPlugin):
         return None
 
     def _encode_timer(self, switching_time):
-        '''
+        """
         Convert time string to encoded time value for timer application
 
         :param switching_time: time value in 'hh:mm' format
         :type switching_time: str
         :return: Encoded time value
         :rtype: int
-        '''
+        """
         if switching_time == '00:00':
-            return 0xff
+            return 0xFF
         clocktime = re.compile(r'(\d\d):(\d\d)')
         mo = clocktime.search(switching_time)
         number = int(mo.group(1)) * 8 + int(mo.group(2)) // 10
         return number
 
     def _value_transform_read(self, value, transform):
-        '''
+        """
         Transform value according to protocol specification for writing to device
 
         :param value: Value to transform
         :param transform: Specification for transforming
         :return: Transformed value
-        '''
+        """
         if transform == 'bool':
             return bool(value)
         elif self._isfloat(transform):
@@ -1765,7 +1866,7 @@ class Viessmann(SmartPlugin):
             return int(value)
 
     def _value_transform_write(self, value, transform):
-        '''
+        """
         Transform value according to protocol requirement after reading from device
 
         :param value: Value to transform
@@ -1774,14 +1875,14 @@ class Viessmann(SmartPlugin):
         :type transform: int
         :return: Transformed value
         :rtype: int
-        '''
+        """
         # as transform and value can be float and by error possibly str, we try to float both
         return int(float(value) * float(transform))
 
     def _error_decode(self, value):
-        '''
+        """
         Decode error value from device if defined, else return error as string
-        '''
+        """
         value = str(value).upper()
         if value in self._errorset:
             errorstring = str(self._errorset[value])
@@ -1790,9 +1891,9 @@ class Viessmann(SmartPlugin):
         return errorstring
 
     def _systemscheme_decode(self, value):
-        '''
+        """
         Decode schema value from device if possible, else return schema as string
-        '''
+        """
         if value in self._systemschemes:
             systemscheme = str(self._systemschemes[value])
         else:
@@ -1800,9 +1901,9 @@ class Viessmann(SmartPlugin):
         return systemscheme
 
     def _operatingmode_decode(self, value):
-        '''
+        """
         Decode operating mode value from device if possible, else return mode as string
-        '''
+        """
         if value in self._operatingmodes:
             operatingmode = str(self._operatingmodes[value])
         else:
@@ -1810,9 +1911,9 @@ class Viessmann(SmartPlugin):
         return operatingmode
 
     def _devicetype_decode(self, value):
-        '''
+        """
         Decode device type value if possible, else return device type as string
-        '''
+        """
         if value in self._devicetypes:
             devicetypes = str(self._devicetypes[value])
         else:
@@ -1820,54 +1921,54 @@ class Viessmann(SmartPlugin):
         return devicetypes
 
     def _serialnumber_decode(self, serialnumberbytes):
-        '''
+        """
         Decode serial number from device response
-        '''
+        """
         serialnumber = 0
         serialnumberbytes.reverse()
         for byte in range(0, len(serialnumberbytes)):
-            serialnumber += (serialnumberbytes[byte] - 48) * 10 ** byte
+            serialnumber += (serialnumberbytes[byte] - 48) * 10**byte
         return hex(serialnumber).upper()
 
     def _commandname_by_commandcode(self, commandcode):
-        '''
+        """
         Find matching command name from commands.py for given command address
 
         :param commandcode: address of command
         :type commandcode: str
         :return: name of matching command or None if not found
-        '''
+        """
         for commandname in self._commandset.keys():
             if self._commandset[commandname]['addr'].lower() == commandcode.lower():
                 return commandname
         return None
 
     def _isfloat(self, value):
-        '''
+        """
         Test if string is decimal number
 
         :param value: expression to test
         :type value: str
         :return: True if value can be converted to a float, False otherwise
-        '''
+        """
         try:
             float(value)
             return True
         except ValueError:
             return False
 
-#
-# webinterface
-#
+    #
+    # webinterface
+    #
 
     def init_webinterface(self):
-        '''
+        """
         Initialize the web interface for this plugin
 
         This method is only needed if the plugin is implementing a web interface
-        '''
+        """
         try:
-            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle running in a core version that does not support modules
+            self.mod_http = Modules.get_instance().get_module('http')  # try/except to handle disabled http module
         except NameError:
             self.mod_http = None
         if self.mod_http is None:
@@ -1881,21 +1982,19 @@ class Viessmann(SmartPlugin):
         # set application configuration for cherrypy
         webif_dir = self.path_join(self.get_plugin_dir(), 'webif')
         config = {
-            '/': {
-                'tools.staticdir.root': webif_dir,
-            },
-            '/static': {
-                'tools.staticdir.on': True,
-                'tools.staticdir.dir': 'static'
-            }
+            '/': {'tools.staticdir.root': webif_dir},
+            '/static': {'tools.staticdir.on': True, 'tools.staticdir.dir': 'static'},
         }
 
         # Register the web interface as a cherrypy app
-        self.mod_http.register_webif(WebInterface(webif_dir, self, self._commandset),
-                                     self.get_shortname(),
-                                     config,
-                                     self.get_classname(), self.get_instance_name(),
-                                     description='')
+        self.mod_http.register_webif(
+            WebInterface(webif_dir, self, self._commandset),
+            self.get_shortname(),
+            config,
+            self.get_classname(),
+            self.get_instance_name(),
+            description='',
+        )
 
         return True
 
@@ -1904,17 +2003,17 @@ class Viessmann(SmartPlugin):
 #    Webinterface of the plugin
 # ------------------------------------------
 
-class WebInterface(SmartPluginWebIf):
 
+class WebInterface(SmartPluginWebIf):
     def __init__(self, webif_dir, plugin, cmdset):
-        '''
+        """
         Initialization of instance of class WebInterface
 
         :param webif_dir: directory where the webinterface of the plugin resides
         :param plugin: instance of the plugin
         :type webif_dir: str
         :type plugin: object
-        '''
+        """
         self.logger = logging.getLogger(__name__)
         self.webif_dir = webif_dir
         self.plugin = plugin
@@ -1933,32 +2032,32 @@ class WebInterface(SmartPluginWebIf):
 
     @cherrypy.expose
     def index(self, reload=None):
-        '''
+        """
         Build index.html for cherrypy
 
         Render the template and return the html file to be delivered to the browser
 
         :return: contents of the template after beeing rendered
-        '''
+        """
         tmpl = self.tplenv.get_template('index.html')
         # add values to be passed to the Jinja2 template eg: tmpl.render(p=self.plugin, interface=interface, ...)
 
-        return tmpl.render(p=self.plugin,
-                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
-                           cmds=self.cmdset,
-                           units=sorted(list(self.plugin._unitset.keys())),
-                           last_read_addr=self._last_read['last']['addr'],
-                           last_read_value=self._last_read['last']['val'],
-                           last_read_cmd=self._last_read['last']['cmd']
-                           )
+        return tmpl.render(
+            p=self.plugin,
+            items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
+            cmds=self.cmdset,
+            units=sorted(list(self.plugin._unitset.keys())),
+            last_read_addr=self._last_read['last']['addr'],
+            last_read_value=self._last_read['last']['val'],
+            last_read_cmd=self._last_read['last']['cmd'],
+        )
 
     @cherrypy.expose
     def submit(self, button=None, addr=None, length=0, unit=None, clear=False):
-        '''
+        """
         Submit handler for Ajax
-        '''
+        """
         if button is not None:
-
             read_val = self.plugin.read_addr(button)
             if read_val is None:
                 self.logger.debug(f'Error trying to read addr {button} submitted by WebIf')
@@ -1970,7 +2069,6 @@ class WebInterface(SmartPluginWebIf):
                     self._last_read['last'] = self._last_read[button]
 
         elif addr is not None and unit is not None and length.isnumeric():
-
             read_val = self.plugin.read_temp_addr(addr, int(length), unit)
             if read_val is None:
                 self.logger.debug(f'Error trying to read custom addr {button} submitted by WebIf')
@@ -1991,6 +2089,7 @@ class WebInterface(SmartPluginWebIf):
 # ------------------------------------------
 # The following code is for standalone use of the plugin to identify the device
 # ------------------------------------------
+
 
 def get_device_type(v, protocol):
 
@@ -2016,14 +2115,10 @@ def get_device_type(v, protocol):
     # we are connected to the IR head
 
     # set needed unit
-    v._unitset = {
-        'DT': {'unit_de': 'DeviceType', 'type': 'list', 'signed': False, 'read_value_transform': 'non'}
-    }
+    v._unitset = {'DT': {'unit_de': 'DeviceType', 'type': 'list', 'signed': False, 'read_value_transform': 'non'}}
 
     # set needed command. DeviceType command is (hopefully) the same in all devices...
-    v._commandset = {
-        'DT': {'addr': '00f8', 'len': 2, 'unit': 'DT', 'set': False},
-    }
+    v._commandset = {'DT': {'addr': '00f8', 'len': 2, 'unit': 'DT', 'set': False}}
 
     # we leave this empty so we get the DT code back
     v._devicetypes = {}
@@ -2031,7 +2126,7 @@ def get_device_type(v, protocol):
     # this is protocol dependent, so easier to let the Class work this out...
     (packet, responselen) = v._build_command_packet('DT')
     if packet is None:
-        raise ValueError('No command packet received for address 00f8. This shouldn\'t happen...')
+        raise ValueError("No command packet received for address 00f8. This shouldn't happen...")
 
     # send it
     response_packet = v._send_command_packet(packet, responselen)
@@ -2050,8 +2145,7 @@ def get_device_type(v, protocol):
 
 
 if __name__ == '__main__':
-
-    usage = '''
+    usage = """
     Usage:
     ----------------------------------------------------------------------------------
 
@@ -2070,7 +2164,7 @@ if __name__ == '__main__':
 
     ./__init__.py /dev/ttyUSB0 -v
 
-    '''
+    """
 
     logger = logging.getLogger(__name__)
     logger.setLevel(logging.CRITICAL)
@@ -2084,7 +2178,7 @@ if __name__ == '__main__':
     # add the handlers to the logger
     logger.addHandler(ch)
 
-    serialport = ""
+    serialport = ''
 
     if len(sys.argv) == 2:
         serialport = sys.argv[1]
@@ -2095,28 +2189,26 @@ if __name__ == '__main__':
         print(usage)
         exit()
 
-    print("This is Viessmann plugin running in standalone mode")
-    print("===================================================")
+    print('This is Viessmann plugin running in standalone mode')
+    print('===================================================')
 
     v = Viessmann(None, standalone=serialport, logger=logger)
 
     for proto in ('P300', 'KW'):
-
         res = get_device_type(v, proto)
         if res is None:
-
             # None means no connection, no further tries
             print(f'Connection could not be established to {serialport}. Please check connection.')
             break
 
         if res is False:
-
             # False means no comm init (only P300), go on
             print(f'Communication could not be established using protocol {proto}.')
         else:
-
             # anything else should be the devices answer, try to decode and quit
-            print(f'Device ID is {res}, device type is {commands.devicetypes.get(res, "unknown")} using protocol {proto}')
+            print(
+                f'Device ID is {res}, device type is {commands.devicetypes.get(res, "unknown")} using protocol {proto}'
+            )
             # break
 
     print('Done.')
