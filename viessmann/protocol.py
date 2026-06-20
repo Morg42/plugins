@@ -281,29 +281,36 @@ class SDPProtocolViessmann(SDPProtocol):
                 self._send_bytes(packet)
                 self.logger.debug(f'sent packet {self._bytes2hexstring(packet)}')
 
-                chunk = self._read_bytes(responselen)
-                self.logger.debug(
-                    f'received {len(chunk)} bytes: '
-                    f'{self._bytes2hexstring(chunk) if chunk else "empty"}'
-                )
-
                 if self._viess_proto == 'P300':
-                    if len(chunk) == 0:
+                    # Read 3-byte header first: ACK + startbyte + datalen
+                    header = self._read_bytes(3)
+                    self.logger.debug(
+                        f'received header {len(header)} bytes: '
+                        f'{self._bytes2hexstring(bytearray(header)) if header else "empty"}'
+                    )
+                    if not header:
                         raise SDPConnectionError('no response from device after P300 command')
-                    if chunk[:1] == self._int2bytes(self._controlset['error'], 1):
+                    if header[:1] == self._int2bytes(self._controlset['error'], 1):
                         raise SDPProtocolError(
-                            f'device reported protocol error, response: {self._bytes2hexstring(chunk)}'
+                            f'device reported protocol error, response: {self._bytes2hexstring(bytearray(header))}'
                         )
-                    if (len(chunk) == 1 and
-                            chunk[:1] == self._int2bytes(self._controlset['not_initiated'], 1)):
+                    if (len(header) == 1 and
+                            header[:1] == self._int2bytes(self._controlset['not_initiated'], 1)):
                         self._is_initialized = False
                         raise SDPProtocolError(
                             'device reports not initialized; will re-initialize on next send'
                         )
-                    if chunk[:1] != self._int2bytes(self._controlset['acknowledge'], 1):
+                    if header[:1] != self._int2bytes(self._controlset['acknowledge'], 1):
                         raise SDPProtocolError(
-                            f'unexpected P300 response (no ACK): {self._bytes2hexstring(chunk)}'
+                            f'unexpected P300 response (no ACK): {self._bytes2hexstring(bytearray(header))}'
                         )
+                    pkt_len = header[2]
+                    rest = self._read_bytes(pkt_len + 1)
+                    chunk = header + rest
+                    self.logger.debug(
+                        f'received {len(chunk)} bytes total: '
+                        f'{self._bytes2hexstring(bytearray(chunk))}'
+                    )
                     return self._parse_response(bytearray(chunk))
 
                 elif self._viess_proto == 'KW':
@@ -383,7 +390,7 @@ class SDPProtocolViessmann(SDPProtocol):
         self.logger.debug(f'Response decoded to: responsedatacode: {responsedatacode}, valuebytecount: {valuebytecount}, responsetypecode: {responsetypecode}')
 
         if responsetypecode == 3:
-            raise ValueError(f'error on reading reply {rawdatabytes}')
+            raise SDPProtocolError(f'device error on reply, error data: {rawdatabytes.hex() if rawdatabytes else "none"}')
 
         if responsedatacode == 2:
             self.logger.debug('write request successful')
