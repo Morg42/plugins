@@ -10,7 +10,7 @@ jobs:
     # Only run on the upstream repository — forks have no dev_doc companion repo
     # and lack the PAT_TOKEN secret required for the deploy step.
     if: github.repository == 'smarthomeNG/plugins'
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-22.04 #latest
     strategy:
       fail-fast: false
       matrix:
