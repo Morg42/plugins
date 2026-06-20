@@ -211,7 +211,7 @@ class viessmann(SmartDevicePlugin):
         self.alive = True
         self._parameters['viess_proto'] = protocol
         self._parameters['protocol'] = 'viessmann'
-        self._get_connection()
+        self._connection = self._get_connection()
         self._dispatch_callback = self._cb_standalone
 
         err = None
