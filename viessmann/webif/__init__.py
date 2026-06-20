@@ -29,7 +29,6 @@ import json
 
 from lib.item import Items
 from lib.model.smartplugin import SmartPluginWebIf
-from lib.model.sdp.globals import *
 import cherrypy
 
 
@@ -39,8 +38,8 @@ import cherrypy
 #
 #############################################################################################################################################################################################################################################
 
-class WebInterface(SmartPluginWebIf):
 
+class WebInterface(SmartPluginWebIf):
     def __init__(self, webif_dir, plugin):
         """
         Initialization of instance of class WebInterface
@@ -75,30 +74,31 @@ class WebInterface(SmartPluginWebIf):
             if item != self.plugin._suspend_item_path and not item.endswith('.read'):
                 plgitems.append(self.plugin._plg_item_dict[item]['item'])
 
-#                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
-#                           cmds=self.cmdset,
-#                           units=sorted(list(self.plugin._unitset.keys())),
-#                           last_read_addr=self._last_read['last']['addr'],
-#                           last_read_value=self._last_read['last']['val'],
-#                           last_read_cmd=self._last_read['last']['cmd']
+        #                           items=sorted(self.items.return_items(), key=lambda k: str.lower(k['_path'])),
+        #                           cmds=self.cmdset,
+        #                           units=sorted(list(self.plugin._unitset.keys())),
+        #                           last_read_addr=self._last_read['last']['addr'],
+        #                           last_read_value=self._last_read['last']['val'],
+        #                           last_read_cmd=self._last_read['last']['cmd']
 
-        return tmpl.render(p=self.plugin,
-                           items=sorted(plgitems, key=lambda k: str.lower(k.property.path)),
-                           cmds=self.plugin._commands.get_commandlist(),
-                           running=self.plugin.alive,
-                           lookups=self.plugin._commands._lookups,
-                           units=self.plugin._commands.get_dtlist(),
-                           last_read_addr=self._last_read['last']['addr'],
-                           last_read_value=self._last_read['last']['val'],
-                           last_read_cmd=self._last_read['last']['cmd'])
+        return tmpl.render(
+            p=self.plugin,
+            items=sorted(plgitems, key=lambda k: str.lower(k.property.path)),
+            cmds=self.plugin._commands.get_commandlist(),
+            running=self.plugin.alive,
+            lookups=self.plugin._commands._lookups,
+            units=self.plugin._commands.get_dtlist(),
+            last_read_addr=self._last_read['last']['addr'],
+            last_read_value=self._last_read['last']['val'],
+            last_read_cmd=self._last_read['last']['cmd'],
+        )
 
     @cherrypy.expose
     def submit(self, button='', addr='', unit='', length='', clear=False):
-        '''
+        """
         Submit handler for Ajax
-        '''
+        """
         if button:
-
             read_val = self.plugin.read_addr(button)
             if read_val is None:
                 self.logger.debug(f'Error trying to read addr {button} submitted by WebIf')
@@ -113,7 +113,6 @@ class WebInterface(SmartPluginWebIf):
                     self._last_read['last'] = self._last_read[button]
 
         elif addr is not None and unit is not None and length.isnumeric():
-
             read_val = self.plugin.read_temp_addr(addr, int(length), unit)
             if read_val is None:
                 self.logger.debug(f'Error trying to read custom addr {button} submitted by WebIf')

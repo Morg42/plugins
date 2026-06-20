@@ -26,8 +26,25 @@
 
 import logging
 
-from lib.model.sdp.globals import (SDPError, SDPConnectionError, SDPProtocolError,
-    CONN_SER_DIR, PLUGIN_ATTR_CB_ON_CONNECT, PLUGIN_ATTR_CB_ON_DISCONNECT, PLUGIN_ATTR_CONNECTION, PLUGIN_ATTR_CONN_AUTO_CONN, PLUGIN_ATTR_CONN_BINARY, PLUGIN_ATTR_CONN_CYCLE, PLUGIN_ATTR_CONN_RETRIES, PLUGIN_ATTR_CONN_TIMEOUT, PLUGIN_ATTR_SERIAL_BAUD, PLUGIN_ATTR_SERIAL_BSIZE, PLUGIN_ATTR_SERIAL_PARITY, PLUGIN_ATTR_SERIAL_PORT, PLUGIN_ATTR_SERIAL_STOP)
+from lib.model.sdp.globals import (
+    SDPError,
+    SDPConnectionError,
+    SDPProtocolError,
+    CONN_SER_DIR,
+    PLUGIN_ATTR_CB_ON_CONNECT,
+    PLUGIN_ATTR_CB_ON_DISCONNECT,
+    PLUGIN_ATTR_CONNECTION,
+    PLUGIN_ATTR_CONN_AUTO_CONN,
+    PLUGIN_ATTR_CONN_BINARY,
+    PLUGIN_ATTR_CONN_CYCLE,
+    PLUGIN_ATTR_CONN_RETRIES,
+    PLUGIN_ATTR_CONN_TIMEOUT,
+    PLUGIN_ATTR_SERIAL_BAUD,
+    PLUGIN_ATTR_SERIAL_BSIZE,
+    PLUGIN_ATTR_SERIAL_PARITY,
+    PLUGIN_ATTR_SERIAL_PORT,
+    PLUGIN_ATTR_SERIAL_STOP,
+)
 from lib.model.sdp.protocol import SDPProtocol
 
 from time import sleep
@@ -40,8 +57,9 @@ import threading
 #
 #############################################################################################################################################################################################################################################
 
+
 class SDPProtocolViessmann(SDPProtocol):
-    """ Protocol support for Viessmann heating systems
+    """Protocol support for Viessmann heating systems
 
     This class implements a Viessmann protocol layer. By default, this uses
     the P300 protocol. By supplying the 'viess_proto' attribute, the older 'KW'
@@ -57,7 +75,7 @@ class SDPProtocolViessmann(SDPProtocol):
 
         self.logger = logging.getLogger(__name__)
 
-        if SDP_standalone:
+        if SDP_standalone:  # noqa: F821
             self.logger = logging.getLogger('__main__')
 
         self.logger.debug(f'protocol initializing from {self.__class__.__name__} with arguments {kwargs}')
@@ -101,9 +119,9 @@ class SDPProtocolViessmann(SDPProtocol):
             },
             'KW': {
                 'baudrate': 4800,
-                'bytesize': 8,          # 'EIGHTBITS'
-                'parity': 'E',          # 'PARITY_EVEN',
-                'stopbits': 2,          # 'STOPBITS_TWO',
+                'bytesize': 8,  # 'EIGHTBITS'
+                'parity': 'E',  # 'PARITY_EVEN',
+                'stopbits': 2,  # 'STOPBITS_TWO',
                 'timeout': 1,
                 'startbyte': 0x01,
                 'read': 0xF7,
@@ -123,19 +141,21 @@ class SDPProtocolViessmann(SDPProtocol):
         self._controlset = self._controlsets[self._viess_proto]
 
         # make sure we have a basic set of parameters for the serial connection
-        self._params = {PLUGIN_ATTR_SERIAL_PORT: '',
-                        PLUGIN_ATTR_SERIAL_BAUD: self._controlset[PLUGIN_ATTR_SERIAL_BAUD],
-                        PLUGIN_ATTR_SERIAL_BSIZE: self._controlset[PLUGIN_ATTR_SERIAL_BSIZE],
-                        PLUGIN_ATTR_SERIAL_PARITY: self._controlset[PLUGIN_ATTR_SERIAL_PARITY],
-                        PLUGIN_ATTR_SERIAL_STOP: self._controlset[PLUGIN_ATTR_SERIAL_STOP],
-                        PLUGIN_ATTR_CONN_TIMEOUT: self._controlset[PLUGIN_ATTR_CONN_TIMEOUT],
-                        PLUGIN_ATTR_CONN_AUTO_CONN: True,
-                        PLUGIN_ATTR_CONN_BINARY: True,
-                        PLUGIN_ATTR_CONN_RETRIES: 0,
-                        PLUGIN_ATTR_CONN_CYCLE: 3,
-                        PLUGIN_ATTR_CB_ON_CONNECT: None,
-                        PLUGIN_ATTR_CB_ON_DISCONNECT: None,
-                        PLUGIN_ATTR_CONNECTION: CONN_SER_DIR}
+        self._params = {
+            PLUGIN_ATTR_SERIAL_PORT: '',
+            PLUGIN_ATTR_SERIAL_BAUD: self._controlset[PLUGIN_ATTR_SERIAL_BAUD],
+            PLUGIN_ATTR_SERIAL_BSIZE: self._controlset[PLUGIN_ATTR_SERIAL_BSIZE],
+            PLUGIN_ATTR_SERIAL_PARITY: self._controlset[PLUGIN_ATTR_SERIAL_PARITY],
+            PLUGIN_ATTR_SERIAL_STOP: self._controlset[PLUGIN_ATTR_SERIAL_STOP],
+            PLUGIN_ATTR_CONN_TIMEOUT: self._controlset[PLUGIN_ATTR_CONN_TIMEOUT],
+            PLUGIN_ATTR_CONN_AUTO_CONN: True,
+            PLUGIN_ATTR_CONN_BINARY: True,
+            PLUGIN_ATTR_CONN_RETRIES: 0,
+            PLUGIN_ATTR_CONN_CYCLE: 3,
+            PLUGIN_ATTR_CB_ON_CONNECT: None,
+            PLUGIN_ATTR_CB_ON_DISCONNECT: None,
+            PLUGIN_ATTR_CONNECTION: CONN_SER_DIR,
+        }
         self._params.update(kwargs)
         # check if some of the arguments are usable
         self._set_connection_params()
@@ -167,7 +187,6 @@ class SDPProtocolViessmann(SDPProtocol):
         :rtype: bool
         """
         if self._viess_proto == 'P300':
-
             if self._is_initialized:
                 return True
 
@@ -179,7 +198,7 @@ class SDPProtocolViessmann(SDPProtocol):
             # interface: resume communication, periodically send 0x160000 as keepalive if necessary
 
             RESET = self._int2bytes(self._controlset['reset_command'], 1)
-            NOTINIT = self._int2bytes(self._controlset["not_initiated"], 1)
+            NOTINIT = self._int2bytes(self._controlset['not_initiated'], 1)
             ACK = self._int2bytes(self._controlset['acknowledge'], 1)
             SYNC = self._int2bytes(self._controlset['sync_command'], 3)
             ERR = self._int2bytes(self._controlset['init_error'], 1)
@@ -231,7 +250,6 @@ class SDPProtocolViessmann(SDPProtocol):
             return True
 
         elif self._viess_proto == 'KW':
-
             retries = 5
             RESET = self._int2bytes(self._controlset['reset_command'], 1)
             NOINIT = self._int2bytes(self._controlset['not_initiated'], 1, signed=False)
@@ -251,7 +269,7 @@ class SDPProtocolViessmann(SDPProtocol):
                     self.logger.debug('got sync, commencing command send')
                     self._is_initialized = True
                     return True
-                sleep(.8)
+                sleep(0.8)
                 attempt = attempt + 1
             self.logger.error(f'KW sync not acquired after {attempt} attempts')
             raise SDPProtocolError(f'KW protocol sync failed after {attempt} attempts')
@@ -295,12 +313,9 @@ class SDPProtocolViessmann(SDPProtocol):
                         raise SDPProtocolError(
                             f'device reported protocol error, response: {self._bytes2hexstring(bytearray(header))}'
                         )
-                    if (len(header) == 1 and
-                            header[:1] == self._int2bytes(self._controlset['not_initiated'], 1)):
+                    if len(header) == 1 and header[:1] == self._int2bytes(self._controlset['not_initiated'], 1):
                         self._is_initialized = False
-                        raise SDPProtocolError(
-                            'device reports not initialized; will re-initialize on next send'
-                        )
+                        raise SDPProtocolError('device reports not initialized; will re-initialize on next send')
                     if header[:1] != self._int2bytes(self._controlset['acknowledge'], 1):
                         raise SDPProtocolError(
                             f'unexpected P300 response (no ACK): {self._bytes2hexstring(bytearray(header))}'
@@ -308,10 +323,7 @@ class SDPProtocolViessmann(SDPProtocol):
                     pkt_len = header[2]
                     rest = self._read_bytes(pkt_len + 1)
                     chunk = header + rest
-                    self.logger.debug(
-                        f'received {len(chunk)} bytes total: '
-                        f'{self._bytes2hexstring(bytearray(chunk))}'
-                    )
+                    self.logger.debug(f'received {len(chunk)} bytes total: {self._bytes2hexstring(bytearray(chunk))}')
                     return self._parse_response(bytearray(chunk))
 
                 elif self._viess_proto == 'KW':
@@ -351,17 +363,17 @@ class SDPProtocolViessmann(SDPProtocol):
         :return: tuple of (parsed response value, commandcode) or None if error
         """
         if self._viess_proto == 'P300':
-
             # A read_response telegram looks like this: ACK (1 byte), startbyte (1 byte), data length in bytes (1 byte), request/response (1 byte), read/write (1 byte), addr (2 byte), amount of valuebytes (1 byte), value (bytes as per last byte), checksum (1 byte)
             # A write_response telegram looks like this: ACK (1 byte), startbyte (1 byte), data length in bytes (1 byte), request/response (1 byte), read/write (1 byte), addr (2 byte), amount of bytes written (1 byte), checksum (1 byte)
 
             # Validate checksum
-            checksum = self._calc_checksum(response[1:len(response) - 1])  # first, cut first byte (ACK) and last byte (checksum) and then calculate checksum
+            checksum = self._calc_checksum(
+                response[1 : len(response) - 1]
+            )  # first, cut first byte (ACK) and last byte (checksum) and then calculate checksum
             received_checksum = response[len(response) - 1]
             if received_checksum != checksum:
                 raise SDPProtocolError(
-                    f'P300 checksum mismatch: expected {checksum:#04x}, '
-                    f'got {received_checksum:#04x}'
+                    f'P300 checksum mismatch: expected {checksum:#04x}, got {received_checksum:#04x}'
                 )
 
             # Extract command/address, valuebytes and valuebytecount out of response
@@ -371,9 +383,8 @@ class SDPProtocolViessmann(SDPProtocol):
 
             # Extract databytes out of response
             rawdatabytes = bytearray()
-            rawdatabytes.extend(response[8:8 + (valuebytecount)])
+            rawdatabytes.extend(response[8 : 8 + (valuebytecount)])
         elif self._viess_proto == 'KW':
-
             # imitate P300 response code data for easier combined handling afterwards
             # a read_response telegram consists only of the value bytes
             # a write_response telegram is 0x00 for OK, 0xXX for error
@@ -394,10 +405,14 @@ class SDPProtocolViessmann(SDPProtocol):
                     # error if status reply is not 0x00
                     responsetypecode = 3
 
-        self.logger.debug(f'Response decoded to: responsedatacode: {responsedatacode}, valuebytecount: {valuebytecount}, responsetypecode: {responsetypecode}')
+        self.logger.debug(
+            f'Response decoded to: responsedatacode: {responsedatacode}, valuebytecount: {valuebytecount}, responsetypecode: {responsetypecode}'
+        )
 
         if responsetypecode == 3:
-            raise SDPProtocolError(f'device error on reply, error data: {rawdatabytes.hex() if rawdatabytes else "none"}')
+            raise SDPProtocolError(
+                f'device error on reply, error data: {rawdatabytes.hex() if rawdatabytes else "none"}'
+            )
 
         if responsedatacode == 2:
             self.logger.debug('write request successful')
@@ -462,9 +477,13 @@ class SDPProtocolViessmann(SDPProtocol):
             responselen = 1 if write else int(cmdlen)
 
         if write:
-            self.logger.debug(f'created payload to be sent as hexstring: {self._bytes2hexstring(packet)} and as bytes: {packet} with value {self._bytes2hexstring(valuebytes)})')
+            self.logger.debug(
+                f'created payload to be sent as hexstring: {self._bytes2hexstring(packet)} and as bytes: {packet} with value {self._bytes2hexstring(valuebytes)})'
+            )
         else:
-            self.logger.debug(f'created payload to be sent as hexstring: {self._bytes2hexstring(packet)} and as bytes: {packet}')
+            self.logger.debug(
+                f'created payload to be sent as hexstring: {self._bytes2hexstring(packet)} and as bytes: {packet}'
+            )
 
         return (packet, responselen)
 

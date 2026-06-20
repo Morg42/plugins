@@ -48,7 +48,7 @@ class DT_Serial(DT_Number):
         sn = 0
         b.reverse()
         for byte in range(0, len(b)):
-            sn += (b[byte] - 48) * 10 ** byte
+            sn += (b[byte] - 48) * 10**byte
         return hex(sn).upper()
 
 
@@ -85,7 +85,9 @@ class DT_Control(DT_Number):
                 aus = encode_timer(switching_time['Aus'])
                 times += f'{an:02x}{aus:02x}'
             valuebytes = bytes.fromhex(times)
-            self.logger.debug(f'created value bytes as hexstring: {bytes2hexstring(valuebytes)} and as bytes: {valuebytes}')
+            self.logger.debug(
+                f'created value bytes as hexstring: {bytes2hexstring(valuebytes)} and as bytes: {valuebytes}'
+            )
             return valuebytes
         except ValueError:
             raise
@@ -148,7 +150,7 @@ class DT_Hex(DT_Number):
 
 
 def int2bytes(value, length=0, signed=False):
-    """ convert value to bytearray, see MD_Command.py """
+    """convert value to bytearray, see MD_Command.py"""
     if not length:
         length = len(value)
     value = value % (2 ** (length * 8))
@@ -156,17 +158,17 @@ def int2bytes(value, length=0, signed=False):
 
 
 def bytes2int(rawbytes, signed):
-    """ convert bytearray to value, see MD_Command.py """
+    """convert bytearray to value, see MD_Command.py"""
     return int.from_bytes(rawbytes, byteorder='little', signed=signed)
 
 
 def bytes2hexstring(bytesvalue):
-    """ create hex-string from bytearray, see MD_Command.py """
+    """create hex-string from bytearray, see MD_Command.py"""
     return ''.join(f'{c:02x}' for c in bytesvalue)
 
 
 def decode_timer(rawdatabytes):
-    """ generator to convert byte sequence to a number of time strings """
+    """generator to convert byte sequence to a number of time strings"""
     while rawdatabytes:
         hours, minutes = divmod(int(rawdatabytes[:2], 16), 8)
         if minutes >= 6 or hours >= 24:
@@ -179,9 +181,9 @@ def decode_timer(rawdatabytes):
 
 
 def encode_timer(switching_time):
-    """ convert time string to encoded time value """
+    """convert time string to encoded time value"""
     if switching_time == '00:00':
-        return 0xff
+        return 0xFF
     clocktime = re.compile(r'(\d\d):(\d\d)')
     mo = clocktime.search(switching_time)
     number = int(mo.group(1)) * 8 + int(mo.group(2)) // 10

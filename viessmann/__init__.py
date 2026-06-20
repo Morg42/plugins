@@ -28,10 +28,10 @@ import sys
 if __name__ == '__main__':
     builtins.SDP_standalone = True
 
-    class SmartPlugin():
+    class SmartPlugin:
         pass
 
-    class SmartPluginWebIf():
+    class SmartPluginWebIf:
         pass
 
     BASE = os.path.sep.join(os.path.realpath(__file__).split(os.path.sep)[:-3])
@@ -46,20 +46,21 @@ from lib.model.sdp.globals import PLUGIN_ATTR_SERIAL_PORT, PLUGIN_ATTR_PROTOCOL
 from lib.model.smartdeviceplugin import SDPResultError, SmartDevicePlugin, Standalone
 
 
-if not SDP_standalone:
+if not SDP_standalone:  # noqa: F821
     from .webif import WebInterface
 
 
 class viessmann(SmartDevicePlugin):
-    """ Device class for Viessmann heating systems.
+    """Device class for Viessmann heating systems.
 
     Standalone mode is automatic device type discovery
     """
+
     PLUGIN_VERSION = '2.0.0'
 
     def _set_device_defaults(self):
 
-        if not SDP_standalone:
+        if not SDP_standalone:  # noqa: F821
             self._webif = WebInterface
 
         self._parameters[PLUGIN_ATTR_PROTOCOL] = SDPProtocolViessmann
@@ -67,9 +68,9 @@ class viessmann(SmartDevicePlugin):
         # use callbacks to enable schedulers
         self._use_callbacks = True
 
-#
-# methods for standalone mode
-#
+    #
+    # methods for standalone mode
+    #
 
     def run_standalone(self):
         """
@@ -81,23 +82,23 @@ class viessmann(SmartDevicePlugin):
             devs = {}
 
         for proto in ('P300', 'KW'):
-
             res = self.get_device_type(proto)
 
             if res is None:
-
                 # None means no connection, no further tries
-                print(f'Connection could not be established to {self._parameters[PLUGIN_ATTR_SERIAL_PORT]}. Please check connection.')
+                print(
+                    f'Connection could not be established to {self._parameters[PLUGIN_ATTR_SERIAL_PORT]}. Please check connection.'
+                )
                 break
 
             if res is False:
-
                 # False means no comm init (only P300), go on
                 print(f'Communication could not be established using protocol {proto}.')
             else:
-
                 # anything else should be the devices answer, try to decode and quit
-                print(f'Device ID is {res}, device type is {devs.get(res.upper(), "unknown")} supporting protocol {proto}')
+                print(
+                    f'Device ID is {res}, device type is {devs.get(res.upper(), "unknown")} supporting protocol {proto}'
+                )
                 # break
 
     def read_addr(self, addr):
@@ -139,16 +140,16 @@ class viessmann(SmartDevicePlugin):
         # as we have no reference whatever concerning the supplied data, we do a few sanity checks...
 
         addr = addr.lower()
-        if len(addr) != 4:              # addresses are 2 bytes
+        if len(addr) != 4:  # addresses are 2 bytes
             self.logger.warning(f'temp address: address not 4 digits long: {addr}')
             return
 
-        for c in addr:                  # addresses are hex strings
+        for c in addr:  # addresses are hex strings
             if c not in '0123456789abcdef':
                 self.logger.warning(f'temp address: address digit "{c}" is not hex char')
                 return
 
-        if length < 1 or length > 32:          # empiritistical choice
+        if length < 1 or length > 32:  # empiritistical choice
             self.logger.warning(f'temp address: len is not > 0 and < 33: {len}')
             return
 
@@ -159,7 +160,16 @@ class viessmann(SmartDevicePlugin):
         else:
             # create temp commandset
             cmd = 'temp_cmd'
-            cmdconf = {'read': True, 'write': False, 'opcode': addr, 'reply_token': addr, 'item_type': 'str', 'dev_datatype': 'H', 'params': ['value', 'mult', 'signed', 'len'], 'param_values': ['VAL', mult, signed, length]}
+            cmdconf = {
+                'read': True,
+                'write': False,
+                'opcode': addr,
+                'reply_token': addr,
+                'item_type': 'str',
+                'dev_datatype': 'H',
+                'params': ['value', 'mult', 'signed', 'len'],
+                'param_values': ['VAL', mult, signed, length],
+            }
             self.logger.debug(f'Adding temporary command config {cmdconf} for command temp_cmd')
             self._commands._parse_commands(self.device_id, {cmd: cmdconf}, [cmd])
 
