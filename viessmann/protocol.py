@@ -225,6 +225,7 @@ class SDPProtocolViessmann(SDPProtocol):
                     empty_replies = 0
 
             if not self._is_initialized:
+                self._close()
                 raise SDPProtocolError('P300 protocol initialization failed after 10 attempts')
             self.logger.debug('P300 communication initialized successfully')
             return True

@@ -74,6 +74,13 @@ parameters:
             en: 'If set, the loop guard only counts write attempts whose "caller" string starts with this prefix
                  (e.g. "MQTT"). Writes from all other callers always pass through freely.'
 
+    autoreconnect:
+        type: bool
+        default: true
+        description:
+            de: Verbindung nach Verbindungsabbruch automatisch wiederherstellen
+            en: Automatically reconnect after connection loss
+
     command_class:
         type: str
         default: SDPCommandViessmann
