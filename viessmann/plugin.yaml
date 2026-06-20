@@ -9,8 +9,9 @@ plugin:
     state: develop
     keywords: iot device sdp
     version: 2.0.0
-    sh_minversion: 1.9.5.1  # 1.10.0.1
-    py_minversion: 3.6
+    sh_minversion: '1.9.5.1'  # 1.10.0.1
+    py_minversion: '3.6'
+    sdp_minversion: '1.1.0'
     multi_instance: false
     restartable: true
     classname: viessmann
