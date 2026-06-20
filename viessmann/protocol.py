@@ -319,12 +319,18 @@ class SDPProtocolViessmann(SDPProtocol):
                         raise SDPConnectionError('no response from device after KW command')
                     return self._parse_response(bytearray(chunk), data_dict['data']['value'] is None)
 
-        except SDPError:
+        except SDPConnectionError:
             self._is_initialized = False
             try:
                 self._close()
             except Exception:
                 pass
+            raise
+        except SDPProtocolError:
+            # Device responded with a protocol-level error (e.g. unknown command,
+            # not-initialized). The serial link is intact — do NOT close it.
+            # Reset init flag so the next send re-runs the P300 handshake.
+            self._is_initialized = False
             raise
         except Exception as e:
             self._is_initialized = False
