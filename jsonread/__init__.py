@@ -35,8 +35,10 @@ from .webif import WebInterface
 # PATCH: Move jq engine into JSONREAD class without breaking behavior
 # Drop-in replacement for previous global jq_* functions
 
+
 class JSONREAD(SmartPlugin):
-    PLUGIN_VERSION = "2.0.0"
+    PLUGIN_VERSION = '2.0.0'
+
     def __init__(self, sh):
         super().__init__()
 
@@ -50,36 +52,36 @@ class JSONREAD(SmartPlugin):
         self._compiled_filters = {}
 
         self._lastresult = {}
-        self._lastresultstr = ""
-        self._lastresultjq = ""
+        self._lastresultstr = ''
+        self._lastresultjq = ''
 
         self.init_webinterface(WebInterface)
 
     def run(self):
-        self.logger.debug("Run method called")
+        self.logger.debug('Run method called')
         self.alive = True
-        self.scheduler_add("poll", self.poll_device, cycle=self._cycle)
+        self.scheduler_add('poll', self.poll_device, cycle=self._cycle)
 
     def stop(self):
-        self.logger.debug("Stop method called")
+        self.logger.debug('Stop method called')
         self.scheduler_remove_all()
         self.alive = False
 
-    def pathes(self, d, stem=""):
+    def pathes(self, d, stem=''):
         if isinstance(d, dict):
             for key, value in d.items():
                 if isinstance(value, (dict, list, tuple)):
-                    yield from self.pathes(value, f"{stem}.{key}")
+                    yield from self.pathes(value, f'{stem}.{key}')
                 else:
-                    yield f"{stem}.{key} => {value}"
+                    yield f'{stem}.{key} => {value}'
         elif isinstance(d, (list, tuple)):
             for value in d:
                 if isinstance(value, (dict, list, tuple)):
                     yield from self.pathes(value, stem)
                 else:
-                    yield f"{stem} => {value}"
+                    yield f'{stem} => {value}'
         else:
-            yield f"{stem}.{d}"
+            yield f'{stem}.{d}'
 
     def jq_compile(self, expr):
         """
@@ -147,7 +149,7 @@ class JSONREAD(SmartPlugin):
 
     def jq_step(self, expr, value):
         expr = expr.strip()
-        if expr.startswith("select("):
+        if expr.startswith('select('):
             # split at first ')'
             depth = 0
             for i, ch in enumerate(expr):
@@ -157,8 +159,8 @@ class JSONREAD(SmartPlugin):
                     depth -= 1
                     if depth == 0:
                         break
-            cond = expr[7:i]                # Inhalt von select(...)
-            rest = expr[i+1:].lstrip('.')   # alles danach
+            cond = expr[7:i]  # Inhalt von select(...)
+            rest = expr[i + 1 :].lstrip('.')  # alles danach
 
             if not isinstance(value, list):
                 value = [value]
@@ -220,7 +222,6 @@ class JSONREAD(SmartPlugin):
 
         return []
 
-
     def jq_condition(self, cond, obj):
         # Unterstützt ==, !=, >, <, >=, <=
         m = re.match(r'\.(.+?)\s*(==|!=|>=|<=|>|<)\s*(.+)', cond)
@@ -238,7 +239,7 @@ class JSONREAD(SmartPlugin):
         else:
             try:
                 cmp_val = float(raw_val)
-            except:
+            except Exception:
                 cmp_val = raw_val
 
         # Traversiere verschachtelte Keys
@@ -250,39 +251,45 @@ class JSONREAD(SmartPlugin):
                 cmp_num = float(cmp_val)
                 val = val_num
                 cmp_val = cmp_num
-            except:
+            except Exception:
                 pass
 
             if op == '==':
-                if val == cmp_val: return True
+                if val == cmp_val:
+                    return True
             elif op == '!=':
-                if val != cmp_val: return True
+                if val != cmp_val:
+                    return True
             elif op == '>':
-                if val > cmp_val: return True
+                if val > cmp_val:
+                    return True
             elif op == '<':
-                if val < cmp_val: return True
+                if val < cmp_val:
+                    return True
             elif op == '>=':
-                if val >= cmp_val: return True
+                if val >= cmp_val:
+                    return True
             elif op == '<=':
-                if val <= cmp_val: return True
+                if val <= cmp_val:
+                    return True
 
         return False
 
     def jq_path(self, path, data):
-        path = path.lstrip(".")
-        if path == "":
+        path = path.lstrip('.')
+        if path == '':
             return data
 
         parts = []
-        buf = ""
+        buf = ''
         in_quotes = False
         for ch in path:
             if ch == '"':
                 in_quotes = not in_quotes
                 buf += ch
-            elif ch == "." and not in_quotes:
+            elif ch == '.' and not in_quotes:
                 parts.append(buf)
-                buf = ""
+                buf = ''
             else:
                 buf += ch
         if buf:
@@ -298,7 +305,7 @@ class JSONREAD(SmartPlugin):
         for part in parts:
             key = normalize_key(part)
             is_list = False
-            if key.endswith("[]"):
+            if key.endswith('[]'):
                 key = key[:-2]
                 is_list = True
 
@@ -349,17 +356,17 @@ class JSONREAD(SmartPlugin):
         try:
             response = self._session.get(self._url)
         except Exception as ex:
-            self.logger.error(f"GET failed {self._url}: {ex}")
+            self.logger.error(f'GET failed {self._url}: {ex}')
             return
 
         if response.status_code != 200:
-            self.logger.error(f"Bad HTTP {response.status_code} from {self._url}")
+            self.logger.error(f'Bad HTTP {response.status_code} from {self._url}')
             return
 
         try:
             json_obj = response.json()
         except Exception:
-            self.logger.error(f"Response from {self._url} is not JSON")
+            self.logger.error(f'Response from {self._url} is not JSON')
             return
 
         # Store debug info (Unicode-safe)
@@ -368,19 +375,19 @@ class JSONREAD(SmartPlugin):
             self._lastresultstr = json.dumps(json_obj, indent=4, sort_keys=True, ensure_ascii=False)
             self._lastresultjq = '\n'.join(self.pathes(json_obj))
         except Exception:
-            self._lastresultstr = "<format error>"
+            self._lastresultstr = '<format error>'
 
         for item, expr in self._items.items():
             try:
                 compiled = self._compiled_filters[item]
                 jqres = self.jq_full(compiled, json_obj)
                 jqres = self.jq_unwrap(jqres)
-                self.logger.debug(f"Item {item} resolved to {jqres}")
+                self.logger.debug(f'Item {item} resolved to {jqres}')
             except Exception as ex:
-                self.logger.error(f"jq failed: {expr} => {ex}")
+                self.logger.error(f'jq failed: {expr} => {ex}')
                 continue
 
             try:
                 item(jqres)
             except Exception as ex:
-                self.logger.error(f"Item update failed {item}: {ex}")
+                self.logger.error(f'Item update failed {item}: {ex}')

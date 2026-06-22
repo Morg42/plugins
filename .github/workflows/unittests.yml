@@ -110,6 +110,14 @@ jobs:
         # all requirements are needed for pytest to run plugin tests
         run: pip install -r requirements/all.txt
 
+      # --- Linting ---
+      - name: Lint with ruff
+        run: |
+          pip install "ruff>=0.4.0"
+          ruff check plugins/ --output-format=github
+        # --output-format=github annotates violations inline on the PR diff.
+        # Uses plugins/pyproject.toml — see SYNC NOTE in both pyproject.toml files.
+
       - name: '>>> Run Python Unittests for PLUGINS <<<'
         working-directory: ./plugins
         run: pytest
