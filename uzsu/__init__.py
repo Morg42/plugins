@@ -180,7 +180,7 @@ class UZSU(SmartPlugin):
             # set activeToday to false if entry is in the future (and wasn't reset correctly at midnight)
             for i, entry in enumerate(self._items[item].get('list')):
                 next, _, _ = self._get_time(entry, 'next', item, i, 'dry_run')
-                if next and next.time() > datetime.now().time() and entry.get('activeToday'):
+                if next and next.time() > datetime.now(self._timezone).time() and entry.get('activeToday'):
                     entry['activeToday'] = False
                     update = 'activeToday'
                     self.logger.debug(
@@ -1085,7 +1085,7 @@ class UZSU(SmartPlugin):
                 self._ignore_once_entries is False and entry.get('activeToday') is True and timescan == 'previous'
             )
             active = True if caller == 'dry_run' or cond_activetoday else entry.get('active')
-            today = datetime.today()
+            today = datetime.now(self._timezone)
             tomorrow = today + timedelta(days=1)
             yesterday = today - timedelta(days=1)
             weekbefore = today - timedelta(days=7)
@@ -1123,7 +1123,7 @@ class UZSU(SmartPlugin):
                             rrule = rrulestr(entry['rrule'], dtstart=datetime.combine(weekbefore, datetime.min.time()))
                             rstr = str(rrule).replace('\n', ';')
                             self.logger.debug(f'{item}: Looking for {timescan} time. Found rrule: {rstr}')
-                dt = datetime.now()
+                dt = datetime.now(self._timezone).replace(tzinfo=None)
                 while self.alive:
                     dt = rrule.before(dt) if timescan == 'previous' else rrule.after(dt)
                     if dt is None:
@@ -1145,12 +1145,12 @@ class UZSU(SmartPlugin):
                         self._update_suncalc(item, entry, entryindex, None)
                     compare_date = None if not next else next.date() - timedelta(days=1) if next_day else next.date()
                     if next and compare_date == dt.date():
-                        cond_istoday = next.date() == datetime.now().date()
+                        cond_istoday = next.date() == datetime.now(self._timezone).date()
                         if caller != 'dry_run' and (
                             not self._items[item]['interpolation'].get('perday') or cond_istoday
                         ):
                             self._itpl[item][next.timestamp() * 1000.0] = value
-                        if next - timedelta(seconds=1) > datetime.now().replace(tzinfo=self._timezone):
+                        if next - timedelta(seconds=1) > datetime.now(self._timezone):
                             self.logger.debug(f'{item}: Return from rrule {timescan}: {next}, value {value}.')
                             return next, value, None
                         else:
@@ -1162,7 +1162,7 @@ class UZSU(SmartPlugin):
                     datetime.combine(today, datetime.min.time()).replace(tzinfo=self._timezone), time, timescan
                 )
                 cond_future = next > datetime.now(self._timezone)
-                cond_istoday = next.date() == datetime.now().date()
+                cond_istoday = next.date() == datetime.now(self._timezone).date()
                 if cond_future:
                     self.logger.debug(f'{item}: Result parsing time today (sun) {time}: {next}')
                     if entryindex is not None:
@@ -1191,7 +1191,7 @@ class UZSU(SmartPlugin):
                 next = self._series_get_time(entry, timescan)
                 if next is None:
                     return None, None, False
-                cond_istoday = next.date() == datetime.now().date()
+                cond_istoday = next.date() == datetime.now(self._timezone).date()
                 if caller != 'dry_run' and (not self._items[item]['interpolation'].get('perday') or cond_istoday):
                     self._itpl[item][next.timestamp() * 1000.0] = value
                     self.logger.debug(f'{item}: Include {timescan} of series: {next} for interpolation.')
@@ -1295,9 +1295,7 @@ class UZSU(SmartPlugin):
                         starttime = datetime.strptime(mydict['series']['timeSeriesMin'], '%H:%M')
                     else:
                         mytime = self._sun(
-                            datetime.now().replace(hour=0, minute=0, second=0).astimezone(self._timezone),
-                            seriesstart,
-                            'next',
+                            datetime.now(self._timezone).replace(hour=0, minute=0, second=0), seriesstart, 'next'
                         )
                         starttime = f'{mytime.hour:02d}:{mytime.minute:02d}'
                         starttime = datetime.strptime(starttime, '%H:%M')
@@ -1309,9 +1307,7 @@ class UZSU(SmartPlugin):
 
                     if seriesend is not None and 'sun' in seriesend:
                         mytime = self._sun(
-                            datetime.now().replace(hour=0, minute=0, second=0).astimezone(self._timezone),
-                            seriesend,
-                            'next',
+                            datetime.now(self._timezone).replace(hour=0, minute=0, second=0), seriesend, 'next'
                         )
                         endtime = f'{mytime.hour:02d}:{mytime.minute:02d}'
                         endtime = datetime.strptime(endtime, '%H:%M')
@@ -1346,7 +1342,8 @@ class UZSU(SmartPlugin):
                     rrule = rrulestr(
                         mydict['rrule'] + ';COUNT=7',
                         dtstart=datetime.combine(
-                            datetime.now(), parser.parse(str(starttime.hour) + ':' + str(starttime.minute)).time()
+                            datetime.now(self._timezone),
+                            parser.parse(str(starttime.hour) + ':' + str(starttime.minute)).time(),
                         ),
                     )
                     mynewlist = []
@@ -1365,7 +1362,7 @@ class UZSU(SmartPlugin):
                         else:
                             seriesstart = mydict['series']['timeSeriesMin']
                             mytime = self._sun(
-                                day.replace(hour=0, minute=0, second=0).astimezone(self._timezone), seriesstart, 'next'
+                                day.replace(hour=0, minute=0, second=0, tzinfo=self._timezone), seriesstart, 'next'
                             )
                             starttime = f'{mytime.hour:02d}:{mytime.minute:02d}'
                             starttime = datetime.strptime(starttime, '%H:%M')
@@ -1417,9 +1414,10 @@ class UZSU(SmartPlugin):
                                 count = 0
                                 seriestarttime = None
                                 actday = mydays[time.weekday()]
-                            if time.time() < datetime.now().time() and time.date() <= datetime.now().date():
+                            now_local = datetime.now(self._timezone).replace(tzinfo=None)
+                            if time.time() < now_local.time() and time.date() <= now_local.date():
                                 continue
-                            if time >= datetime.now() + timedelta(days=7):
+                            if time >= now_local + timedelta(days=7):
                                 continue
                             if seriestarttime is None:
                                 seriestarttime = time
@@ -1470,7 +1468,7 @@ class UZSU(SmartPlugin):
         """
         dayrule = rrulestr(
             'FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR,SA,SU' + ';COUNT=7',
-            dtstart=datetime.now().replace(hour=0, minute=0, second=0),
+            dtstart=datetime.now(self._timezone).replace(hour=0, minute=0, second=0),
         )
         self.logger.debug(f'Get sun4week for item {item} called by {caller}')
         mynewdict = {'sunrise': {}, 'sunset': {}}
@@ -1525,17 +1523,13 @@ class UZSU(SmartPlugin):
         if 'sun' not in mydict['series']['timeSeriesMin']:
             starttime = datetime.strptime(mydict['series']['timeSeriesMin'], '%H:%M')
         else:
-            mytime = self._sun(
-                datetime.now().replace(hour=0, minute=0, second=0).astimezone(self._timezone), seriesstart, 'next'
-            )
+            mytime = self._sun(datetime.now(self._timezone).replace(hour=0, minute=0, second=0), seriesstart, 'next')
             starttime = f'{mytime.hour:02d}:{mytime.minute:02d}'
             starttime = datetime.strptime(starttime, '%H:%M')
 
         if daycount is None and seriesend is not None:
             if 'sun' in seriesend:
-                mytime = self._sun(
-                    datetime.now().replace(hour=0, minute=0, second=0).astimezone(self._timezone), seriesend, 'next'
-                )
+                mytime = self._sun(datetime.now(self._timezone).replace(hour=0, minute=0, second=0), seriesend, 'next')
                 seriesend = f'{mytime.hour:02d}:{mytime.minute:02d}'
                 endtime = datetime.strptime(seriesend, '%H:%M')
             else:
@@ -1576,7 +1570,7 @@ class UZSU(SmartPlugin):
         rrule = rrulestr(
             actrrule,
             dtstart=datetime.combine(
-                datetime.now() - timedelta(days=7),
+                datetime.now(self._timezone) - timedelta(days=7),
                 parser.parse(str(starttime.hour) + ':' + str(starttime.minute)).time(),
             ),
         )
@@ -1589,7 +1583,7 @@ class UZSU(SmartPlugin):
                 mylist[timestamp] = 'x'
                 mycount += 1
 
-        now = datetime.now()
+        now = datetime.now(self._timezone).replace(tzinfo=None)
         mylist[now] = 'now'
         mysortedlist = sorted(mylist)
         myindex = mysortedlist.index(now)
@@ -1601,7 +1595,7 @@ class UZSU(SmartPlugin):
         # Get correct "sun" for this Day
         if 'sun' in mydict['series']['timeSeriesMin'] and returnvalue is not None:
             mytime = self._sun(
-                returnvalue.replace(hour=0, minute=0, second=0).astimezone(self._timezone),
+                returnvalue.replace(hour=0, minute=0, second=0, tzinfo=self._timezone),
                 mydict['series']['timeSeriesMin'],
                 'next',
             )
