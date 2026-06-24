@@ -1626,7 +1626,7 @@ item_structs:
                         modBusDirection@instance: read
 
                 energy:
-                    total:
+                    active:
                         description: kWh
                         type: num
                         modBusAddress@instance: 31671
