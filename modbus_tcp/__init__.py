@@ -512,7 +512,6 @@ class modbus_tcp(SmartPlugin):
         objectType = regPara['objectType']
         dataTypeStr = regPara['dataType']
         dataType = ''.join(filter(str.isalpha, dataTypeStr))    # get the base type from eg. 'uint32' --> 'uint'
-        bo = regPara['byteOrder']
         wo = regPara['wordOrder']
         slaveUnit = regPara['slaveUnit']
         registerCount = 0
@@ -577,7 +576,7 @@ class modbus_tcp(SmartPlugin):
         if objectType == 'Coil' or objectType == 'DiscreteInput':
             return result.bits[0]
         elif objectType == 'InputRegister':
-            value = self._Mclient.convert_from_registers(result.registers, data_type=dtype) #, byteorder=bo, wordorder=wo
+            value = self._Mclient.convert_from_registers(result.registers, data_type=dtype)
         else:
             value = self._Mclient.convert_from_registers(result.registers, data_type=dtype)
 
