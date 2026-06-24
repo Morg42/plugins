@@ -36,3 +36,8 @@ ignore = [
 
 [tool.ruff.lint.per-file-ignores]
 "tests/*" = ["F401", "F811"]
+
+[tool.pytest.ini_options]
+# Filename half of the test convention; conftest.py's pytest_ignore_collect enforces
+# the directory half (must live under a 'tests' subdirectory).
+python_files = ["test_*.py"]
