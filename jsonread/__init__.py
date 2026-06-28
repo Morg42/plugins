@@ -178,6 +178,45 @@ class JSONREAD(SmartPlugin):
         # normaler Pfad
         return self._traverse(value, expr)
 
+    def _split_key_indices(self, token):
+        """
+        Split a path token like ``Data["0"]`` or ``Data[0]`` or ``Data[]``
+        into its base key name and a list of bracket-index strings, e.g.
+        ``('Data', ['"0"'])`` / ``('Data', ['0'])`` / ``('Data', [''])``.
+        A bare key with no brackets returns an empty index list.
+        """
+        m = re.match(r'^([^\[\]]*)((?:\[[^\[\]]*\])*)$', token)
+        if not m:
+            return token, []
+        name, bracket_part = m.groups()
+        indices = re.findall(r'\[([^\[\]]*)\]', bracket_part)
+        return name, indices
+
+    def _resolve_index(self, val, idx):
+        """
+        Resolve a single bracket-index token (already stripped of the
+        brackets) against val. '' means "flatten" (jq's ``[]``): every
+        element of a list, or the value itself if it's not a list. A
+        quoted or unquoted index is tried as a list index first (jq
+        allows array indices written as ``[0]`` or ``["0"]``), falling
+        back to a dict-key lookup.
+        """
+        if idx == '':
+            return val if isinstance(val, list) else [val]
+
+        idx = idx.strip()
+        if idx.startswith('"') and idx.endswith('"'):
+            idx = idx[1:-1]
+
+        if isinstance(val, list):
+            try:
+                return [val[int(idx)]]
+            except (ValueError, IndexError):
+                return []
+        if isinstance(val, dict) and idx in val:
+            return [val[idx]]
+        return []
+
     def _traverse(self, obj, keypath):
         if not keypath:
             if isinstance(obj, list):
@@ -188,39 +227,37 @@ class JSONREAD(SmartPlugin):
             keypath = keypath[1:]
 
         parts = keypath.split('.', 1)
-        key = parts[0]
+        token = parts[0]
         rest = parts[1] if len(parts) > 1 else ''
 
-        if key.endswith('[]'):
-            key = key[:-2]
-            val = []
+        key, indices = self._split_key_indices(token)
+
+        if key:
             if isinstance(obj, dict) and key in obj:
-                val = obj[key]
+                values = [obj[key]]
             elif isinstance(obj, list):
-                val = obj
-            if not isinstance(val, list):
-                val = [val]
-            out = []
-            for v in val:
-                if rest:
-                    out.extend(self._traverse(v, rest))
-                else:
-                    if isinstance(v, list):
-                        out.extend(v)
-                    else:
-                        out.append(v)
-            return out
+                out = []
+                for v in obj:
+                    out.extend(self._traverse(v, keypath))
+                return out
+            else:
+                return []
+        else:
+            values = [obj]
 
-        if isinstance(obj, dict) and key in obj:
-            return self._traverse(obj[key], rest)
+        for idx in indices:
+            new_values = []
+            for v in values:
+                new_values.extend(self._resolve_index(v, idx))
+            values = new_values
 
-        if isinstance(obj, list):
-            out = []
-            for v in obj:
-                out.extend(self._traverse(v, keypath))
-            return out
-
-        return []
+        out = []
+        for v in values:
+            if rest:
+                out.extend(self._traverse(v, rest))
+            else:
+                out.append(v)
+        return out
 
     def jq_condition(self, cond, obj):
         # Unterstützt ==, !=, >, <, >=, <=
@@ -344,12 +381,29 @@ class JSONREAD(SmartPlugin):
                 return value[0]
         return value
 
+    def evaluate_filter(self, expr, data):
+        """
+        Resolve a single ``jsonread_filter`` expression against a parsed
+        JSON document and return the matched value (or None if nothing
+        matched). This is the one seam between "what an item's filter
+        string means" and "how that's actually computed" — poll_device()
+        and the test suite both go through here rather than calling
+        jq_compile/jq_full/jq_unwrap directly, so swapping the underlying
+        engine (e.g. for a real jmespath/jq library) only requires
+        reimplementing this one method; callers and the filter-contract
+        tests (tests/test_filter_contract.py) don't change.
+        """
+        compiled = self._compiled_filters.get(expr)
+        if compiled is None:
+            compiled = self.jq_compile(expr)
+            self._compiled_filters[expr] = compiled
+        return self.jq_unwrap(self.jq_full(compiled, data))
+
     # MODIFY parse_item
     def parse_item(self, item):
         if self.has_iattr(item.conf, 'jsonread_filter'):
             expr = self.get_iattr_value(item.conf, 'jsonread_filter')
             self._items[item] = expr
-            self._compiled_filters[item] = self.jq_compile(expr)
 
     # MODIFY poll_device jq call
     def poll_device(self):
@@ -379,9 +433,7 @@ class JSONREAD(SmartPlugin):
 
         for item, expr in self._items.items():
             try:
-                compiled = self._compiled_filters[item]
-                jqres = self.jq_full(compiled, json_obj)
-                jqres = self.jq_unwrap(jqres)
+                jqres = self.evaluate_filter(expr, json_obj)
                 self.logger.debug(f'Item {item} resolved to {jqres}')
             except Exception as ex:
                 self.logger.error(f'jq failed: {expr} => {ex}')
