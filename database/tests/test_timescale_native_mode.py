@@ -30,7 +30,7 @@ class _SpyDB:
     def transaction(self):
         yield object()
 
-    def execute(self, stmt, params=(), cur=None):
+    def execute(self, stmt, params=(), cur=None, quiet=False):
         self.executed.append((stmt, params))
         for needle in self._fail_on:
             if needle in stmt:
@@ -104,7 +104,7 @@ class TestEnableTimescaleNativeAggregation(TestDatabaseBase):
         # leftover registration). Must be treated as success, not a failure
         # that aborts native mode on every restart after the first one.
         class _AlreadySetDB(_SpyDB):
-            def execute(self, stmt, params=(), cur=None):
+            def execute(self, stmt, params=(), cur=None, quiet=False):
                 self.executed.append((stmt, params))
                 if 'set_integer_now_func' in stmt:
                     raise RuntimeError('custom time function already set for hypertable "log"')

@@ -3448,12 +3448,14 @@ class Database(SmartPlugin):
             return
         try:
             with self._db.transaction() as cur:
-                self._db.execute(f"SELECT set_integer_now_func('{log_table}', '{now_func}');", cur=cur)
+                self._db.execute(f"SELECT set_integer_now_func('{log_table}', '{now_func}');", cur=cur, quiet=True)
         except Exception as e:
             # set_integer_now_func() is not idempotent - it errors on every call after the first,
             # even re-registering the same function, unlike every other IF NOT EXISTS-style call
             # here. "already set" is the expected, harmless case on every restart after the first
-            # successful one; anything else is a real failure.
+            # successful one; anything else is a real failure. quiet=True above since this
+            # expected case would otherwise ERROR-log on every single restart - this except
+            # block already reports the genuinely-bad case itself, just without lib.db's noise.
             if 'already set' not in str(e).lower():
                 self.logger.warning(
                     f'Database: could not register integer-now function for native aggregation ({e}) - '
@@ -3605,6 +3607,65 @@ class Database(SmartPlugin):
             {'table': log_table},
         )
         return bool(result)
+
+    def _hypertable_active_in_db(self):
+        """True if {log} is currently a TimescaleDB hypertable in the real
+        database, regardless of what timescale_hypertable currently says -
+        same reality-over-config rationale as _native_retention_active_in_db().
+        Raises like that method does; callers needing a non-raising check
+        (e.g. against a plain PostgreSQL server with no TimescaleDB
+        extension) should use timescale_status()."""
+        log_table = self._replace['log']
+        result = self._fetchall(
+            'SELECT 1 FROM timescaledb_information.hypertables WHERE hypertable_name = :table LIMIT 1;',
+            {'table': log_table},
+        )
+        return bool(result)
+
+    def _native_cagg_active_in_db(self):
+        """True if at least one native TimescaleDB continuous aggregate
+        exists for {log} in the real database, regardless of what
+        timescale_native_aggregation currently says - same reality-over-
+        config rationale as _native_retention_active_in_db()."""
+        log_table = self._replace['log']
+        result = self._fetchall(
+            'SELECT 1 FROM timescaledb_information.continuous_aggregates WHERE hypertable_name = :table LIMIT 1;',
+            {'table': log_table},
+        )
+        return bool(result)
+
+    def timescale_status(self):
+        """Reality-checked TimescaleDB status for {log}, independent of
+        what timescale_hypertable/timescale_native_aggregation/
+        timescale_native_retention currently say in plugin.yaml - config
+        can drift from the database's actual state (see
+        _reconcile_native_retention_reality()'s docstring for why). Used by
+        the dashboard's database-properties widget to show what's actually
+        active, not what's configured.
+
+        A value of None means the check itself failed (e.g. the
+        TimescaleDB extension isn't installed, so its catalog views don't
+        exist) - distinct from False, which means the check ran and found
+        the feature inactive.
+
+        :return: {'hypertable': bool | None, 'native_cagg': bool | None,
+            'native_retention': bool | None}, or {} for a non-psycopg driver.
+        """
+        if self.driver.lower() not in lib.db.Database._psycopg_driver_names:
+            return {}
+        checks = {
+            'hypertable': self._hypertable_active_in_db,
+            'native_cagg': self._native_cagg_active_in_db,
+            'native_retention': self._native_retention_active_in_db,
+        }
+        status = {}
+        for key, check in checks.items():
+            try:
+                status[key] = check()
+            except Exception as e:
+                self.logger.warning(f'Database: could not check {key} status ({e})')
+                status[key] = None
+        return status
 
     def _disable_native_retention_policy(self):
         """Remove an active retention policy - the one deliberate exception
