@@ -10,9 +10,11 @@ data from a WsPeer standing in for matter-server.
 import dataclasses
 import json
 import os
+import tempfile
 import unittest
 
 import lib.module
+from plugins.matter.server.ble import BleEnvironment
 from plugins.matter.tests.support import PluginHarness, connect_client, wait_for
 from plugins.matter.tests.test_server_role import NODE_3, MatterServerPeer
 from plugins.matter.webif import WebInterface
@@ -174,15 +176,46 @@ class TestActions(_WebifTest):
         self.assertIn('Bridge nicht verbunden', html)
 
 
+def tab(html: str, number: int) -> str:
+    """Content of the rendered page's tab *number*."""
+    return html.split(f'id="bodytab_{number}"', 1)[1].split('id="bodytab_', 1)[0]
+
+
 class TestBluetooth(_WebifTest):
     PARAMETERS = {'server_bluetooth_adapter': '0'}
 
-    def test_server_page_lists_the_ble_checks_of_the_configured_adapter(self):
+    def _ble_env(self, adapters: tuple[str, ...] = ()) -> None:
+        """Point the BLE checks at a /sys tree with *adapters* (an empty tree when none) and no readable file capabilities."""
+        tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(tmp.cleanup)
+        bluetooth = os.path.join(tmp.name, 'sys', 'class', 'bluetooth')
+        for hci in adapters:
+            os.makedirs(os.path.join(bluetooth, hci))
+        self.plugin.server.sidecar.ble_env = BleEnvironment(
+            os.path.join(tmp.name, 'proc'), os.path.join(tmp.name, 'sys'), None
+        )
+
+    def test_bluetooth_tab_lists_the_ble_checks_of_the_configured_adapter(self):
         html = self.webif._render_server({})
 
-        self.assertIn('Bluetooth-Kommissionierung (hci0)', html)
+        self.assertIn('data-bs-target="#bodytab_5"', html)
+        self.assertIn('Bluetooth-Kommissionierung (hci0)', tab(html, 5))
         for label in ('Adapter', 'Sidecar-Prozess', 'Node-Binary'):
-            self.assertIn(label, html)
+            self.assertIn(label, tab(html, 5))
+        self.assertNotIn('Bluetooth-Kommissionierung', tab(html, 1))
+
+    def test_failed_check_is_shown_above_the_pairing_form(self):
+        self._ble_env(adapters=('hci1',))
+
+        devices = tab(self.webif._render_server({}), 1)
+
+        self.assertIn('hci0 not found', devices)
+        self.assertLess(devices.index('hci0 not found'), devices.index('id="pairing_form"'))
+
+    def test_devices_tab_has_no_ble_alert_without_a_failed_check(self):
+        self._ble_env()
+
+        self.assertNotIn('Bluetooth', tab(self.webif._render_server({}), 1))
 
     def test_restart_action_restarts_the_sidecar(self):
         flash = self.webif.run_actions('server', {'restart_sidecar': '1'})
@@ -191,8 +224,11 @@ class TestBluetooth(_WebifTest):
 
 
 class TestNoBluetooth(_WebifTest):
-    def test_server_page_has_no_ble_block_without_an_adapter(self):
-        self.assertNotIn('Bluetooth-Kommissionierung', self.webif._render_server({}))
+    def test_server_page_has_no_bluetooth_tab_without_an_adapter(self):
+        html = self.webif._render_server({})
+
+        self.assertNotIn('Bluetooth', html)
+        self.assertNotIn('data-bs-target="#bodytab_5"', html)
 
 
 if __name__ == '__main__':

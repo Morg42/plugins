@@ -194,7 +194,7 @@
 </script>
 {% endblock pluginscripts %}
 
-{% set tabcount = 5 %}
+{% set tabcount = 6 %}
 
 {% set tab1title = "<strong>" ~ _('Geräte') ~ "</strong> (" ~ devices|length ~ ")" %}
 {% block bodytab1 %}
@@ -213,23 +213,12 @@
 		<div class="alert alert-danger mt-2">{{ _('Neustart fehlgeschlagen') }}: {{ flash.restart_sidecar_error }}</div>
 	{% endif %}
 
-	{% if ble_status is not none %}
-		{% set ble_labels = {'adapter': _('Adapter'), 'process_net_raw': _('Sidecar-Prozess: CAP_NET_RAW'), 'binary_net_raw': _('Node-Binary: Capability')} %}
-		{% set ble_icons = {'ok': 'fa-check text-success', 'fail': 'fa-times text-danger', 'unknown': 'fa-question text-muted'} %}
-		<div class="mb-2">
-			<h5>{{ _('Bluetooth-Kommissionierung') }} (hci{{ ble_status.adapter }})</h5>
-			<table class="table table-sm table-striped mb-1">
-				<tbody>
-				{% for check in ble_status.checks %}
-					<tr>
-						<td class="py-1" width="30px"><i class="fas {{ ble_icons[check.state.value] }}"></i></td>
-						<td class="py-1" width="260px">{{ ble_labels.get(check.name, check.name) }}</td>
-						<td class="py-1">{{ check.detail }}</td>
-						<td class="py-1">{% if check.state.value == 'fail' and check.hint %}<code>{{ check.hint }}</code>{% endif %}</td>
-					</tr>
-				{% endfor %}
-				</tbody>
-			</table>
+	{% if ble_status is not none and ble_status.failed %}
+		<div class="alert alert-warning mt-2">
+			{{ _('Bluetooth-Kommissionierung wird nicht funktionieren (Details im Tab Bluetooth)') }}:
+			{% for check in ble_status.failed %}
+				<br>{{ check.detail }}{% if check.hint %} - <code>{{ check.hint }}</code>{% endif %}
+			{% endfor %}
 		</div>
 	{% endif %}
 
@@ -582,8 +571,37 @@
 	</table>
 {% endblock bodytab4 %}
 
-{% set tab5title = "<strong>" ~ _('Info') ~ "</strong>" %}
+{% if ble_status is none %}
+	{% set tab5title = "hidden" %}
+{% elif ble_status.failed %}
+	{% set tab5title = "<strong>" ~ _('Bluetooth') ~ "</strong> <span class=\"text-danger\">(" ~ ble_status.failed|length ~ ")</span>" %}
+{% else %}
+	{% set tab5title = "<strong>" ~ _('Bluetooth') ~ "</strong>" %}
+{% endif %}
 {% block bodytab5 %}
+	{% if ble_status is not none %}
+		{% set ble_labels = {'adapter': _('Adapter'), 'process_net_raw': _('Sidecar-Prozess: CAP_NET_RAW'), 'binary_net_raw': _('Node-Binary: Capability')} %}
+		{% set ble_icons = {'ok': 'fa-check text-success', 'fail': 'fa-times text-danger', 'unknown': 'fa-question text-muted'} %}
+		<div class="mb-2 mt-2">
+			<h5>{{ _('Bluetooth-Kommissionierung') }} (hci{{ ble_status.adapter }})</h5>
+			<table class="table table-sm table-striped mb-1">
+				<tbody>
+				{% for check in ble_status.checks %}
+					<tr>
+						<td class="py-1" width="30px"><i class="fas {{ ble_icons[check.state.value] }}"></i></td>
+						<td class="py-1" width="260px">{{ ble_labels.get(check.name, check.name) }}</td>
+						<td class="py-1">{{ check.detail }}</td>
+						<td class="py-1">{% if check.state.value == 'fail' and check.hint %}<code>{{ check.hint }}</code>{% endif %}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	{% endif %}
+{% endblock bodytab5 %}
+
+{% set tab6title = "<strong>" ~ _('Info') ~ "</strong>" %}
+{% block bodytab6 %}
 	<div class="mb-2">
 		{{ _('Endpoint/Cluster-Discovery-Browser + Item-Definition (Copy-Paste-YAML, Button "Item-Definition" je Gerät).') }}
 	</div>
@@ -596,4 +614,4 @@
 	<div class="mb-2">
 		{{ _('Für alles andere die Discovery-Tabelle nutzen und die low-level Attribute (matter_attribute/matter_command/matter_command_false) direkt setzen.') }}
 	</div>
-{% endblock bodytab5 %}
+{% endblock bodytab6 %}

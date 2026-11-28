@@ -208,8 +208,8 @@ Bluetooth-Status im Webinterface
 
 .. index:: matter; Bluetooth Status
 
-Ist ``server_bluetooth_adapter`` gesetzt, zeigt der Devices-Tab einen Block
-"Bluetooth-Kommissionierung" mit drei Prüfungen (nur unter Linux, sonst "?"):
+Ist ``server_bluetooth_adapter`` gesetzt, zeigt der Tab "Bluetooth" drei Prüfungen
+(nur unter Linux, sonst "?"):
 
 - **Adapter**: ``/sys/class/bluetooth/hci<N>`` existiert und ist nicht per rfkill blockiert.
 - **Sidecar-Prozess: CAP_NET_RAW**: der laufende matter-server-Prozess hat die Capability
@@ -218,8 +218,9 @@ Ist ``server_bluetooth_adapter`` gesetzt, zeigt der Devices-Tab einen Block
   ``cap_net_raw+ep`` als File-Capability, damit auch jeder Neustart sie bekommt. Entfällt, wenn
   der Sidecar als root läuft.
 
-Fehlgeschlagene Prüfungen zeigen den nötigen Befehl (z.B. ``setcap`` mit dem echten Binary-Pfad)
-und werden bei jedem Start des Sidecars zusätzlich als Warnung geloggt. Ein Node.js-Update, das
+Fehlgeschlagene Prüfungen zeigen den nötigen Befehl (z.B. ``setcap`` mit dem echten Binary-Pfad),
+erscheinen zusätzlich als Hinweis über dem Kopplungsformular im Tab "Geräte" und werden bei jedem
+Start des Sidecars als Warnung geloggt. Ein Node.js-Update, das
 das Binary ersetzt, entfernt die File-Capability wieder - die Warnung macht das sichtbar.
 
 Der Button "Sidecar neu starten" im Tabellenkopf beendet den matter-server-Prozess und startet

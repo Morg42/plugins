@@ -41,15 +41,17 @@ class _BleTest(unittest.TestCase):
         self.tmp = tmp.name
         self.proc = os.path.join(tmp.name, 'proc')
         self.sys = os.path.join(tmp.name, 'sys')
+        self.bin = os.path.join(tmp.name, 'bin')
         self.xattrs: dict[str, bytes] = {}
 
-    def _process(self, cap_eff: int, euid: int = 1000, exe: str = NODE):
-        """A /proc/<PID> entry for a process with effective capabilities *cap_eff*, running *exe*."""
+    def _process(self, cap_eff: int, euid: int = 1000, exe: str | None = NODE):
+        """A /proc/<PID> entry for a process with effective capabilities *cap_eff*, running *exe* (None: exe link unreadable)."""
         pid_dir = os.path.join(self.proc, str(PID))
         os.makedirs(pid_dir)
         with open(os.path.join(pid_dir, 'status'), 'w') as f:
             f.write(f'Name:\tnode\nUid:\t{euid}\t{euid}\t{euid}\t{euid}\nCapEff:\t{cap_eff:016x}\n')
-        os.symlink(exe, os.path.join(pid_dir, 'exe'))
+        if exe is not None:
+            os.symlink(exe, os.path.join(pid_dir, 'exe'))
 
     def _adapter(self, hci: str = 'hci0', soft: int = 0, hard: int = 0):
         """A /sys/class/bluetooth/<hci> entry with one rfkill switch."""
@@ -60,7 +62,19 @@ class _BleTest(unittest.TestCase):
                 f.write(f'{value}\n')
 
     def _env(self, read_xattr=True) -> BleEnvironment:
-        return BleEnvironment(self.proc, self.sys, self._read_xattr if read_xattr else None)
+        return BleEnvironment(self.proc, self.sys, self._read_xattr if read_xattr else None, self.bin)
+
+    def _installed_node(self, link_target: str | None = None) -> str:
+        """An executable ``node`` on the search path, optionally a symlink to *link_target*; return its real path."""
+        os.makedirs(self.bin, exist_ok=True)
+        real = os.path.join(self.tmp, link_target) if link_target else os.path.join(self.bin, 'node')
+        os.makedirs(os.path.dirname(real), exist_ok=True)
+        with open(real, 'w') as f:
+            f.write('#!/bin/sh\n')
+        os.chmod(real, 0o755)
+        if link_target:
+            os.symlink(real, os.path.join(self.bin, 'node'))
+        return os.path.realpath(real)
 
     def _read_xattr(self, path: str, name: str) -> bytes:
         try:
@@ -68,8 +82,8 @@ class _BleTest(unittest.TestCase):
         except KeyError:
             raise OSError(errno.ENODATA, 'No data available') from None
 
-    def _status(self, pid: int | None = PID, adapter: str = '0'):
-        probe = BleProbe(adapter, pid, NODE, self._env())
+    def _status(self, pid: int | None = PID, adapter: str = '0', node_binary: str = NODE):
+        probe = BleProbe(adapter, pid, node_binary, self._env())
         return {check.name: check for check in probe_ble(probe).checks}
 
 
@@ -133,6 +147,25 @@ class TestBinaryCapability(_BleTest):
         self._process(cap_eff=(1 << 41) - 1, euid=0)
 
         self.assertIs(self._status()['binary_net_raw'].state, CheckState.OK)
+
+    def test_capable_process_with_unreadable_exe_link_checks_the_node_found_on_the_search_path(self):
+        node = self._installed_node()
+        self._process(cap_eff=1 << CAP_NET_RAW, exe=None)
+        self.xattrs[node] = file_caps(1 << CAP_NET_RAW)
+
+        check = self._status(node_binary='node')['binary_net_raw']
+
+        self.assertIs(check.state, CheckState.OK)
+        self.assertIn(node, check.detail)
+
+    def test_setcap_hint_names_the_real_file_behind_a_symlinked_node(self):
+        node = self._installed_node(link_target='opt/node-v22/bin/node')
+        self._process(cap_eff=0, exe=None)
+
+        check = self._status(node_binary='node')['binary_net_raw']
+
+        self.assertIs(check.state, CheckState.FAIL)
+        self.assertIn(f'setcap cap_net_raw+eip {node}', check.hint)
 
     def test_unreadable_file_capabilities_are_unknown(self):
         self._process(cap_eff=0)

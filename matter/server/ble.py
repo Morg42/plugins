@@ -31,6 +31,7 @@ import enum
 import errno
 import glob
 import os
+import shutil
 import struct
 from dataclasses import dataclass, field
 from typing import Callable
@@ -65,6 +66,8 @@ class BleEnvironment:
     sys_root: str = '/sys'
     # os.getxattr, which only exists on Linux
     read_xattr: Callable[[str, str], bytes] | None = field(default=getattr(os, 'getxattr', None))
+    # PATH used to resolve a bare node_binary; None: the process environment's PATH, as for the sidecar itself
+    search_path: str | None = None
 
 
 @dataclass(frozen=True)
@@ -114,13 +117,22 @@ def _proc_status(probe: BleProbe) -> dict[str, str] | None:
 
 
 def _binary_path(probe: BleProbe) -> str:
-    """The executable the sidecar really runs (/proc/<pid>/exe), falling back to the configured node binary."""
+    """
+    The executable the sidecar runs: /proc/<pid>/exe, else the configured
+    node binary resolved via the search path and symlinks (setcap acts on
+    the real file).
+
+    /proc/<pid>/exe is unreadable for the sidecar's own user exactly when
+    file capabilities took effect: the kernel marks such a process
+    non-dumpable, which hides the link.
+    """
     if probe.pid is not None:
         try:
             return os.readlink(os.path.join(probe.env.proc_root, str(probe.pid), 'exe'))
         except OSError:
             pass
-    return probe.node_binary
+    found = shutil.which(probe.node_binary, path=probe.env.search_path)
+    return os.path.realpath(found) if found else probe.node_binary
 
 
 def _binary_net_raw(probe: BleProbe, path: str) -> bool | None:
