@@ -14,7 +14,14 @@
 	<tbody>
 		<tr>
 			<td class="py-1"><strong>{{ _('Server') }}</strong></td>
-			<td class="py-1">{{ role_state(server) }}</td>
+			<td class="py-1">
+				{{ role_state(server) }}
+				{% if server is not none %}
+				<form method="post" action="" class="d-inline">
+					<button type="submit" name="restart_sidecar" value="1" class="btn btn-outline-secondary btn-sm ml-2" title="{{ _('matter-server-Prozess beenden und neu starten, z.B. nach setcap') }}"><i class="fas fa-redo"></i>&nbsp;{{ _('Sidecar neu starten') }}</button>
+				</form>
+				{% endif %}
+			</td>
 			<td class="py-1" width="50px"></td>
 			<td class="py-1"><strong>{{ _('Bridge') }}</strong></td>
 			<td class="py-1">{{ role_state(p.bridge) }}</td>
@@ -199,6 +206,31 @@
 	{% endif %}
 	{% if flash.request_error %}
 		<div class="alert alert-danger mt-2">{{ flash.request_error }}</div>
+	{% endif %}
+	{% if flash.restart_sidecar_done %}
+		<div class="alert alert-info mt-2">{{ _('matter-server wird neu gestartet, die Verbindung baut sich gleich wieder auf.') }}</div>
+	{% elif flash.restart_sidecar_error %}
+		<div class="alert alert-danger mt-2">{{ _('Neustart fehlgeschlagen') }}: {{ flash.restart_sidecar_error }}</div>
+	{% endif %}
+
+	{% if ble_status is not none %}
+		{% set ble_labels = {'adapter': _('Adapter'), 'process_net_raw': _('Sidecar-Prozess: CAP_NET_RAW'), 'binary_net_raw': _('Node-Binary: Capability')} %}
+		{% set ble_icons = {'ok': 'fa-check text-success', 'fail': 'fa-times text-danger', 'unknown': 'fa-question text-muted'} %}
+		<div class="mb-2">
+			<h5>{{ _('Bluetooth-Kommissionierung') }} (hci{{ ble_status.adapter }})</h5>
+			<table class="table table-sm table-striped mb-1">
+				<tbody>
+				{% for check in ble_status.checks %}
+					<tr>
+						<td class="py-1" width="30px"><i class="fas {{ ble_icons[check.state.value] }}"></i></td>
+						<td class="py-1" width="260px">{{ ble_labels.get(check.name, check.name) }}</td>
+						<td class="py-1">{{ check.detail }}</td>
+						<td class="py-1">{% if check.state.value == 'fail' and check.hint %}<code>{{ check.hint }}</code>{% endif %}</td>
+					</tr>
+				{% endfor %}
+				</tbody>
+			</table>
+		</div>
 	{% endif %}
 
 	<div class="mb-2">

@@ -29,6 +29,7 @@ import logging
 from dataclasses import dataclass
 
 from ..sidecar import NodeSidecar
+from .ble import BleEnvironment, BleProbe, BleStatus, probe_ble
 
 
 @dataclass(frozen=True)
@@ -62,9 +63,24 @@ class MatterServerSidecar(NodeSidecar):
         storage_path: str,
         settings: ServerSidecarSettings,
         logger: logging.Logger | None = None,
+        ble_env: BleEnvironment | None = None,
     ):
         super().__init__(node_binary, entry_path, storage_path, logger)
         self.settings = settings
+        self.ble_env = ble_env or BleEnvironment()
+
+    def ble_status(self) -> BleStatus | None:
+        """BLE commissioning prerequisites of the running process, None while no adapter is configured."""
+        adapter = self.settings.bluetooth_adapter
+        if not adapter:
+            return None
+        return probe_ble(BleProbe(adapter, self.pid, self.node_binary, self.ble_env))
+
+    def _on_started(self) -> None:
+        status = self.ble_status()
+        for check in status.failed if status else ():
+            hint = f' - fix: {check.hint}' if check.hint else ''
+            self.logger.warning(f'BLE commissioning will not work: {check.name}: {check.detail}{hint}')
 
     def _build_args(self) -> list[str]:
         settings = self.settings

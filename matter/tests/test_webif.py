@@ -42,12 +42,15 @@ class _NoModules:
 
 
 class _WebifTest(unittest.TestCase):
+    # plugin parameter overrides for the harness
+    PARAMETERS: dict[str, str] = {}
+
     def setUp(self):
         saved = lib.module._modules_instance
         lib.module._modules_instance = _NoModules()
         self.addCleanup(setattr, lib.module, '_modules_instance', saved)
 
-        self.harness = PluginHarness(ITEMS)
+        self.harness = PluginHarness(ITEMS, **self.PARAMETERS)
         self.addCleanup(self.harness.close)
         self.plugin = self.harness.plugin
         self.plugin.mod_http = type('ModHttp', (), {'gtemplates_dir': os.path.abspath(GTEMPLATES)})()
@@ -169,6 +172,27 @@ class TestActions(_WebifTest):
         html = self.webif._render_bridge({})
 
         self.assertIn('Bridge nicht verbunden', html)
+
+
+class TestBluetooth(_WebifTest):
+    PARAMETERS = {'server_bluetooth_adapter': '0'}
+
+    def test_server_page_lists_the_ble_checks_of_the_configured_adapter(self):
+        html = self.webif._render_server({})
+
+        self.assertIn('Bluetooth-Kommissionierung (hci0)', html)
+        for label in ('Adapter', 'Sidecar-Prozess', 'Node-Binary'):
+            self.assertIn(label, html)
+
+    def test_restart_action_restarts_the_sidecar(self):
+        flash = self.webif.run_actions('server', {'restart_sidecar': '1'})
+
+        self.assertEqual(flash, {'restart_sidecar_done': True})
+
+
+class TestNoBluetooth(_WebifTest):
+    def test_server_page_has_no_ble_block_without_an_adapter(self):
+        self.assertNotIn('Bluetooth-Kommissionierung', self.webif._render_server({}))
 
 
 if __name__ == '__main__':

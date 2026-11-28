@@ -50,7 +50,7 @@ ROLE_TYPES: tuple[type[ServerRole] | type[BridgeRole], ...] = (ServerRole, Bridg
 class Matter(SmartPlugin):
     """Matter plugin frame - see the module header."""
 
-    PLUGIN_VERSION = '0.4.0'
+    PLUGIN_VERSION = '0.5.0'
     ALLOW_MULTIINSTANCE = True
     STOP_ON_ITEM_CHANGE = False
 

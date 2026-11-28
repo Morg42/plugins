@@ -136,6 +136,13 @@ class WebInterface(SmartPluginWebIf):
             lambda: self._server().clear_thread_dataset(),
         )
 
+    def _restart_sidecar(self, params: Mapping[str, str]) -> Flash:
+        def restart() -> Flash:
+            self._server().restart_sidecar()
+            return {'restart_sidecar_done': True}
+
+        return _attempt(self.logger, 'restart_sidecar_error', 'restarting the matter server sidecar', restart)
+
     def _clear_commission_jobs(self, params: Mapping[str, str]) -> Flash:
         return _attempt(
             self.logger,
@@ -270,6 +277,7 @@ class WebInterface(SmartPluginWebIf):
     ACTIONS: tuple[WebifAction, ...] = (
         WebifAction('pairing_code', 'server', _commission),
         WebifAction('clear_commission_jobs', 'server', _clear_commission_jobs),
+        WebifAction('restart_sidecar', 'server', _restart_sidecar),
         WebifAction('thread_dataset_clear', 'server', _thread_dataset_clear),
         WebifAction('thread_dataset', 'server', _thread_dataset),
         WebifAction('thread_dataset_fetch', 'server', _thread_dataset_fetch),
@@ -331,6 +339,7 @@ class WebInterface(SmartPluginWebIf):
             discovery_rows=[row for node in snapshot.nodes for row in discovery_rows(node)],
             aliases=server.aliases.snapshot() if server else {},
             thread_dataset_is_set=server.thread_dataset_is_set() if server else False,
+            ble_status=server.ble_status() if server else None,
             commission_jobs=server.commission_jobs() if server else [],
             flash=flash,
         )

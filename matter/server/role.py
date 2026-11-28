@@ -68,6 +68,7 @@ from .discovery import (
     parse_nodes,
     split_path,
 )
+from .ble import BleStatus
 from .sidecar import MatterServerSidecar
 
 if TYPE_CHECKING:
@@ -138,6 +139,7 @@ class ServerRole(SidecarRole[MatterServerClient]):
     """
 
     name: ClassVar[str] = 'server'
+    sidecar: MatterServerSidecar
     ITEM_ATTRIBUTES: ClassVar[tuple[str, ...]] = (
         'matter_attribute',
         'matter_command',
@@ -743,6 +745,10 @@ class ServerRole(SidecarRole[MatterServerClient]):
     def clear_thread_dataset(self) -> None:
         client = self._require_client()
         self._call(client.remove_thread_dataset())
+
+    def ble_status(self) -> BleStatus | None:
+        """BLE commissioning prerequisites of the running matter-server, None while no adapter is configured."""
+        return self.sidecar.ble_status()
 
     def thread_dataset_is_set(self) -> bool:
         """False, not an error, while not connected."""

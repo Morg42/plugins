@@ -147,6 +147,26 @@ class TestSupervise(_SidecarTest):
 
         self.assertTrue(restarted)
 
+    async def test_requested_restart_replaces_the_process_without_backoff(self):
+        sidecar = ScriptSidecar(self.entry, self.storage)
+        await sidecar.start()
+        first_pid = sidecar.pid
+        supervisor = asyncio.create_task(sidecar.supervise(Backoff(schedule=(30,))))
+        self.addAsyncCleanup(sidecar.stop)
+        self.addAsyncCleanup(asyncio.gather, supervisor, return_exceptions=True)
+        self.addCleanup(supervisor.cancel)
+
+        with self.assertNoLogs(sidecar.logger, level='WARNING'):
+            await sidecar.restart()
+            for _ in range(200):
+                if sidecar.running and sidecar.pid != first_pid:
+                    break
+                await asyncio.sleep(0.02)
+
+        self.assertTrue(sidecar.running)
+        self.assertNotEqual(sidecar.pid, first_pid)
+        self.assertFalse(psutil.pid_exists(first_pid) and psutil.Process(first_pid).status() != psutil.STATUS_ZOMBIE)
+
     async def test_failing_restart_keeps_supervising(self):
         sidecar = ScriptSidecar(self.entry, self.storage, mode='crash')
         await sidecar.start()

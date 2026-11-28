@@ -74,14 +74,23 @@ class NodeSidecar(ABC):
         self._process: asyncio.subprocess.Process | None = None
         self._log_task: asyncio.Task | None = None
         self._stopping = False
+        self._restart_requested = False
 
     @abstractmethod
     def _build_args(self) -> list[str]:
         """Command line arguments after the node binary, starting with the entry file."""
 
+    def _on_started(self) -> None:
+        """Called after every (re)start once the process is ready (or its readiness wait timed out)."""
+
     @property
     def running(self) -> bool:
         return self._process is not None and self._process.returncode is None
+
+    @property
+    def pid(self) -> int | None:
+        """Pid of the running child process, None while none runs."""
+        return self._process.pid if self.running else None
 
     @property
     def pidfile_path(self) -> str:
@@ -120,6 +129,7 @@ class NodeSidecar(ABC):
                 'the connect retry loop catches up if it is just slow'
             )
         self._log_task = asyncio.create_task(self._pump_logs(), name=f'matter-{self.PIDFILE_NAME}-logs')
+        self._on_started()
 
     async def stop(self, timeout: float = STOP_TIMEOUT_SECONDS) -> None:
         self._stopping = True
@@ -131,16 +141,36 @@ class NodeSidecar(ABC):
         process, self._process = self._process, None
         if process is None:
             return
-        if process.returncode is None:
-            process.terminate()
-            try:
-                await asyncio.wait_for(process.wait(), timeout=timeout)
-            except asyncio.TimeoutError:
-                self.logger.warning(f'{self.LABEL} did not exit in time, killing it')
-                process.kill()
-                await process.wait()
+        await self._terminate(process, timeout)
         self._remove_pidfile()
         self.logger.info(f'{self.LABEL} stopped')
+
+    async def restart(self, timeout: float = STOP_TIMEOUT_SECONDS) -> None:
+        """
+        Terminate the running process so supervise() starts a fresh one right
+        away (no backoff, no unexpected-exit warning). A fresh process picks up
+        changes to the node binary, e.g. capabilities set with setcap. Returns
+        once the old process has exited; without a running supervise() nothing
+        starts a new one.
+        """
+        process = self._process
+        if process is None or process.returncode is not None:
+            return
+        self.logger.info(f'{self.LABEL} restart requested (pid={process.pid})')
+        self._restart_requested = True
+        await self._terminate(process, timeout)
+
+    async def _terminate(self, process: asyncio.subprocess.Process, timeout: float) -> None:
+        """SIGTERM *process*, SIGKILL it if it hasn't exited after *timeout* seconds."""
+        if process.returncode is not None:
+            return
+        process.terminate()
+        try:
+            await asyncio.wait_for(process.wait(), timeout=timeout)
+        except asyncio.TimeoutError:
+            self.logger.warning(f'{self.LABEL} did not exit in time, killing it')
+            process.kill()
+            await process.wait()
 
     async def supervise(self, backoff: Backoff | None = None) -> None:
         """
@@ -165,6 +195,9 @@ class NodeSidecar(ABC):
             if self._stopping:
                 return
             self._process = None
+            if self._restart_requested:
+                self._restart_requested = False
+                continue
             delay = backoff.next_delay()
             self.logger.warning(
                 f'{self.LABEL} exited unexpectedly (code={returncode}), restarting in {delay}s (attempt {backoff.attempt})'

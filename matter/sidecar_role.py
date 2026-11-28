@@ -35,7 +35,7 @@ from typing import Any, ClassVar, Coroutine, Generic, TypeVar
 
 from .role import Backoff, RoleHost, RoleState, RoleStatus
 from .rpc import DEFAULT_COMMAND_TIMEOUT, TRANSIENT_ERRORS, JsonWsRpcClient, describe_error
-from .sidecar import NodeSidecar
+from .sidecar import STOP_TIMEOUT_SECONDS, NodeSidecar
 
 ClientT = TypeVar('ClientT', bound=JsonWsRpcClient)
 
@@ -137,6 +137,14 @@ class SidecarRole(ABC, Generic[ClientT]):
         if client is None or not client.connected:
             raise ConnectionError(f'not connected to {self.sidecar.LABEL}')
         return client
+
+    def restart_sidecar(self) -> None:
+        """
+        Restart the sidecar process from a non-asyncio thread (webif), e.g. to
+        pick up a changed node binary. Returns once the old process has
+        exited; supervision starts the new one and the run loop reconnects.
+        """
+        self.host.run_asyncio_coro(self.sidecar.restart(), timeout=2 * STOP_TIMEOUT_SECONDS + CALL_TIMEOUT_MARGIN)
 
     def _call(self, coro: Coroutine[Any, Any, Any], timeout: float = DEFAULT_COMMAND_TIMEOUT) -> Any:
         """Run a client coroutine from a non-asyncio thread (webif) and wait for its result."""
